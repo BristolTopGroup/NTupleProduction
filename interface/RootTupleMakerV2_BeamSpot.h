@@ -2,6 +2,8 @@
 #define RootTupleMakerV2beamSpot
 
 #include "FWCore/Framework/interface/EDProducer.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+
 
 class RootTupleMakerV2_BeamSpot : public edm::EDProducer {
  public:
