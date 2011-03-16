@@ -6,7 +6,7 @@ rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
     InputTag = cms.InputTag('cleanPatElectrons'),
     Prefix = cms.string('Electron.'),
     Suffix = cms.string(''),
-    MaxSize = cms.uint32(20),
+    MaxSize = cms.uint32(99),
     ElectronIso = cms.double(0.1),
     MuonPt = cms.double(10.),
     MuonIso = cms.double(0.05),
@@ -24,7 +24,7 @@ rootTupleElectronsExtra = cms.EDProducer("RootTupleMakerV2_Electrons_Extra",
     InputTagBS = cms.InputTag('cleanPatEle3'),
     Prefix = cms.string('Electron.'),
     Suffix = cms.string(''),
-    MaxSize = cms.uint32(20),
+    MaxSize = cms.uint32(99),
     storePFIsolation = cms.bool(False)
 )
 

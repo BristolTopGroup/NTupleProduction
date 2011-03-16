@@ -8,7 +8,7 @@ rootTupleVertex = cms.EDProducer("RootTupleMakerV2_Vertex",
 
 rootTupleVertexWithBS = cms.EDProducer("RootTupleMakerV2_Vertex",
     InputTag = cms.InputTag('offlinePrimaryVerticesWithBS'),
-    Prefix = cms.string('VertexWithBS.'),
+    Prefix = cms.string('VertexWRTBeamSpot.'),
     Suffix = cms.string('')
 )
 

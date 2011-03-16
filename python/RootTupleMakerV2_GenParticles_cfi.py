@@ -4,6 +4,6 @@ rootTupleGenParticles = cms.EDProducer("RootTupleMakerV2_GenParticles",
     InputTag = cms.InputTag('genParticles'),
     Prefix = cms.string('GenParticle.'),
     Suffix = cms.string(''),
-    MaxSize = cms.uint32(25)
+    MaxSize = cms.uint32(999)
 )
 
