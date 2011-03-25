@@ -39,7 +39,7 @@ from PhysicsTools.PatAlgos.tools.electronTools import *
 addElectronUserIsolation(process)
 
 
-process.GlobalTag.globaltag = cms.string( 'START38_V14::All' )
+process.GlobalTag.globaltag = cms.string( 'START311_V2::All' )
 
 from PhysicsTools.PatAlgos.tools.coreTools import *
 from PhysicsTools.PatAlgos.tools.tauTools import *
@@ -322,30 +322,30 @@ process.rootTupleTree = cms.EDAnalyzer( "RootTupleMakerV2_Tree",
         'drop *',
         'keep *_rootTupleBeamSpot_*_*',
         'keep *_rootTupleEvent_*_*',
-        'keep *_rootTupleEventExtra_*_*',
+#        'keep *_rootTupleEventExtra_*_*',
         'keep *_rootTupleEventSelection_*_*',
         'keep *_rootTupleCaloJets_*_*',
-        'keep *_rootTupleCaloJetsExtra_*_*',
+#        'keep *_rootTupleCaloJetsExtra_*_*',
         'keep *_rootTuplePFJets_*_*',
-        'keep *_rootTuplePFJetsExtra_*_*',
+#        'keep *_rootTuplePFJetsExtra_*_*',
         'keep *_rootTuplePF2PATJets_*_*',
-        'keep *_rootTuplePF2PATJetsExtra_*_*',
+#        'keep *_rootTuplePF2PATJetsExtra_*_*',
         'keep *_rootTupleElectrons_*_*',
-        'keep *_rootTupleElectronsExtra_*_*',
+#        'keep *_rootTupleElectronsExtra_*_*',
         'keep *_rootTuplePFElectrons_*_*',
-        'keep *_rootTuplePFElectronsExtra_*_*',
+#        'keep *_rootTuplePFElectronsExtra_*_*',
         'keep *_rootTupleElectronsExtra_*_*',
-        'keep *_rootTuplePFElectronsExtra_*_*',
+#        'keep *_rootTuplePFElectronsExtra_*_*',
         'keep *_rootTupleCaloMET_*_*',
         'keep *_rootTupleTCMET_*_*',
         'keep *_rootTuplePFMET_*_*',
-        'keep *_rootTupleCaloMETExtra_*_*',
-        'keep *_rootTupleTCMETExtra_*_*',
-        'keep *_rootTuplePFMETExtra_*_*',
-        'keep *_rootTupleMuons_*_*',
-        'keep *_rootTupleMuonsExtra_*_*',
-        'keep *_rootTuplePFMuons_*_*',
-        'keep *_rootTuplePFMuonsExtra_*_*',
+#        'keep *_rootTupleCaloMETExtra_*_*',
+#        'keep *_rootTupleTCMETExtra_*_*',
+#        'keep *_rootTuplePFMETExtra_*_*',
+        'keep *_nTupleMuons_*_*',
+#        'keep *_rootTupleMuonsExtra_*_*',
+        'keep *_nTuplePFMuons_*_*',
+#        'keep *_rootTuplePFMuonsExtra_*_*',
         'keep *_rootTupleSuperClusters_*_*',
         'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleVertex_*_*',
@@ -353,9 +353,9 @@ process.rootTupleTree = cms.EDAnalyzer( "RootTupleMakerV2_Tree",
         'keep *_rootTupleGenEventInfo_*_*',
         'keep *_rootTupleGenParticles_*_*',
         'keep *_rootTupleGenJets_*_*',
-        'keep *_rootTupleGenJetsExtra_*_*',
+#        'keep *_rootTupleGenJetsExtra_*_*',
         'keep *_rootTupleGenMETTrue_*_*',
-        'keep *_rootTupleGenMETTrueExtra_*_*',
+#        'keep *_rootTupleGenMETTrueExtra_*_*',
         'keep *_rootTupleTracks_*_*'
     )
  )
@@ -398,14 +398,14 @@ process.p = cms.Path(
 process.p *= ( 
     process.rootTupleBeamSpot +
     process.rootTupleEvent +
-    process.rootTupleEventExtra +
+#    process.rootTupleEventExtra +
     process.rootTupleEventSelection +
     process.rootTupleCaloJetSequence +
 #    process.rootTupleJPTJetSequence + 
     process.rootTuplePFJetSequence +
     process.rootTupleElectronSequence +
     process.rootTupleMETSequence +
-    process.rootTupleMuonSequence +
+    process.nTupleMuonSequence +
     process.rootTupleTrigger +
     process.rootTupleVertex +
     process.rootTupleVertexWithBS +
