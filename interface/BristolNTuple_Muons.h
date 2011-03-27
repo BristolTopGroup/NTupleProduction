@@ -15,6 +15,7 @@ class BristolNTuple_Muons : public edm::EDProducer {
   const std::string     prefix,suffix;
   const unsigned int    maxSize;
   const bool storePFIsolation;
+  const edm::InputTag   vtxInputTag;
 };
 
 #endif

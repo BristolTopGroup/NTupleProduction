@@ -1,9 +1,10 @@
 import FWCore.ParameterSet.Config as cms
 
-rootTupleTrigger = cms.EDProducer("RootTupleMakerV2_Trigger",
+rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     L1InputTag  = cms.InputTag('gtDigis'),
     HLTInputTag = cms.InputTag('TriggerResults','','HLT'),
-                                  
+    Prefix=cms.string('Trigger.'),
+    Suffix=cms.string(''),                              
     HLTPathsOfInterest = cms.vstring(
 #Double Electron
         'HLT_DoubleEle10_CaloIdL_TrkIdVL_Ele10_v1', #1
