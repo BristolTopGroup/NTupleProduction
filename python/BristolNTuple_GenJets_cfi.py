@@ -7,12 +7,5 @@ rootTupleGenJets = cms.EDProducer("BristolNTuple_GenJets",
     MaxSize = cms.uint32(99)
 )
 
-#rootTupleGenJetsExtra = cms.EDProducer("BristolNTuple_GenJets_Extra",
-#    InputTag = cms.InputTag('ak5GenJets'),
-#    Prefix = cms.string('GenJet.'),
-#    Suffix = cms.string(''),
-#    MaxSize = cms.uint32(99)
-#)
-
-rootTupleGenJetSequence = cms.Sequence(rootTupleGenJets)# + rootTupleGenJetsExtra)
+rootTupleGenJetSequence = cms.Sequence(rootTupleGenJets)
 

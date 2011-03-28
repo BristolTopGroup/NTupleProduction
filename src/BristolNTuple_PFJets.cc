@@ -2,16 +2,18 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
-#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+//#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+//#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+//#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 #include <iostream>
 
 BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
     inputTag(iConfig.getParameter<edm::InputTag> ("InputTag")),
     prefix(iConfig.getParameter<std::string> ("Prefix")),
     suffix(iConfig.getParameter<std::string> ("Suffix")),
-    maxSize(iConfig.getParameter<unsigned int> ("MaxSize")) {
+    maxSize(iConfig.getParameter<unsigned int> ("MaxSize"))
+//    jecUncPath(iConfig.getParameter<std::string>("JECUncertainty"))
+{
 
     produces<std::vector<double> > (prefix + "Eta" + suffix);
     produces<std::vector<double> > (prefix + "Phi" + suffix);
@@ -54,6 +56,8 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
     produces<std::vector<double> > (prefix + "SimpleSecondaryVertexHighPurBTag" + suffix);
     produces<std::vector<double> > (prefix + "JetProbabilityBTag" + suffix);
     produces<std::vector<double> > (prefix + "JetBProbabilityBTag" + suffix);
+
+//    produces <std::vector<double> > ( prefix + "JECUncertainty" + suffix );
 }
 
 void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -97,6 +101,12 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
     std::auto_ptr < std::vector<double> > simpleSecondaryVertexHighPurBTag(new std::vector<double>());
     std::auto_ptr < std::vector<double> > jetProbabilityBTag(new std::vector<double>());
     std::auto_ptr < std::vector<double> > jetBProbabilityBTag(new std::vector<double>());
+
+//    std::auto_ptr<std::vector<double> >  jecUnc_vec ( new std::vector<double>()  );
+
+
+//    edm::FileInPath fipUnc(jecUncPath);;
+//    JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(fipUnc.fullPath());
 
     edm::Handle < std::vector<pat::Jet> > jets;
     iEvent.getByLabel(inputTag, jets);
@@ -152,6 +162,10 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
             jetProbabilityBTag->push_back(it->bDiscriminator("jetProbabilityBJetTags"));
             jetBProbabilityBTag->push_back(it->bDiscriminator("jetBProbabilityBJetTags"));
 
+//            jecUnc->setJetEta( it->eta() );
+//            jecUnc->setJetPt( it->pt() ); // the uncertainty is a function of the corrected pt
+//            jecUnc_vec->push_back( jecUnc->getUncertainty(true) );
+
         }
     } else {
         edm::LogError("BristolNTuple_PFJetsError") << "Error! Can't get the product " << inputTag;
@@ -200,4 +214,5 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
     iEvent.put(jetProbabilityBTag, prefix + "JetProbabilityBTag" + suffix);
     iEvent.put(jetBProbabilityBTag, prefix + "JetBProbabilityBTag" + suffix);
 
+//    iEvent.put( jecUnc_vec, prefix + "JECUnc" + suffix );
 }

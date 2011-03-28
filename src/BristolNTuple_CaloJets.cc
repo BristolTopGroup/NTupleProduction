@@ -6,14 +6,16 @@
 #include "DataFormats/PatCandidates/interface/Muon.h"
 //#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 //#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
-//#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 
 
 BristolNTuple_CaloJets::BristolNTuple_CaloJets(const edm::ParameterSet& iConfig) :
     inputTag(iConfig.getParameter<edm::InputTag> ("InputTag")),
     prefix(iConfig.getParameter<std::string> ("Prefix")),
     suffix(iConfig.getParameter<std::string> ("Suffix")),
-    maxSize(iConfig.getParameter<unsigned int> ("MaxSize")) {
+    maxSize(iConfig.getParameter<unsigned int> ("MaxSize"))
+//    jecUncPath(iConfig.getParameter<std::string>("JECUncertainty"))
+{
 
     produces<std::vector<double> > (prefix + "Eta" + suffix);
     produces<std::vector<double> > (prefix + "Phi" + suffix);
@@ -50,6 +52,8 @@ BristolNTuple_CaloJets::BristolNTuple_CaloJets(const edm::ParameterSet& iConfig)
     produces<std::vector<double> > (prefix + "SoftMuonNoIPBJetTag" + suffix);
     produces<std::vector<double> > (prefix + "CombinedSVBJetTag" + suffix);
     produces<std::vector<double> > (prefix + "CombinedSVMVABJetTag" + suffix);
+
+//    produces <std::vector<double> > ( prefix + "JECUncertainty" + suffix );
 }
 
 void BristolNTuple_CaloJets::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -90,6 +94,12 @@ void BristolNTuple_CaloJets::produce(edm::Event& iEvent, const edm::EventSetup& 
 
     std::auto_ptr < std::vector<double> > combinedSVBJetTag(new std::vector<double>());
     std::auto_ptr < std::vector<double> > combinedSVMVABJetTag(new std::vector<double>());
+
+//    std::auto_ptr<std::vector<double> >  jecUnc_vec ( new std::vector<double>()  );
+
+
+//    edm::FileInPath fipUnc(jecUncPath);;
+//    JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(fipUnc.fullPath());
 
     edm::Handle < std::vector<pat::Jet> > jets;
     iEvent.getByLabel(inputTag, jets);
@@ -139,6 +149,10 @@ void BristolNTuple_CaloJets::produce(edm::Event& iEvent, const edm::EventSetup& 
             combinedSVBJetTag->push_back(it->bDiscriminator("combinedSVBJetTags"));
             combinedSVMVABJetTag->push_back(it->bDiscriminator("combinedSVMVABJetTag"));
 
+//            jecUnc->setJetEta( it->eta() );
+//            jecUnc->setJetPt( it->pt() ); // the uncertainty is a function of the corrected pt
+//            jecUnc_vec->push_back( jecUnc->getUncertainty(true) );
+
         }
     } else {
         edm::LogError("BristolNTuple_CaloJetsError") << "Error! Can't get the product " << inputTag;
@@ -181,4 +195,6 @@ void BristolNTuple_CaloJets::produce(edm::Event& iEvent, const edm::EventSetup& 
     iEvent.put(softMuonNoIPBJetTag, prefix + "SoftMuonNoIPBJetTag" + suffix);
     iEvent.put(combinedSVBJetTag, prefix + "CombinedSVBJetTag" + suffix);
     iEvent.put(combinedSVMVABJetTag, prefix + "CombinedSVMVABJetTag" + suffix);
+
+//    iEvent.put( jecUnc_vec, prefix + "JECUnc" + suffix );
 }

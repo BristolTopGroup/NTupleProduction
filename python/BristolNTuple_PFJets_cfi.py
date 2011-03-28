@@ -5,7 +5,7 @@ rootTuplePFJets = cms.EDProducer("BristolNTuple_PFJets",
     Prefix = cms.string('PFJet.'),
     Suffix = cms.string(''),
     MaxSize = cms.uint32(99),
-#    JECUncertainty = cms.string('CondFormats/JetMETObjects/data/Spring10DataV2_Uncertainty_AK5PF.txt'),
+    JECUncertainty = cms.string('CondFormats/JetMETObjects/data/Spring10DataV2_Uncertainty_AK5PF.txt'),
 #    ApplyResidualJEC = cms.bool(False),
 #    ResidualJEC = cms.string('CondFormats/JetMETObjects/data/Spring10DataV2_L2L3Residual_AK5PF.txt')
 )
@@ -14,15 +14,5 @@ rootTuplePFJets = cms.EDProducer("BristolNTuple_PFJets",
 rootTuplePF2PATJets = rootTuplePFJets.clone(InputTag = cms.InputTag('selectedPatJetsPF'),
     Prefix = cms.string('PF2PATJet.'))
 
-#rootTuplePFJetsExtra = cms.EDProducer("BristolNTuple_PFJets_Extra",
-#    InputTag = cms.InputTag('cleanPatJetsAK5PF'),
-#    Prefix = cms.string('PFJet.'),
-#    Suffix = cms.string(''),
-#    MaxSize = cms.uint32(99)
-#)
-#
-#rootTuplePF2PATJetsExtra = rootTuplePFJetsExtra.clone(InputTag = cms.InputTag('selectedPatJetsPF'),
-#    Prefix = cms.string('PF2PATJet.'))
 
-rootTuplePFJetSequence = cms.Sequence(rootTuplePFJets + rootTuplePF2PATJets)# + rootTuplePFJetsExtra + 
-                                      #rootTuplePF2PATJetsExtra)
+rootTuplePFJetSequence = cms.Sequence(rootTuplePFJets + rootTuplePF2PATJets)

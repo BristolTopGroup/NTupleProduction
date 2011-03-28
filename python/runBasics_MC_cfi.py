@@ -398,7 +398,6 @@ process.p = cms.Path(
 process.p *= ( 
     process.rootTupleBeamSpot +
     process.rootTupleEvent +
-#    process.rootTupleEventExtra +
     process.rootTupleEventSelection +
     process.rootTupleCaloJetSequence +
 #    process.rootTupleJPTJetSequence + 
