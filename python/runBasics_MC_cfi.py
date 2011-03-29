@@ -316,6 +316,8 @@ process.TFileService = cms.Service( "TFileService",
 
 process.load( 'BristolAnalysis.NTupleTools.Ntuple_cff' )
 process.load( "CommonTools.RecoAlgos.HBHENoiseFilter_cfi" )
+
+process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','','REDIGI311X')
 # RootTupleMakerV2 tree
 process.rootTupleTree = cms.EDAnalyzer( "RootTupleMakerV2_Tree",
     outputCommands = cms.untracked.vstring( 
