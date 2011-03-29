@@ -145,18 +145,18 @@ process.hltLevel1GTSeed.L1TechTriggerSeeding = cms.bool( True )
 process.hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string( '(40 OR 41) AND NOT (36 OR 37 OR 38 OR 39)' )
 
 
-#process.hlTrigReport = cms.EDAnalyzer("HLTrigReport",
-#    HLTriggerResults = cms.InputTag("TriggerResults","","REDIGI")
-#)
+process.hlTrigReport = cms.EDAnalyzer("HLTrigReport",
+    HLTriggerResults = cms.InputTag("TriggerResults","","REDIGI311X")
+)
 
 
 
 
 # reduce verbosity
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
-#process.MessageLogger.cerr.INFO.limit = 10
-#process.MessageLogger.cerr.threshold = "DEBUG"
-#process.MessageLogger.categories.append("HLTrigReport")
+process.MessageLogger.cerr.INFO.limit = 10
+process.MessageLogger.cerr.threshold = "DEBUG"
+process.MessageLogger.categories.append("HLTrigReport")
 #process.MessageLogger.hlTrigReport.limit = 1000
 
 
@@ -165,9 +165,6 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 # process all the events
 process.maxEvents.input = -1 #20000
 process.options.wantSummary = False
-
-#process.out.outputCommands += (['keep *_*_*_*'
-#                               ])
 
 
 #from PhysicsTools.PatAlgos.patEventContent_cff import patEventContent
@@ -324,30 +321,18 @@ process.rootTupleTree = cms.EDAnalyzer( "RootTupleMakerV2_Tree",
         'drop *',
         'keep *_rootTupleBeamSpot_*_*',
         'keep *_rootTupleEvent_*_*',
-#        'keep *_rootTupleEventExtra_*_*',
         'keep *_rootTupleEventSelection_*_*',
         'keep *_rootTupleCaloJets_*_*',
-#        'keep *_rootTupleCaloJetsExtra_*_*',
         'keep *_rootTuplePFJets_*_*',
-#        'keep *_rootTuplePFJetsExtra_*_*',
         'keep *_rootTuplePF2PATJets_*_*',
-#        'keep *_rootTuplePF2PATJetsExtra_*_*',
         'keep *_rootTupleElectrons_*_*',
-#        'keep *_rootTupleElectronsExtra_*_*',
         'keep *_rootTuplePFElectrons_*_*',
-#        'keep *_rootTuplePFElectronsExtra_*_*',
         'keep *_rootTupleElectronsExtra_*_*',
-#        'keep *_rootTuplePFElectronsExtra_*_*',
         'keep *_rootTupleCaloMET_*_*',
         'keep *_rootTupleTCMET_*_*',
         'keep *_rootTuplePFMET_*_*',
-#        'keep *_rootTupleCaloMETExtra_*_*',
-#        'keep *_rootTupleTCMETExtra_*_*',
-#        'keep *_rootTuplePFMETExtra_*_*',
         'keep *_nTupleMuons_*_*',
-#        'keep *_rootTupleMuonsExtra_*_*',
         'keep *_nTuplePFMuons_*_*',
-#        'keep *_rootTuplePFMuonsExtra_*_*',
         'keep *_rootTupleSuperClusters_*_*',
         'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleVertex_*_*',
@@ -355,9 +340,7 @@ process.rootTupleTree = cms.EDAnalyzer( "RootTupleMakerV2_Tree",
         'keep *_rootTupleGenEventInfo_*_*',
         'keep *_rootTupleGenParticles_*_*',
         'keep *_rootTupleGenJets_*_*',
-#        'keep *_rootTupleGenJetsExtra_*_*',
         'keep *_rootTupleGenMETTrue_*_*',
-#        'keep *_rootTupleGenMETTrueExtra_*_*',
         'keep *_rootTupleTracks_*_*'
     )
  )
@@ -381,7 +364,7 @@ process.LJFilter.counteitherleptontype = False
 
 
 process.p = cms.Path( 
-#        process.hlTrigReport *
+        process.hlTrigReport *
         process.LJFilter*
         process.HBHENoiseFilter*
         process.HBHENoiseFilterResultProducer*
