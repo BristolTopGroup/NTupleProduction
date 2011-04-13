@@ -10,7 +10,8 @@ unsigned int NmaxL1TechBit = 64;
 BristolNTuple_Trigger::BristolNTuple_Trigger(const edm::ParameterSet& iConfig) :
     l1InputTag(iConfig.getParameter<edm::InputTag> ("L1InputTag")),
     hltInputTag(iConfig.getParameter<edm::InputTag> ("HLTInputTag")),
-    hltPathsOfInterest(iConfig.getParameter<std::vector<std::string> > ("HLTPathsOfInterest")),
+    hltPathsOfInterest(iConfig.getParameter<std::vector<std::string> > ("HLTPathsOfInterest_Signal")),
+    hltPathsOfInterest_other(iConfig.getParameter<std::vector<std::string> > ("HLTPathsOfInterest_Other")),
     prefix(iConfig.getParameter<std::string> ("Prefix")),
     suffix(iConfig.getParameter<std::string> ("Suffix")) {
 
@@ -19,6 +20,8 @@ BristolNTuple_Trigger::BristolNTuple_Trigger(const edm::ParameterSet& iConfig) :
     produces<std::vector<int> > (prefix + "HLTBits" + suffix);
     produces<std::vector<int> > (prefix + "HLTResults" + suffix);
     produces<std::vector<int> > (prefix + "HLTPrescales" + suffix);
+    produces<std::vector<int> > (prefix + "HLTResultsOther" + suffix);
+    produces<std::vector<int> > (prefix + "HLTPrescalesOther" + suffix);
 }
 
 void BristolNTuple_Trigger::beginRun(edm::Run& iRun, const edm::EventSetup& iSetup) {
@@ -44,6 +47,8 @@ void BristolNTuple_Trigger::produce(edm::Event& iEvent, const edm::EventSetup& i
     std::auto_ptr < std::vector<int> > hltbits(new std::vector<int>());
     std::auto_ptr < std::vector<int> > hltresults(new std::vector<int>());
     std::auto_ptr < std::vector<int> > hltprescales(new std::vector<int>());
+    std::auto_ptr < std::vector<int> > hltresults_other(new std::vector<int>());
+    std::auto_ptr < std::vector<int> > hltprescales_other(new std::vector<int>());
 
     //-----------------------------------------------------------------
     edm::Handle < L1GlobalTriggerReadoutRecord > l1GtReadoutRecord;
@@ -92,6 +97,27 @@ void BristolNTuple_Trigger::produce(edm::Event& iEvent, const edm::EventSetup& i
             }
             hltprescales->push_back(prescale);
         }
+
+        for (std::vector<std::string>::const_iterator it = hltPathsOfInterest_other.begin(); it != hltPathsOfInterest_other.end(); ++it) {
+            int fired = 0;
+            unsigned int index = hltConfig.triggerIndex(*it);
+            if (index < triggerResults->size()) {
+                if (triggerResults->accept(index))
+                    fired = 1;
+            } else {
+                edm::LogInfo("BristolNTuple_TriggerInfo") << "Requested HLT path \"" << (*it) << "\" does not exist";
+            }
+            hltresults_other->push_back(fired);
+
+            int prescale = -1;
+            if (hltConfig.prescaleSet(iEvent, iSetup) < 0) {
+                edm::LogError("BristolNTuple_TriggerError")
+                        << "Error! The prescale set index number could not be obtained";
+            } else {
+                prescale = hltConfig.prescaleValue(iEvent, iSetup, *it);
+            }
+            hltprescales_other->push_back(prescale);
+        }
     } else {
         edm::LogError("BristolNTuple_TriggerError") << "Error! Can't get the product " << hltInputTag;
     }
@@ -103,4 +129,6 @@ void BristolNTuple_Trigger::produce(edm::Event& iEvent, const edm::EventSetup& i
     iEvent.put(hltbits, prefix + "HLTBits" + suffix);
     iEvent.put(hltresults, prefix + "HLTResults" + suffix);
     iEvent.put(hltprescales, prefix + "HLTPrescales" + suffix);
+    iEvent.put(hltresults_other, prefix + "HLTResultsOther" + suffix);
+    iEvent.put(hltprescales_other, prefix + "HLTPrescalesOther" + suffix);
 }

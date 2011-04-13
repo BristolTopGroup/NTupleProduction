@@ -14,7 +14,7 @@ class BristolNTuple_Trigger : public edm::EDProducer {
   void produce( edm::Event &, const edm::EventSetup & );
   void beginRun( edm::Run &, const edm::EventSetup & );
   const edm::InputTag   l1InputTag, hltInputTag;
-  const std::vector<std::string> hltPathsOfInterest;
+  const std::vector<std::string> hltPathsOfInterest, hltPathsOfInterest_other;
   HLTConfigProvider hltConfig;
   const std::string     prefix,suffix;
 };
