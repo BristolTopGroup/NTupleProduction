@@ -12,14 +12,9 @@ patname          = "pat_data.root"
     
 from BristolAnalysis.NTupleTools.PF2PAT_DATA_cfi import * 
 process = PF2PAtProcess()
-###################
-#  Add JPT jets
-###################
-# Ref: https://twiki.cern.ch/twiki/bin/view/CMS/JetPlusTracksCorrections
-process.load("RecoJets.Configuration.RecoJPTJets_cff")
 
 # Jet Correction (in 3_6_0)
-process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
+#process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 # load the PAT config
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
 # to run on 35X input sample
@@ -28,6 +23,7 @@ from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
 
 from PhysicsTools.PatAlgos.tools.muonTools import *
 addMuonUserIsolation(process)
+
 from PhysicsTools.PatAlgos.tools.electronTools import *
 addElectronUserIsolation(process)
 
@@ -45,16 +41,6 @@ from PhysicsTools.PatAlgos.tools.tauTools import *
 #print "*********************"
 removeMCMatching(process, ["All"])
 
-
-
-
-# set jet corrections
-#print "*******************************************************"
-#print "Calling switchJECSet() to set jet energy corrections: ", JECSetName
-#print "*******************************************************"
-#from PhysicsTools.PatAlgos.tools.jetTools import switchJECSet
-#switchJECSet( process, JECSetName )
-
 from PhysicsTools.PatAlgos.tools.jetTools import *
 
 # remove the tag infos
@@ -66,7 +52,7 @@ process.selectedPatJets.cut = cms.string('pt > 10')
 process.countPatJets.minNumber = 0
 
 from PhysicsTools.PatAlgos.tools.metTools import *
-addTcMET(process, 'TC')
+#addTcMET(process, 'TC')
 
 switchJetCollection( process,
                      jetCollection = cms.InputTag( 'ak5CaloJets' ),
@@ -78,19 +64,6 @@ switchJetCollection( process,
 ##    Add extra jet collections
 ##
 ####################################
-# JPT jets
-#addJetCollection(process,cms.InputTag('JetPlusTrackZSPCorJetAntiKt5'),
-#                 'AK5', 'JPT',
-#                 doJTA        = True,
-#                 doBTagging   = True, #off
-#                 jetCorrLabel = ( 'AK5JPT', ['L2Relative', 'L3Absolute', 'L2L3Residual']), #None,
-#                 doType1MET   = False,
-#                 doL1Cleaning = False,
-#                 doL1Counters = False,
-#                 genJetCollection = cms.InputTag("ak5GenJets"),
-#                 doJetID      = True,
-#                 jetIdLabel   = "ak5"
-#                 )
 process.load("RecoJets.JetProducers.ak5PFJets_cfi")
 addJetCollection( process, 
                   cms.InputTag( 'ak5PFJets::PAT' ), 
@@ -134,24 +107,14 @@ process.hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string('0')
 
 
 
-## TL 16 Apr
-## - Added physics declared, scraping filter, pv filter
-## - following the example in PhysicsTools/PatExamples/test/patLayer1_fromRECO_7TeV_firstdata_cfg.py
-# require physics declared
-#process.hltPhysicsDeclared = cms.EDFilter("PhysDecl",
-#   applyfilter = cms.untracked.bool(True),
-#   HLTriggerResults = cms.InputTag("TriggerResults","","HLT")
-#)
-# Update for 357
-#if runOn_Data and not runOn_Data_EG:
 process.load('HLTrigger.special.hltPhysicsDeclared_cfi')
 process.hltPhysicsDeclared.L1GtReadoutRecordTag = 'gtDigis'
 
     
 # HLT Trigger Report
-#process.hlTrigReport = cms.EDAnalyzer("HLTrigReport",
-#    HLTriggerResults = cms.InputTag("TriggerResults","","HLT")
-#)
+process.hlTrigReport = cms.EDAnalyzer("HLTrigReport",
+    HLTriggerResults = cms.InputTag("TriggerResults","","HLT")
+)
 
 # reduce verbosity
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
@@ -303,47 +266,27 @@ process.TFileService = cms.Service( "TFileService",
 
     
 process.load('BristolAnalysis.NTupleTools.Ntuple_cff')
-process.load("CommonTools.RecoAlgos.HBHENoiseFilter_cfi")
+
 # RootTupleMakerV2 tree
 process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
     outputCommands = cms.untracked.vstring(
        'drop *',
         'keep *_rootTupleBeamSpot_*_*',
         'keep *_rootTupleEvent_*_*',
-#        'keep *_rootTupleEventExtra_*_*',
-        'keep *_rootTupleEventSelection_*_*',
         'keep *_rootTupleCaloJets_*_*',
-#        'keep *_rootTupleCaloJetsExtra_*_*',
         'keep *_rootTuplePFJets_*_*',
-#        'keep *_rootTuplePFJetsExtra_*_*',
         'keep *_rootTuplePF2PATJets_*_*',
-#        'keep *_rootTuplePF2PATJetsExtra_*_*',
         'keep *_rootTupleElectrons_*_*',
-#        'keep *_rootTupleElectronsExtra_*_*',
         'keep *_rootTuplePFElectrons_*_*',
-#        'keep *_rootTuplePFElectronsExtra_*_*',
         'keep *_rootTupleElectronsExtra_*_*',
-#        'keep *_rootTuplePFElectronsExtra_*_*',
         'keep *_rootTupleCaloMET_*_*',
-        'keep *_rootTupleTCMET_*_*',
         'keep *_rootTuplePFMET_*_*',
-#        'keep *_rootTupleCaloMETExtra_*_*',
-#        'keep *_rootTupleTCMETExtra_*_*',
-#        'keep *_rootTuplePFMETExtra_*_*',
         'keep *_nTupleMuons_*_*',
-#        'keep *_rootTupleMuonsExtra_*_*',
         'keep *_nTuplePFMuons_*_*',
-#        'keep *_rootTuplePFMuonsExtra_*_*',
         'keep *_rootTupleSuperClusters_*_*',
         'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleVertex_*_*',
         'keep *_rootTupleVertexWithBS_*_*',
-        'keep *_rootTupleGenEventInfo_*_*',
-        'keep *_rootTupleGenParticles_*_*',
-        'keep *_rootTupleGenJets_*_*',
-#        'keep *_rootTupleGenJetsExtra_*_*',
-        'keep *_rootTupleGenMETTrue_*_*',
-#        'keep *_rootTupleGenMETTrueExtra_*_*',
         'keep *_rootTupleTracks_*_*'
     )
 )
@@ -354,25 +297,15 @@ if not wantPatTuple:
     del process.outpath
 
 process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
-process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")    
-##################################################################
-#### Electron based skim
-process.LJFilter.muLabel = 'muons'
-process.LJFilter.elecLabel = 'gsfElectrons'
-process.LJFilter.jetLabel = 'ak5CaloJets'
-process.LJFilter.muonsMin = -1
-process.LJFilter.electronsMin = -1
-process.LJFilter.elecPT = 25.
-process.LJFilter.counteitherleptontype = False
+process.load("BristolAnalysis.NTupleTools.EventFilter_cfi")    
 
 # let it run
 process.p = cms.Path(
-        process.LJFilter*
-        process.HBHENoiseFilter*
+        process.hlTrigReport *
         process.HBHENoiseFilterResultProducer*
+        process.EventFilter*
         process.hltLevel1GTSeed*
         process.hltPhysicsDeclared*
-#        process.hlTrigReport *
         process.patDefaultSequence *
         process.myExtraLepton *
         getattr(process,"patPF2PATSequence"+postfix)
@@ -382,22 +315,15 @@ process.p = cms.Path(
 process.p *= (
     process.rootTupleBeamSpot +
     process.rootTupleEvent +
-#    process.rootTupleEventExtra +
-    process.rootTupleEventSelection +
     process.rootTupleCaloJetSequence +
-#    process.rootTupleJPTJetSequence + 
     process.rootTuplePFJetSequence +
     process.rootTupleElectronSequence +
     process.rootTupleMETSequence +
     process.nTupleMuonSequence +
     process.rootTupleTrigger +
     process.rootTupleVertex +
-    process.rootTupleVertexWithBS +
-#    process.rootTupleGenEventInfo +
-#    process.rootTupleGenParticles +
-#    process.rootTupleGenJetSequence +
-#    process.rootTupleGenMETSequence +
-    process.rootTupleTracks
+    process.rootTupleVertexWithBS# +
+#    process.rootTupleTracks
     ) * process.rootTupleTree
     
 process.schedule = cms.Schedule( process.p )

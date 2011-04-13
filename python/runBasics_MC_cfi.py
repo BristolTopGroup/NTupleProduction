@@ -307,12 +307,12 @@ process.VariableHelperService = cms.Service( "VariableHelperService" )
 process.UpdaterService = cms.Service( "UpdaterService" )
 
 process.TFileService = cms.Service( "TFileService",
-                           fileName = cms.string( 'ntuple.root' )
+                           fileName = cms.string( 'ntupleMC.root' )
                            )
 
 
 process.load( 'BristolAnalysis.NTupleTools.Ntuple_cff' )
-process.load( "CommonTools.RecoAlgos.HBHENoiseFilter_cfi" )
+#process.load( "CommonTools.RecoAlgos.HBHENoiseFilter_cfi" )
 
 process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','','REDIGI311X')
 # RootTupleMakerV2 tree
@@ -321,7 +321,6 @@ process.rootTupleTree = cms.EDAnalyzer( "RootTupleMakerV2_Tree",
         'drop *',
         'keep *_rootTupleBeamSpot_*_*',
         'keep *_rootTupleEvent_*_*',
-        'keep *_rootTupleEventSelection_*_*',
         'keep *_rootTupleCaloJets_*_*',
         'keep *_rootTuplePFJets_*_*',
         'keep *_rootTuplePF2PATJets_*_*',
@@ -329,7 +328,7 @@ process.rootTupleTree = cms.EDAnalyzer( "RootTupleMakerV2_Tree",
         'keep *_rootTuplePFElectrons_*_*',
         'keep *_rootTupleElectronsExtra_*_*',
         'keep *_rootTupleCaloMET_*_*',
-        'keep *_rootTupleTCMET_*_*',
+#        'keep *_rootTupleTCMET_*_*',
         'keep *_rootTuplePFMET_*_*',
         'keep *_nTupleMuons_*_*',
         'keep *_nTuplePFMuons_*_*',
@@ -341,7 +340,7 @@ process.rootTupleTree = cms.EDAnalyzer( "RootTupleMakerV2_Tree",
         'keep *_rootTupleGenParticles_*_*',
         'keep *_rootTupleGenJets_*_*',
         'keep *_rootTupleGenMETTrue_*_*',
-        'keep *_rootTupleTracks_*_*'
+#        'keep *_rootTupleTracks_*_*'
     )
  )
 process.TFileService.fileName = outname
@@ -351,26 +350,14 @@ if not wantPatTuple:
     del process.outpath
 
 process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
-process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
-##################################################################
-#### Electron based skim
-process.LJFilter.muLabel = 'muons'
-process.LJFilter.elecLabel = 'gsfElectrons'
-process.LJFilter.jetLabel = 'ak5CaloJets'
-process.LJFilter.muonsMin = -1
-process.LJFilter.electronsMin = -1
-process.LJFilter.elecPT = 25.
-process.LJFilter.counteitherleptontype = False
-
+process.load("BristolAnalysis.NTupleTools.EventFilter_cfi")
 
 process.p = cms.Path( 
         process.hlTrigReport *
-        process.LJFilter*
-        process.HBHENoiseFilter*
         process.HBHENoiseFilterResultProducer*
+        process.EventFilter*
         process.genParticlesForJets *
         process.ak5GenJets *
-        #process.myJPT *
         process.patDefaultSequence *
         process.myExtraLepton *
         getattr( process, "patPF2PATSequence" + postfix )
@@ -383,9 +370,7 @@ process.p = cms.Path(
 process.p *= ( 
     process.rootTupleBeamSpot +
     process.rootTupleEvent +
-    process.rootTupleEventSelection +
     process.rootTupleCaloJetSequence +
-#    process.rootTupleJPTJetSequence + 
     process.rootTuplePFJetSequence +
     process.rootTupleElectronSequence +
     process.rootTupleMETSequence +
@@ -396,8 +381,8 @@ process.p *= (
     process.rootTupleGenEventInfo +
     process.rootTupleGenParticles +
     process.rootTupleGenJetSequence +
-    process.rootTupleGenMETSequence +
-    process.rootTupleTracks
+    process.rootTupleGenMETSequence# +
+#    process.rootTupleTracks
     ) * process.rootTupleTree
 
 process.schedule = cms.Schedule( process.p )
