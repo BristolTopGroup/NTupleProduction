@@ -22,10 +22,10 @@ BristolNTuple_BeamSpot::BristolNTuple_BeamSpot(const edm::ParameterSet& iConfig)
     produces<std::vector<double> > (prefix + "dydz" + suffix);
     produces<std::vector<double> > (prefix + "dydzError" + suffix);
 
-    produces<std::vector<double> > (prefix + "BeamWidthX" + suffix);
-    produces<std::vector<double> > (prefix + "BeamWidthY" + suffix);
-    produces<std::vector<double> > (prefix + "BeamWidthXError" + suffix);
-    produces<std::vector<double> > (prefix + "BeamWidthYError" + suffix);
+    produces<std::vector<double> > (prefix + "WidthX" + suffix);
+    produces<std::vector<double> > (prefix + "WidthY" + suffix);
+    produces<std::vector<double> > (prefix + "WidthXError" + suffix);
+    produces<std::vector<double> > (prefix + "WidthYError" + suffix);
 }
 
 void BristolNTuple_BeamSpot::
@@ -93,8 +93,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put(dydz, prefix + "dydz" + suffix);
   iEvent.put(dydzError, prefix + "dydzError" + suffix);
 
-  iEvent.put(beamWidthX, prefix + "BeamWidthX" + suffix);
-  iEvent.put(beamWidthY, prefix + "BeamWidthY" + suffix);
-  iEvent.put(beamWidthXError, prefix + "BeamWidthXError" + suffix);
-  iEvent.put(beamWidthYError, prefix + "BeamWidthYError" + suffix);
+  iEvent.put(beamWidthX, prefix + "WidthX" + suffix);
+  iEvent.put(beamWidthY, prefix + "WidthY" + suffix);
+  iEvent.put(beamWidthXError, prefix + "WidthXError" + suffix);
+  iEvent.put(beamWidthYError, prefix + "WidthYError" + suffix);
 }
