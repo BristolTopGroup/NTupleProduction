@@ -16,5 +16,5 @@ process.options.SkipEvent = cms.untracked.vstring('ProductNotFound')
 process.TFileService.fileName = 'nTuple_data.root'
 process.out.fileName          = 'pat_data.root'
 #use online skimming
-process.LJFilter.electronsMin = 1
-process.LJFilter.elecPT = 25.
+process.EventFilter.minNElectrons = 1
+process.EventFilter.minElectronPt = 25.

@@ -12,5 +12,5 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(10000)
 process.options.SkipEvent = cms.untracked.vstring('ProductNotFound')
 
 #use online skimming
-process.LJFilter.electronsMin = 1
-process.LJFilter.elecPT = 25.
+process.EventFilter.minNElectrons = 1
+process.EventFilter.minElectronPt = 25.
