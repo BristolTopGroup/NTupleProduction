@@ -21,7 +21,7 @@ BristolNTuple_Vertex::BristolNTuple_Vertex(const edm::ParameterSet& iConfig) :
   produces <std::vector<double> > ( prefix + "NDF" + suffix );
   produces <std::vector<int> >    ( prefix + "NTracks" + suffix );
   produces <std::vector<int> >    ( prefix + "NTracksW05" + suffix );
-  produces <std::vector<bool> >   ( prefix + "IsFake" + suffix );
+  produces <std::vector<int> >   ( prefix + "IsFake" + suffix );
 }
 
 void BristolNTuple_Vertex::
@@ -38,7 +38,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  ndf  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     ntracks  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >     ntracksw05  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<bool> >    isfake  ( new std::vector<bool>()  );
+  std::auto_ptr<std::vector<int> >    isfake  ( new std::vector<int>()  );
 
   //-----------------------------------------------------------------
   edm::Handle<reco::VertexCollection> primaryVertices;
@@ -59,7 +59,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       ndf->push_back( it->ndof() );
       ntracks->push_back( int(it->tracksSize()) );
       ntracksw05->push_back( it->nTracks(0.5) ); // number of tracks in the vertex with weight above 0.5
-      isfake->push_back( it->isFake() );
+      isfake->push_back( it->isFake() ? 1 : 0);
     }
   } else {
     edm::LogError("BristolNTuple_VertexError") << "Error! Can't get the product " << inputTag;

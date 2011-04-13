@@ -36,14 +36,14 @@ BristolNTuple_Tracks::BristolNTuple_Tracks(const edm::ParameterSet& iConfig) :
 //    produces<std::vector<double> > (prefix + "OuterPosition.z" + suffix);
 //
 //    produces<std::vector<int> > (prefix + "recHitsSize" + suffix);
-//    produces<std::vector<int> > (prefix + "numberOfValidHits" + suffix);
-//    produces<std::vector<int> > (prefix + "numberOfLostHits" + suffix);
+    produces<std::vector<int> > (prefix + "numberOfValidHits" + suffix);
+    produces<std::vector<int> > (prefix + "numberOfLostHits" + suffix);
     produces<std::vector<int> > (prefix + "innerLayerMissingHits" + suffix);
-//    produces<std::vector<int> > (prefix + "innerLayerMissingHitsPixels" + suffix);
+    produces<std::vector<int> > (prefix + "innerLayerMissingHitsPixels" + suffix);
 //    produces<std::vector<int> > (prefix + "numPixelHits" + suffix);
 //    produces<std::vector<int> > (prefix + "numStripHits" + suffix);
 
-    produces<std::vector<bool> > (prefix + "isHighPurity" + suffix);
+    produces<std::vector<int> > (prefix + "isHighPurity" + suffix);
 //    produces<std::vector<bool> > (prefix + "hasValidHitInFirstPixelBarrel" + suffix);
 }
 
@@ -78,14 +78,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     std::auto_ptr < std::vector<int> > Charge(new std::vector<int>());
 //    std::auto_ptr<std::vector<int> > recHitsSize(new std::vector<int>());
-//    std::auto_ptr<std::vector<int> > numberOfValidHits(new std::vector<int>());
-//    std::auto_ptr<std::vector<int> > numberOfLostHits(new std::vector<int>());
+    std::auto_ptr<std::vector<int> > numberOfValidHits(new std::vector<int>());
+    std::auto_ptr<std::vector<int> > numberOfLostHits(new std::vector<int>());
     std::auto_ptr<std::vector<int> > innerLayerMissingHits(new std::vector<int>());
-//    std::auto_ptr<std::vector<int> > innerLayerMissingHitsPixels(new std::vector<int>());
+    std::auto_ptr<std::vector<int> > innerLayerMissingHitsPixels(new std::vector<int>());
 //    std::auto_ptr<std::vector<int> > numPixelHits(new std::vector<int>());
 //    std::auto_ptr<std::vector<int> > numStripHits(new std::vector<int>());
 
-    std::auto_ptr<std::vector<bool> > isHighPurity(new std::vector<bool>());
+    std::auto_ptr<std::vector<int> > isHighPurity(new std::vector<int>());
 //    std::auto_ptr<std::vector<bool> > hasValidHitInFirstPixelBarrel(new std::vector<bool>());
 
   //-----------------------------------------------------------------
@@ -123,14 +123,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
           Charge->push_back(it->charge());
 //          recHitsSize->push_back(it->recHitsSize());
-//          numberOfValidHits->push_back(it->numberOfValidHits());
-//          numberOfLostHits->push_back(it->numberOfLostHits());
+          numberOfValidHits->push_back(it->numberOfValidHits());
+          numberOfLostHits->push_back(it->numberOfLostHits());
           innerLayerMissingHits->push_back(it->trackerExpectedHitsInner().numberOfHits());
-//          innerLayerMissingHitsPixels->push_back(it->trackerExpectedHitsInner().numberOfValidPixelHits());
+          innerLayerMissingHitsPixels->push_back(it->trackerExpectedHitsInner().numberOfValidPixelHits());
 //          numPixelHits->push_back(it->hitPattern().numberOfValidPixelHits());
 //          numStripHits->push_back(it->hitPattern().numberOfValidStripHits());
 
-          isHighPurity->push_back(it->quality(reco::Track::highPurity));
+          isHighPurity->push_back(it->quality(reco::Track::highPurity) ? 1 : 0);
 //          hasValidHitInFirstPixelBarrel->push_back(it->hitPattern().hasValidHitInFirstPixelBarrel());
       }
   } else {
@@ -169,10 +169,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 //  iEvent.put(OuterPositionZ , (prefix + "OuterPosition.z" + suffix));
 //
 //  iEvent.put(recHitsSize , (prefix + "recHitsSize" + suffix));
-//  iEvent.put(numberOfValidHits , (prefix + "numberOfValidHits" + suffix));
-//  iEvent.put(numberOfLostHits , (prefix + "numberOfLostHits" + suffix));
+  iEvent.put(numberOfValidHits , (prefix + "numberOfValidHits" + suffix));
+  iEvent.put(numberOfLostHits , (prefix + "numberOfLostHits" + suffix));
   iEvent.put(innerLayerMissingHits , (prefix + "innerLayerMissingHits" + suffix));
-//  iEvent.put(innerLayerMissingHitsPixels , (prefix + "innerLayerMissingHitsPixels" + suffix));
+  iEvent.put(innerLayerMissingHitsPixels , (prefix + "innerLayerMissingHitsPixels" + suffix));
 //  iEvent.put(numPixelHits , (prefix + "numPixelHits" + suffix));
 //  iEvent.put(numStripHits , (prefix + "numStripHits" + suffix));
 
