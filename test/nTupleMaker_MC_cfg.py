@@ -6,3 +6,6 @@ process.source.fileNames = cms.untracked.vstring(
 process.TFileService.fileName = 'testNtupler_MC.root'
 
 process.maxEvents.input = 100
+
+process.EventFilter.minNElectrons = 1
+process.EventFilter.minElectronPt = 25.
