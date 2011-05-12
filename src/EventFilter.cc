@@ -171,7 +171,7 @@ bool EventFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     // If not enough jets found (or too many found), return false
     if (minNJets_ > -1 && njets < minNJets_)
         return false;
-    if (maxNElectrons_ > -1 && njets > maxNElectrons_)
+    if (maxNJets_ > -1 && njets > maxNJets_)
         return false;
 
     ++passJetCuts;
