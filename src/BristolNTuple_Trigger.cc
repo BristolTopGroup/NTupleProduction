@@ -3,9 +3,12 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
+#include <boost/regex.hpp>
 
 unsigned int NmaxL1AlgoBit = 128;
 unsigned int NmaxL1TechBit = 64;
+
+using namespace std;
 
 BristolNTuple_Trigger::BristolNTuple_Trigger(const edm::ParameterSet& iConfig) :
     l1InputTag(iConfig.getParameter<edm::InputTag> ("L1InputTag")),
@@ -19,6 +22,7 @@ BristolNTuple_Trigger::BristolNTuple_Trigger(const edm::ParameterSet& iConfig) :
     produces<std::vector<int> > (prefix + "L1TechBits" + suffix);
     produces<std::vector<int> > (prefix + "HLTBits" + suffix);
     produces<std::vector<int> > (prefix + "HLTResults" + suffix);
+    produces<std::vector <std::string > > (prefix + "HLTNames" + suffix);
     produces<std::vector<int> > (prefix + "HLTPrescales" + suffix);
     produces<std::vector<int> > (prefix + "HLTResultsOther" + suffix);
     produces<std::vector<int> > (prefix + "HLTPrescalesOther" + suffix);
@@ -46,6 +50,7 @@ void BristolNTuple_Trigger::produce(edm::Event& iEvent, const edm::EventSetup& i
     std::auto_ptr < std::vector<int> > l1techbits(new std::vector<int>());
     std::auto_ptr < std::vector<int> > hltbits(new std::vector<int>());
     std::auto_ptr < std::vector<int> > hltresults(new std::vector<int>());
+    std::auto_ptr < std::vector <std::string > > hltnames(new std::vector <std::string >());
     std::auto_ptr < std::vector<int> > hltprescales(new std::vector<int>());
     std::auto_ptr < std::vector<int> > hltresults_other(new std::vector<int>());
     std::auto_ptr < std::vector<int> > hltprescales_other(new std::vector<int>());
@@ -79,14 +84,17 @@ void BristolNTuple_Trigger::produce(edm::Event& iEvent, const edm::EventSetup& i
 
         for (std::vector<std::string>::const_iterator it = hltPathsOfInterest.begin(); it != hltPathsOfInterest.end(); ++it) {
             int fired = 0;
-            unsigned int index = hltConfig.triggerIndex(*it);
+            unsigned int index = findTrigger(*it);
+            string triggerName = *it + " not found";
             if (index < triggerResults->size()) {
                 if (triggerResults->accept(index))
                     fired = 1;
+                triggerName = hltConfig.triggerName(index);
             } else {
                 edm::LogInfo("BristolNTuple_TriggerInfo") << "Requested HLT path \"" << (*it) << "\" does not exist";
             }
             hltresults->push_back(fired);
+            hltnames->push_back(triggerName);
 
             int prescale = -1;
             if (hltConfig.prescaleSet(iEvent, iSetup) < 0) {
@@ -128,7 +136,22 @@ void BristolNTuple_Trigger::produce(edm::Event& iEvent, const edm::EventSetup& i
     iEvent.put(l1techbits, prefix + "L1TechBits" + suffix);
     iEvent.put(hltbits, prefix + "HLTBits" + suffix);
     iEvent.put(hltresults, prefix + "HLTResults" + suffix);
+    iEvent.put(hltnames, prefix + "HLTNames" + suffix);
     iEvent.put(hltprescales, prefix + "HLTPrescales" + suffix);
     iEvent.put(hltresults_other, prefix + "HLTResultsOther" + suffix);
     iEvent.put(hltprescales_other, prefix + "HLTPrescalesOther" + suffix);
+}
+
+unsigned int BristolNTuple_Trigger::findTrigger(const std::string& triggerWildCard) {
+    const std::vector<std::string>& triggers = hltConfig.triggerNames();
+    unsigned int found = 9999;
+    static const boost::regex e(triggerWildCard);
+
+    for (unsigned int index = 0; index < triggers.size(); ++index) {
+        if (boost::regex_search(hltConfig.triggerName(index), e)) {
+            found = index;
+            break;
+        }
+    }
+    return found;
 }

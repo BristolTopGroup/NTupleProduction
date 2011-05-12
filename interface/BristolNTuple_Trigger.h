@@ -1,5 +1,6 @@
 #ifndef BristolNTupleTrigger
 #define BristolNTupleTrigger
+#include <string>
 
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -13,6 +14,8 @@ class BristolNTuple_Trigger : public edm::EDProducer {
  private:
   void produce( edm::Event &, const edm::EventSetup & );
   void beginRun( edm::Run &, const edm::EventSetup & );
+  unsigned int findTrigger(const std::string& triggerWildCard);
+
   const edm::InputTag   l1InputTag, hltInputTag;
   const std::vector<std::string> hltPathsOfInterest, hltPathsOfInterest_other;
   HLTConfigProvider hltConfig;
