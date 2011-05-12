@@ -3,7 +3,6 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
-#include <boost/regex.hpp>
 
 unsigned int NmaxL1AlgoBit = 128;
 unsigned int NmaxL1TechBit = 64;
@@ -145,13 +144,14 @@ void BristolNTuple_Trigger::produce(edm::Event& iEvent, const edm::EventSetup& i
 unsigned int BristolNTuple_Trigger::findTrigger(const std::string& triggerWildCard) {
     const std::vector<std::string>& triggers = hltConfig.triggerNames();
     unsigned int found = 9999;
-    static const boost::regex e(triggerWildCard);
 
+    size_t length = triggerWildCard.size();
     for (unsigned int index = 0; index < triggers.size(); ++index) {
-        if (boost::regex_search(hltConfig.triggerName(index), e)) {
+        if (length <= triggers[index].size() && triggerWildCard == triggers[index].substr(0, length)) {
             found = index;
             break;
         }
     }
+
     return found;
 }
