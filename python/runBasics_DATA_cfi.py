@@ -28,7 +28,7 @@ from PhysicsTools.PatAlgos.tools.electronTools import *
 addElectronUserIsolation(process)
 
 
-process.GlobalTag.globaltag =   cms.string('GR_R_311_V2::All') 
+process.GlobalTag.globaltag =   cms.string('GR_P_V17::All') 
 
 from PhysicsTools.PatAlgos.tools.coreTools import *
 from PhysicsTools.PatAlgos.tools.tauTools import *
