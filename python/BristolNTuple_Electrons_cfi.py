@@ -8,8 +8,6 @@ rootTupleElectrons = cms.EDProducer("BristolNTuple_Electrons",
     Suffix = cms.string(''),
     MaxSize = cms.uint32(99),
     VertexInputTag = cms.InputTag('offlinePrimaryVertices'),
-    InputTagPVWithBS = cms.InputTag('cleanPatEle2'),
-    InputTagBS = cms.InputTag('cleanPatEle3'),
     storePFIsolation = cms.bool(False)
     
 )

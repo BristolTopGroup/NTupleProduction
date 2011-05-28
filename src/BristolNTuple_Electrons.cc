@@ -17,8 +17,6 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
     trkInputTag(iConfig.getParameter<edm::InputTag> ("TracksInputTag")),
     dcsInputTag(iConfig.getParameter<edm::InputTag> ("DCSInputTag")),
     inputTag(iConfig.getParameter<edm::InputTag> ("InputTag")),
-    inputTagPVWithBS(iConfig.getParameter<edm::InputTag> ("InputTagPVWithBS")),
-    inputTagBS(iConfig.getParameter<edm::InputTag> ("InputTagBS")),
     prefix(iConfig.getParameter<std::string> ("Prefix")),
     suffix(iConfig.getParameter<std::string> ("Suffix")),
     maxSize(iConfig.getParameter<unsigned int> ("MaxSize")),
@@ -49,8 +47,6 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
     produces<std::vector<double> > (prefix + "HcalIso" + suffix);
 
     produces<std::vector<double> > (prefix + "dB" + suffix);
-    produces<std::vector<double> > (prefix + "dBPVWithBS" + suffix);
-    produces<std::vector<double> > (prefix + "dBBS" + suffix);
 
     produces<std::vector<int> > (prefix + "closestCtfTrackRef" + suffix);
     produces<std::vector<double> > (prefix + "shFracInnerHits" + suffix);
@@ -84,14 +80,6 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
     produces<std::vector<double> > (prefix + "Vertex.Y" + suffix);
     produces<std::vector<double> > (prefix + "Vertex.Z" + suffix);
 
-    produces<std::vector<double> > (prefix + "VertexWithBS.X" + suffix);
-    produces<std::vector<double> > (prefix + "VertexWithBS.Y" + suffix);
-    produces<std::vector<double> > (prefix + "VertexWithBS.Z" + suffix);
-
-    produces<std::vector<double> > (prefix + "VertexBS.X" + suffix);
-    produces<std::vector<double> > (prefix + "VertexBS.Y" + suffix);
-    produces<std::vector<double> > (prefix + "VertexBS.Z" + suffix);
-
     if (storePFIsolation) {
         produces<std::vector<double> > (prefix + "PfChargedHadronIso" + suffix);
         produces<std::vector<double> > (prefix + "PfNeutralHadronIso" + suffix);
@@ -124,8 +112,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
     std::auto_ptr < std::vector<double> > hcalIso03(new std::vector<double>());
 
     std::auto_ptr < std::vector<double> > dB(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > dBPVWithBS(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > dBBS(new std::vector<double>());
 
     std::auto_ptr < std::vector<double> > PfChargedHadronIso(new std::vector<double>());
     std::auto_ptr < std::vector<double> > PfNeutralHadronIso(new std::vector<double>());
@@ -162,23 +148,9 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
     std::auto_ptr < std::vector<double> > VertexY(new std::vector<double>());
     std::auto_ptr < std::vector<double> > VertexZ(new std::vector<double>());
 
-    std::auto_ptr < std::vector<double> > VertexWithBSX(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > VertexWithBSY(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > VertexWithBSZ(new std::vector<double>());
-
-    std::auto_ptr < std::vector<double> > VertexBSX(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > VertexBSY(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > VertexBSZ(new std::vector<double>());
-
     //-----------------------------------------------------------------
     edm::Handle < std::vector<pat::Electron> > electrons;
     iEvent.getByLabel(inputTag, electrons);
-
-    edm::Handle < std::vector<pat::Electron> > electronsWithBS;
-    iEvent.getByLabel(inputTagPVWithBS, electronsWithBS);
-
-    edm::Handle < std::vector<pat::Electron> > electronsBS;
-    iEvent.getByLabel(inputTagBS, electronsBS);
 
     edm::Handle < reco::TrackCollection > tracks;
     iEvent.getByLabel(trkInputTag, tracks);
@@ -362,41 +334,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
         edm::LogError("BristolNTuple_ElectronsExtraError") << "Error! Can't get the product " << inputTag;
     }
 
-    if (electronsWithBS.isValid()) {
-        edm::LogInfo("BristolNTuple_ElectronsExtraInfo") << "Total # Electrons: " << electronsWithBS->size();
-        for (std::vector<pat::Electron>::const_iterator it = electronsWithBS->begin(); it != electronsWithBS->end(); ++it) {
-            // exit from loop when you reach the required number of electrons
-            if (dBPVWithBS->size() >= maxSize)
-                break;
-
-            dBPVWithBS->push_back(it->dB());
-
-            VertexWithBSX->push_back(it->vertex().x());
-            VertexWithBSY->push_back(it->vertex().y());
-            VertexWithBSZ->push_back(it->vertex().z());
-
-        }
-    } else {
-        edm::LogError("BristolNTuple_ElectronsExtraError") << "Error! Can't get the product " << inputTagPVWithBS;
-    }
-
-    if (electronsBS.isValid()) {
-        edm::LogInfo("BristolNTuple_ElectronsExtraInfo") << "Total # Electrons: " << electronsBS->size();
-        for (std::vector<pat::Electron>::const_iterator it = electronsBS->begin(); it != electronsBS->end(); ++it) {
-            // exit from loop when you reach the required number of electrons
-            if (dBBS->size() >= maxSize)
-                break;
-
-            dBBS->push_back(it->dB());
-
-            VertexBSX->push_back(it->vertex().x());
-            VertexBSY->push_back(it->vertex().y());
-            VertexBSZ->push_back(it->vertex().z());
-
-        }
-    } else {
-        edm::LogError("BristolNTuple_ElectronsExtraError") << "Error! Can't get the product " << inputTagBS;
-    }
 
     //-----------------------------------------------------------------
     // put vectors in the event
@@ -440,8 +377,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
     iEvent.put(vtxDistZ, prefix + "VtxDistZ" + suffix);
 
     iEvent.put(dB, prefix + "dB" + suffix);
-    iEvent.put(dBPVWithBS, prefix + "dBPVWithBS" + suffix);
-    iEvent.put(dBBS, prefix + "dBBS" + suffix);
 
     iEvent.put(closestCtfTrackRef, prefix + "closestCtfTrackRef" + suffix);
     iEvent.put(shFracInnerHits, prefix + "shFracInnerHits" + suffix);
@@ -456,14 +391,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
     iEvent.put(VertexX, prefix + "Vertex.X" + suffix);
     iEvent.put(VertexY, prefix + "Vertex.Y" + suffix);
     iEvent.put(VertexZ, prefix + "Vertex.Z" + suffix);
-
-    iEvent.put(VertexWithBSX, prefix + "VertexWithBS.X" + suffix);
-    iEvent.put(VertexWithBSY, prefix + "VertexWithBS.Y" + suffix);
-    iEvent.put(VertexWithBSZ, prefix + "VertexWithBS.Z" + suffix);
-
-    iEvent.put(VertexBSX, prefix + "VertexBS.X" + suffix);
-    iEvent.put(VertexBSY, prefix + "VertexBS.Y" + suffix);
-    iEvent.put(VertexBSZ, prefix + "VertexBS.Z" + suffix);
 
     if (storePFIsolation) {
         iEvent.put(PfChargedHadronIso, prefix + "PfChargedHadronIso" + suffix);

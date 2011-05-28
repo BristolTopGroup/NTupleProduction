@@ -11,7 +11,7 @@ class BristolNTuple_Electrons : public edm::EDProducer {
 
  private:
   void produce( edm::Event &, const edm::EventSetup & );
-  const edm::InputTag   trkInputTag, dcsInputTag, inputTag, inputTagPVWithBS, inputTagBS;
+  const edm::InputTag   trkInputTag, dcsInputTag, inputTag;
   const std::string     prefix,suffix;
   const unsigned int    maxSize;
   const bool storePFIsolation;
