@@ -28,7 +28,7 @@ options.register ('writeFat',
                   "Output tracks and PF candidates")
 
 options.register ('use41x',
-                  False,
+                  '',
                   VarParsing.multiplicity.singleton,
                   VarParsing.varType.int,
                   "Use the 41x options")
@@ -40,7 +40,7 @@ options.register ('forceCheckClosestZVertex',
                   "Force the check of the closest z vertex")
 
 options.register ('dataType',
-                  False,
+                  '',
                   VarParsing.multiplicity.singleton,
                   VarParsing.varType.string,
                   "DataType prefix for output file name")
@@ -54,7 +54,7 @@ if not options.useData :
     caloJetCorrection = ( 'AK5Calo', ['L1Offset' , 'L2Relative', 'L3Absolute'])
     if options.use41x:
         process.source.fileNames = [
-            '/store/relval/CMSSW_4_1_5/RelValTTbar/GEN-SIM-RECO/START311_V2-v1/0037/20A7B6E4-8F6C-E011-9E6B-003048678FE4.root',
+            'file:///storage/TopQuarkGroup/TT_ZuneZ2_Spring11.root',
             ]
     else :
         process.source.fileNames = [
@@ -775,11 +775,16 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         #vertices (DA)
         'keep *_rootTupleVertex_*_*',
         #tracks
-        'keep *_rootTupleTracks_*_*'
+        'keep *_rootTupleTracks_*_*',
+        #gen information
+        'keep *_rootTupleGenEventInfo_*_*',
+        'keep *_rootTupleGenParticles_*_*',
+        'keep *_rootTupleGenJets_*_*',
+        'keep *_rootTupleGenMETTrue_*_*',
     )
 )
 
-process.rootNTuples = cms.Sequence(( 
+process.rootNTuples = cms.Sequence((
     #beamspot
     process.rootTupleBeamSpot +
     #vertices
@@ -800,10 +805,20 @@ process.rootNTuples = cms.Sequence((
     process.rootTupleCaloMET + 
     process.rootTuplePFMET +
     #Event
-    process.rootTupleEvent)*
+    process.rootTupleEvent +
+    #genEventInfos
+    process.rootTupleGenEventInfo +
+    process.rootTupleGenParticles +
+    process.rootTupleGenJetSequence +
+    process.rootTupleGenMETSequence)*
     process.rootTupleTree)
 
-
+if options.useData:
+    process.rootNTuples.remove( process.rootTupleGenEventInfo )
+    process.rootNTuples.remove( process.rootTupleGenParticles )
+    process.rootNTuples.remove( process.rootTupleGenJetSequence )
+    process.rootNTuples.remove( process.rootTupleGenMETSequence )
+    
 process.p0 = cms.Path(
     process.patseq * process.rootNTuples)
 
@@ -817,16 +832,19 @@ process.TFileService = cms.Service( "TFileService",
                            fileName = cms.string( 'ntuple.root' )
                            )
 # rename output file
+outPutFilePrefix = ''
+if not options.dataType == '':
+    outPutFilePrefix = options.dataType + '_'
 if options.useData :
     if options.writeFat :
-        process.TFileService.fileName = cms.string('nTuple_' + fileTag + '_data_fat.root')
+        process.TFileService.fileName = cms.string(outPutFilePrefix + 'nTuple_' + fileTag + '_data_fat.root')
     else :
-        process.TFileService.fileName = cms.string('nTuple_' + fileTag + '_data.root')
+        process.TFileService.fileName = cms.string(outPutFilePrefix + 'nTuple_' + fileTag + '_data.root')
 else :
     if options.writeFat :
-        process.TFileService.fileName = cms.string('nTuple_' + fileTag + '_mc_fat.root')
+        process.TFileService.fileName = cms.string(outPutFilePrefix + 'nTuple_' + fileTag + '_mc_fat.root')
     else :
-        pprocess.TFileService.fileName = cms.string('nTuple_' + fileTag + '_mc.root')
+        process.TFileService.fileName = cms.string(outPutFilePrefix + 'nTuple_' + fileTag + '_mc.root')
 
 
 # reduce verbosity
