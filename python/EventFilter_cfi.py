@@ -17,12 +17,12 @@ EventFilter = cms.EDFilter('EventFilter',
     minElectronPt       = cms.double(25.),
     maxAbsElectronEta      = cms.double(100.),
     debug    = cms.untracked.bool(False),
-    
+    #Primary Vertex filtering
     VertexInput = cms.InputTag('offlinePrimaryVertices'),
-    VertexMinimumNDOF = cms.uint32(4),
-    VertexMaxAbsZ = cms.double(24.),
+    VertexMinimumNDOF = cms.uint32(7.0),
+    VertexMaxAbsZ = cms.double(24.0),
     VertexMaxAbsRho = cms.double(2.),
-    
+    #ScrapingVeto
     TracksInput = cms.InputTag('generalTracks'),
     NumTracks = cms.uint32(10),
     HPTrackThreshold = cms.double(0.25),
