@@ -19,7 +19,7 @@ EventFilter = cms.EDFilter('EventFilter',
     debug    = cms.untracked.bool(False),
     #Primary Vertex filtering
     VertexInput = cms.InputTag('offlinePrimaryVertices'),
-    VertexMinimumNDOF = cms.uint32(7.0),
+    VertexMinimumNDOF = cms.uint32(7),
     VertexMaxAbsZ = cms.double(24.0),
     VertexMaxAbsRho = cms.double(2.),
     #ScrapingVeto
