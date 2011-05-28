@@ -8,12 +8,14 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
     genEvtInfoInputTag(iConfig.getParameter<edm::InputTag>("GenEventInfoInputTag")),
     storePDFWeights(iConfig.getParameter<bool>("StorePDFWeights")),
     pdfWeightsInputTag(iConfig.getParameter<edm::InputTag>("PDFWeightsInputTag")),
+    pileupInfoSrc(iConfig.getParameter<edm::InputTag>("pileupInfo")),
     prefix(iConfig.getParameter<std::string> ("Prefix")),
     suffix(iConfig.getParameter<std::string> ("Suffix"))
 {
   produces <unsigned int> (prefix + "ProcessID" + suffix );
   produces <double>       (prefix + "PtHat" + suffix );
   produces <std::vector<double> > (prefix + "PDFWeights" + suffix );
+  produces <int> ( "PileUpInteractions" );
 }
 
 void BristolNTuple_GenEventInfo::
@@ -22,6 +24,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<unsigned int >         processID   ( new unsigned int() );
   std::auto_ptr<double >               ptHat ( new double() );
   std::auto_ptr<std::vector<double> >  pdfWeights  ( new std::vector<double>()  );
+  std::auto_ptr<int >                  Number_interactions  ( new int() );
 
   *processID.get() = 0;
   *ptHat.get() = 0.;
@@ -55,10 +58,24 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product " << pdfWeightsInputTag;
       }
     }
+    // PileupSummary Part
+        edm::Handle<std::vector<PileupSummaryInfo> >  puInfo;
+        iEvent.getByLabel(pileupInfoSrc, puInfo);
+
+        if(puInfo.isValid()) {
+          for( std::vector<PileupSummaryInfo>::const_iterator it = puInfo->begin(); it != puInfo->end(); ++it ) {
+        *Number_interactions.get() = it->getPU_NumInteractions();
+        //std::cout<<it->getPU_NumInteractions()<<std::endl;
+          }
+        }
+        else {
+          edm::LogError("BristolNTuple_PileUpError") << "Error! Can't get the product " << pileupInfoSrc;
+        }
   }
 
   //-----------------------------------------------------------------
   iEvent.put( processID, prefix + "ProcessID" + suffix );
   iEvent.put( ptHat, prefix + "PtHat" + suffix );
   iEvent.put( pdfWeights, prefix + "PDFWeights" + suffix );
+  iEvent.put( Number_interactions,   "PileUpInteractions"   );
 }
