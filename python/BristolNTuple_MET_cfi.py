@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 rootTupleCaloMET = cms.EDProducer( "BristolNTuple_MET",
     InputTag = cms.InputTag( 'patMETs' ),
-    Prefix = cms.string( 'CaloMET.' ),
+    Prefix = cms.string( 'patMETs.' ),
     Suffix = cms.string( '' ),
     StoreUncorrectedMET = cms.bool( True )
  )
@@ -15,8 +15,8 @@ rootTupleTCMET = cms.EDProducer( "BristolNTuple_MET",
  )
 
 rootTuplePFMET = cms.EDProducer( "BristolNTuple_MET",
-    InputTag = cms.InputTag( 'patMETsPF' ),
-    Prefix = cms.string( 'PFMET.' ),
+    InputTag = cms.InputTag( 'patMETsPFlow' ),
+    Prefix = cms.string( 'patMETsPFlow.' ),
     Suffix = cms.string( '' ),
     StoreUncorrectedMET = cms.bool( True )
  )
