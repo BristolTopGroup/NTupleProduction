@@ -321,8 +321,8 @@ process.p *= (
     process.rootTupleMETSequence +
     process.nTupleMuonSequence +
     process.rootTupleTrigger +
-    process.rootTupleVertex +
-    process.rootTupleVertexWithBS# +
+    process.rootTupleVertex# +
+#    process.rootTupleVertexWithBS# +
 #    process.rootTupleTracks
     ) * process.rootTupleTree
     

@@ -377,7 +377,7 @@ process.p *= (
     process.nTupleMuonSequence +
     process.rootTupleTrigger +
     process.rootTupleVertex +
-    process.rootTupleVertexWithBS +
+#    process.rootTupleVertexWithBS +
     process.rootTupleGenEventInfo +
     process.rootTupleGenParticles +
     process.rootTupleGenJetSequence +
