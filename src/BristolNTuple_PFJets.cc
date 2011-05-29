@@ -227,7 +227,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
     } else {
         edm::LogError("BristolNTuple_PFJetsError") << "Error! Can't get the product " << inputTag;
     }
-
+    delete jecUnc;
     //-----------------------------------------------------------------
     // put vectors in the event
     iEvent.put(eta, prefix + "Eta" + suffix);
