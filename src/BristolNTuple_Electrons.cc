@@ -80,6 +80,7 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
     produces<std::vector<double> > (prefix + "Vertex.Y" + suffix);
     produces<std::vector<double> > (prefix + "Vertex.Z" + suffix);
 
+    produces <std::vector<int> >    ( prefix + "PassID" + suffix );
     if (storePFIsolation) {
         produces<std::vector<double> > (prefix + "PfChargedHadronIso" + suffix);
         produces<std::vector<double> > (prefix + "PfNeutralHadronIso" + suffix);
@@ -148,6 +149,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
     std::auto_ptr < std::vector<double> > VertexY(new std::vector<double>());
     std::auto_ptr < std::vector<double> > VertexZ(new std::vector<double>());
 
+    std::auto_ptr<std::vector<int> >     passID  ( new std::vector<int>()  );
+
     //-----------------------------------------------------------------
     edm::Handle < std::vector<pat::Electron> > electrons;
     iEvent.getByLabel(inputTag, electrons);
@@ -199,6 +202,38 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
             // exit from loop when you reach the required number of electrons
             if (px->size() >= maxSize)
                 break;
+
+            int passId = 0;
+            /* passID for different electron IDs is assigned bitwise
+             * https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideCategoryBasedElectronID
+             * bit 0: eidVeryLooseMC
+             * bit 1: eidLooseMC
+             * bit 2: eidMediumMC
+             * bit 3: eidTightMC
+             * bit 4: eidSuperTightMC
+             * bit 5: eidHyperTight1MC
+             * bit 6: eidHyperTight2MC
+             * bit 7: eidHyperTight3MC
+             * bit 8: eidHyperTight4MC
+             */
+            if (it->electronID("eidVeryLooseMC") > 0)
+                passId = passId | 1 << 0;
+            if (it->electronID("eidLooseMC") > 0)
+                passId = passId | 1 << 1;
+            if (it->electronID("eidMediumMC") > 0)
+                passId = passId | 1 << 2;
+            if (it->electronID("eidTightMC") > 0)
+                passId = passId | 1 << 3;
+            if (it->electronID("eidSuperTightMC") > 0)
+                passId = passId | 1 << 4;
+            if (it->electronID("eidHyperTight1MC") > 0)
+                passId = passId | 1 << 5;
+            if (it->electronID("eidHyperTight2MC") > 0)
+                passId = passId | 1 << 6;
+            if (it->electronID("eidHyperTight3MC") > 0)
+                passId = passId | 1 << 7;
+            if (it->electronID("eidHyperTight4MC") > 0)
+                passId = passId | 1 << 8;
 
             // Conversion
             ConversionFinder convFinder;
@@ -391,6 +426,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
     iEvent.put(VertexX, prefix + "Vertex.X" + suffix);
     iEvent.put(VertexY, prefix + "Vertex.Y" + suffix);
     iEvent.put(VertexZ, prefix + "Vertex.Z" + suffix);
+
+    iEvent.put( passID, prefix + "PassID" + suffix );
 
     if (storePFIsolation) {
         iEvent.put(PfChargedHadronIso, prefix + "PfChargedHadronIso" + suffix);
