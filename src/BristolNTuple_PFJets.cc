@@ -1,18 +1,23 @@
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_PFJets.h"
 #include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
-//#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
-//#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
-//#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+#include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
+#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
+#include "FWCore/Framework/interface/ESHandle.h"
 #include <iostream>
 
 BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
     inputTag(iConfig.getParameter<edm::InputTag> ("InputTag")),
     prefix(iConfig.getParameter<std::string> ("Prefix")),
     suffix(iConfig.getParameter<std::string> ("Suffix")),
-    maxSize(iConfig.getParameter<unsigned int> ("MaxSize"))
-//    jecUncPath(iConfig.getParameter<std::string>("JECUncertainty"))
+    maxSize(iConfig.getParameter<unsigned int> ("MaxSize")),
+    jecUncPath(iConfig.getParameter<std::string>("JECUncertainty")),
+    readJECuncertainty (iConfig.getParameter<bool>   ("ReadJECuncertainty"))
 {
 
     produces<std::vector<double> > (prefix + "Eta" + suffix);
@@ -28,6 +33,12 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
     produces<std::vector<double> > (prefix + "Energy" + suffix);
     produces<std::vector<double> > (prefix + "EnergyRaw" + suffix);
     produces<std::vector<int> > (prefix + "PartonFlavour" + suffix);
+
+    produces<std::vector<double> > (prefix + "JECUnc" + suffix);
+    produces<std::vector<double> > (prefix + "L2L3ResJEC" + suffix);
+    produces<std::vector<double> > (prefix + "L3AbsJEC" + suffix);
+    produces<std::vector<double> > (prefix + "L2RelJEC" + suffix);
+    produces<std::vector<double> > (prefix + "L1OffJEC" + suffix);
 
     produces<std::vector<double> > (prefix + "ChargedEmEnergyFraction" + suffix);
     produces<std::vector<double> > (prefix + "ChargedHadronEnergyFraction" + suffix);
@@ -57,8 +68,14 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
     produces<std::vector<double> > (prefix + "JetProbabilityBTag" + suffix);
     produces<std::vector<double> > (prefix + "JetBProbabilityBTag" + suffix);
 
-//    produces <std::vector<double> > ( prefix + "JECUncertainty" + suffix );
+    produces<std::vector<int> > (prefix + "PassLooseID" + suffix);
+    produces<std::vector<int> > (prefix + "PassTightID" + suffix);
 }
+
+PFJetIDSelectionFunctor pfjetIDLoose( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE );
+PFJetIDSelectionFunctor pfjetIDTight( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT );
+
+pat::strbitset retpf = pfjetIDLoose.getBitTemplate();
 
 void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     std::auto_ptr < std::vector<double> > eta(new std::vector<double>());
@@ -74,6 +91,12 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
     std::auto_ptr < std::vector<double> > energy(new std::vector<double>());
     std::auto_ptr < std::vector<double> > energy_raw(new std::vector<double>());
     std::auto_ptr < std::vector<int> > partonFlavour(new std::vector<int>());
+
+    std::auto_ptr < std::vector<double> > jecUnc_vec(new std::vector<double>());
+    std::auto_ptr < std::vector<double> > l2l3resJEC_vec(new std::vector<double>());
+    std::auto_ptr < std::vector<double> > l3absJEC_vec(new std::vector<double>());
+    std::auto_ptr < std::vector<double> > l2relJEC_vec(new std::vector<double>());
+    std::auto_ptr < std::vector<double> > l1offJEC_vec(new std::vector<double>());
 
     std::auto_ptr < std::vector<double> > chargedEmEnergyFraction(new std::vector<double>());
     std::auto_ptr < std::vector<double> > chargedHadronEnergyFraction(new std::vector<double>());
@@ -102,11 +125,23 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
     std::auto_ptr < std::vector<double> > jetProbabilityBTag(new std::vector<double>());
     std::auto_ptr < std::vector<double> > jetBProbabilityBTag(new std::vector<double>());
 
-//    std::auto_ptr<std::vector<double> >  jecUnc_vec ( new std::vector<double>()  );
+    std::auto_ptr < std::vector<int> > passLooseID(new std::vector<int>());
+    std::auto_ptr < std::vector<int> > passTightID(new std::vector<int>());
 
+    JetCorrectionUncertainty *jecUnc = 0;
+    if (readJECuncertainty) {
+        //(See https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1075/1.html
+        // and https://hypernews.cern.ch/HyperNews/CMS/get/physTools/2367/1.html)
+        // handle the jet corrector parameters collection
+        edm::ESHandle < JetCorrectorParametersCollection > JetCorParColl;
+        // get the jet corrector parameters collection from the global tag
+        iSetup.get<JetCorrectionsRecord> ().get(jecUncPath, JetCorParColl);
+        // get the uncertainty parameters from the collection
+        JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
+        // instantiate the jec uncertainty object
+        jecUnc = new JetCorrectionUncertainty(JetCorPar);
+    }
 
-//    edm::FileInPath fipUnc(jecUncPath);;
-//    JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(fipUnc.fullPath());
 
     edm::Handle < std::vector<pat::Jet> > jets;
     iEvent.getByLabel(inputTag, jets);
@@ -118,6 +153,21 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
             // exit from loop when you reach the required number of jets
             if (px->size() >= maxSize)
                 break;
+
+            retpf.set(false);
+            int passjetLoose = 0;
+            if (pfjetIDLoose(*it, retpf))
+                passjetLoose = 1;
+
+            retpf.set(false);
+            int passjetTight = 0;
+            if (pfjetIDTight(*it, retpf))
+                passjetTight = 1;
+
+            if (readJECuncertainty) {
+                jecUnc->setJetEta(it->eta());
+                jecUnc->setJetPt(it->pt()); // the uncertainty is a function of the corrected pt
+            }
 
             // fill in all the vectors
             eta->push_back(it->eta());
@@ -133,6 +183,15 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
             energy->push_back(it->energy());
             energy_raw->push_back(it->correctedJet("Uncorrected").energy());
             partonFlavour->push_back(it->partonFlavour());
+
+            l2l3resJEC_vec->push_back(it->pt() / it->correctedJet("L3Absolute").pt());
+            l3absJEC_vec->push_back(it->correctedJet("L3Absolute").pt() / it->correctedJet("L2Relative").pt());
+            l2relJEC_vec->push_back(it->correctedJet("L2Relative").pt() / it->correctedJet("L1FastJet").pt());
+            l1offJEC_vec->push_back(it->correctedJet("L1FastJet").pt() / it->correctedJet("Uncorrected").pt());
+            if (readJECuncertainty)
+                jecUnc_vec->push_back(jecUnc->getUncertainty(true));
+            else
+                jecUnc_vec->push_back(-999);
 
             chargedEmEnergyFraction->push_back(it->chargedEmEnergyFraction());
             chargedHadronEnergyFraction->push_back(it->chargedHadronEnergyFraction());
@@ -162,10 +221,8 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
             jetProbabilityBTag->push_back(it->bDiscriminator("jetProbabilityBJetTags"));
             jetBProbabilityBTag->push_back(it->bDiscriminator("jetBProbabilityBJetTags"));
 
-//            jecUnc->setJetEta( it->eta() );
-//            jecUnc->setJetPt( it->pt() ); // the uncertainty is a function of the corrected pt
-//            jecUnc_vec->push_back( jecUnc->getUncertainty(true) );
-
+            passLooseID->push_back(passjetLoose);
+            passTightID->push_back(passjetTight);
         }
     } else {
         edm::LogError("BristolNTuple_PFJetsError") << "Error! Can't get the product " << inputTag;
@@ -187,6 +244,12 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
     iEvent.put(energy_raw, prefix + "EnergyRaw" + suffix);
     iEvent.put(partonFlavour, prefix + "PartonFlavour" + suffix);
 
+    iEvent.put(jecUnc_vec, prefix + "JECUnc" + suffix);
+    iEvent.put(l2l3resJEC_vec, prefix + "L2L3ResJEC" + suffix);
+    iEvent.put(l3absJEC_vec, prefix + "L3AbsJEC" + suffix);
+    iEvent.put(l2relJEC_vec, prefix + "L2RelJEC" + suffix);
+    iEvent.put(l1offJEC_vec, prefix + "L1OffJEC" + suffix);
+
     iEvent.put(chargedEmEnergyFraction, prefix + "ChargedEmEnergyFraction" + suffix);
     iEvent.put(chargedHadronEnergyFraction, prefix + "ChargedHadronEnergyFraction" + suffix);
     iEvent.put(chargedMuEnergyFraction, prefix + "ChargedMuEnergyFraction" + suffix);
@@ -207,12 +270,16 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
     iEvent.put(chargedHadronEnergyFractionRAW, prefix + "ChargedHadronEnergyFractionRAW" + suffix);
     iEvent.put(neutralEmEnergyFractionRAW, prefix + "NeutralEmEnergyFractionRAW" + suffix);
     iEvent.put(neutralHadronEnergyFractionRAW, prefix + "NeutralHadronEnergyFractionRAW" + suffix);
+
     iEvent.put(trackCountingHighEffBTag, prefix + "TrackCountingHighEffBTag" + suffix);
     iEvent.put(trackCountingHighPurBTag, prefix + "TrackCountingHighPurBTag" + suffix);
     iEvent.put(simpleSecondaryVertexHighEffBTag, prefix + "SimpleSecondaryVertexHighEffBTag" + suffix);
     iEvent.put(simpleSecondaryVertexHighPurBTag, prefix + "SimpleSecondaryVertexHighPurBTag" + suffix);
     iEvent.put(jetProbabilityBTag, prefix + "JetProbabilityBTag" + suffix);
     iEvent.put(jetBProbabilityBTag, prefix + "JetBProbabilityBTag" + suffix);
+
+    iEvent.put(passLooseID, prefix + "PassLooseID" + suffix);
+    iEvent.put(passTightID, prefix + "PassTightID" + suffix);
 
 //    iEvent.put( jecUnc_vec, prefix + "JECUnc" + suffix );
 }

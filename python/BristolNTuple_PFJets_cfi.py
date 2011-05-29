@@ -5,9 +5,8 @@ rootTuplePFJets = cms.EDProducer("BristolNTuple_PFJets",
     Prefix = cms.string('PFJet.'),
     Suffix = cms.string(''),
     MaxSize = cms.uint32(99),
-    JECUncertainty = cms.string('CondFormats/JetMETObjects/data/Spring10DataV2_Uncertainty_AK5PF.txt'),
-#    ApplyResidualJEC = cms.bool(False),
-#    ResidualJEC = cms.string('CondFormats/JetMETObjects/data/Spring10DataV2_L2L3Residual_AK5PF.txt')
+    JECUncertainty = cms.string('AK5PF'),
+    ReadJECuncertainty = cms.bool(True)
 )
 
 
