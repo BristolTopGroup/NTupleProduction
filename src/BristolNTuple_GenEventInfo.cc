@@ -2,7 +2,7 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
 BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& iConfig) :
     genEvtInfoInputTag(iConfig.getParameter<edm::InputTag>("GenEventInfoInputTag")),
@@ -77,5 +77,5 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( processID, prefix + "ProcessID" + suffix );
   iEvent.put( ptHat, prefix + "PtHat" + suffix );
   iEvent.put( pdfWeights, prefix + "PDFWeights" + suffix );
-  iEvent.put( Number_interactions,   "PileUpInteractions"   );
+  iEvent.put( Number_interactions, prefix + "PileUpInteractions" + suffix );
 }
