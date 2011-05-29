@@ -15,7 +15,7 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
   produces <unsigned int> (prefix + "ProcessID" + suffix );
   produces <double>       (prefix + "PtHat" + suffix );
   produces <std::vector<double> > (prefix + "PDFWeights" + suffix );
-  produces <int> ( "PileUpInteractions" );
+  produces <int> ( prefix + "PileUpInteractions" + suffix  );
 }
 
 void BristolNTuple_GenEventInfo::
