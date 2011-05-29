@@ -12,7 +12,7 @@ options = VarParsing ('python')
 options.register ('useData',
                   False,
                   VarParsing.multiplicity.singleton,
-                  VarParsing.varType.int,
+                  VarParsing.varType.bool,
                   "Run this on real data")
 
 options.register ('hltProcess',
@@ -24,19 +24,19 @@ options.register ('hltProcess',
 options.register ('writeFat',
                   False,
                   VarParsing.multiplicity.singleton,
-                  VarParsing.varType.int,
+                  VarParsing.varType.bool,
                   "Output tracks and PF candidates")
 
 options.register ('use41x',
-                  '',
+                  False,
                   VarParsing.multiplicity.singleton,
-                  VarParsing.varType.int,
+                  VarParsing.varType.bool,
                   "Use the 41x options")
 
 options.register ('forceCheckClosestZVertex',
                   False,
                   VarParsing.multiplicity.singleton,
-                  VarParsing.varType.int,
+                  VarParsing.varType.bool,
                   "Force the check of the closest z vertex")
 
 options.register ('dataType',
@@ -96,7 +96,7 @@ if not options.use41x :
     # 4.2.x configuration
     fileTag = '42x'
     if options.useData :
-        process.GlobalTag.globaltag = cms.string( 'GR_R_42_V12::All' )
+        process.GlobalTag.globaltag = cms.string( 'GR_R_42_V14::All' )
     else :
         process.GlobalTag.globaltag = cms.string( 'START42_V12::All' )
 
@@ -109,20 +109,7 @@ else :
         process.GlobalTag.globaltag = cms.string('START41_V0::All')
     
 
-# require scraping filter
-#process.scrapingVeto = cms.EDFilter("FilterOutScraping",
-#                                    applyfilter = cms.untracked.bool(True),
-#                                    debugOn = cms.untracked.bool(False),
-#                                    numtrack = cms.untracked.uint32(10),
-#                                    thresh = cms.untracked.double(0.2)
-#                                    )
 # HB + HE noise filtering
-#process.load('CommonTools/RecoAlgos/HBHENoiseFilter_cfi')
-# Modify defaults setting to avoid an over-efficiency in the presence of OFT PU
-#process.HBHENoiseFilter.minIsolatedNoiseSumE = cms.double(999999.)
-#process.HBHENoiseFilter.minNumIsolatedNoiseChannels = cms.int32(999999)
-#process.HBHENoiseFilter.minIsolatedNoiseSumEt = cms.double(999999.)
-
 #values taken from
 #https://twiki.cern.ch/twiki/bin/view/CMS/HBHEAnomalousSignals2011
 process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
@@ -149,6 +136,16 @@ process.HBHENoiseFilterResultProducer.minIsolatedNoiseSumEt = cms.double(999999.
 process.load("BristolAnalysis.NTupleTools.EventFilter_cfi")
 process.EventFilter.NumTracks = cms.uint32(10)
 process.EventFilter.HPTrackThreshold = cms.double(0.2)
+process.EventFilter.minNElectrons = cms.int32(1)
+process.EventFilter.minElectronPt = cms.double(25.)
+process.EventFilter.maxAbsElectronEta = cms.double(2.6)
+#for DAV vertices
+pvSrc = 'offlinePrimaryVertices'
+process.EventFilter.VertexInput = cms.InputTag(pvSrc)
+process.EventFilter.VertexMinimumNDOF = cms.uint32(7)
+process.EventFilter.VertexMaxAbsZ = cms.double(24)
+process.EventFilter.VertexMaxAbsRho = cms.double(2)
+
 # switch on PAT trigger
 #from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
 #switchOnTrigger( process, hltProcess=options.hltProcess )
@@ -160,25 +157,10 @@ process.EventFilter.HPTrackThreshold = cms.double(0.2)
 ####### DAF PV's     ##########
 ###############################
 
-pvSrc = 'offlinePrimaryVertices'
+
 if options.use41x :
     # redo DAF vertices
     process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi")
-
-#for DAV vertices
-process.EventFilter.VertexInput = cms.InputTag(pvSrc)
-process.EventFilter.VertexMinimumNDOF = cms.uint32(7)
-process.EventFilter.VertexMaxAbsZ = cms.double(24)
-process.EventFilter.VertexMaxAbsRho = cms.double(2)
-#process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
-#                                           vertexCollection = cms.InputTag(pvSrc),
-#                                           minimumNDOF = cms.uint32(7) ,
-#                                           maxAbsZ = cms.double(24), 
-#                                           maxd0 = cms.double(2) 
-#                                           )
-
-
-
 
 from PhysicsTools.SelectorUtils.pvSelector_cfi import pvSelector
 
@@ -664,11 +646,7 @@ process.goodPatJetsCATopTagPF = cms.EDFilter("PFJetIDSelectionFunctorFilter",
 process.patseq = cms.Sequence(
     process.HBHENoiseFilterResultProducer*
     process.EventFilter*
-    #process.scrapingVeto*
-    
-    #process.HBHENoiseFilter*
     process.goodOfflinePrimaryVertices*
-    #process.primaryVertexFilter*
     process.genParticlesForJetsNoNu*
     process.ca8GenJetsNoNu*
     getattr(process,"patPF2PATSequence"+postfix)*
@@ -716,9 +694,13 @@ process.rootTupleVertex.Prefix = cms.string('goodOfflinePrimaryVertices.')
 #calo jets
 process.rootTupleCaloJets.InputTag = cms.InputTag('goodPatJets')
 process.rootTupleCaloJets.Prefix = cms.string('goodPatJets.')
+
 #PF2PAT jets
 process.rootTuplePF2PATJets.InputTag = cms.InputTag('goodPatJetsPFlow')
 process.rootTuplePF2PATJets.Prefix = cms.string('goodPatJetsPFlow.')
+#no JEC uncertainty available for PF jets yet in 42X
+process.rootTuplePF2PATJets.ReadJECuncertainty = cms.bool(options.use41x)
+
 #Cambridge-Aachen cone 0.8 jets
 process.rootTupleCA8PFJets = process.rootTuplePF2PATJets.clone()
 process.rootTupleCA8PFJets.InputTag = cms.InputTag('goodPatJetsCA8PF')
@@ -760,7 +742,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleCaloJets_*_*',
         #PF jets
         'keep *_rootTuplePF2PATJets_*_*',
-        'keep *_rootTupleCA08PFJets_*_*',
+        'keep *_rootTupleCA8PFJets_*_*',
         #electrons
         'keep *_rootTupleElectrons_*_*',
         'keep *_rootTuplePFElectrons_*_*',
