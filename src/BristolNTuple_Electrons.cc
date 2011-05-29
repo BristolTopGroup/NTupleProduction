@@ -34,6 +34,9 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
     produces<std::vector<int> > (prefix + "Charge" + suffix);
 
     produces<std::vector<double> > (prefix + "HoE" + suffix);
+    produces <std::vector<double> > ( prefix + "eSeedClusterOverPout" + suffix );
+    produces <std::vector<double> > ( prefix + "EoverP" + suffix );
+    produces <std::vector<double> > ( prefix + "fbrem" + suffix );
     produces<std::vector<double> > (prefix + "SigmaEtaEta" + suffix);
     produces<std::vector<double> > (prefix + "SigmaIEtaIEta" + suffix);
     produces<std::vector<double> > (prefix + "DeltaPhiTrkSC" + suffix);
@@ -100,6 +103,9 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
     std::auto_ptr < std::vector<int> > charge(new std::vector<int>());
 
     std::auto_ptr < std::vector<double> > hoe(new std::vector<double>());
+    std::auto_ptr < std::vector<double> > EseedOverPout(new std::vector<double>());
+    std::auto_ptr < std::vector<double> > eOverP(new std::vector<double>());
+    std::auto_ptr < std::vector<double> > fbrem(new std::vector<double>());
     std::auto_ptr < std::vector<double> > sigmaEtaEta(new std::vector<double>());
     std::auto_ptr < std::vector<double> > sigmaIEtaIEta(new std::vector<double>());
     std::auto_ptr < std::vector<double> > deltaPhiTrkSC(new std::vector<double>());
@@ -290,6 +296,9 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
             // ID variables
             hoe->push_back(it->hadronicOverEm());
+            EseedOverPout->push_back(it->eSeedClusterOverPout());
+            eOverP->push_back(it->eSuperClusterOverP());
+            fbrem->push_back(it->fbrem());
             sigmaEtaEta->push_back(it->sigmaEtaEta());
             sigmaIEtaIEta->push_back(it->sigmaIetaIeta());
             deltaPhiTrkSC->push_back(it->deltaPhiSuperClusterTrackAtVtx());
@@ -383,6 +392,9 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
     iEvent.put(charge, prefix + "Charge" + suffix);
 
     iEvent.put(hoe, prefix + "HoE" + suffix);
+    iEvent.put(EseedOverPout, prefix + "eSeedClusterOverPout" + suffix );
+    iEvent.put(eOverP, prefix + "EoverP" + suffix);
+    iEvent.put(fbrem, prefix + "fbrem" + suffix);
     iEvent.put(sigmaEtaEta, prefix + "SigmaEtaEta" + suffix);
     iEvent.put(sigmaIEtaIEta, prefix + "SigmaIEtaIEta" + suffix);
     iEvent.put(deltaPhiTrkSC, prefix + "DeltaPhiTrkSC" + suffix);
@@ -426,6 +438,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
     iEvent.put(VertexX, prefix + "Vertex.X" + suffix);
     iEvent.put(VertexY, prefix + "Vertex.Y" + suffix);
     iEvent.put(VertexZ, prefix + "Vertex.Z" + suffix);
+
 
     iEvent.put( passID, prefix + "PassID" + suffix );
 
