@@ -14,6 +14,7 @@
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_GenEventInfo.h"
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_Vertex.h"
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_Trigger.h"
+#include "BristolAnalysis/NTupleTools/interface/BristolNTuple_GenParticles.h"
 
 DEFINE_FWK_MODULE(BristolNTuple_CaloJets);
 DEFINE_FWK_MODULE(BristolNTuple_GenJets);
@@ -29,3 +30,4 @@ DEFINE_FWK_MODULE(BristolNTuple_EventSelection);
 DEFINE_FWK_MODULE(BristolNTuple_GenEventInfo);
 DEFINE_FWK_MODULE(BristolNTuple_Vertex);
 DEFINE_FWK_MODULE(BristolNTuple_Trigger);
+DEFINE_FWK_MODULE(BristolNTuple_GenParticles);
