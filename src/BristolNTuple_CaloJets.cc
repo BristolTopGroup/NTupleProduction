@@ -68,11 +68,6 @@ BristolNTuple_CaloJets::BristolNTuple_CaloJets(const edm::ParameterSet& iConfig)
     produces<std::vector<int> > (prefix + "PassTightID" + suffix);
 }
 
-JetIDSelectionFunctor jetIDLoose( JetIDSelectionFunctor::PURE09, JetIDSelectionFunctor::LOOSE );
-JetIDSelectionFunctor jetIDTight( JetIDSelectionFunctor::PURE09, JetIDSelectionFunctor::TIGHT );
-
-pat::strbitset ret = jetIDLoose.getBitTemplate();
-
 void BristolNTuple_CaloJets::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     std::auto_ptr < std::vector<double> > eta(new std::vector<double>());
@@ -137,6 +132,10 @@ void BristolNTuple_CaloJets::produce(edm::Event& iEvent, const edm::EventSetup& 
         jecUnc = new JetCorrectionUncertainty(JetCorPar);
     }
 
+    JetIDSelectionFunctor jetIDLoose( JetIDSelectionFunctor::PURE09, JetIDSelectionFunctor::LOOSE );
+    JetIDSelectionFunctor jetIDTight( JetIDSelectionFunctor::PURE09, JetIDSelectionFunctor::TIGHT );
+
+    pat::strbitset ret = jetIDLoose.getBitTemplate();
 
     edm::Handle < std::vector<pat::Jet> > jets;
     iEvent.getByLabel(inputTag, jets);

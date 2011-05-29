@@ -72,11 +72,6 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
     produces<std::vector<int> > (prefix + "PassTightID" + suffix);
 }
 
-PFJetIDSelectionFunctor pfjetIDLoose( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE );
-PFJetIDSelectionFunctor pfjetIDTight( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT );
-
-pat::strbitset retpf = pfjetIDLoose.getBitTemplate();
-
 void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     std::auto_ptr < std::vector<double> > eta(new std::vector<double>());
     std::auto_ptr < std::vector<double> > phi(new std::vector<double>());
@@ -142,6 +137,10 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
         jecUnc = new JetCorrectionUncertainty(JetCorPar);
     }
 
+    PFJetIDSelectionFunctor pfjetIDLoose( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE );
+    PFJetIDSelectionFunctor pfjetIDTight( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT );
+
+    pat::strbitset retpf = pfjetIDLoose.getBitTemplate();
 
     edm::Handle < std::vector<pat::Jet> > jets;
     iEvent.getByLabel(inputTag, jets);
