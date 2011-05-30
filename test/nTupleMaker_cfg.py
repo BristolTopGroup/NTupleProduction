@@ -731,6 +731,9 @@ process.nTupleMuons.Prefix = cms.string('selectedPatMuons.')
 process.nTuplePFMuons.InputTag = cms.InputTag('selectedPatMuonsLoosePFlow')
 process.nTuplePFMuons.Prefix = cms.string('selectedPatMuonsLoosePFlow.')
 
+#trigger
+process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','',options.hltProcess)
+
 process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
     outputCommands = cms.untracked.vstring(
        'drop *',
@@ -788,6 +791,8 @@ process.rootNTuples = cms.Sequence((
     process.rootTuplePFMET +
     #Event
     process.rootTupleEvent +
+    #trigger
+    process.rootTupleTrigger +
     #genEventInfos
     process.rootTupleGenEventInfo +
     process.rootTupleGenParticles +
@@ -801,7 +806,14 @@ if options.useData:
     process.rootNTuples.remove( process.rootTupleGenJetSequence )
     process.rootNTuples.remove( process.rootTupleGenMETSequence )
     
+# HLT Trigger Report
+process.hlTrigReport = cms.EDAnalyzer("HLTrigReport",
+    HLTriggerResults=cms.InputTag("TriggerResults", "", options.hltProcess)
+)
+
+
 process.p0 = cms.Path(
+                      process.hlTrigReport*
     process.patseq * process.rootNTuples)
 
 
