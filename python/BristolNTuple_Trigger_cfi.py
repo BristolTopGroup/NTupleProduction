@@ -40,7 +40,7 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v',#25
     #EWK triggers
     'HLT_Ele25_WP80_PFMT40_v',#26
-    'HLT_Ele27_WP70_PFMT40_PFMHT20_v'#27
+    'HLT_Ele27_WP70_PFMT40_PFMHT20_v',#27
     
     
     #SingleElectron PD
