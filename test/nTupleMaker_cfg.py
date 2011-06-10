@@ -113,25 +113,11 @@ else :
 #values taken from
 #https://twiki.cern.ch/twiki/bin/view/CMS/HBHEAnomalousSignals2011
 process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
+# Modify defaults setting to avoid an over-efficiency in the presence of OFT PU
 process.HBHENoiseFilterResultProducer.minIsolatedNoiseSumE = cms.double(999999.)
 process.HBHENoiseFilterResultProducer.minNumIsolatedNoiseChannels = cms.int32(999999)
 process.HBHENoiseFilterResultProducer.minIsolatedNoiseSumEt = cms.double(999999.)
-#process.HBHENoiseFilterResultProducer = cms.EDProducer(
-#    'HBHENoiseFilterResultProducer',
-#    minRatio = cms.double(-999),
-#    maxRatio = cms.double(999),
-#    minHPDHits = cms.int32(17),
-#    minRBXHits = cms.int32(999),
-#    minHPDNoOtherHits = cms.int32(10),
-#    minZeros = cms.int32(10),
-#    minHighEHitTime = cms.double(-9999.0),
-#    maxHighEHitTime = cms.double(9999.0),
-#    maxRBXEMF = cms.double(-999.0),
-#    minNumIsolatedNoiseChannels = cms.int32(9999),
-#    minIsolatedNoiseSumE = cms.double(9999),
-#    minIsolatedNoiseSumEt = cms.double(9999),
-#    useTS4TS5 = cms.bool(True)
-#    )
+
 
 process.load("BristolAnalysis.NTupleTools.EventFilter_cfi")
 process.EventFilter.NumTracks = cms.uint32(10)
@@ -142,7 +128,7 @@ process.EventFilter.maxAbsElectronEta = cms.double(2.6)
 #for DAV vertices
 pvSrc = 'offlinePrimaryVertices'
 process.EventFilter.VertexInput = cms.InputTag(pvSrc)
-process.EventFilter.VertexMinimumNDOF = cms.uint32(7)
+process.EventFilter.VertexMinimumNDOF = cms.uint32(4)# this is >= 4
 process.EventFilter.VertexMaxAbsZ = cms.double(24)
 process.EventFilter.VertexMaxAbsRho = cms.double(2)
 
@@ -167,7 +153,7 @@ from PhysicsTools.SelectorUtils.pvSelector_cfi import pvSelector
 process.goodOfflinePrimaryVertices = cms.EDFilter(
     "PrimaryVertexObjectFilter",
     filterParams = pvSelector.clone( maxZ = cms.double(24.0),
-                                     minNdof = cms.double(7.0)
+                                     minNdof = cms.double(4.0) # this is >= 4
                                      ),
     src=cms.InputTag(pvSrc)
     )
@@ -340,14 +326,7 @@ process.kt6PFJetsPFlow = kt4PFJets.clone(
     rParam = cms.double(0.6),
     src = cms.InputTag('pfNoElectron'+postfix),
     doAreaFastjet = cms.bool(True),
-    doRhoFastjet = cms.bool(True),
-    voronoiRfact = cms.double(0.9)
-    )
-process.kt6PFJets = kt4PFJets.clone(
-    rParam = cms.double(0.6),
-    doAreaFastjet = cms.bool(True),
-    doRhoFastjet = cms.bool(True),
-    voronoiRfact = cms.double(0.9)
+    doRhoFastjet = cms.bool(True)
     )
 
 
@@ -359,7 +338,9 @@ process.ca8PFJetsPFlow = ca4PFJets.clone(
     rParam = cms.double(0.8),
     src = cms.InputTag('pfNoElectron'+postfix),
     doAreaFastjet = cms.bool(True),
-    doRhoFastjet = cms.bool(True)
+    doRhoFastjet = cms.bool(True),
+    Rho_EtaMax = cms.double(6.0),
+    Ghost_EtaMax = cms.double(7.0)
     )
 
 ###############################
@@ -384,7 +365,8 @@ process.caPrunedPFlow = cms.EDProducer(
 process.caPrunedPFlow.nSubjets = cms.int32(2)
 
 
-process.caPrunedGen =  cms.EDProducer("SubJetProducer",
+process.caPrunedGen =  cms.EDProducer(
+    "SubJetProducer",
     GenJetParameters.clone(src = cms.InputTag("genParticlesForJetsNoNu"),
                            doAreaFastjet = cms.bool(True),
                            doRhoFastjet = cms.bool(False)
@@ -460,7 +442,7 @@ process.CATopTagInfosGen = cms.EDProducer("CATopJetTagger",
 
 for ipostfix in [postfix] :
     for module in (
-        getattr(process,"kt6PFJets"),
+        #getattr(process,"kt6PFJets"),
         getattr(process,"kt6PFJets" + ipostfix),
         getattr(process,"ca8PFJets" + ipostfix),        
         getattr(process,"CATopTagInfos" + ipostfix),
@@ -664,7 +646,9 @@ process.patseq = cms.Sequence(
     process.CATopTagInfosGen
     )
 
+
 if options.use41x :
+
     process.patseq.replace( process.goodOfflinePrimaryVertices,
                             process.offlinePrimaryVertices *
                             process.goodOfflinePrimaryVertices *
