@@ -684,7 +684,7 @@ process.rootTupleVertex.Prefix = cms.string('goodOfflinePrimaryVertices.')
 #calo jets
 process.rootTupleCaloJets.InputTag = cms.InputTag('goodPatJets')
 process.rootTupleCaloJets.Prefix = cms.string('goodPatJets.')
-
+process.rootTupleCaloJets.ReadJECuncertainty = cms.bool(options.use41x)
 #PF2PAT jets
 process.rootTuplePF2PATJets.InputTag = cms.InputTag('goodPatJetsPFlow')
 process.rootTuplePF2PATJets.Prefix = cms.string('goodPatJetsPFlow.')
