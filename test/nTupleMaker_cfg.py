@@ -322,6 +322,12 @@ for iele in [ process.patElectrons,
 ###############################
 
 from RecoJets.JetProducers.kt4PFJets_cfi import kt4PFJets
+process.kt6PFJets = kt4PFJets.clone(
+    rParam = cms.double(0.6),
+    doAreaFastjet = cms.bool(True),
+    doRhoFastjet = cms.bool(True)
+    )
+
 process.kt6PFJetsPFlow = kt4PFJets.clone(
     rParam = cms.double(0.6),
     src = cms.InputTag('pfNoElectron'+postfix),
@@ -442,7 +448,7 @@ process.CATopTagInfosGen = cms.EDProducer("CATopJetTagger",
 
 for ipostfix in [postfix] :
     for module in (
-        #getattr(process,"kt6PFJets"),
+        getattr(process,"kt6PFJets"),
         getattr(process,"kt6PFJets" + ipostfix),
         getattr(process,"ca8PFJets" + ipostfix),        
         getattr(process,"CATopTagInfos" + ipostfix),
