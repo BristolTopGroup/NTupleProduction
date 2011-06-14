@@ -303,7 +303,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
             sigmaIEtaIEta->push_back(it->sigmaIetaIeta());
             deltaPhiTrkSC->push_back(it->deltaPhiSuperClusterTrackAtVtx());
             deltaEtaTrkSC->push_back(it->deltaEtaSuperClusterTrackAtVtx());
-
+            passID->push_back( passId );
             //Iso variables
             trkIso->push_back(it->trackIso());
             ecalIso->push_back(it->ecalIso());
