@@ -695,6 +695,9 @@ process.rootTuplePF2PATJets.ReadJECuncertainty = cms.bool(options.use41x)
 process.rootTupleCA8PFJets = process.rootTuplePF2PATJets.clone()
 process.rootTupleCA8PFJets.InputTag = cms.InputTag('goodPatJetsCA8PF')
 process.rootTupleCA8PFJets.Prefix = cms.string('goodPatJetsCA8PF.')
+#selection on GenParticles
+process.rootTupleGenParticles.minPt = cms.double(-1)
+process.rootTupleGenParticles.maxAbsoluteEta = cms.double(100)
 
 #the following jets need their own producer
 #Cambridge-Aachen cone 0.8 jets pruned
