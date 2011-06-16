@@ -80,12 +80,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         status->push_back( it->status() );
 
         int idx = -1;
-        for( reco::GenParticleCollection::const_iterator mit = genParticles->begin(); mit != genParticles->end(); ++mit ) {
-          if( it->mother()==&(*mit) ) {
-             idx = std::distance(genParticles->begin(),mit);
-             break;
-          }
-        }
+        for (reco::GenParticleCollection::const_iterator mit = genParticles->begin(); mit
+                        != genParticles->end(); ++mit) {
+                    if (it->mother() == &(*mit)) {
+                        if (mit->pt() < minPt || fabs(mit->eta()) > maxAbsoluteEta)
+                            continue;
+                        idx = std::distance(genParticles->begin(), mit);
+                        break;
+                    }
+                }
         motherIndex->push_back( idx );
       }
     } else {
