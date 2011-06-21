@@ -8,8 +8,6 @@ BristolNTuple_GenParticles::BristolNTuple_GenParticles(const edm::ParameterSet& 
     inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
     prefix  (iConfig.getParameter<std::string>  ("Prefix")),
     suffix  (iConfig.getParameter<std::string>  ("Suffix")),
-    minPt (iConfig.getParameter<double> ("minPt")),
-    maxAbsoluteEta (iConfig.getParameter<double> ("maxAbsoluteEta")),
     maxSize (iConfig.getParameter<unsigned int> ("MaxSize"))
 {
   produces <std::vector<double> > ( prefix + "Eta" + suffix );
@@ -60,8 +58,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         // exit from loop when you reach the required number of GenParticles
         if(eta->size() >= maxSize)
           break;
-        if(it->pt() < minPt || fabs(it->eta()) > maxAbsoluteEta)
-            continue;
 
         // fill in all the vectors
         eta->push_back( it->eta() );
@@ -83,8 +79,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         for (reco::GenParticleCollection::const_iterator mit = genParticles->begin(); mit
                         != genParticles->end(); ++mit) {
                     if (it->mother() == &(*mit)) {
-                        if (mit->pt() < minPt || fabs(mit->eta()) > maxAbsoluteEta)
-                            continue;
                         idx = std::distance(genParticles->begin(), mit);
                         break;
                     }
