@@ -127,7 +127,7 @@ process.EventFilter.minElectronPt = cms.double(25.)
 process.EventFilter.maxAbsElectronEta = cms.double(2.6)
 #for DAV vertices
 pvSrc = 'offlinePrimaryVertices'
-process.EventFilter.VertexInput = cms.InputTag(pvSrc)
+process.EventFilter.VertexInput = cms.InputTag('goodOfflinePrimaryVertices')
 process.EventFilter.VertexMinimumNDOF = cms.uint32(4)# this is >= 4
 process.EventFilter.VertexMaxAbsZ = cms.double(24)
 process.EventFilter.VertexMaxAbsRho = cms.double(2)
@@ -633,8 +633,8 @@ process.goodPatJetsCATopTagPF = cms.EDFilter("PFJetIDSelectionFunctorFilter",
 
 process.patseq = cms.Sequence(
     process.HBHENoiseFilterResultProducer*
-    process.EventFilter*
     process.goodOfflinePrimaryVertices*
+    process.EventFilter*
     process.genParticlesForJetsNoNu*
     process.ca8GenJetsNoNu*
     getattr(process,"patPF2PATSequence"+postfix)*
