@@ -62,15 +62,14 @@ if not options.useData :
             ]
     
 else :
+    inputJetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual'])
+    caloJetCorrection = ( 'AK5Calo', ['L1Offset' , 'L2Relative', 'L3Absolute', 'L2L3Residual'])
+    
     if options.use41x :
-        inputJetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual'])
-        caloJetCorrection = ( 'AK5Calo', ['L1Offset' , 'L2Relative', 'L3Absolute', 'L2L3Residual'])
         process.source.fileNames = [
             'file:///storage/TopQuarkGroup/data/Run2011ASingleElectronPromtReco_v2_run163796_AOD.root'
             ]
     else :
-        inputJetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'])
-        caloJetCorrection = ( 'AK5Calo', ['L1Offset' , 'L2Relative', 'L3Absolute'])
         process.source.fileNames = [
             'file:///storage/TopQuarkGroup/SingleElectronMay10Rereco.root'
             ]
@@ -96,9 +95,9 @@ if not options.use41x :
     # 4.2.x configuration
     fileTag = '42x'
     if options.useData :
-        process.GlobalTag.globaltag = cms.string( 'GR_R_42_V14::All' )
+        process.GlobalTag.globaltag = cms.string( 'GR_R_42_V19::All' )
     else :
-        process.GlobalTag.globaltag = cms.string( 'START42_V12::All' )
+        process.GlobalTag.globaltag = cms.string( 'START42_V13::All' )
 
 else :
     # 4.1.x configuration
