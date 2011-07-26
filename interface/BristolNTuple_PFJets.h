@@ -16,6 +16,7 @@ class BristolNTuple_PFJets : public edm::EDProducer {
   const unsigned int    maxSize;
   const std::string jecUncPath;
   const bool readJECuncertainty;
+  const edm::InputTag   vtxInputTag;
 };
 
 #endif

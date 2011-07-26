@@ -6,7 +6,8 @@ rootTuplePFJets = cms.EDProducer("BristolNTuple_PFJets",
     Suffix = cms.string(''),
     MaxSize = cms.uint32(99),
     JECUncertainty = cms.string('AK5PF'),
-    ReadJECuncertainty = cms.bool(True)
+    ReadJECuncertainty = cms.bool(True),
+    VertexInputTag = cms.InputTag('offlinePrimaryVertices')
 )
 
 
