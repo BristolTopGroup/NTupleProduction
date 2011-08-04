@@ -19,6 +19,7 @@ BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig):
     produces<unsigned int> (prefix + "Orbit" + suffix);
     produces<double> (prefix + "Time" + suffix);
     produces<bool> (prefix + "isData" + suffix);
+    produces <double>       ( "rho" );
 }
 
 void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -70,6 +71,10 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
     std::auto_ptr<bool> isdata(new bool(iEvent.isRealData()));
 
+    edm::Handle<double> rhoH;
+    iEvent.getByLabel(edm::InputTag("kt6PFJets", "rho"), rhoH);
+    std::auto_ptr<double> rho(new double(*rhoH.product()));
+
     //-----------------------------------------------------------------
     iEvent.put(magField, prefix + "MagneticField" + suffix);
     iEvent.put(run, prefix + "Run" + suffix);
@@ -79,4 +84,5 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
     iEvent.put(orbit, prefix + "Orbit" + suffix);
     iEvent.put(time, prefix + "Time" + suffix);
     iEvent.put(isdata, prefix + "isData" + suffix);
+    iEvent.put( rho,   "rho"   );
 }
