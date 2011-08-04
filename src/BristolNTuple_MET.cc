@@ -14,6 +14,7 @@ BristolNTuple_MET::BristolNTuple_MET(const edm::ParameterSet& iConfig) :
     produces<std::vector<double> > (prefix + "ET" + suffix);
     produces<std::vector<double> > (prefix + "Phi" + suffix);
     produces<std::vector<double> > (prefix + "SumET" + suffix);
+    produces<std::vector<double> > (prefix + "Significance" + suffix);
 
     if (store_uncorrected_MET) {
         produces<std::vector<double> > (prefix + "ETUncorr" + suffix);
@@ -32,6 +33,7 @@ void BristolNTuple_MET::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     std::auto_ptr < std::vector<double> > metuncorr(new std::vector<double>());
     std::auto_ptr < std::vector<double> > metphiuncorr(new std::vector<double>());
     std::auto_ptr < std::vector<double> > sumetuncorr(new std::vector<double>());
+    std::auto_ptr < std::vector<double> > significance(new std::vector<double>());
 
     //-----------------------------------------------------------------
     edm::Handle < std::vector<pat::MET> > mets;
@@ -48,7 +50,7 @@ void BristolNTuple_MET::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
             met->push_back(it->pt());
             metphi->push_back(it->phi());
             sumet->push_back(it->sumEt());
-
+            significance->push_back(it->significance());
             if (store_uncorrected_MET) {
                 metuncorr->push_back(it->uncorrectedPt(pat::MET::uncorrALL));
                 metphiuncorr->push_back(it->uncorrectedPhi(pat::MET::uncorrALL));
