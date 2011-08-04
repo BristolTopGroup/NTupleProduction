@@ -164,6 +164,9 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
     edm::Handle < std::vector<pat::Jet> > jets;
     iEvent.getByLabel(inputTag, jets);
 
+    edm::Handle < reco::VertexCollection > primaryVertices; // DB
+    iEvent.getByLabel(vtxInputTag, primaryVertices); // DB
+
     if (jets.isValid()) {
         edm::LogInfo("BristolNTuple_PFJetsInfo") << "Total # PFJets: " << jets->size();
 
