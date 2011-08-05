@@ -723,8 +723,8 @@ process.nTupleMuons.Prefix = cms.string('selectedPatMuons.')
 process.nTuplePFMuons.InputTag = cms.InputTag('selectedPatMuonsLoosePFlow')
 process.nTuplePFMuons.Prefix = cms.string('selectedPatMuonsLoosePFlow.')
 #PF taus
-process.rootTupleTaus.InputTag = cms.InputTag('selectedPatTausPFlow')
-process.rootTupleTaus.Prefix = cms.string('selectedPatTausPFlow.')
+#process.rootTupleTaus.InputTag = cms.InputTag('selectedPatTausPFlow')
+#process.rootTupleTaus.Prefix = cms.string('selectedPatTausPFlow.')
 #PF photons
 #process.rootTuplePhotons.InputTag = cms.InputTag('patPhotonsPFlow')
 #process.rootTuplePhotons.Prefix = cms.string('patPhotonsPFlow.')
