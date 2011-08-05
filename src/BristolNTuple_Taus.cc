@@ -1,5 +1,5 @@
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_Taus.h"
-#include "Leptoquarks/RootTupleMakerV2/interface/PatUtilities.h"
+#include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
