@@ -18,6 +18,7 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
     maxSize(iConfig.getParameter<unsigned int> ("MaxSize")),
     jecUncPath(iConfig.getParameter<std::string>("JECUncertainty")),
     readJECuncertainty (iConfig.getParameter<bool>   ("ReadJECuncertainty")),
+    doVertexAssociation(iConfig.getParameter<bool>   ("DoVertexAssociation")),
     vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 {
 
@@ -72,14 +73,17 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
     produces<std::vector<int> > (prefix + "PassLooseID" + suffix);
     produces<std::vector<int> > (prefix + "PassTightID" + suffix);
 
-    produces<std::vector<double> > (prefix + "BestVertexTrackAssociationFactor" + suffix);
-	produces<std::vector<int> > (prefix + "BestVertexTrackAssociationIndex" + suffix);
-	produces<std::vector<double> > (prefix + "ClosestVertexWeighted3DSeparation" + suffix);
-	produces<std::vector<double> > (prefix + "ClosestVertexWeightedXYSeparation" + suffix);
-	produces<std::vector<double> > (prefix + "ClosestVertexWeightedZSeparation" + suffix);
-	produces<std::vector<int> > (prefix + "ClosestVertex3DIndex" + suffix);
-	produces<std::vector<int> > (prefix + "ClosestVertexXYIndex" + suffix);
-	produces<std::vector<int> > (prefix + "ClosestVertexZIndex" + suffix);
+    if (doVertexAssociation) {
+        produces<std::vector<double> > (prefix + "BestVertexTrackAssociationFactor" + suffix);
+        produces<std::vector<int> > (prefix + "BestVertexTrackAssociationIndex" + suffix);
+        produces<std::vector<double> > (prefix + "ClosestVertexWeighted3DSeparation" + suffix);
+        produces<std::vector<double> > (prefix + "ClosestVertexWeightedXYSeparation" + suffix);
+        produces<std::vector<double> > (prefix + "ClosestVertexWeightedZSeparation" + suffix);
+        produces<std::vector<int> > (prefix + "ClosestVertex3DIndex" + suffix);
+        produces<std::vector<int> > (prefix + "ClosestVertexXYIndex" + suffix);
+        produces<std::vector<int> > (prefix + "ClosestVertexZIndex" + suffix);
+    }
+
 }
 
 void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -132,6 +136,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
     std::auto_ptr < std::vector<int> > passLooseID(new std::vector<int>());
     std::auto_ptr < std::vector<int> > passTightID(new std::vector<int>());
+
 
     std::auto_ptr<std::vector<double> > bestVertexTrackAssociationFactor(new std::vector<double>());
 	std::auto_ptr<std::vector<int> > bestVertexTrackAssociationIndex(new std::vector<int>());
@@ -207,81 +212,83 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
 			if (primaryVertices.isValid()) {
 				edm::LogInfo("BristolNTuple_PFJetsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
+				if (doVertexAssociation) {
+                    // Main Vertex Loop
+                    for (reco::VertexCollection::const_iterator v_it = primaryVertices->begin(); v_it
+                            != primaryVertices->end(); ++v_it) {
 
-				// Main Vertex Loop
-				for (reco::VertexCollection::const_iterator v_it = primaryVertices->begin(); v_it
-						!= primaryVertices->end(); ++v_it) {
+                        double sumweights = 0.0;
+                        double dist3Dweighted = 0.0;
+                        double distXYweighted = 0.0;
+                        double distZweighted = 0.0;
+                        double assocsumpttracks = 0.0;
+                        double trackassociationratio = 0.000001;
 
-					double sumweights = 0.0;
-					double dist3Dweighted = 0.0;
-					double distXYweighted = 0.0;
-					double distZweighted = 0.0;
-					double assocsumpttracks = 0.0;
-					double trackassociationratio = 0.000001;
+                        // Loop on tracks in jet, calculate PT weighted 3D distance to vertex and PT weighted shared track ratio
+                        const reco::TrackRefVector &jtracks = it->associatedTracks();
+                        for (reco::TrackRefVector::const_iterator jtIt = jtracks.begin(); jtIt != jtracks.end(); ++jtIt) {
+                            if (jtIt->isNull())
+                                continue;
+                            const reco::Track *jtrack = jtIt->get();
+                            double trackptweight = jtrack->pt();
+                            sumweights += trackptweight;
 
-					// Loop on tracks in jet, calculate PT weighted 3D distance to vertex and PT weighted shared track ratio
-					const reco::TrackRefVector &jtracks = it->associatedTracks();
-					for (reco::TrackRefVector::const_iterator jtIt = jtracks.begin(); jtIt != jtracks.end(); ++jtIt) {
-						if (jtIt->isNull())
-							continue;
-						const reco::Track *jtrack = jtIt->get();
-						double trackptweight = jtrack->pt();
-						sumweights += trackptweight;
+                            // Weighted Distance Calculation
+                            double distXY = jtrack->dxy(v_it->position());
+                            double distZ = jtrack->dz(v_it->position());
+                            dist3Dweighted = trackptweight * (sqrt(pow(distXY, 2) + pow(distZ, 2)));
+                            distXYweighted = trackptweight * distXY;
+                            distZweighted = trackptweight * distZ;
 
-						// Weighted Distance Calculation
-						double distXY = jtrack->dxy(v_it->position());
-						double distZ = jtrack->dz(v_it->position());
-						dist3Dweighted = trackptweight * (sqrt(pow(distXY, 2) + pow(distZ, 2)));
-						distXYweighted = trackptweight * distXY;
-						distZweighted = trackptweight * distZ;
+                            // Loop on vertex tracks, find PT weighted shared tracks.
+                            for (reco::Vertex::trackRef_iterator vtIt = v_it->tracks_begin(); vtIt
+                                    != v_it->tracks_end(); ++vtIt) {
+                                if (vtIt->isNull())
+                                    continue;
+                                const reco::Track *vtrack = vtIt->get();
+                                if (vtrack != jtrack)
+                                    continue;
+                                assocsumpttracks += jtrack->pt();
+                                break;
+                            }
 
-						// Loop on vertex tracks, find PT weighted shared tracks.
-						for (reco::Vertex::trackRef_iterator vtIt = v_it->tracks_begin(); vtIt != v_it->tracks_end(); ++vtIt) {
-							if (vtIt->isNull())
-								continue;
-							const reco::Track *vtrack = vtIt->get();
-							if (vtrack != jtrack)
-								continue;
-							assocsumpttracks += jtrack->pt();
-							break;
-						}
+                            trackassociationratio = assocsumpttracks / sumweights;
 
-						trackassociationratio = assocsumpttracks / sumweights;
+                        }
 
-					}
+                        // Divide distances by sum of weights.
+                        dist3Dweighted = dist3Dweighted / sumweights;
+                        distXYweighted = distXYweighted / sumweights;
+                        distZweighted = distZweighted / sumweights;
 
-					// Divide distances by sum of weights.
-					dist3Dweighted = dist3Dweighted / sumweights;
-					distXYweighted = distXYweighted / sumweights;
-					distZweighted = distZweighted / sumweights;
+                        // Find vertex with minimum weighted distance.
+                        if (dist3Dweighted < minVtxDist3D) {
+                            minVtxDist3D = dist3Dweighted;
+                            bestVtxIndex3Ddist = int(std::distance(primaryVertices->begin(), v_it));
 
-					// Find vertex with minimum weighted distance.
-					if (dist3Dweighted < minVtxDist3D) {
-						minVtxDist3D = dist3Dweighted;
-						bestVtxIndex3Ddist = int(std::distance(primaryVertices->begin(), v_it));
+                        }
 
-					}
+                        if (distXYweighted < minVtxDistXY) {
+                            minVtxDistXY = distXYweighted;
+                            bestVtxIndexXYdist = int(std::distance(primaryVertices->begin(), v_it));
+                        }
 
-					if (distXYweighted < minVtxDistXY) {
-						minVtxDistXY = distXYweighted;
-						bestVtxIndexXYdist = int(std::distance(primaryVertices->begin(), v_it));
-					}
+                        if (distZweighted < minVtxDistZ) {
+                            minVtxDistZ = distZweighted;
+                            bestVtxIndexZdist = int(std::distance(primaryVertices->begin(), v_it));
+                        }
 
-					if (distZweighted < minVtxDistZ) {
-						minVtxDistZ = distZweighted;
-						bestVtxIndexZdist = int(std::distance(primaryVertices->begin(), v_it));
-					}
+                        // Find vertex with minimum weighted distance.
+                        if (trackassociationratio > maxTrackAssocRatio) {
+                            maxTrackAssocRatio = trackassociationratio;
+                            bestVtxIndexSharedTracks = int(std::distance(primaryVertices->begin(), v_it));
+                        }
 
-					// Find vertex with minimum weighted distance.
-					if (trackassociationratio > maxTrackAssocRatio) {
-						maxTrackAssocRatio = trackassociationratio;
-						bestVtxIndexSharedTracks = int(std::distance(primaryVertices->begin(), v_it));
-					}
-
-					//std::cout<<dist3Dweighted<<"  "<<distXYweighted<<"  "<<distZweighted<<"  "<<trackassociationratio<<"  "<<int(std::distance(primaryVertices->begin(),v_it))<<std::endl;
+                        //std::cout<<dist3Dweighted<<"  "<<distXYweighted<<"  "<<distZweighted<<"  "<<trackassociationratio<<"  "<<int(std::distance(primaryVertices->begin(),v_it))<<std::endl;
 
 
-				}
+                    }
+                }
 				//std::cout<<"---------------------"<<std::endl;
 			} else {
 				edm::LogError("BristolNTuple_PFJetsError") << "Error! Can't get the product " << vtxInputTag;
@@ -411,6 +418,9 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
     iEvent.put(passLooseID, prefix + "PassLooseID" + suffix);
     iEvent.put(passTightID, prefix + "PassTightID" + suffix);
+    if (doVertexAssociation) {
+
+    }
 
 //    iEvent.put( jecUnc_vec, prefix + "JECUnc" + suffix );
 }
