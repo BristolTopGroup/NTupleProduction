@@ -694,7 +694,6 @@ process.rootTuplePF2PATJets.ReadJECuncertainty = cms.bool(options.use41x)
 process.rootTupleCA8PFJets = process.rootTuplePF2PATJets.clone()
 process.rootTupleCA8PFJets.InputTag = cms.InputTag('goodPatJetsCA8PF')
 process.rootTupleCA8PFJets.Prefix = cms.string('goodPatJetsCA8PF.')
-process.rootTupleCA8PFJets.DoVertexAssociation = cms.bool(False)
 #selection on GenParticles
 process.rootTupleGenParticles.minPt = cms.double(-1)
 process.rootTupleGenParticles.maxAbsoluteEta = cms.double(100)
@@ -727,8 +726,8 @@ process.nTuplePFMuons.Prefix = cms.string('selectedPatMuonsLoosePFlow.')
 process.rootTupleTaus.InputTag = cms.InputTag('selectedPatTausPFlow')
 process.rootTupleTaus.Prefix = cms.string('selectedPatTausPFlow.')
 #PF photons
-process.rootTuplePhotons.InputTag = cms.InputTag('patPhotonsPFlow')
-process.rootTuplePhotons.Prefix = cms.string('patPhotonsPFlow.')
+#process.rootTuplePhotons.InputTag = cms.InputTag('patPhotonsPFlow')
+#process.rootTuplePhotons.Prefix = cms.string('patPhotonsPFlow.')
 #trigger
 process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','',options.hltProcess)
 
@@ -789,9 +788,9 @@ process.rootNTuples = cms.Sequence((
     process.nTuplePFMuons + 
     process.nTupleMuons +
     #taus
-    process.rootTupleTaus +
+    #process.rootTupleTaus +
     #photons
-    process.rootTuplePhotons +
+    #process.rootTuplePhotons +
     #MET
     process.rootTupleCaloMET + 
     process.rootTuplePFMET +
