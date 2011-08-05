@@ -723,7 +723,12 @@ process.nTupleMuons.Prefix = cms.string('selectedPatMuons.')
 #non isolated PF muons
 process.nTuplePFMuons.InputTag = cms.InputTag('selectedPatMuonsLoosePFlow')
 process.nTuplePFMuons.Prefix = cms.string('selectedPatMuonsLoosePFlow.')
-
+#PF taus
+process.rootTupleTaus.InputTag = cms.InputTag('selectedPatTausPFlow')
+process.rootTupleTaus.Prefix = cms.string('selectedPatTausPFlow.')
+#PF photons
+process.rootTuplePhotons.InputTag = cms.InputTag('patPhotonsPFlow')
+process.rootTuplePhotons.Prefix = cms.string('patPhotonsPFlow.')
 #trigger
 process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','',options.hltProcess)
 
@@ -748,6 +753,10 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         #muons
         'keep *_nTupleMuons_*_*',
         'keep *_nTuplePFMuons_*_*',
+        #taus
+        'keep *_rootTupleTaus_*_*',
+        #photons
+        'keep *_rootTuplePhotons_*_*',
         #trigger
         'keep *_rootTupleTrigger_*_*',
         #vertices (DA)
@@ -779,6 +788,10 @@ process.rootNTuples = cms.Sequence((
     #muons
     process.nTuplePFMuons + 
     process.nTupleMuons +
+    #taus
+    process.rootTupleTaus +
+    #photons
+    process.rootTuplePhotons +
     #MET
     process.rootTupleCaloMET + 
     process.rootTuplePFMET +
