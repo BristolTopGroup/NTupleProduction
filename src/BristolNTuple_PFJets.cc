@@ -419,8 +419,14 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
     iEvent.put(passLooseID, prefix + "PassLooseID" + suffix);
     iEvent.put(passTightID, prefix + "PassTightID" + suffix);
     if (doVertexAssociation) {
-
+        iEvent.put(bestVertexTrackAssociationFactor, prefix + "BestVertexTrackAssociationFactor" + suffix);
+        iEvent.put(bestVertexTrackAssociationIndex, prefix + "BestVertexTrackAssociationIndex" + suffix);
+        iEvent.put(closestVertexWeighted3DSeparation, prefix + "ClosestVertexWeighted3DSeparation" + suffix);
+        iEvent.put(closestVertexWeightedXYSeparation, prefix + "ClosestVertexWeightedXYSeparation" + suffix);
+        iEvent.put(closestVertexWeightedZSeparation, prefix + "ClosestVertexWeightedZSeparation" + suffix);
+        iEvent.put(closestVertex3DIndex, prefix + "ClosestVertex3DIndex" + suffix);
+        iEvent.put(closestVertexXYIndex, prefix + "ClosestVertexXYIndex" + suffix);
+        iEvent.put(closestVertexZIndex, prefix + "ClosestVertexZIndex" + suffix);
     }
 
-//    iEvent.put( jecUnc_vec, prefix + "JECUnc" + suffix );
 }
