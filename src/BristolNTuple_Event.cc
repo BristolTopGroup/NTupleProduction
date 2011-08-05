@@ -9,8 +9,8 @@
 BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig):
     dcsInputTag(iConfig.getParameter<edm::InputTag> ("DCSInputTag")),
     prefix(iConfig.getParameter<std::string> ("Prefix")),
-    suffix(iConfig.getParameter<std::string> ("Suffix")) {
-
+    suffix(iConfig.getParameter<std::string> ("Suffix"))
+{
     produces<double> (prefix + "MagneticField" + suffix);
     produces<unsigned int> (prefix + "Run" + suffix);
     produces<unsigned int> (prefix + "Number" + suffix);
@@ -19,7 +19,7 @@ BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig):
     produces<unsigned int> (prefix + "Orbit" + suffix);
     produces<double> (prefix + "Time" + suffix);
     produces<bool> (prefix + "isData" + suffix);
-    produces <double>       ( "rho" );
+    produces<double> (prefix + "rho" + suffix);
 }
 
 void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -84,5 +84,5 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
     iEvent.put(orbit, prefix + "Orbit" + suffix);
     iEvent.put(time, prefix + "Time" + suffix);
     iEvent.put(isdata, prefix + "isData" + suffix);
-    iEvent.put( rho,   "rho"   );
+    iEvent.put(rho, prefix + "rho" + suffix);
 }
