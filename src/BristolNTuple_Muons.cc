@@ -124,7 +124,9 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
                 break;
             if (!it->isGlobalMuon())
                 continue;
-            const reco::TrackRef& cocktail_track = pmcTrack(*it);
+
+            int refit_id = -999;
+            const reco::TrackRef& cocktail_track = pmcTrack(*it, refit_id);
             double trkd0 = it->track()->d0();
             double cttrkd0 = cocktail_track->d0();
 
