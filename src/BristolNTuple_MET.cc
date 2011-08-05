@@ -69,6 +69,7 @@ void BristolNTuple_MET::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     iEvent.put(met, prefix + "ET" + suffix);
     iEvent.put(metphi, prefix + "Phi" + suffix);
     iEvent.put(sumet, prefix + "SumET" + suffix);
+    iEvent.put(significance, prefix + "Significance" + suffix);
     if (store_uncorrected_MET) {
         iEvent.put(metuncorr, prefix + "ETUncorr" + suffix);
         iEvent.put(metphiuncorr, prefix + "PhiUncorr" + suffix);
