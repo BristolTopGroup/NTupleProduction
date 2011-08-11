@@ -39,6 +39,12 @@ options.register ('forceCheckClosestZVertex',
                   VarParsing.varType.bool,
                   "Force the check of the closest z vertex")
 
+options.register ('includeEventMetaData',
+                  False,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.bool,
+                  "include event meta data")
+
 options.register ('dataType',
                   '',
                   VarParsing.multiplicity.singleton,
@@ -841,6 +847,39 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(100)
 process.maxEvents.input = 100
 process.options.wantSummary = True
 process.out.dropMetaData = cms.untracked.string("DROPPED")
+process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMConverter_*_*")
+process.out.outputCommands = [
+    'drop *',
+       #beamspot
+        'keep *_rootTupleBeamSpot_*_*',
+        #EventContent
+        'keep *_rootTupleEvent_*_*',
+        #CaloJets
+        'keep *_rootTupleCaloJets_*_*',
+        #PF jets
+        'keep *_rootTuplePF2PATJets_*_*',
+        'keep *_rootTupleCA8PFJets_*_*',
+        #electrons
+        'keep *_rootTupleElectrons_*_*',
+        'keep *_rootTuplePFElectrons_*_*',
+        #MET
+        'keep *_rootTupleCaloMET_*_*',
+        'keep *_rootTuplePFMET_*_*',
+        #muons
+        'keep *_nTupleMuons_*_*',
+        'keep *_nTuplePFMuons_*_*',
+        #trigger
+        'keep *_rootTupleTrigger_*_*',
+        #vertices (DA)
+        'keep *_rootTupleVertex_*_*',
+        #tracks
+        'keep *_rootTupleTracks_*_*',
+        #gen information
+        'keep *_rootTupleGenEventInfo_*_*',
+        'keep *_rootTupleGenParticles_*_*',
+        'keep *_rootTupleGenJets_*_*',
+        'keep *_rootTupleGenMETTrue_*_*',
+    ]
 
 
 #del process.outpath
