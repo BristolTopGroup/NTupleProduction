@@ -70,6 +70,15 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
     produces<std::vector<double> > (prefix + "JetProbabilityBTag" + suffix);
     produces<std::vector<double> > (prefix + "JetBProbabilityBTag" + suffix);
 
+    produces < std::vector<double> > (prefix + "SoftElectronByIP3dBJetTag" + suffix);
+	produces < std::vector<double> > (prefix + "SoftElectronByPtBJetTag" + suffix);
+
+	produces < std::vector<double> > (prefix + "SoftMuonBJetTag" + suffix);
+	produces < std::vector<double> > (prefix + "SoftMuonByIP3dBJetTag" + suffix);
+	produces < std::vector<double> > (prefix + "SoftMuonByPtBJetTag" + suffix);
+	produces < std::vector<double> > (prefix + "CombinedSecondaryVertexMVABJetTag" + suffix);
+	produces < std::vector<double> > (prefix + "CombinedSecondaryVertexBJetTag" + suffix);
+
     produces<std::vector<int> > (prefix + "PassLooseID" + suffix);
     produces<std::vector<int> > (prefix + "PassTightID" + suffix);
 
@@ -133,6 +142,13 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
     std::auto_ptr < std::vector<double> > simpleSecondaryVertexHighPurBTag(new std::vector<double>());
     std::auto_ptr < std::vector<double> > jetProbabilityBTag(new std::vector<double>());
     std::auto_ptr < std::vector<double> > jetBProbabilityBTag(new std::vector<double>());
+
+    std::auto_ptr < std::vector<double> > softElectronBJetTag(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > softMuonBJetTag(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > softMuonNoIPBJetTag(new std::vector<double>());
+
+	std::auto_ptr < std::vector<double> > combinedSVBJetTag(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > combinedSVMVABJetTag(new std::vector<double>());
 
     std::auto_ptr < std::vector<int> > passLooseID(new std::vector<int>());
     std::auto_ptr < std::vector<int> > passTightID(new std::vector<int>());
@@ -352,12 +368,22 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
             neutralEmEnergyFractionRAW->push_back(it->correctedJet("Uncorrected").neutralEmEnergyFraction());
             neutralHadronEnergyFractionRAW->push_back(it->correctedJet("Uncorrected").neutralHadronEnergyFraction());
 
-            trackCountingHighEffBTag->push_back(it->bDiscriminator("trackCountingHighEffBJetTags"));
-            trackCountingHighPurBTag->push_back(it->bDiscriminator("trackCountingHighPurBJetTags"));
-            simpleSecondaryVertexHighEffBTag->push_back(it->bDiscriminator("simpleSecondaryVertexHighEffBJetTags"));
-            simpleSecondaryVertexHighPurBTag->push_back(it->bDiscriminator("simpleSecondaryVertexHighPurBJetTags"));
-            jetProbabilityBTag->push_back(it->bDiscriminator("jetProbabilityBJetTags"));
-            jetBProbabilityBTag->push_back(it->bDiscriminator("jetBProbabilityBJetTags"));
+            //names are changing between major software releases
+                        trackCountingHighEffBTag->push_back(it->bDiscriminator("trackCountingHighEffBJetTags"));// checked 19.09.2011
+                        trackCountingHighPurBTag->push_back(it->bDiscriminator("trackCountingHighPurBJetTags"));// checked 19.09.2011
+                        simpleSecondaryVertexHighEffBTag->push_back(it->bDiscriminator("simpleSecondaryVertexHighEffBJetTags"));// checked 19.09.2011
+                        simpleSecondaryVertexHighPurBTag->push_back(it->bDiscriminator("simpleSecondaryVertexHighPurBJetTags"));// checked 19.09.2011
+                        jetProbabilityBTag->push_back(it->bDiscriminator("jetProbabilityBJetTags"));// checked 19.09.2011
+                        jetBProbabilityBTag->push_back(it->bDiscriminator("jetBProbabilityBJetTags"));// checked 19.09.2011
+
+                        softElectronByIP3dBJetTags->push_back(it->bDiscriminator("softElectronByIP3dBJetTags"));// corrected 19.09.2011
+                        softElectronByPtBJetTags->push_back(it->bDiscriminator("softElectronByPtBJetTags"));// introduced 19.09.2011
+
+                        softMuonBJetTag->push_back(it->bDiscriminator("softMuonBJetTags"));// checked 19.09.2011
+                        softMuonByIP3dBJetTags->push_back(it->bDiscriminator("softMuonByIP3dBJetTags"));// corrected 19.09.2011
+                        softMuonByPtBJetTags->push_back(it->bDiscriminator("softMuonByPtBJetTags"));// introduced 19.09.2011
+                        combinedSecondaryVertexBJetTags->push_back(it->bDiscriminator("combinedSecondaryVertexBJetTags"));// corrected 19.09.2011
+                        combinedSecondaryVertexMVABJetTag->push_back(it->bDiscriminator("combinedSecondaryVertexMVABJetTag"));// corrected 19.09.2011
 
             passLooseID->push_back(passjetLoose);
             passTightID->push_back(passjetTight);
@@ -410,11 +436,19 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
     iEvent.put(neutralHadronEnergyFractionRAW, prefix + "NeutralHadronEnergyFractionRAW" + suffix);
 
     iEvent.put(trackCountingHighEffBTag, prefix + "TrackCountingHighEffBTag" + suffix);
-    iEvent.put(trackCountingHighPurBTag, prefix + "TrackCountingHighPurBTag" + suffix);
-    iEvent.put(simpleSecondaryVertexHighEffBTag, prefix + "SimpleSecondaryVertexHighEffBTag" + suffix);
-    iEvent.put(simpleSecondaryVertexHighPurBTag, prefix + "SimpleSecondaryVertexHighPurBTag" + suffix);
-    iEvent.put(jetProbabilityBTag, prefix + "JetProbabilityBTag" + suffix);
-    iEvent.put(jetBProbabilityBTag, prefix + "JetBProbabilityBTag" + suffix);
+	iEvent.put(trackCountingHighPurBTag, prefix + "TrackCountingHighPurBTag" + suffix);
+	iEvent.put(simpleSecondaryVertexHighEffBTag, prefix + "SimpleSecondaryVertexHighEffBTag" + suffix);
+	iEvent.put(simpleSecondaryVertexHighPurBTag, prefix + "SimpleSecondaryVertexHighPurBTag" + suffix);
+	iEvent.put(jetProbabilityBTag, prefix + "JetProbabilityBTag" + suffix);
+	iEvent.put(jetBProbabilityBTag, prefix + "JetBProbabilityBTag" + suffix);
+
+	iEvent.put(softElectronByIP3dBJetTags, prefix + "SoftElectronByIP3dBJetTag" + suffix);
+	iEvent.put(softElectronByPtBJetTags, prefix + "SoftElectronByPtBJetTag" + suffix);
+	iEvent.put(softMuonBJetTag, prefix + "SoftMuonBJetTag" + suffix);
+	iEvent.put(softMuonByIP3dBJetTags, prefix + "SoftMuonByIP3dBJetTag" + suffix);
+	iEvent.put(softMuonByPtBJetTags, prefix + "SoftMuonByPtBJetTag" + suffix);
+	iEvent.put(combinedSecondaryVertexBJetTags, prefix + "CombinedSecondaryVertexBJetTag" + suffix);
+	iEvent.put(combinedSecondaryVertexMVABJetTag, prefix + "CombinedSecondaryVertexMVABJetTag" + suffix);
 
     iEvent.put(passLooseID, prefix + "PassLooseID" + suffix);
     iEvent.put(passTightID, prefix + "PassTightID" + suffix);
