@@ -22,9 +22,6 @@ BristolNTuple_CaloJets::BristolNTuple_CaloJets(const edm::ParameterSet& iConfig)
     readJECuncertainty (iConfig.getParameter<bool>   ("ReadJECuncertainty"))
 {
 
-    produces<std::vector<double> > (prefix + "Eta" + suffix);
-    produces<std::vector<double> > (prefix + "Phi" + suffix);
-    produces<std::vector<double> > (prefix + "Pt" + suffix);
     produces<std::vector<double> > (prefix + "Px" + suffix);
     produces<std::vector<double> > (prefix + "Py" + suffix);
     produces<std::vector<double> > (prefix + "Pz" + suffix);
@@ -74,9 +71,6 @@ BristolNTuple_CaloJets::BristolNTuple_CaloJets(const edm::ParameterSet& iConfig)
 
 void BristolNTuple_CaloJets::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-    std::auto_ptr < std::vector<double> > eta(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > phi(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > pt(new std::vector<double>());
     std::auto_ptr < std::vector<double> > px(new std::vector<double>());
     std::auto_ptr < std::vector<double> > py(new std::vector<double>());
     std::auto_ptr < std::vector<double> > pz(new std::vector<double>());
@@ -114,8 +108,8 @@ void BristolNTuple_CaloJets::produce(edm::Event& iEvent, const edm::EventSetup& 
     std::auto_ptr < std::vector<double> > softElectronByPtBJetTags(new std::vector<double>());
 
     std::auto_ptr < std::vector<double> > softMuonBJetTag(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > softMuonByIP3dBJetTag(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > softMuonByPtBJetTag(new std::vector<double>());
+    std::auto_ptr < std::vector<double> > softMuonByIP3dBJetTags(new std::vector<double>());
+    std::auto_ptr < std::vector<double> > softMuonByPtBJetTags(new std::vector<double>());
 
     std::auto_ptr < std::vector<double> > combinedSecondaryVertexBJetTags(new std::vector<double>());
     std::auto_ptr < std::vector<double> > combinedSecondaryVertexMVABJetTag(new std::vector<double>());
@@ -170,9 +164,6 @@ void BristolNTuple_CaloJets::produce(edm::Event& iEvent, const edm::EventSetup& 
             }
 
             // fill in all the vectors
-            eta->push_back(it->eta());
-            phi->push_back(it->phi());
-            pt->push_back(it->pt());
             px->push_back(it->px());
             py->push_back(it->py());
             pz->push_back(it->pz());
@@ -227,9 +218,6 @@ void BristolNTuple_CaloJets::produce(edm::Event& iEvent, const edm::EventSetup& 
     delete jecUnc;
     //-----------------------------------------------------------------
     // put vectors in the event
-    iEvent.put(eta, prefix + "Eta" + suffix);
-    iEvent.put(phi, prefix + "Phi" + suffix);
-    iEvent.put(pt, prefix + "Pt" + suffix);
     iEvent.put(px, prefix + "Px" + suffix);
     iEvent.put(py, prefix + "Py" + suffix);
     iEvent.put(pz, prefix + "Pz" + suffix);
