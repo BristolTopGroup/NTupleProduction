@@ -7,14 +7,17 @@ rootTupleElectrons = cms.EDProducer("BristolNTuple_Electrons",
     Prefix = cms.string('Electron.'),
     Suffix = cms.string(''),
     MaxSize = cms.uint32(99),
-    VertexInputTag = cms.InputTag('offlinePrimaryVertices'),
-    storePFIsolation = cms.bool(False)
-    
+    VertexInputTag = cms.InputTag('goodOfflinePrimaryVertices'),
+    storePFIsolation = cms.bool(False),
+    BeamSpotInputTag = cms.InputTag('offlineBeamSpot'),
+    ConversionsInputTag = cms.InputTag('allConversions'),
+    LikelihoodInputTag = cms.InputTag('egammaIDLikelihood'),
 )
 
 rootTuplePFElectrons = rootTupleElectrons.clone(
     InputTag = cms.InputTag('selectedPatElectronsPF'),
     Prefix = cms.string('PFElectron.'),
-    storePFIsolation = cms.bool(True))
+    storePFIsolation = cms.bool(True)
+)
 
 rootTupleElectronSequence =  cms.Sequence(rootTupleElectrons + rootTuplePFElectrons)

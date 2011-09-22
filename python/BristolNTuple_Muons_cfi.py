@@ -5,7 +5,10 @@ nTupleMuons = cms.EDProducer("BristolNTuple_Muons",
     Prefix = cms.string('Muon.'),
     Suffix = cms.string(''),
     MaxSize = cms.uint32(99),
-    VertexInputTag = cms.InputTag('offlinePrimaryVertices'),
+     MuonID = cms.string('GlobalMuonPromptTight'),
+    BeamSpotCorr = cms.bool(True),
+    UseCocktailRefits = cms.bool(True),
+    VertexInputTag = cms.InputTag('goodOfflinePrimaryVertices'),
     storePFIsolation = cms.bool(False)
 )
 

@@ -21,24 +21,27 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
     doVertexAssociation(iConfig.getParameter<bool>   ("DoVertexAssociation")),
     vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 {
-
+	//kinematic variables
     produces<std::vector<double> > (prefix + "Px" + suffix);
     produces<std::vector<double> > (prefix + "Py" + suffix);
     produces<std::vector<double> > (prefix + "Pz" + suffix);
+    produces<std::vector<double> > (prefix + "Energy" + suffix);
+    //kinematic variables before corrections
+	produces < std::vector<double> > (prefix + "PxRAW" + suffix);
+	produces < std::vector<double> > (prefix + "PyRAW" + suffix);
+	produces < std::vector<double> > (prefix + "PzRAW" + suffix);
+	produces < std::vector<double> > (prefix + "EnergyRaw" + suffix);
+	//extra properties
     produces<std::vector<double> > (prefix + "Charge" + suffix);
     produces<std::vector<double> > (prefix + "Mass" + suffix);
-
-    produces<std::vector<double> > (prefix + "PtRaw" + suffix);
-    produces<std::vector<double> > (prefix + "Energy" + suffix);
-    produces<std::vector<double> > (prefix + "EnergyRaw" + suffix);
     produces<std::vector<int> > (prefix + "PartonFlavour" + suffix);
-
+    //jet energy correction and uncertainties
     produces<std::vector<double> > (prefix + "JECUnc" + suffix);
     produces<std::vector<double> > (prefix + "L2L3ResJEC" + suffix);
     produces<std::vector<double> > (prefix + "L3AbsJEC" + suffix);
     produces<std::vector<double> > (prefix + "L2RelJEC" + suffix);
     produces<std::vector<double> > (prefix + "L1OffJEC" + suffix);
-
+    //jet ID variables
     produces<std::vector<double> > (prefix + "ChargedEmEnergyFraction" + suffix);
     produces<std::vector<double> > (prefix + "ChargedHadronEnergyFraction" + suffix);
     produces<std::vector<double> > (prefix + "ChargedMuEnergyFraction" + suffix);
@@ -59,7 +62,10 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
     produces<std::vector<double> > (prefix + "ChargedHadronEnergyFractionRAW" + suffix);
     produces<std::vector<double> > (prefix + "NeutralEmEnergyFractionRAW" + suffix);
     produces<std::vector<double> > (prefix + "NeutralHadronEnergyFractionRAW" + suffix);
-
+    produces<std::vector<int> > (prefix + "PassLooseID" + suffix);
+    produces<std::vector<int> > (prefix + "PassTightID" + suffix);
+    //b-tagging information
+    //names are changing between major software releases
     produces<std::vector<double> > (prefix + "TrackCountingHighEffBTag" + suffix);
     produces<std::vector<double> > (prefix + "TrackCountingHighPurBTag" + suffix);
     produces<std::vector<double> > (prefix + "SimpleSecondaryVertexHighEffBTag" + suffix);
@@ -76,9 +82,7 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "CombinedSecondaryVertexMVABJetTag" + suffix);
 	produces < std::vector<double> > (prefix + "CombinedSecondaryVertexBJetTag" + suffix);
 
-    produces<std::vector<int> > (prefix + "PassLooseID" + suffix);
-    produces<std::vector<int> > (prefix + "PassTightID" + suffix);
-
+	//jet-vertex association
     if (doVertexAssociation) {
         produces<std::vector<double> > (prefix + "BestVertexTrackAssociationFactor" + suffix);
         produces<std::vector<int> > (prefix + "BestVertexTrackAssociationIndex" + suffix);
@@ -93,23 +97,27 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 }
 
 void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
+	//kinematic variables
 	std::auto_ptr < std::vector<double> > px(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > py(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > pz(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > energy(new std::vector<double>());
+	//kinematic variables before corrections
+	std::auto_ptr < std::vector<double> > px_raw(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > py_raw(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > pz_raw(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > energy_raw(new std::vector<double>());
+	//extra properties
 	std::auto_ptr < std::vector<double> > charge(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > mass(new std::vector<double>());
-
-	std::auto_ptr < std::vector<double> > pt_raw(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > energy(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > energy_raw(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > partonFlavour(new std::vector<int>());
-
+	//jet energy correction and uncertainties
 	std::auto_ptr < std::vector<double> > jecUnc_vec(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > l2l3resJEC_vec(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > l3absJEC_vec(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > l2relJEC_vec(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > l1offJEC_vec(new std::vector<double>());
-
+	//jet ID variables
 	std::auto_ptr < std::vector<double> > chargedEmEnergyFraction(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > chargedHadronEnergyFraction(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > chargedMuEnergyFraction(new std::vector<double>());
@@ -130,6 +138,9 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<double> > chargedHadronEnergyFractionRAW(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > neutralEmEnergyFractionRAW(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > neutralHadronEnergyFractionRAW(new std::vector<double>());
+	std::auto_ptr < std::vector<int> > passLooseID(new std::vector<int>());
+	std::auto_ptr < std::vector<int> > passTightID(new std::vector<int>());
+	 //b-tagging information
 	std::auto_ptr < std::vector<double> > trackCountingHighEffBTag(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > trackCountingHighPurBTag(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > simpleSecondaryVertexHighEffBTag(new std::vector<double>());
@@ -147,9 +158,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<double> > combinedSecondaryVertexBJetTags(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > combinedSecondaryVertexMVABJetTag(new std::vector<double>());
 
-	std::auto_ptr < std::vector<int> > passLooseID(new std::vector<int>());
-	std::auto_ptr < std::vector<int> > passTightID(new std::vector<int>());
-
+	//jet-vertex association
 	std::auto_ptr < std::vector<double> > bestVertexTrackAssociationFactor(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > bestVertexTrackAssociationIndex(new std::vector<int>());
 	std::auto_ptr < std::vector<double> > closestVertexWeighted3DSeparation(new std::vector<double>());
@@ -306,39 +315,33 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				edm::LogError("BristolNTuple_PFJetsError") << "Error! Can't get the product " << vtxInputTag;
 			}
 
-			//std::cout<<bestVtxIndex3Ddist<<"  "<<bestVtxIndexSharedTracks<<"  "<<minVtxDist3D<<"  "<<minVtxDistXY<<"  "<<minVtxDistZ<<"  "<<maxTrackAssocRatio<<std::endl;
-			//std::cout<<"------------------------------------------"<<std::endl;
-
-			bestVertexTrackAssociationFactor->push_back(maxTrackAssocRatio);
-			bestVertexTrackAssociationIndex->push_back(bestVtxIndexSharedTracks);
-			closestVertexWeighted3DSeparation->push_back(minVtxDist3D);
-			closestVertexWeightedXYSeparation->push_back(minVtxDistXY);
-			closestVertexWeightedZSeparation->push_back(minVtxDistZ);
-			closestVertex3DIndex->push_back(bestVtxIndex3Ddist);
-			closestVertexXYIndex->push_back(bestVtxIndexXYdist);
-			closestVertexZIndex->push_back(bestVtxIndexZdist);
-
 			// fill in all the vectors
+			//kinematic variables
 			px->push_back(it->px());
 			py->push_back(it->py());
 			pz->push_back(it->pz());
+			energy->push_back(it->energy());
+			//kinematic variables before corrections
+			px_raw->push_back(it->correctedJet("Uncorrected").px());
+			py_raw->push_back(it->correctedJet("Uncorrected").py());
+			pz_raw->push_back(it->correctedJet("Uncorrected").pz());
+			energy_raw->push_back(it->correctedJet("Uncorrected").energy());
+			//extra properties
 			charge->push_back(it->jetCharge());
 			mass->push_back(it->mass());
-			//TODO: add px_, py_, pz_RAW     remove pt_RAW
-			pt_raw->push_back(it->correctedJet("Uncorrected").pt());
-			energy->push_back(it->energy());
-			energy_raw->push_back(it->correctedJet("Uncorrected").energy());
 			partonFlavour->push_back(it->partonFlavour());
 
-			l2l3resJEC_vec->push_back(it->pt() / it->correctedJet("L3Absolute").pt());
-			l3absJEC_vec->push_back(it->correctedJet("L3Absolute").pt() / it->correctedJet("L2Relative").pt());
-			l2relJEC_vec->push_back(it->correctedJet("L2Relative").pt() / it->correctedJet("L1FastJet").pt());
-			l1offJEC_vec->push_back(it->correctedJet("L1FastJet").pt() / it->correctedJet("Uncorrected").pt());
+			//jet energy correction and uncertainties
 			if (readJECuncertainty)
 				jecUnc_vec->push_back(jecUnc->getUncertainty(true));
 			else
 				jecUnc_vec->push_back(-999);
+			l2l3resJEC_vec->push_back(it->pt() / it->correctedJet("L3Absolute").pt());
+			l3absJEC_vec->push_back(it->correctedJet("L3Absolute").pt() / it->correctedJet("L2Relative").pt());
+			l2relJEC_vec->push_back(it->correctedJet("L2Relative").pt() / it->correctedJet("L1FastJet").pt());
+			l1offJEC_vec->push_back(it->correctedJet("L1FastJet").pt() / it->correctedJet("Uncorrected").pt());
 
+			//jet ID variables
 			chargedEmEnergyFraction->push_back(it->chargedEmEnergyFraction());
 			chargedHadronEnergyFraction->push_back(it->chargedHadronEnergyFraction());
 			chargedMuEnergyFraction->push_back(it->chargedMuEnergyFraction());
@@ -359,7 +362,10 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			chargedHadronEnergyFractionRAW->push_back(it->correctedJet("Uncorrected").chargedHadronEnergyFraction());
 			neutralEmEnergyFractionRAW->push_back(it->correctedJet("Uncorrected").neutralEmEnergyFraction());
 			neutralHadronEnergyFractionRAW->push_back(it->correctedJet("Uncorrected").neutralHadronEnergyFraction());
+			passLooseID->push_back(passjetLoose);
+			passTightID->push_back(passjetTight);
 
+			//b-tagging information
 			//names are changing between major software releases
 			trackCountingHighEffBTag->push_back(it->bDiscriminator("trackCountingHighEffBJetTags")); // checked 19.09.2011
 			trackCountingHighPurBTag->push_back(it->bDiscriminator("trackCountingHighPurBJetTags")); // checked 19.09.2011
@@ -377,8 +383,17 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			combinedSecondaryVertexBJetTags->push_back(it->bDiscriminator("combinedSecondaryVertexBJetTags")); // corrected 19.09.2011
 			combinedSecondaryVertexMVABJetTag->push_back(it->bDiscriminator("combinedSecondaryVertexMVABJetTag")); // corrected 19.09.2011
 
-			passLooseID->push_back(passjetLoose);
-			passTightID->push_back(passjetTight);
+			//jet-vertex association
+			if (doVertexAssociation) {
+				bestVertexTrackAssociationFactor->push_back(maxTrackAssocRatio);
+				bestVertexTrackAssociationIndex->push_back(bestVtxIndexSharedTracks);
+				closestVertexWeighted3DSeparation->push_back(minVtxDist3D);
+				closestVertexWeightedXYSeparation->push_back(minVtxDistXY);
+				closestVertexWeightedZSeparation->push_back(minVtxDistZ);
+				closestVertex3DIndex->push_back(bestVtxIndex3Ddist);
+				closestVertexXYIndex->push_back(bestVtxIndexXYdist);
+				closestVertexZIndex->push_back(bestVtxIndexZdist);
+			}
 		}
 	} else {
 		edm::LogError("BristolNTuple_PFJetsError") << "Error! Can't get the product " << inputTag;
@@ -386,23 +401,27 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	delete jecUnc;
 	//-----------------------------------------------------------------
 	// put vectors in the event
+	//kinematic variables
 	iEvent.put(px, prefix + "Px" + suffix);
 	iEvent.put(py, prefix + "Py" + suffix);
 	iEvent.put(pz, prefix + "Pz" + suffix);
+	iEvent.put(energy, prefix + "Energy" + suffix);
+	//kinematic variables before corrections
+	iEvent.put(px_raw, prefix + "PxRAW" + suffix);
+	iEvent.put(py_raw, prefix + "PyRAW" + suffix);
+	iEvent.put(pz_raw, prefix + "PzRAW" + suffix);
+	iEvent.put(energy_raw, prefix + "EnergyRAW" + suffix);
+	//extra properties
 	iEvent.put(charge, prefix + "Charge" + suffix);
 	iEvent.put(mass, prefix + "Mass" + suffix);
-
-	iEvent.put(pt_raw, prefix + "PtRaw" + suffix);
-	iEvent.put(energy, prefix + "Energy" + suffix);
-	iEvent.put(energy_raw, prefix + "EnergyRaw" + suffix);
 	iEvent.put(partonFlavour, prefix + "PartonFlavour" + suffix);
-
+	//jet energy correction and uncertainties
 	iEvent.put(jecUnc_vec, prefix + "JECUnc" + suffix);
 	iEvent.put(l2l3resJEC_vec, prefix + "L2L3ResJEC" + suffix);
 	iEvent.put(l3absJEC_vec, prefix + "L3AbsJEC" + suffix);
 	iEvent.put(l2relJEC_vec, prefix + "L2RelJEC" + suffix);
 	iEvent.put(l1offJEC_vec, prefix + "L1OffJEC" + suffix);
-
+	//jet ID variables
 	iEvent.put(chargedEmEnergyFraction, prefix + "ChargedEmEnergyFraction" + suffix);
 	iEvent.put(chargedHadronEnergyFraction, prefix + "ChargedHadronEnergyFraction" + suffix);
 	iEvent.put(chargedMuEnergyFraction, prefix + "ChargedMuEnergyFraction" + suffix);
@@ -423,14 +442,16 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(chargedHadronEnergyFractionRAW, prefix + "ChargedHadronEnergyFractionRAW" + suffix);
 	iEvent.put(neutralEmEnergyFractionRAW, prefix + "NeutralEmEnergyFractionRAW" + suffix);
 	iEvent.put(neutralHadronEnergyFractionRAW, prefix + "NeutralHadronEnergyFractionRAW" + suffix);
+	iEvent.put(passLooseID, prefix + "PassLooseID" + suffix);
+	iEvent.put(passTightID, prefix + "PassTightID" + suffix);
 
+	//b-tagging information
 	iEvent.put(trackCountingHighEffBTag, prefix + "TrackCountingHighEffBTag" + suffix);
 	iEvent.put(trackCountingHighPurBTag, prefix + "TrackCountingHighPurBTag" + suffix);
 	iEvent.put(simpleSecondaryVertexHighEffBTag, prefix + "SimpleSecondaryVertexHighEffBTag" + suffix);
 	iEvent.put(simpleSecondaryVertexHighPurBTag, prefix + "SimpleSecondaryVertexHighPurBTag" + suffix);
 	iEvent.put(jetProbabilityBTag, prefix + "JetProbabilityBTag" + suffix);
 	iEvent.put(jetBProbabilityBTag, prefix + "JetBProbabilityBTag" + suffix);
-
 	iEvent.put(softElectronByIP3dBJetTags, prefix + "SoftElectronByIP3dBJetTag" + suffix);
 	iEvent.put(softElectronByPtBJetTags, prefix + "SoftElectronByPtBJetTag" + suffix);
 	iEvent.put(softMuonBJetTag, prefix + "SoftMuonBJetTag" + suffix);
@@ -439,8 +460,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(combinedSecondaryVertexBJetTags, prefix + "CombinedSecondaryVertexBJetTag" + suffix);
 	iEvent.put(combinedSecondaryVertexMVABJetTag, prefix + "CombinedSecondaryVertexMVABJetTag" + suffix);
 
-	iEvent.put(passLooseID, prefix + "PassLooseID" + suffix);
-	iEvent.put(passTightID, prefix + "PassTightID" + suffix);
+	//jet-vertex association
 	if (doVertexAssociation) {
 		iEvent.put(bestVertexTrackAssociationFactor, prefix + "BestVertexTrackAssociationFactor" + suffix);
 		iEvent.put(bestVertexTrackAssociationIndex, prefix + "BestVertexTrackAssociationIndex" + suffix);
