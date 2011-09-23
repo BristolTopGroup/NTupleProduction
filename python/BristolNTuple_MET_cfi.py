@@ -20,5 +20,3 @@ rootTuplePFMET = cms.EDProducer( "BristolNTuple_MET",
     Suffix = cms.string( '' ),
     StoreUncorrectedMET = cms.bool( True )
  )
-
-rootTupleMETSequence = cms.Sequence( rootTupleCaloMET + rootTuplePFMET ) 
