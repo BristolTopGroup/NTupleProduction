@@ -12,72 +12,81 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
     prefix(iConfig.getParameter<std::string> ("Prefix")),
     suffix(iConfig.getParameter<std::string> ("Suffix"))
 {
-    produces<unsigned int> (prefix + "ProcessID" + suffix);
-    produces<double> (prefix + "PtHat" + suffix);
-    produces<std::vector<double> > (prefix + "PDFWeights" + suffix);
-    produces<std::vector<int> > (prefix + "PileUpInteractions" + suffix);
-    produces<std::vector<int> > (prefix + "PileUpOriginBX" + suffix);
+	produces<unsigned int>(prefix + "ProcessID" + suffix);
+	produces<double>(prefix + "PtHat" + suffix);
+	produces < std::vector<double> > (prefix + "PDFWeights" + suffix);
+	produces < std::vector<int> > (prefix + "PileUpInteractions" + suffix);
+	produces < std::vector<int> > (prefix + "PileUpOriginBX" + suffix);
+	produces <unsigned int> (prefix + "FlavourHistory" + suffix);
 }
 
 void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-    std::auto_ptr<unsigned int> processID(new unsigned int());
-    std::auto_ptr<double> ptHat(new double());
-    std::auto_ptr < std::vector<double> > pdfWeights(new std::vector<double>());
-    std::auto_ptr < std::vector<int> > Number_interactions(new std::vector<int>());
-    std::auto_ptr < std::vector<int> > OriginBX(new std::vector<int>());
+	std::auto_ptr<unsigned int> processID(new unsigned int());
+	std::auto_ptr<double> ptHat(new double());
+	std::auto_ptr < std::vector<double> > pdfWeights(new std::vector<double>());
+	std::auto_ptr < std::vector<int> > Number_interactions(new std::vector<int>());
+	std::auto_ptr < std::vector<int> > OriginBX(new std::vector<int>());
+	std::auto_ptr < unsigned int > flavourHistory(new unsigned int());
 
-    *processID.get() = 0;
-    *ptHat.get() = 0.;
+	*processID.get() = 0;
+	*ptHat.get() = 0.;
+	*flavourHistory.get() = 0;
 
-    //-----------------------------------------------------------------
-    if (!iEvent.isRealData()) {
-        // GenEventInfo Part
-        edm::Handle < GenEventInfoProduct > genEvtInfoProduct;
-        iEvent.getByLabel(genEvtInfoInputTag, genEvtInfoProduct);
+	//-----------------------------------------------------------------
+	if (!iEvent.isRealData()) {
+		// GenEventInfo Part
+		edm::Handle < GenEventInfoProduct > genEvtInfoProduct;
+		iEvent.getByLabel(genEvtInfoInputTag, genEvtInfoProduct);
 
-        if (genEvtInfoProduct.isValid()) {
-            edm::LogInfo("BristolNTuple_GenEventInfoInfo") << "Successfully obtained " << genEvtInfoInputTag;
+		edm::Handle <unsigned int> historyProduct;
+		iEvent.getByLabel("flavorHistoryFilter", historyProduct);
 
-            *processID.get() = genEvtInfoProduct->signalProcessID();
-            *ptHat.get() = (genEvtInfoProduct->hasBinningValues() ? genEvtInfoProduct->binningValues()[0] : 0.);
+		*flavourHistory.get() = *historyProduct;
 
-        } else {
-            edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product " << genEvtInfoInputTag;
-        }
-        // PDF Weights Part
-        if (storePDFWeights) {
-            edm::Handle < std::vector<double> > pdfWeightsHandle;
-            iEvent.getByLabel(pdfWeightsInputTag, pdfWeightsHandle);
+		if (genEvtInfoProduct.isValid()) {
+			edm::LogInfo("BristolNTuple_GenEventInfoInfo") << "Successfully obtained " << genEvtInfoInputTag;
 
-            if (pdfWeightsHandle.isValid()) {
-                edm::LogInfo("BristolNTuple_GenEventInfoInfo") << "Successfully obtained " << pdfWeightsInputTag;
+			*processID.get() = genEvtInfoProduct->signalProcessID();
+			*ptHat.get() = (genEvtInfoProduct->hasBinningValues() ? genEvtInfoProduct->binningValues()[0] : 0.);
 
-                *pdfWeights.get() = *pdfWeightsHandle;
+		} else {
+			edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product " << genEvtInfoInputTag;
+		}
+		// PDF Weights Part
+		if (storePDFWeights) {
+			edm::Handle < std::vector<double> > pdfWeightsHandle;
+			iEvent.getByLabel(pdfWeightsInputTag, pdfWeightsHandle);
 
-            } else {
-                edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product "
-                        << pdfWeightsInputTag;
-            }
-        }
-        // PileupSummary Part
-        edm::Handle < std::vector<PileupSummaryInfo> > puInfo;
-        iEvent.getByLabel(pileupInfoSrc, puInfo);
+			if (pdfWeightsHandle.isValid()) {
+				edm::LogInfo("BristolNTuple_GenEventInfoInfo") << "Successfully obtained " << pdfWeightsInputTag;
 
-        if (puInfo.isValid()) {
-            for (std::vector<PileupSummaryInfo>::const_iterator it = puInfo->begin(); it != puInfo->end(); ++it) {
-                Number_interactions->push_back(it->getPU_NumInteractions());
-                OriginBX -> push_back(it -> getBunchCrossing());
-            }
-        } else {
-            edm::LogError("BristolNTuple_PileUpError") << "Error! Can't get the product " << pileupInfoSrc;
-        }
-    }
+				*pdfWeights.get() = *pdfWeightsHandle;
 
-    //-----------------------------------------------------------------
-    iEvent.put(processID, prefix + "ProcessID" + suffix);
-    iEvent.put(ptHat, prefix + "PtHat" + suffix);
-    iEvent.put(pdfWeights, prefix + "PDFWeights" + suffix);
-    iEvent.put(Number_interactions, prefix + "PileUpInteractions" + suffix);
-    iEvent.put(OriginBX, prefix + "PileUpOriginBX" + suffix);
+			} else {
+				edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product "
+						<< pdfWeightsInputTag;
+			}
+		}
+		// PileupSummary Part
+		edm::Handle < std::vector<PileupSummaryInfo> > puInfo;
+		iEvent.getByLabel(pileupInfoSrc, puInfo);
+
+		if (puInfo.isValid()) {
+			for (std::vector<PileupSummaryInfo>::const_iterator it = puInfo->begin(); it != puInfo->end(); ++it) {
+				Number_interactions->push_back(it->getPU_NumInteractions());
+				OriginBX->push_back(it->getBunchCrossing());
+			}
+		} else {
+			edm::LogError("BristolNTuple_PileUpError") << "Error! Can't get the product " << pileupInfoSrc;
+		}
+	}
+
+	//-----------------------------------------------------------------
+	iEvent.put(processID, prefix + "ProcessID" + suffix);
+	iEvent.put(ptHat, prefix + "PtHat" + suffix);
+	iEvent.put(pdfWeights, prefix + "PDFWeights" + suffix);
+	iEvent.put(Number_interactions, prefix + "PileUpInteractions" + suffix);
+	iEvent.put(OriginBX, prefix + "PileUpOriginBX" + suffix);
+	iEvent.put(flavourHistory, prefix + "FlavourHistory" + suffix);
 }
