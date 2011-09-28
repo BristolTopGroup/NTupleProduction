@@ -20,9 +20,6 @@ BristolNTuple_Photons::BristolNTuple_Photons(const edm::ParameterSet& iConfig) :
     suffix  (iConfig.getParameter<std::string>  ("Suffix")),
     maxSize (iConfig.getParameter<unsigned int> ("MaxSize"))
 {
-    produces<std::vector<double> > (prefix + "Eta" + suffix);
-    produces<std::vector<double> > (prefix + "Phi" + suffix);
-    produces<std::vector<double> > (prefix + "Pt" + suffix);
     produces<std::vector<double> > (prefix + "Px" + suffix);
     produces<std::vector<double> > (prefix + "Py" + suffix);
     produces<std::vector<double> > (prefix + "Pz" + suffix);
@@ -43,9 +40,6 @@ BristolNTuple_Photons::BristolNTuple_Photons(const edm::ParameterSet& iConfig) :
 
 void BristolNTuple_Photons::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-    std::auto_ptr < std::vector<double> > eta(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > phi(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > pt(new std::vector<double>());
     std::auto_ptr < std::vector<double> > px(new std::vector<double>());
     std::auto_ptr < std::vector<double> > py(new std::vector<double>());
     std::auto_ptr < std::vector<double> > pz(new std::vector<double>());
@@ -73,12 +67,9 @@ void BristolNTuple_Photons::produce(edm::Event& iEvent, const edm::EventSetup& i
 
         for (std::vector<pat::Photon>::const_iterator it = photons->begin(); it != photons->end(); ++it) {
             // exit from loop when you reach the required number of photons
-            if (eta->size() >= maxSize)
+            if (px->size() >= maxSize)
                 break;
 
-            eta->push_back(it->eta());
-            phi->push_back(it->phi());
-            pt->push_back(it->pt());
             px->push_back(it->px());
             py->push_back(it->py());
             pz->push_back(it->pz());
@@ -103,9 +94,6 @@ void BristolNTuple_Photons::produce(edm::Event& iEvent, const edm::EventSetup& i
 
     //-----------------------------------------------------------------
     // put vectors in the event
-    iEvent.put(eta, prefix + "Eta" + suffix);
-    iEvent.put(phi, prefix + "Phi" + suffix);
-    iEvent.put(pt, prefix + "Pt" + suffix);
     iEvent.put(px, prefix + "Px" + suffix);
     iEvent.put(py, prefix + "Py" + suffix);
     iEvent.put(pz, prefix + "Pz" + suffix);
