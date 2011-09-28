@@ -10,7 +10,6 @@
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_Tracks.h"
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_PFJets.h"
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_Event.h"
-#include "BristolAnalysis/NTupleTools/interface/BristolNTuple_EventSelection.h"
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_GenEventInfo.h"
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_Vertex.h"
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_Trigger.h"
@@ -28,7 +27,6 @@ DEFINE_FWK_MODULE(BristolNTuple_Tracks);
 DEFINE_FWK_MODULE(BristolNTuple_Electrons);
 DEFINE_FWK_MODULE(BristolNTuple_PFJets);
 DEFINE_FWK_MODULE(BristolNTuple_Event);
-DEFINE_FWK_MODULE(BristolNTuple_EventSelection);
 DEFINE_FWK_MODULE(BristolNTuple_GenEventInfo);
 DEFINE_FWK_MODULE(BristolNTuple_Vertex);
 DEFINE_FWK_MODULE(BristolNTuple_Trigger);
