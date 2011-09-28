@@ -51,19 +51,19 @@ options.parseArguments()
 
 if not options.useData :
     inputJetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'])
-    caloJetCorrection = ( 'AK5Calo', ['L1Offset' , 'L2Relative', 'L3Absolute'])
+#    caloJetCorrection = ( 'AK5Calo', ['L1Offset' , 'L2Relative', 'L3Absolute'])
     if options.use41x:
         process.source.fileNames = [
             'file:///storage/TopQuarkGroup/TT_ZuneZ2_Spring11.root',
             ]
     else :
         process.source.fileNames = [
-            '/store/relval/CMSSW_4_2_2/RelValTTbar/GEN-SIM-RECO/START42_V11-v1/0005/50AC4DBF-746D-E011-8CF9-00248C55CC62.root'
+            'file:///storage/TopQuarkGroup/TTjet_TuneZ2_Summer11_AODSIM.root'
             ]
     
 else :
     inputJetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual'])
-    caloJetCorrection = ( 'AK5Calo', ['L1Offset' , 'L2Relative', 'L3Absolute', 'L2L3Residual'])
+#    caloJetCorrection = ( 'AK5Calo', ['L1Offset' , 'L2Relative', 'L3Absolute', 'L2L3Residual'])
     
     if options.use41x :
         process.source.fileNames = [
@@ -78,8 +78,8 @@ else :
 print options
 
 print 'Running jet corrections: '
-print 'Calo Jets'
-print caloJetCorrection
+#print 'Calo Jets'
+#print caloJetCorrection
 print 'PF Jets'
 print inputJetCorrLabel
 
@@ -121,15 +121,29 @@ process.HBHENoiseFilterResultProducer.minIsolatedNoiseSumEt = cms.double(999999.
 process.load("BristolAnalysis.NTupleTools.EventFilter_cfi")
 process.EventFilter.NumTracks = cms.uint32(10)
 process.EventFilter.HPTrackThreshold = cms.double(0.2)
+#electron skim
+process.EventFilter.electronInput = cms.InputTag("selectedPatElectronsLoosePFlow")
 process.EventFilter.minNElectrons = cms.int32(1)
-process.EventFilter.minElectronPt = cms.double(25.)
+process.EventFilter.minElectronPt = cms.double(30.)
 process.EventFilter.maxAbsElectronEta = cms.double(2.6)
+#muon skim
+process.EventFilter.muonInput = cms.InputTag("selectedPatMuonsLoosePFlow")
+process.EventFilter.minNMuons = cms.int32(1)
+process.EventFilter.minMuonPt = cms.double(20.)
+process.EventFilter.maxAbsMuonEta = cms.double(2.6)
+#jet skim
+process.EventFilter.jetInput = cms.InputTag("selectedPatJetsPFlow")
+process.EventFilter.minNJets = cms.int32(2)
+process.EventFilter.minJetPt = cms.double(30.)
+process.EventFilter.maxAbsJetEta = cms.double(2.6)
 #for DAV vertices
 pvSrc = 'offlinePrimaryVertices'
 process.EventFilter.VertexInput = cms.InputTag('goodOfflinePrimaryVertices')
 process.EventFilter.VertexMinimumNDOF = cms.uint32(4)# this is >= 4
 process.EventFilter.VertexMaxAbsZ = cms.double(24)
 process.EventFilter.VertexMaxAbsRho = cms.double(2)
+#take either muon or electron:
+process.EventFilter.counteitherleptontype = cms.untracked.bool(True)
 
 # switch on PAT trigger
 #from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
@@ -214,6 +228,8 @@ process.patJetCorrFactorsPFlow.rho = cms.InputTag("kt6PFJetsPFlow", "rho")
 if not options.use41x and not options.forceCheckClosestZVertex :
     process.pfPileUpPFlow.checkClosestZVertex = False
 
+#taus are also reconstructed as jets
+process.pfNoTauPFlow.enable = False
 
 # In order to have a coherent semileptonic channel also, add
 # some "loose" leptons to do QCD estimates.
@@ -266,12 +282,12 @@ process.looseLeptonSequence = cms.Sequence(
 ###############################
 #this has to run after PF2PAT and before removeMCMatching
 #see https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookPAT38xChanges#Details_with_PF2PAT
-from PhysicsTools.PatAlgos.tools.jetTools import switchJetCollection
-switchJetCollection( process,
-                     jetCollection = cms.InputTag( 'ak5CaloJets' ),
-                     jetCorrLabel = caloJetCorrection,
-                     doBTagging = True,
-                     doType1MET=False, )
+#from PhysicsTools.PatAlgos.tools.jetTools import switchJetCollection
+#switchJetCollection( process,
+#                     jetCollection = cms.InputTag( 'ak5CaloJets' ),
+#                     jetCorrLabel = caloJetCorrection,
+#                     doBTagging = True,
+#                     doType1MET=False, )
 
 # turn to false when running on data
 if options.useData :
@@ -542,15 +558,35 @@ for jetcoll in (process.patJetsPFlow,
     jetcoll.embedPFCandidates = True
 
 
+# LikelihoodEle
+process.load('RecoEgamma.ElectronIdentification.electronIdLikelihoodExt_cfi')
+process.egammaIDLikelihood = process.eidLikelihoodExt.clone()
 
+#Load CosmicID producer
+process.load('Leptoquarks.CosmicID.cosmicid_cfi')
+process.cosmicCompatibility = cms.EDProducer("CosmicID",
+                                             src=cms.InputTag("cosmicsVeto"),
+                                             result = cms.string("cosmicCompatibility")
+                                             )
+process.timeCompatibility = process.cosmicCompatibility.clone(result = 'timeCompatibility')
+process.backToBackCompatibility = process.cosmicCompatibility.clone(result = 'backToBackCompatibility')
+process.overlapCompatibility = process.cosmicCompatibility.clone(result = 'overlapCompatibility')
+process.patMuons.userData.userFloats.src = ['cosmicCompatibility',
+                                            'timeCompatibility',
+                                            'backToBackCompatibility',
+                                            'overlapCompatibility']
 
+process.patMuonsLoosePFlow.userData.userFloats.src = ['cosmicCompatibility',
+                                            'timeCompatibility',
+                                            'backToBackCompatibility',
+                                            'overlapCompatibility']
 ###############################
 #### Selections Setup #########
 ###############################
 
 ### AK5 Jets
 #calo jets
-process.selectedPatJets.cut = cms.string("pt > 20 & abs(eta) < 2.5")
+#process.selectedPatJets.cut = cms.string("pt > 20 & abs(eta) < 2.5")
 #PF jets
 process.selectedPatJetsPFlow.cut = cms.string("pt > 20 & abs(eta) < 2.5")
 process.patJetsPFlow.addTagInfos = True
@@ -633,14 +669,14 @@ process.goodPatJetsCATopTagPF = cms.EDFilter("PFJetIDSelectionFunctorFilter",
 process.patseq = cms.Sequence(
     process.HBHENoiseFilterResultProducer*
     process.goodOfflinePrimaryVertices*
-    process.EventFilter*
     process.genParticlesForJetsNoNu*
     process.ca8GenJetsNoNu*
     getattr(process,"patPF2PATSequence"+postfix)*
     process.looseLeptonSequence*
     process.patDefaultSequence*
-    process.goodPatJets *
+#    process.goodPatJets *
     process.goodPatJetsPFlow*
+    process.EventFilter*
     process.goodPatJetsCA8PF*
     process.goodPatJetsCA8PrunedPF*
     process.goodPatJetsCATopTagPF*
@@ -681,14 +717,14 @@ process.load('BristolAnalysis.NTupleTools.Ntuple_cff')
 process.rootTupleVertex.InputTag = cms.InputTag('goodOfflinePrimaryVertices')
 process.rootTupleVertex.Prefix = cms.string('goodOfflinePrimaryVertices.')
 #calo jets
-process.rootTupleCaloJets.InputTag = cms.InputTag('goodPatJets')
-process.rootTupleCaloJets.Prefix = cms.string('goodPatJets.')
-process.rootTupleCaloJets.ReadJECuncertainty = cms.bool(options.use41x)
+#process.rootTupleCaloJets.InputTag = cms.InputTag('goodPatJets')
+#process.rootTupleCaloJets.Prefix = cms.string('goodPatJets.')
+#process.rootTupleCaloJets.ReadJECuncertainty = cms.bool(options.use41x)
 #PF2PAT jets
 process.rootTuplePF2PATJets.InputTag = cms.InputTag('goodPatJetsPFlow')
 process.rootTuplePF2PATJets.Prefix = cms.string('goodPatJetsPFlow.')
 #no JEC uncertainty available for PF jets yet in 42X
-process.rootTuplePF2PATJets.ReadJECuncertainty = cms.bool(options.use41x)
+#process.rootTuplePF2PATJets.ReadJECuncertainty = cms.bool(options.use41x)
 
 #Cambridge-Aachen cone 0.8 jets
 process.rootTupleCA8PFJets = process.rootTuplePF2PATJets.clone()
@@ -723,11 +759,11 @@ process.nTupleMuons.Prefix = cms.string('selectedPatMuons.')
 process.nTuplePFMuons.InputTag = cms.InputTag('selectedPatMuonsLoosePFlow')
 process.nTuplePFMuons.Prefix = cms.string('selectedPatMuonsLoosePFlow.')
 #PF taus
-#process.rootTupleTaus.InputTag = cms.InputTag('selectedPatTausPFlow')
-#process.rootTupleTaus.Prefix = cms.string('selectedPatTausPFlow.')
+process.rootTupleTaus.InputTag = cms.InputTag('selectedPatTausPFlow')
+process.rootTupleTaus.Prefix = cms.string('selectedPatTausPFlow.')
 #PF photons
-#process.rootTuplePhotons.InputTag = cms.InputTag('patPhotonsPFlow')
-#process.rootTuplePhotons.Prefix = cms.string('patPhotonsPFlow.')
+process.rootTuplePhotons.InputTag = cms.InputTag('patPhotons')
+process.rootTuplePhotons.Prefix = cms.string('patPhotons.')
 #trigger
 process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','',options.hltProcess)
 
@@ -776,7 +812,7 @@ process.rootNTuples = cms.Sequence((
     #vertices
     process.rootTupleVertex +
     #jets
-    process.rootTupleCaloJets +
+#    process.rootTupleCaloJets +
     process.rootTuplePF2PATJets +
     process.rootTupleCA8PFJets + 
 #    process.rootTupleCA8PFJetsPruned +
@@ -788,11 +824,11 @@ process.rootNTuples = cms.Sequence((
     process.nTuplePFMuons + 
     process.nTupleMuons +
     #taus
-    #process.rootTupleTaus +
+    process.rootTupleTaus +
     #photons
-    #process.rootTuplePhotons +
+    process.rootTuplePhotons +
     #MET
-    process.rootTupleCaloMET + 
+#    process.rootTupleCaloMET + 
     process.rootTuplePFMET +
     #Event
     process.rootTupleEvent +
@@ -802,14 +838,14 @@ process.rootNTuples = cms.Sequence((
     process.rootTupleGenEventInfo +
     process.rootTupleGenParticles +
     process.rootTupleGenJetSequence +
-    process.rootTupleGenMETSequence)*
+    process.rootTupleGenMETTrue)*
     process.rootTupleTree)
 
 if options.useData:
     process.rootNTuples.remove( process.rootTupleGenEventInfo )
     process.rootNTuples.remove( process.rootTupleGenParticles )
     process.rootNTuples.remove( process.rootTupleGenJetSequence )
-    process.rootNTuples.remove( process.rootTupleGenMETSequence )
+    process.rootNTuples.remove( process.rootTupleGenMETTrue )
     
 # HLT Trigger Report
 process.hlTrigReport = cms.EDAnalyzer("HLTrigReport",
@@ -818,7 +854,13 @@ process.hlTrigReport = cms.EDAnalyzer("HLTrigReport",
 
 
 process.p0 = cms.Path(
-                      process.hlTrigReport*
+                      process.hlTrigReport*process.egammaIDLikelihood*
+(
+    process.cosmicCompatibility +
+    process.timeCompatibility +
+    process.backToBackCompatibility +
+    process.overlapCompatibility
+    )*
     process.patseq * process.rootNTuples)
 
 
@@ -851,7 +893,10 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(100)
 
 
 # process all the events
-process.maxEvents.input = 100
+if options.maxEvents:
+    process.maxEvents.input = options.maxEvents
+else:
+    process.maxEvents.input = 100
 process.options.wantSummary = True
 process.out.dropMetaData = cms.untracked.string("DROPPED")
 
