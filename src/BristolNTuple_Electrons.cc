@@ -395,6 +395,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
             dist_vec->push_back(it->convDist());
             dCotTheta->push_back(it->convDcot());
             conversionRadius->push_back(it->convRadius());
+            hasMatchedConvPhot->push_back( matchesConv );
             shFracInnerHits->push_back(it->shFracInnerHits());
 
             //associated track
@@ -416,10 +417,10 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
             vtxIndex->push_back(vtxIndex_);
      //       vtxDistXY->push_back(vtxDistXY_);
             vtxDistZ->push_back(vtxDistZ_);
-            primaryVertexDXY->push_back(fabs(it->dB()));
-			primaryVertexDXYError->push_back(fabs(it->edB()));
-			beamSpotDXY->push_back(fabs(it->dB(pat::Electron::BS2D)));
-			beamSpotDXYError->push_back(fabs(it->edB(pat::Electron::BS2D)));
+            primaryVertexDXY->push_back(it->dB());
+			primaryVertexDXYError->push_back(it->edB());
+			beamSpotDXY->push_back(it->dB(pat::Electron::BS2D));
+			beamSpotDXYError->push_back(it->edB(pat::Electron::BS2D));
 //            VertexX->push_back(it->vertex().x());
 //            VertexY->push_back(it->vertex().y());
 //            VertexZ->push_back(it->vertex().z());
@@ -434,9 +435,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
     //-----------------------------------------------------------------
     // put vectors in the event
-//    iEvent.put(eta, prefix + "Eta" + suffix);
-//    iEvent.put(phi, prefix + "Phi" + suffix);
-//    iEvent.put(pt, prefix + "Pt" + suffix);
     //kinematic variables
     iEvent.put(px, prefix + "Px" + suffix);
     iEvent.put(py, prefix + "Py" + suffix);
@@ -484,7 +482,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
     //high energy electron isolation variables
     iEvent.put(ecalIsoHeep03, prefix + "EcalIsoHeep03" + suffix);
-    iEvent.put(hcalIsoD1Heep03, prefix + "HcalIsoD1Hee03p" + suffix);
+    iEvent.put(hcalIsoD1Heep03, prefix + "HcalIsoD1Heep03" + suffix);
     iEvent.put(hcalIsoD2Heep03, prefix + "HcalIsoD2Heep03" + suffix);
     iEvent.put(trkIsoHeep03, prefix + "TrkIsoHeep03" + suffix);
 
