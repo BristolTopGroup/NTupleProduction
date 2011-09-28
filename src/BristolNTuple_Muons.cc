@@ -425,8 +425,8 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	iEvent.put(innerTrackPixelLayersWithMeasurement, prefix + "InnerTrack.PixelLayersWithMeasurement" + suffix);
 
 	//muon vertex variables
-	iEvent.put(vtxIndex, prefix + "VtxIndex" + suffix);
-	iEvent.put(vtxDistZ, prefix + "VtxDistZ" + suffix);
+	iEvent.put(vtxIndex, prefix + "Vertex.Index" + suffix);
+	iEvent.put(vtxDistZ, prefix + "Vertex.DistZ" + suffix);
 
 	iEvent.put(primaryVertexDXY, prefix + "PrimaryVertexDXY" + suffix);
 	iEvent.put(primaryVertexDXYError, prefix + "PrimaryVertexDXYError" + suffix);
