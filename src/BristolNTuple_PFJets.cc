@@ -30,7 +30,7 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "PxRAW" + suffix);
 	produces < std::vector<double> > (prefix + "PyRAW" + suffix);
 	produces < std::vector<double> > (prefix + "PzRAW" + suffix);
-	produces < std::vector<double> > (prefix + "EnergyRaw" + suffix);
+	produces < std::vector<double> > (prefix + "EnergyRAW" + suffix);
 	//extra properties
     produces<std::vector<double> > (prefix + "Charge" + suffix);
     produces<std::vector<double> > (prefix + "Mass" + suffix);
@@ -381,7 +381,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			softMuonByIP3dBJetTags->push_back(it->bDiscriminator("softMuonByIP3dBJetTags")); // corrected 19.09.2011
 			softMuonByPtBJetTags->push_back(it->bDiscriminator("softMuonByPtBJetTags")); // introduced 19.09.2011
 			combinedSecondaryVertexBJetTags->push_back(it->bDiscriminator("combinedSecondaryVertexBJetTags")); // corrected 19.09.2011
-			combinedSecondaryVertexMVABJetTag->push_back(it->bDiscriminator("combinedSecondaryVertexMVABJetTag")); // corrected 19.09.2011
+			combinedSecondaryVertexMVABJetTag->push_back(it->bDiscriminator("combinedSecondaryVertexMVABJetTags")); // corrected 19.09.2011
 
 			//jet-vertex association
 			if (doVertexAssociation) {
