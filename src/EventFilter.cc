@@ -16,6 +16,7 @@ using namespace std;
 EventFilter::EventFilter(const edm::ParameterSet& iConfig) :
     jetInput_(iConfig.getParameter<edm::InputTag> ("jetInput")),
     electronInput_(iConfig.getParameter<edm::InputTag> ("electronInput")),
+    muonInput_(iConfig.getParameter<edm::InputTag> ("muonInput")),
     vertexInput_(iConfig.getParameter<edm::InputTag>("VertexInput")),
     hcalNoiseInput_(iConfig.getParameter<edm::InputTag>("HcalNoiseInput")),
     trkInput_(iConfig.getParameter<edm::InputTag>("TracksInput")),
@@ -23,10 +24,14 @@ EventFilter::EventFilter(const edm::ParameterSet& iConfig) :
     maxNJets_(iConfig.getParameter<int> ("maxNJets")),
     minNElectrons_(iConfig.getParameter<int> ("minNElectrons")),
     maxNElectrons_(iConfig.getParameter<int> ("maxNElectrons")),
+    minNMuons_(iConfig.getParameter<int> ("minNMuons")),
+    maxNMuons_(iConfig.getParameter<int> ("maxNMuons")),
     minJetPt(iConfig.getParameter<double> ("minJetPt")),
     maxAbsJetEta(iConfig.getParameter<double> ("maxAbsJetEta")),
     minElectronPt_(iConfig.getParameter<double> ("minElectronPt")),
     maxAbsElectronEta_(iConfig.getParameter<double> ("maxAbsElectronEta")),
+    minMuonPt_(iConfig.getParameter<double> ("minMuonPt")),
+    maxAbsMuonEta_(iConfig.getParameter<double> ("maxAbsMuonEta")),
     vtxMinNDOF(iConfig.getParameter<unsigned int>("VertexMinimumNDOF")),
     vtxMaxAbsZ(iConfig.getParameter<double>("VertexMaxAbsZ")),
     vtxMaxAbsRho(iConfig.getParameter<double>("VertexMaxAbsRho")),
@@ -34,23 +39,26 @@ EventFilter::EventFilter(const edm::ParameterSet& iConfig) :
     hpTrackThreshold(iConfig.getParameter<double>("HPTrackThreshold")),
 
     debug_(iConfig.getUntrackedParameter<bool> ("debug")),
+    counteitherleptontype_(iConfig.getUntrackedParameter<bool> ("counteitherleptontype")),
     totalCount(0),
     passHBHENoiseFilter(0),
     passScrapingVeto(0),
     passGoodPrimaryVertex(0),
     passElectronCuts(0),
+    passMuonCuts(0),
     passJetCuts(0),
     hCount(){
 
     edm::Service<TFileService> histServ;
 
-    hCount = histServ->make<TH1I> ("EventCounter", "Event Counter", 6, -0.5, 5.5);
+    hCount = histServ->make<TH1I> ("EventCounter", "Event Counter", 7, -0.5, 6.5);
     hCount->GetXaxis()->SetBinLabel(1, "all events");
     hCount->GetXaxis()->SetBinLabel(2, "HBHENoiseFilter");
     hCount->GetXaxis()->SetBinLabel(3, "ScrapingVeto");
     hCount->GetXaxis()->SetBinLabel(4, "GoodPrimaryVertex");
     hCount->GetXaxis()->SetBinLabel(5, "ElectronCuts");
-    hCount->GetXaxis()->SetBinLabel(6, "JetCuts");
+    hCount->GetXaxis()->SetBinLabel(6, "MuonCuts");
+    hCount->GetXaxis()->SetBinLabel(7, "JetCuts");
 }
 
 EventFilter::~EventFilter() {
@@ -131,6 +139,9 @@ bool EventFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::Handle < edm::View<reco::Candidate> > electrons;
     iEvent.getByLabel(electronInput_, electrons);
 
+    edm::Handle < edm::View<reco::Candidate> > muons;
+	iEvent.getByLabel(muonInput_, muons);
+
     int nelectrons = 0;
 
     for (edm::View<reco::Candidate>::const_iterator it = electrons->begin(); it != electrons->end(); ++it) {
@@ -147,12 +158,57 @@ bool EventFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     if (debug_)
         cout << "# Electrons = " << nelectrons << endl;
 
-    if (minNElectrons_ > -1 && nelectrons < minNElectrons_)
-        return false;
-    if (maxNElectrons_ > -1 && nelectrons > maxNElectrons_)
-        return false;
+    if (counteitherleptontype_ == false) {
+		if (minNElectrons_ > -1 && nelectrons < minNElectrons_)
+			return false;
+		if (maxNElectrons_ > -1 && nelectrons > maxNElectrons_)
+			return false;
 
-    ++passElectronCuts;
+		++passElectronCuts;
+	}
+
+
+
+    int nmuons = 0;
+
+	for (edm::View<reco::Candidate>::const_iterator it = muons->begin(); it != muons->end(); ++it) {
+		if (debug_)
+			cout << "Muon:" << endl;
+		if (debug_)
+			cout << "pT: " << it->pt() << " eta: " << it->eta() << " phi: " << it->phi() << endl;
+
+		if (it->pt() > minMuonPt_ && fabs(it->eta()) < maxAbsMuonEta_) {
+			++nmuons;
+		}
+	}
+
+	if (debug_)
+		cout << "# Muons = " << nmuons << endl;
+
+	if (counteitherleptontype_ == false) {
+		if (minNMuons_ > -1 && nmuons < minNMuons_)
+			return false;
+		if (maxNMuons_ > -1 && nmuons > maxNMuons_)
+			return false;
+
+		++passMuonCuts;
+	}
+
+
+
+	if (counteitherleptontype_ == true) {
+		if ((minNMuons_ > -1 && nmuons < minNMuons_) && (minNElectrons_ > -1 && nelectrons < minNElectrons_))
+			return false;
+		if ((maxNMuons_ > -1 && nmuons > maxNMuons_) && (maxNElectrons_ > -1 && nelectrons > maxNElectrons_))
+			return false;
+
+		if (!(minNMuons_ > -1 && nmuons < minNMuons_) && !(maxNMuons_ > -1 && nmuons > maxNMuons_))
+			++passMuonCuts;
+
+		if (!(minNElectrons_ > -1 && nelectrons < minNElectrons_)
+				&& !(maxNElectrons_ > -1 && nelectrons > maxNElectrons_))
+			++passElectronCuts;
+	}
 
     int njets = 0;
 
@@ -191,13 +247,15 @@ void EventFilter::endJob() {
     hCount->SetBinContent(3, passScrapingVeto);
     hCount->SetBinContent(4, passGoodPrimaryVertex);
     hCount->SetBinContent(5, passElectronCuts);
-    hCount->SetBinContent(6, passJetCuts);
+    hCount->SetBinContent(6, passMuonCuts);
+    hCount->SetBinContent(7, passJetCuts);
 
     cout << "Total events = " << totalCount << endl;
     cout << "passed  HBHENoiseFilter= " << passHBHENoiseFilter << endl;
     cout << "passed  ScrapingVeto= " << passScrapingVeto << endl;
     cout << "passed  GoodPrimaryVertex= " << passGoodPrimaryVertex << endl;
     cout << "passed  ElectronCuts= " << passElectronCuts << endl;
+    cout << "passed  MuonCuts= " << passMuonCuts << endl;
     cout << "passed  JetCuts= " << passJetCuts << endl;
 }
 

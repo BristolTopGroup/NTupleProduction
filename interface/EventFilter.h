@@ -21,11 +21,11 @@ private:
     virtual bool filter(edm::Event&, const edm::EventSetup&);
     virtual void endJob();
 
-    edm::InputTag jetInput_, electronInput_, vertexInput_, hcalNoiseInput_, trkInput_;
+    edm::InputTag jetInput_, electronInput_, muonInput_, vertexInput_, hcalNoiseInput_, trkInput_;
 
-    int minNJets_, maxNJets_, minNElectrons_, maxNElectrons_;
+    int minNJets_, maxNJets_, minNElectrons_, maxNElectrons_, minNMuons_, maxNMuons_;
 
-    double minJetPt, maxAbsJetEta, minElectronPt_, maxAbsElectronEta_;
+    double minJetPt, maxAbsJetEta, minElectronPt_, maxAbsElectronEta_, minMuonPt_, maxAbsMuonEta_;
 
     const unsigned int vtxMinNDOF;
     const double vtxMaxAbsZ, vtxMaxAbsRho;
@@ -33,10 +33,10 @@ private:
     const unsigned int numTracks;
     const double hpTrackThreshold;
 
-    bool debug_;
+    bool debug_, counteitherleptontype_;
 
     int totalCount, passHBHENoiseFilter, passScrapingVeto, passGoodPrimaryVertex;
-    int passElectronCuts, passJetCuts;
+    int passElectronCuts, passMuonCuts, passJetCuts;
 
     TH1I* hCount;
 };
