@@ -10,8 +10,8 @@ BristolNTuple_GenMET::BristolNTuple_GenMET(const edm::ParameterSet& iConfig) :
     prefix  (iConfig.getParameter<std::string>  ("Prefix")),
     suffix  (iConfig.getParameter<std::string>  ("Suffix"))
 {
-    produces <std::vector<double> > ( prefix + "METEx" + suffix );
-    produces <std::vector<double> > ( prefix + "METEy" + suffix );
+    produces <std::vector<double> > ( prefix + "Ex" + suffix );
+    produces <std::vector<double> > ( prefix + "Ey" + suffix );
 }
 
 void BristolNTuple_GenMET::
@@ -41,6 +41,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     //-----------------------------------------------------------------
     // put vectors in the event
-    iEvent.put( px, prefix + "METEx" + suffix );
-    iEvent.put( py, prefix + "METEy" + suffix );
+    iEvent.put( px, prefix + "Ex" + suffix );
+    iEvent.put( py, prefix + "Ey" + suffix );
 }
