@@ -12,8 +12,5 @@ rootTuplePFJets = cms.EDProducer("BristolNTuple_PFJets",
 )
 
 
-rootTuplePF2PATJets = rootTuplePFJets.clone(InputTag = cms.InputTag('selectedPatJetsPF'),
-    Prefix = cms.string('PF2PATJet.'))
-
-
-rootTuplePFJetSequence = cms.Sequence(rootTuplePFJets + rootTuplePF2PATJets)
+rootTuplePF2PATJets = rootTuplePFJets.clone(InputTag = cms.InputTag('goodPatJetsPFlow'),
+    Prefix = cms.string('goodPatJetsPFlow.'))
