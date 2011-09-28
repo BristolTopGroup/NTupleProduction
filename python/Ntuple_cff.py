@@ -2,7 +2,6 @@ import FWCore.ParameterSet.Config as cms
 
 from BristolAnalysis.NTupleTools.BristolNTuple_BeamSpot_cfi import *
 from BristolAnalysis.NTupleTools.BristolNTuple_Event_cfi import *
-from BristolAnalysis.NTupleTools.BristolNTuple_EventSelection_cfi import *
 from BristolAnalysis.NTupleTools.BristolNTuple_CaloJets_cfi import *
 from BristolAnalysis.NTupleTools.BristolNTuple_PFJets_cfi import *
 from BristolAnalysis.NTupleTools.BristolNTuple_JPTJets_cfi import *
