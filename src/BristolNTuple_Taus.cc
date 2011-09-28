@@ -24,12 +24,9 @@ BristolNTuple_Taus::BristolNTuple_Taus(const edm::ParameterSet& iConfig) :
     suffix  (iConfig.getParameter<std::string>  ("Suffix")),
     maxSize (iConfig.getParameter<unsigned int> ("MaxSize"))
 {
-    produces<std::vector<double> > (prefix + "Eta" + suffix);
-    produces<std::vector<double> > (prefix + "Phi" + suffix);
-    produces<std::vector<double> > (prefix + "Pt" + suffix);
-    produces<std::vector<double> > (prefix + "Pt" + suffix);
     produces<std::vector<double> > (prefix + "Px" + suffix);
     produces<std::vector<double> > (prefix + "Py" + suffix);
+    produces<std::vector<double> > (prefix + "Pz" + suffix);
     produces<std::vector<double> > (prefix + "Energy" + suffix);
     produces<std::vector<int> > (prefix + "Charge" + suffix);
     produces<std::vector<int> > (prefix + "IsPFTau" + suffix);
@@ -60,9 +57,6 @@ BristolNTuple_Taus::BristolNTuple_Taus(const edm::ParameterSet& iConfig) :
 
 void BristolNTuple_Taus::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-    std::auto_ptr < std::vector<double> > eta(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > phi(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > pt(new std::vector<double>());
     std::auto_ptr < std::vector<double> > px(new std::vector<double>());
     std::auto_ptr < std::vector<double> > py(new std::vector<double>());
     std::auto_ptr < std::vector<double> > pz(new std::vector<double>());
@@ -104,7 +98,7 @@ void BristolNTuple_Taus::produce(edm::Event& iEvent, const edm::EventSetup& iSet
         //
         //
         for (; it != it_end; ++it) {
-            if (eta->size() > maxSize)
+            if (px->size() > maxSize)
                 break;
             //
             // Discriminators are defined in:
@@ -176,9 +170,6 @@ void BristolNTuple_Taus::produce(edm::Event& iEvent, const edm::EventSetup& iSet
                 byisolationdiscr -> push_back(0);
             }
             //
-            eta -> push_back((double) (it -> eta()));
-            phi -> push_back((double) (it -> phi()));
-            pt -> push_back((double) (it -> pt()));
             px->push_back(it->px());
             py->push_back(it->py());
             pz->push_back(it->pz());
@@ -214,9 +205,6 @@ void BristolNTuple_Taus::produce(edm::Event& iEvent, const edm::EventSetup& iSet
         edm::LogError("BristolNTuple_TausError") << "Error! Can't get the product " << inputTag;
     }
 
-    iEvent.put(eta, prefix + "Eta" + suffix);
-    iEvent.put(phi, prefix + "Phi" + suffix);
-    iEvent.put(pt, prefix + "Pt" + suffix);
     iEvent.put(px, prefix + "Px" + suffix);
     iEvent.put(py, prefix + "Py" + suffix);
     iEvent.put(pz, prefix + "Pz" + suffix);
