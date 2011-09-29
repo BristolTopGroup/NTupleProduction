@@ -84,10 +84,10 @@ else :
 print options
 
 print 'Running jet corrections: '
-#print 'Calo Jets'
-#print caloJetCorrection
 print 'PF Jets'
 print inputJetCorrLabel
+print 'Using Skim:'
+print options.skim
 
 import sys
 
@@ -157,7 +157,7 @@ if options.skim in ['ElectronAndMuon', 'ElectronOrMuon']:
     
 #jet skim
 process.EventFilter.jetInput = cms.InputTag("selectedPatJetsPFlow")
-process.EventFilter.minNJets = cms.int32(2)#unprescaled triggers are >=3 jets
+process.EventFilter.minNJets = cms.int32(2)#unprescaled triggers are >=3/>=2 jets for electron/muon triggers
 process.EventFilter.minJetPt = cms.double(30.)# identical (within JEC) to trigger
 process.EventFilter.maxAbsJetEta = cms.double(2.6)# identical to trigger
 #for DAV vertices
