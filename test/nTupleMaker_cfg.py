@@ -137,11 +137,11 @@ process.EventFilter.muonInput = cms.InputTag("selectedPatMuonsLoosePFlow")
 process.EventFilter.minMuonPt = cms.double(20.)#triggers are 17GeV
 process.EventFilter.maxAbsMuonEta = cms.double(2.1)#new triggers have this restriction anyway
 
-if options.skim == 'ElectronAndMuon':
+if options.skim == 'ElectronOrMuon':
     #take either muon or electron:
-    process.EventFilter.counteitherleptontype = cms.untracked.bool(False)
-else:
     process.EventFilter.counteitherleptontype = cms.untracked.bool(True)
+else:
+    process.EventFilter.counteitherleptontype = cms.untracked.bool(False)
     
 if options.skim == 'ElectronOnly':
     process.EventFilter.minNElectrons = cms.int32(1)
