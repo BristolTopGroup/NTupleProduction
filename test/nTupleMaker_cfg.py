@@ -45,6 +45,12 @@ options.register ('dataType',
                   VarParsing.varType.string,
                   "DataType prefix for output file name")
 
+options.register ('skim',
+                  'ElectronOrMuon',
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.string,
+                  "Skim definition")
+
 
 options.parseArguments()
 
@@ -121,29 +127,46 @@ process.HBHENoiseFilterResultProducer.minIsolatedNoiseSumEt = cms.double(999999.
 process.load("BristolAnalysis.NTupleTools.EventFilter_cfi")
 process.EventFilter.NumTracks = cms.uint32(10)
 process.EventFilter.HPTrackThreshold = cms.double(0.2)
+
 #electron skim
 process.EventFilter.electronInput = cms.InputTag("selectedPatElectronsLoosePFlow")
-process.EventFilter.minNElectrons = cms.int32(1)
-process.EventFilter.minElectronPt = cms.double(30.)
-process.EventFilter.maxAbsElectronEta = cms.double(2.6)
+process.EventFilter.minElectronPt = cms.double(30.)#triggers are 25 GeV
+    
 #muon skim
 process.EventFilter.muonInput = cms.InputTag("selectedPatMuonsLoosePFlow")
-process.EventFilter.minNMuons = cms.int32(1)
-process.EventFilter.minMuonPt = cms.double(20.)
-process.EventFilter.maxAbsMuonEta = cms.double(2.6)
+process.EventFilter.minMuonPt = cms.double(20.)#triggers are 17GeV
+process.EventFilter.maxAbsMuonEta = cms.double(2.1)#new triggers have this restriction anyway
+
+if options.skim == 'ElectronAndMuon':
+    #take either muon or electron:
+    process.EventFilter.counteitherleptontype = cms.untracked.bool(False)
+else:
+    process.EventFilter.counteitherleptontype = cms.untracked.bool(True)
+    
+if options.skim == 'ElectronOnly':
+    process.EventFilter.minNElectrons = cms.int32(1)
+    process.EventFilter.minNMuons = cms.int32(-1)
+    
+if options.skim == 'MuonOnly':
+    process.EventFilter.minNElectrons = cms.int32(-1)
+    process.EventFilter.minNMuons = cms.int32(1)
+    
+if options.skim in ['ElectronAndMuon', 'ElectronOrMuon']:
+    process.EventFilter.minNElectrons = cms.int32(1)
+    process.EventFilter.minNMuons = cms.int32(1)
+    
 #jet skim
 process.EventFilter.jetInput = cms.InputTag("selectedPatJetsPFlow")
-process.EventFilter.minNJets = cms.int32(2)
-process.EventFilter.minJetPt = cms.double(30.)
-process.EventFilter.maxAbsJetEta = cms.double(2.6)
+process.EventFilter.minNJets = cms.int32(2)#unprescaled triggers are >=3 jets
+process.EventFilter.minJetPt = cms.double(30.)# identical (within JEC) to trigger
+process.EventFilter.maxAbsJetEta = cms.double(2.6)# identical to trigger
 #for DAV vertices
 pvSrc = 'offlinePrimaryVertices'
 process.EventFilter.VertexInput = cms.InputTag('goodOfflinePrimaryVertices')
 process.EventFilter.VertexMinimumNDOF = cms.uint32(4)# this is >= 4
 process.EventFilter.VertexMaxAbsZ = cms.double(24)
 process.EventFilter.VertexMaxAbsRho = cms.double(2)
-#take either muon or electron:
-process.EventFilter.counteitherleptontype = cms.untracked.bool(True)
+
 
 # switch on PAT trigger
 #from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
