@@ -28,13 +28,11 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     #EWK triggers
     'HLT_Ele25_WP80_PFMT40_v',#26
     'HLT_Ele27_WP70_PFMT40_PFMHT20_v',#27
-    
     #SingleElectron PD
     'HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v', #28
     'HLT_Ele25_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v',#29
     'HLT_Ele32_CaloIdVL_CaloIsoVL_TrkIdVL_TrkIsoVL_v',#30
     'HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v',#31
-    
     #5E33 change to PF jets @ HLT
     'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralPFJet30_v',
     'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralPFJet30_v',
@@ -45,10 +43,15 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     'HLT_Ele25_CaloIdVT_TrkIdT_DiCentralPFJet30_v',
     'HLT_Ele25_CaloIdVT_TrkIdT_TriCentralPFJet30_v',
     'HLT_Ele25_CaloIdVT_TrkIdT_QuadCentralPFJet30_v',
-    
     #Muon Triggers
     #SingleMuon - last unprescaled in 1E33 menu
-    'HLT_IsoMu17_v5', #37
+    'HLT_Mu15_v', 
+    'HLT_Mu20_v',
+    'HLT_IsoMu17_v', 
+    'HLT_IsoMu15_v', 
+    'HLT_IsoMu24_v',
+    'HLT_IsoMu24_eta2p1_v',
+    'HLT_IsoMu30_eta2p1_v',
     #MuHad
     'HLT_IsoMu17_CentralJet40_BTagIP_v', #32
     'HLT_Mu17_CentralJet30_v', #33
@@ -67,8 +70,6 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     'HLT_IsoMu17_eta2p1_DiCentralJet30_v',
     'HLT_IsoMu17_eta2p1_QuadCentralJet30_v',
     'HLT_IsoMu17_eta2p1_TriCentralJet30_v',
-    
-    
     #5E33 change to PF jets @ HLT
     'HLT_IsoMu17_eta2p1_CentralPFJet30_v',
     'HLT_IsoMu17_eta2p1_DiCentralPFJet30_v',
@@ -79,8 +80,6 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     'HLT_Mu17_eta2p1_DiCentralPFJet30_v',
     'HLT_Mu17_eta2p1_TriCentralPFJet30_v',
     'HLT_Mu17_eta2p1_QuadCentralPFJet30_v',
-    
-    
  ),                              
     HLTPathsOfInterest_Other = cms.vstring(
                                            #2010 data RunA + RunB

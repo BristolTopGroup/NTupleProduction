@@ -100,17 +100,19 @@ void BristolNTuple_Trigger::produce(edm::Event& iEvent, const edm::EventSetup& i
                 edm::LogError("BristolNTuple_TriggerError")
                         << "Error! The prescale set index number could not be obtained";
             } else {
-                prescale = hltConfig.prescaleValue(iEvent, iSetup, *it);
+                prescale = hltConfig.prescaleValue(iEvent, iSetup, triggerName);
             }
             hltprescales->push_back(prescale);
         }
 
         for (std::vector<std::string>::const_iterator it = hltPathsOfInterest_other.begin(); it != hltPathsOfInterest_other.end(); ++it) {
             int fired = 0;
-            unsigned int index = hltConfig.triggerIndex(*it);
+            unsigned int index = findTrigger(*it);
+            string triggerName = *it + " not found";
             if (index < triggerResults->size()) {
                 if (triggerResults->accept(index))
                     fired = 1;
+                triggerName = hltConfig.triggerName(index);
             } else {
                 edm::LogInfo("BristolNTuple_TriggerInfo") << "Requested HLT path \"" << (*it) << "\" does not exist";
             }
@@ -121,7 +123,7 @@ void BristolNTuple_Trigger::produce(edm::Event& iEvent, const edm::EventSetup& i
                 edm::LogError("BristolNTuple_TriggerError")
                         << "Error! The prescale set index number could not be obtained";
             } else {
-                prescale = hltConfig.prescaleValue(iEvent, iSetup, *it);
+                prescale = hltConfig.prescaleValue(iEvent, iSetup, triggerName);
             }
             hltprescales_other->push_back(prescale);
         }
