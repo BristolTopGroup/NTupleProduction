@@ -243,6 +243,9 @@ postfix = "PFlow"
 usePF2PAT(process,runPF2PAT=True, jetAlgo='AK5', runOnMC=not options.useData, postfix=postfix)
 process.pfPileUpPFlow.Enable = True
 process.pfPileUpPFlow.Vertices = 'goodOfflinePrimaryVertices'
+process.pfElectronsFromVertexPFlow.vertices = 'goodOfflinePrimaryVertices'
+process.pfMuonsFromVertexPFlow.vertices = 'goodOfflinePrimaryVertices'
+
 process.pfJetsPFlow.doAreaFastjet = True
 process.pfJetsPFlow.doRhoFastjet = False
 process.patJetCorrFactorsPFlow.payload = inputJetCorrLabel[0]
@@ -412,7 +415,7 @@ process.caPrunedPFlow.nSubjets = cms.int32(2)
 process.caPrunedGen =  cms.EDProducer(
     "SubJetProducer",
     GenJetParameters.clone(src = cms.InputTag("genParticlesForJetsNoNu"),
-                           doAreaFastjet = cms.bool(True),
+                           doAreaFastjet = cms.bool(False),
                            doRhoFastjet = cms.bool(False)
                            ),
     AnomalousCellParameters,
@@ -432,7 +435,7 @@ process.caPrunedGen =  cms.EDProducer(
 process.caTopTagPFlow = cms.EDProducer(
     "CATopJetProducer",
     PFJetParameters.clone( src = cms.InputTag('pfNoElectron'+postfix),
-                           doAreaFastjet = cms.bool(True),
+                           doAreaFastjet = cms.bool(False),
                            doRhoFastjet = cms.bool(False)                         
                            ),
     AnomalousCellParameters,
@@ -459,7 +462,7 @@ process.CATopTagInfosPFlow = cms.EDProducer("CATopJetTagger",
 process.caTopTagGen = cms.EDProducer(
     "CATopJetProducer",
     GenJetParameters.clone(src = cms.InputTag("genParticlesForJetsNoNu"),
-                           doAreaFastjet = cms.bool(True),
+                           doAreaFastjet = cms.bool(False),
                            doRhoFastjet = cms.bool(False)),
     AnomalousCellParameters,
     CATopJetParameters,
