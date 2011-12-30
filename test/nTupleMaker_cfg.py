@@ -33,6 +33,12 @@ options.register ('use41x',
                   VarParsing.varType.bool,
                   "Use the 41x options")
 
+options.register ('Fall11',
+                  False,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.bool,
+                  "Use Fall11 MC")
+
 options.register ('forceCheckClosestZVertex',
                   False,
                   VarParsing.multiplicity.singleton,
@@ -63,7 +69,12 @@ if not options.useData :
             'file:///storage/TopQuarkGroup/TT_ZuneZ2_Spring11.root',
             ]
     else :
-        process.source.fileNames = [
+        if options.Fall11:
+            process.source.fileNames = [
+            'file:///storage/TopQuarkGroup/mc/TTJets_TuneZ2_7TeV-madgraph-tauola_Fall11_AODSIM.root'
+            ]
+        else:
+            process.source.fileNames = [
             'file:///storage/TopQuarkGroup/TTjet_TuneZ2_Summer11_AODSIM.root'
             ]
     
@@ -103,7 +114,10 @@ if not options.use41x :
     if options.useData :
         process.GlobalTag.globaltag = cms.string( 'GR_R_42_V19::All' )
     else :
-        process.GlobalTag.globaltag = cms.string( 'START42_V13::All' )
+        if options.Fall11:
+            process.GlobalTag.globaltag = cms.string( 'START42_V15B::All' )
+        else:
+            process.GlobalTag.globaltag = cms.string( 'START42_V13::All' )
 
 else :
     # 4.1.x configuration
