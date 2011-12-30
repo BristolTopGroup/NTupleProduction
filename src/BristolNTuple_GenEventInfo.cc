@@ -3,31 +3,38 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+#include "boost/filesystem.hpp"
 
 BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& iConfig) :
-    genEvtInfoInputTag(iConfig.getParameter<edm::InputTag>("GenEventInfoInputTag")),
-    storePDFWeights(iConfig.getParameter<bool>("StorePDFWeights")),
-    pdfWeightsInputTag(iConfig.getParameter<edm::InputTag>("PDFWeightsInputTag")),
-    pileupInfoSrc(iConfig.getParameter<edm::InputTag>("pileupInfo")),
-    prefix(iConfig.getParameter<std::string> ("Prefix")),
-    suffix(iConfig.getParameter<std::string> ("Suffix"))
-{
-	produces<unsigned int>(prefix + "ProcessID" + suffix);
-	produces<double>(prefix + "PtHat" + suffix);
-	produces < std::vector<double> > (prefix + "PDFWeights" + suffix);
-	produces < std::vector<int> > (prefix + "PileUpInteractions" + suffix);
-	produces < std::vector<int> > (prefix + "PileUpOriginBX" + suffix);
-	produces <unsigned int> (prefix + "FlavourHistory" + suffix);
+	genEvtInfoInputTag(iConfig.getParameter<edm::InputTag> ("GenEventInfoInputTag")), storePDFWeights_(
+			iConfig.getParameter<bool> ("StorePDFWeights")), isFall11MC_(iConfig.getParameter<bool> ("isFall11")),
+			pdfWeightsInputTag_(iConfig.getParameter<edm::InputTag> ("PDFWeightsInputTag")), pileupInfoSrc_(
+					iConfig.getParameter<edm::InputTag> ("pileupInfo")), prefix_(iConfig.getParameter<std::string> (
+					"Prefix")), suffix_(iConfig.getParameter<std::string> ("Suffix")), dataPileUpFile_(
+					iConfig.getParameter<std::string> ("Suffix")), lumiWeightOneX_(), lumiWeight3X_(), lumiWeight3D_(),
+			PShiftUp_(iConfig.getParameter<double> ("PossionShiftUp")), PShiftDown_(iConfig.getParameter<double> (
+					"PossionShiftDown")) {
+	produces<unsigned int> (prefix_ + "ProcessID" + suffix_);
+	produces<double> (prefix_ + "PtHat" + suffix_);
+	produces<double> (prefix_ + "PUWeightInTimeOnly" + suffix_);
+	produces<double> (prefix_ + "PUWeight3BX" + suffix_);
+	produces<double> (prefix_ + "PUWeight3D" + suffix_);
+	produces<double> (prefix_ + "PUWeightShiftUp" + suffix_);
+	produces<double> (prefix_ + "PUWeightShiftDown" + suffix_);
+	produces<std::vector<double> > (prefix_ + "PDFWeights" + suffix_);
+	produces<std::vector<int> > (prefix_ + "PileUpInteractions" + suffix_);
+	produces<std::vector<int> > (prefix_ + "PileUpOriginBX" + suffix_);
+	produces<unsigned int> (prefix_ + "FlavourHistory" + suffix_);
 }
 
 void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
 	std::auto_ptr<unsigned int> processID(new unsigned int());
 	std::auto_ptr<double> ptHat(new double());
-	std::auto_ptr < std::vector<double> > pdfWeights(new std::vector<double>());
-	std::auto_ptr < std::vector<int> > Number_interactions(new std::vector<int>());
-	std::auto_ptr < std::vector<int> > OriginBX(new std::vector<int>());
-	std::auto_ptr < unsigned int > flavourHistory(new unsigned int());
+	std::auto_ptr<std::vector<double> > pdfWeights(new std::vector<double>());
+	std::auto_ptr<std::vector<int> > Number_interactions(new std::vector<int>());
+	std::auto_ptr<std::vector<int> > OriginBX(new std::vector<int>());
+	std::auto_ptr<unsigned int> flavourHistory(new unsigned int());
 
 	*processID.get() = 0;
 	*ptHat.get() = 0.;
@@ -36,10 +43,10 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	//-----------------------------------------------------------------
 	if (!iEvent.isRealData()) {
 		// GenEventInfo Part
-		edm::Handle < GenEventInfoProduct > genEvtInfoProduct;
+		edm::Handle<GenEventInfoProduct> genEvtInfoProduct;
 		iEvent.getByLabel(genEvtInfoInputTag, genEvtInfoProduct);
 
-		edm::Handle <unsigned int> historyProduct;
+		edm::Handle<unsigned int> historyProduct;
 		iEvent.getByLabel("flavorHistoryFilter", historyProduct);
 
 		*flavourHistory.get() = *historyProduct;
@@ -54,39 +61,87 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 			edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product " << genEvtInfoInputTag;
 		}
 		// PDF Weights Part
-		if (storePDFWeights) {
-			edm::Handle < std::vector<double> > pdfWeightsHandle;
-			iEvent.getByLabel(pdfWeightsInputTag, pdfWeightsHandle);
+		if (storePDFWeights_) {
+			edm::Handle<std::vector<double> > pdfWeightsHandle;
+			iEvent.getByLabel(pdfWeightsInputTag_, pdfWeightsHandle);
 
 			if (pdfWeightsHandle.isValid()) {
-				edm::LogInfo("BristolNTuple_GenEventInfoInfo") << "Successfully obtained " << pdfWeightsInputTag;
+				edm::LogInfo("BristolNTuple_GenEventInfoInfo") << "Successfully obtained " << pdfWeightsInputTag_;
 
 				*pdfWeights.get() = *pdfWeightsHandle;
 
 			} else {
 				edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product "
-						<< pdfWeightsInputTag;
+						<< pdfWeightsInputTag_;
 			}
 		}
 		// PileupSummary Part
-		edm::Handle < std::vector<PileupSummaryInfo> > puInfo;
-		iEvent.getByLabel(pileupInfoSrc, puInfo);
-
+		edm::Handle<std::vector<PileupSummaryInfo> > puInfo;
+		iEvent.getByLabel(pileupInfoSrc_, puInfo);
+		int npv0 = 0;
 		if (puInfo.isValid()) {
+
 			for (std::vector<PileupSummaryInfo>::const_iterator it = puInfo->begin(); it != puInfo->end(); ++it) {
 				Number_interactions->push_back(it->getPU_NumInteractions());
 				OriginBX->push_back(it->getBunchCrossing());
+				if (it->getBunchCrossing() == 0)
+					npv0 = it->getPU_NumInteractions();
 			}
 		} else {
-			edm::LogError("BristolNTuple_PileUpError") << "Error! Can't get the product " << pileupInfoSrc;
+			edm::LogError("BristolNTuple_PileUpError") << "Error! Can't get the product " << pileupInfoSrc_;
 		}
 	}
 
 	//-----------------------------------------------------------------
-	iEvent.put(processID, prefix + "ProcessID" + suffix);
-	iEvent.put(ptHat, prefix + "PtHat" + suffix);
-	iEvent.put(pdfWeights, prefix + "PDFWeights" + suffix);
-	iEvent.put(Number_interactions, prefix + "PileUpInteractions" + suffix);
-	iEvent.put(OriginBX, prefix + "PileUpOriginBX" + suffix);
-	iEvent.put(flavourHistory, prefix + "FlavourHistory" + suffix);
+	iEvent.put(processID, prefix_ + "ProcessID" + suffix_);
+	iEvent.put(ptHat, prefix_ + "PtHat" + suffix_);
+	iEvent.put(pdfWeights, prefix_ + "PDFWeights" + suffix_);
+	iEvent.put(Number_interactions, prefix_ + "PileUpInteractions" + suffix_);
+	iEvent.put(OriginBX, prefix_ + "PileUpOriginBX" + suffix_);
+	iEvent.put(flavourHistory, prefix_ + "FlavourHistory" + suffix_);
 }
+
+void BristolNTuple_GenEventInfo::initLumiWeights() {
+	//check if data pile up input file exists
+	if (!boost::filesystem::exists(dataPileUpFile_)) {
+		edm::LogError("BristolNTuple_PileUpError") << "Error! Could not find PU data file " << dataPileUpFile_;
+	}
+
+	//assign MC PU distribution vectors
+	std::vector<double> dataDistr, dataDistr1BX, mcDistr, mcDistr1BX;
+	unsigned int inputSize = 0;
+	unsigned int inputSize1BX = 0;
+	if (isFall11) {
+		for (unsigned int i = 0; i < Fall2011.size(); ++i)
+			mcDistr.push_back(Fall2011.at(i));
+
+		for (unsigned int i = 0; i < Fall2011_InTime.size(); ++i)
+			mcDistr1BX.push_back(Fall2011_InTime.at(i));
+
+	} else {
+		for (unsigned int i = 0; i < PoissonIntDist.size(); ++i)
+			mcDistr.push_back(PoissonIntDist.at(i));
+
+		for (unsigned int i = 0; i < PoissonOneXDist.size(); ++i)
+			mcDistr1BX.push_back(PoissonOneXDist.at(i));
+	}
+
+	//get data histogram
+	boost::scoped_ptr<TFile> file(new TFile(dataPileUpFile_.c_str()));
+	boost::scoped_ptr<TH1D> dataInput(file->Get("pileup")->Clone());
+
+	for(unsigned int i = 0; i < mcDistr.size(); ++ i)
+		//find bin-center corresponding to i number of vertices
+		dataDistr.push_back(dataInput->GetBinContent(dataInput->GetXaxis()->FindBin(i)));
+
+	for(unsigned int i = 0; i < mcDistr1BX.size(); ++ i)
+			//find bin-center corresponding to i number of vertices
+		dataDistr1BX.push_back(dataInput->GetBinContent(dataInput->GetXaxis()->FindBin(i)));
+
+	lumiWeightOneX_ = LumiReWeighting(mcDistr1BX, dataDistr1BX);
+	lumiWeight3X_ = LumiReWeighting(mcDistr, dataDistr);
+	lumiWeight3D_ = Lumi3DReWeighting(mcDistr, dataDistr);
+
+
+}
+
