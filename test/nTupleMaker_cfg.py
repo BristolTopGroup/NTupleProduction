@@ -112,7 +112,7 @@ if not options.use41x :
     # 4.2.x configuration
     fileTag = '42x'
     if options.useData :
-        process.GlobalTag.globaltag = cms.string( 'GR_R_42_V19::All' )
+        process.GlobalTag.globaltag = cms.string( 'GR_R_42_V21A::All' )
     else :
         if options.Fall11:
             process.GlobalTag.globaltag = cms.string( 'START42_V15B::All' )
@@ -806,6 +806,8 @@ process.rootTuplePhotons.InputTag = cms.InputTag('patPhotons')
 process.rootTuplePhotons.Prefix = cms.string('patPhotons.')
 #trigger
 process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','',options.hltProcess)
+
+process.rootTupleGenEventInfo.isFall11MC = cms.bool(options.Fall11)
 
 process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
     outputCommands = cms.untracked.vstring(
