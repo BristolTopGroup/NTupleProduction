@@ -114,9 +114,7 @@ void BristolNTuple_GenEventInfo::initLumiWeights() {
 	}
 
 	//assign MC PU distribution vectors
-	std::vector<double> dataDistr, dataDistr1BX, mcDistr, mcDistr1BX;
-	unsigned int inputSize = 0;
-	unsigned int inputSize1BX = 0;
+	std::vector<float> dataDistr, dataDistr1BX, mcDistr, mcDistr1BX;
 	if (isFall11MC_) {
 		for (unsigned int i = 0; i < Fall2011.size(); ++i)
 			mcDistr.push_back(Fall2011.at(i));
