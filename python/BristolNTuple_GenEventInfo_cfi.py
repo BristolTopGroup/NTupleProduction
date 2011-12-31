@@ -8,7 +8,7 @@ rootTupleGenEventInfo = cms.EDProducer("BristolNTuple_GenEventInfo",
     pileupInfo           = cms.InputTag('addPileupInfo'),
     Prefix               = cms.string('Event.'),
     Suffix               = cms.string(''),
-    dataPileUpFile       = cms.string('BristolAnalysis/NTupleTools/data/PileUp_2011_truth_finebin.root'),
+    dataPileUpFile       = cms.string('BristolAnalysis/NTupleTools/data/PileUp/PileUp_2011_truth_finebin.root'),
     PossionShiftUp       = cms.double(0.5),
     PossionShiftDown       = cms.double(-0.5),
 )
