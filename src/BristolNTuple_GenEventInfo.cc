@@ -29,6 +29,7 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 	produces<double> (prefix_ + "PUWeightShiftDown" + suffix_);
 	produces<std::vector<double> > (prefix_ + "PDFWeights" + suffix_);
 	produces<std::vector<int> > (prefix_ + "PileUpInteractions" + suffix_);
+	produces<std::vector<int> > (prefix_ + "NumberOfTrueInteractions" + suffix_);
 	produces<std::vector<int> > (prefix_ + "PileUpOriginBX" + suffix_);
 	produces<unsigned int> (prefix_ + "FlavourHistory" + suffix_);
 
@@ -39,13 +40,27 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 
 	std::auto_ptr<unsigned int> processID(new unsigned int());
 	std::auto_ptr<double> ptHat(new double());
+	std::auto_ptr<double> PUWeightInTimeOnly(new double());
+	std::auto_ptr<double> PUWeight3BX(new double());
+	std::auto_ptr<double> PUWeight3D(new double());
+	std::auto_ptr<double> PUWeightShiftUp(new double());
+	std::auto_ptr<double> PUWeightShiftDown(new double());
 	std::auto_ptr<std::vector<double> > pdfWeights(new std::vector<double>());
 	std::auto_ptr<std::vector<int> > Number_interactions(new std::vector<int>());
+	if (isFall11MC_)
+		std::auto_ptr<std::vector<int> > NumberOfTrueInteractions(new std::vector<int>());
 	std::auto_ptr<std::vector<int> > OriginBX(new std::vector<int>());
 	std::auto_ptr<unsigned int> flavourHistory(new unsigned int());
 
 	*processID.get() = 0;
 	*ptHat.get() = 0.;
+	*PUWeightInTimeOnly.get() = 0.;
+	*PUWeight3BX.get() = 0.;
+	*PUWeight3D.get() = 0.;
+	*PUWeightShiftUp.get() = 0.;
+	*PUWeightShiftDown.get() = 0.;
+
+	*NumberOfTrueInteractions.get() = 0;
 	*flavourHistory.get() = 0;
 
 	//-----------------------------------------------------------------
@@ -87,26 +102,51 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 		edm::Handle<std::vector<PileupSummaryInfo> > puInfo;
 		iEvent.getByLabel(pileupInfoSrc_, puInfo);
 		int npv0 = 0;
+		float sum_nvtx = 0;
+
 		if (puInfo.isValid()) {
 
 			for (std::vector<PileupSummaryInfo>::const_iterator it = puInfo->begin(); it != puInfo->end(); ++it) {
 				Number_interactions->push_back(it->getPU_NumInteractions());
 				OriginBX->push_back(it->getBunchCrossing());
-				if (it->getBunchCrossing() == 0)
+				sum_nvtx += float(it->getPU_NumInteractions());
+				if (isFall11MC_) {
+					NumberOfTrueInteractions->push_back(it->getTrueNumInteractions());
+				}
+				if (it->getBunchCrossing() == 0) {
 					npv0 = it->getPU_NumInteractions();
+					if (isFall11MC_)
+						npv0 = it->getTrueNumInteractions();
+				}
+
 			}
 		} else {
 			edm::LogError("BristolNTuple_PileUpError") << "Error! Can't get the product " << pileupInfoSrc_;
 		}
+		float ave_nvtx = sum_nvtx / 3.;
+		edm::EventBase* iEventB = dynamic_cast<edm::EventBase*> (&iEvent);
+		*PUWeightInTimeOnly.get() = lumiWeightOneX_.weight(*iEventB);
+		*PUWeight3BX.get() = lumiWeight3X_.weight3BX(ave_nvtx);
+		*PUWeight3D.get() = lumiWeight3D_.weight3D((*iEventB));
+		*PUWeightShiftUp.get() = PShiftUp_.ShiftWeight(npv0);
+		*PUWeightShiftDown.get() = PShiftDown_.ShiftWeight(npv0);
 	}
 
 	//-----------------------------------------------------------------
 	iEvent.put(processID, prefix_ + "ProcessID" + suffix_);
 	iEvent.put(ptHat, prefix_ + "PtHat" + suffix_);
+	iEvent.put(PUWeightInTimeOnly, prefix_ + "PUWeightInTimeOnly" + suffix_);
+	iEvent.put(PUWeight3BX, prefix_ + "PUWeight3BX" + suffix_);
+	iEvent.put(PUWeight3D, prefix_ + "PUWeight3D" + suffix_);
+	iEvent.put(PUWeightShiftUp, prefix_ + "PUWeightShiftUp" + suffix_);
+	iEvent.put(PUWeightShiftDown, prefix_ + "PUWeightShiftDown" + suffix_);
 	iEvent.put(pdfWeights, prefix_ + "PDFWeights" + suffix_);
 	iEvent.put(Number_interactions, prefix_ + "PileUpInteractions" + suffix_);
+	if (isFall11MC_)
+		iEvent.put(NumberOfTrueInteractions, prefix_ + "NumberOfTrueInteractions" + suffix_);
 	iEvent.put(OriginBX, prefix_ + "PileUpOriginBX" + suffix_);
 	iEvent.put(flavourHistory, prefix_ + "FlavourHistory" + suffix_);
+
 }
 
 void BristolNTuple_GenEventInfo::initLumiWeights() {
@@ -136,18 +176,17 @@ void BristolNTuple_GenEventInfo::initLumiWeights() {
 	boost::scoped_ptr<TFile> file(new TFile(dataPileUpFile_.c_str()));
 	boost::scoped_ptr<TH1D> dataInput((TH1D*) file->Get("pileup")->Clone());
 
-	for(unsigned int i = 0; i < mcDistr.size(); ++ i)
+	for (unsigned int i = 0; i < mcDistr.size(); ++i)
 		//find bin-center corresponding to i number of vertices
 		dataDistr.push_back(dataInput->GetBinContent(dataInput->GetXaxis()->FindBin(i)));
 
-	for(unsigned int i = 0; i < mcDistr1BX.size(); ++ i)
-			//find bin-center corresponding to i number of vertices
+	for (unsigned int i = 0; i < mcDistr1BX.size(); ++i)
+		//find bin-center corresponding to i number of vertices
 		dataDistr1BX.push_back(dataInput->GetBinContent(dataInput->GetXaxis()->FindBin(i)));
 
 	lumiWeightOneX_ = edm::LumiReWeighting(mcDistr1BX, dataDistr1BX);
 	lumiWeight3X_ = edm::LumiReWeighting(mcDistr, dataDistr);
 	lumiWeight3D_ = edm::Lumi3DReWeighting(mcDistr, dataDistr);
-
 
 }
 
