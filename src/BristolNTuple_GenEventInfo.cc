@@ -5,15 +5,21 @@
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "boost/filesystem.hpp"
 
-BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& iConfig) :
-	genEvtInfoInputTag(iConfig.getParameter<edm::InputTag> ("GenEventInfoInputTag")), storePDFWeights_(
-			iConfig.getParameter<bool> ("StorePDFWeights")), isFall11MC_(iConfig.getParameter<bool> ("isFall11")),
-			pdfWeightsInputTag_(iConfig.getParameter<edm::InputTag> ("PDFWeightsInputTag")), pileupInfoSrc_(
-					iConfig.getParameter<edm::InputTag> ("pileupInfo")), prefix_(iConfig.getParameter<std::string> (
-					"Prefix")), suffix_(iConfig.getParameter<std::string> ("Suffix")), dataPileUpFile_(
-					iConfig.getParameter<std::string> ("Suffix")), lumiWeightOneX_(), lumiWeight3X_(), lumiWeight3D_(),
-			PShiftUp_(iConfig.getParameter<double> ("PossionShiftUp")), PShiftDown_(iConfig.getParameter<double> (
-					"PossionShiftDown")) {
+BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& iConfig) ://
+	genEvtInfoInputTag(iConfig.getParameter<edm::InputTag> ("GenEventInfoInputTag")), //
+			storePDFWeights_(iConfig.getParameter<bool> ("StorePDFWeights")), //
+			isFall11MC_(iConfig.getParameter<bool> ("isFall11MC")),//
+			pdfWeightsInputTag_(iConfig.getParameter<edm::InputTag> ("PDFWeightsInputTag")), //
+			pileupInfoSrc_(iConfig.getParameter<edm::InputTag> ("pileupInfo")), //
+			prefix_(iConfig.getParameter<std::string> ("Prefix")), //
+			suffix_(iConfig.getParameter<std::string> ("Suffix")), //
+			dataPileUpFile_(iConfig.getParameter<std::string> ("Suffix")), //
+			lumiWeightOneX_(), //
+			lumiWeight3X_(), //
+			lumiWeight3D_(),//
+			PShiftUp_(iConfig.getParameter<double> ("PossionShiftUp")), //
+			PShiftDown_(iConfig.getParameter<double> ("PossionShiftDown"))//
+{
 	produces<unsigned int> (prefix_ + "ProcessID" + suffix_);
 	produces<double> (prefix_ + "PtHat" + suffix_);
 	produces<double> (prefix_ + "PUWeightInTimeOnly" + suffix_);
@@ -111,7 +117,7 @@ void BristolNTuple_GenEventInfo::initLumiWeights() {
 	std::vector<double> dataDistr, dataDistr1BX, mcDistr, mcDistr1BX;
 	unsigned int inputSize = 0;
 	unsigned int inputSize1BX = 0;
-	if (isFall11) {
+	if (isFall11MC_) {
 		for (unsigned int i = 0; i < Fall2011.size(); ++i)
 			mcDistr.push_back(Fall2011.at(i));
 
@@ -128,7 +134,7 @@ void BristolNTuple_GenEventInfo::initLumiWeights() {
 
 	//get data histogram
 	boost::scoped_ptr<TFile> file(new TFile(dataPileUpFile_.c_str()));
-	boost::scoped_ptr<TH1D> dataInput(file->Get("pileup")->Clone());
+	boost::scoped_ptr<TH1D> dataInput((TH1D*) file->Get("pileup")->Clone());
 
 	for(unsigned int i = 0; i < mcDistr.size(); ++ i)
 		//find bin-center corresponding to i number of vertices
@@ -138,9 +144,9 @@ void BristolNTuple_GenEventInfo::initLumiWeights() {
 			//find bin-center corresponding to i number of vertices
 		dataDistr1BX.push_back(dataInput->GetBinContent(dataInput->GetXaxis()->FindBin(i)));
 
-	lumiWeightOneX_ = LumiReWeighting(mcDistr1BX, dataDistr1BX);
-	lumiWeight3X_ = LumiReWeighting(mcDistr, dataDistr);
-	lumiWeight3D_ = Lumi3DReWeighting(mcDistr, dataDistr);
+	lumiWeightOneX_ = edm::LumiReWeighting(mcDistr1BX, dataDistr1BX);
+	lumiWeight3X_ = edm::LumiReWeighting(mcDistr, dataDistr);
+	lumiWeight3D_ = edm::Lumi3DReWeighting(mcDistr, dataDistr);
 
 
 }

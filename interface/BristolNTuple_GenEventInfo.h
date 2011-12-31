@@ -19,7 +19,7 @@ private:
 	const bool storePDFWeights_, isFall11MC_;
 	const edm::InputTag pdfWeightsInputTag_;
 	const edm::InputTag pileupInfoSrc_;
-	const std::string prefix, suffix, dataPileUpFile_;
+	const std::string prefix_, suffix_, dataPileUpFile_;
 	edm::LumiReWeighting lumiWeightOneX_;//different MC input for in-time
 	edm::LumiReWeighting lumiWeight3X_;//different MC input for average pile-up
 	edm::Lumi3DReWeighting lumiWeight3D_;// 3D reweighting is using average pile-up input
