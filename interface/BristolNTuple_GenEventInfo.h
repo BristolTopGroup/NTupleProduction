@@ -20,9 +20,9 @@ private:
 	const edm::InputTag pdfWeightsInputTag_;
 	const edm::InputTag pileupInfoSrc_;
 	const std::string prefix, suffix, dataPileUpFile_;
-	LumiReWeighting lumiWeightOneX_;//different MC input for in-time
-	LumiReWeighting lumiWeight3X_;//different MC input for average pile-up
-	Lumi3DReWeighting lumiWeight3D_;// 3D reweighting is using average pile-up input
+	edm::LumiReWeighting lumiWeightOneX_;//different MC input for in-time
+	edm::LumiReWeighting lumiWeight3X_;//different MC input for average pile-up
+	edm::Lumi3DReWeighting lumiWeight3D_;// 3D reweighting is using average pile-up input
 	reweight::PoissonMeanShifter PShiftUp_;
 	reweight::PoissonMeanShifter PShiftDown_;
 
