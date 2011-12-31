@@ -13,7 +13,7 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 			pileupInfoSrc_(iConfig.getParameter<edm::InputTag> ("pileupInfo")), //
 			prefix_(iConfig.getParameter<std::string> ("Prefix")), //
 			suffix_(iConfig.getParameter<std::string> ("Suffix")), //
-			dataPileUpFile_(iConfig.getParameter<std::string> ("Suffix")), //
+			dataPileUpFile_(iConfig.getParameter<std::string> ("dataPileUpFile")), //
 			lumiWeightOneX_(), //
 			lumiWeight3X_(), //
 			lumiWeight3D_(),//
@@ -31,6 +31,8 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 	produces<std::vector<int> > (prefix_ + "PileUpInteractions" + suffix_);
 	produces<std::vector<int> > (prefix_ + "PileUpOriginBX" + suffix_);
 	produces<unsigned int> (prefix_ + "FlavourHistory" + suffix_);
+
+	initLumiWeights();
 }
 
 void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
