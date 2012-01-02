@@ -52,7 +52,7 @@ options.register ('dataType',
                   "DataType prefix for output file name")
 
 options.register ('skim',
-                  'ElectronOrMuon',
+                  'Lepton_2Jets',
                   VarParsing.multiplicity.singleton,
                   VarParsing.varType.string,
                   "Skim definition")
@@ -63,7 +63,7 @@ options.parseArguments()
 
 if not options.useData :
     inputJetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'])
-#    caloJetCorrection = ( 'AK5Calo', ['L1Offset' , 'L2Relative', 'L3Absolute'])
+    caloJetCorrection = ( 'AK5Calo', ['L1Offset' , 'L2Relative', 'L3Absolute'])
     if options.use41x:
         process.source.fileNames = [
             'file:///storage/TopQuarkGroup/TT_ZuneZ2_Spring11.root',
@@ -80,7 +80,7 @@ if not options.useData :
     
 else :
     inputJetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual'])
-#    caloJetCorrection = ( 'AK5Calo', ['L1Offset' , 'L2Relative', 'L3Absolute', 'L2L3Residual'])
+    caloJetCorrection = ( 'AK5Calo', ['L1Offset' , 'L2Relative', 'L3Absolute', 'L2L3Residual'])
     
     if options.use41x :
         process.source.fileNames = [
@@ -95,6 +95,8 @@ else :
 print options
 
 print 'Running jet corrections: '
+print 'Calo Jets'
+print caloJetCorrection
 print 'PF Jets'
 print inputJetCorrLabel
 print 'Using Skim:'
@@ -139,47 +141,114 @@ process.HBHENoiseFilterResultProducer.minIsolatedNoiseSumEt = cms.double(999999.
 
 
 process.load("BristolAnalysis.NTupleTools.EventFilter_cfi")
+#Event cleaning
 process.EventFilter.NumTracks = cms.uint32(10)
 process.EventFilter.HPTrackThreshold = cms.double(0.2)
-
-#electron skim
-process.EventFilter.electronInput = cms.InputTag("selectedPatElectronsLoosePFlow")
-process.EventFilter.minElectronPt = cms.double(30.)#triggers are 25 GeV
-    
-#muon skim
-process.EventFilter.muonInput = cms.InputTag("selectedPatMuonsLoosePFlow")
-process.EventFilter.minMuonPt = cms.double(20.)#triggers are 17GeV
-process.EventFilter.maxAbsMuonEta = cms.double(2.1)#new triggers have this restriction anyway
-
-if options.skim == 'ElectronOrMuon':
-    #take either muon or electron:
-    process.EventFilter.counteitherleptontype = cms.untracked.bool(True)
-else:
-    process.EventFilter.counteitherleptontype = cms.untracked.bool(False)
-    
-if options.skim == 'ElectronOnly':
-    process.EventFilter.minNElectrons = cms.int32(1)
-    process.EventFilter.minNMuons = cms.int32(-1)
-    
-if options.skim == 'MuonOnly':
-    process.EventFilter.minNElectrons = cms.int32(-1)
-    process.EventFilter.minNMuons = cms.int32(1)
-    
-if options.skim in ['ElectronAndMuon', 'ElectronOrMuon']:
-    process.EventFilter.minNElectrons = cms.int32(1)
-    process.EventFilter.minNMuons = cms.int32(1)
-    
-#jet skim
-process.EventFilter.jetInput = cms.InputTag("selectedPatJetsPFlow")
-process.EventFilter.minNJets = cms.int32(2)#unprescaled triggers are >=3/>=2 jets for electron/muon triggers
-process.EventFilter.minJetPt = cms.double(30.)# identical (within JEC) to trigger
-process.EventFilter.maxAbsJetEta = cms.double(2.6)# identical to trigger
-#for DAV vertices
+#for DAV vertices, obsolete?
 pvSrc = 'offlinePrimaryVertices'
+#at least one good primary vertex
 process.EventFilter.VertexInput = cms.InputTag('goodOfflinePrimaryVertices')
 process.EventFilter.VertexMinimumNDOF = cms.uint32(4)# this is >= 4
 process.EventFilter.VertexMaxAbsZ = cms.double(24)
 process.EventFilter.VertexMaxAbsRho = cms.double(2)
+
+#electron skim
+#process.EventFilter.electronInput = cms.InputTag("selectedPatElectronsLoosePFlow")
+#process.EventFilter.minElectronPt = cms.double(30.)#triggers are 25 GeV
+    
+#muon skim
+#process.EventFilter.muonInput = cms.InputTag("selectedPatMuonsLoosePFlow")
+#process.EventFilter.minMuonPt = cms.double(20.)#triggers are 17GeV
+#process.EventFilter.maxAbsMuonEta = cms.double(2.1)#new triggers have this restriction anyway
+
+#reset to 0 skim
+process.EventFilter.minNElectrons           = cms.int32(-1)
+process.EventFilter.minNMuons               = cms.int32(-1)
+process.EventFilter.minNJets                = cms.int32(-1)
+process.EventFilter.counteitherleptontype   = cms.untracked.bool(False)
+skimOutput = ''
+
+if 'LooseElectron' in options.skim or 'LooseLepton' in options.skim:
+    process.EventFilter.minNElectrons       = cms.int32(1)
+    process.EventFilter.minElectronPt       = cms.double(20.)
+    process.EventFilter.maxAbsElectronEta   = cms.double(2.5)#within tracker volume
+    process.EventFilter.electronInput = cms.InputTag("selectedPatElectrons")#GSF electrons
+    
+    
+if 'LooseMuon'  in options.skim or 'LooseLepton' in options.skim:
+    process.EventFilter.minNMuons       = cms.int32(1)
+    process.EventFilter.minMuonPt       = cms.double(10.)
+    process.EventFilter.maxAbsMuonEta   = cms.double(2.5)#within tracker volume
+    process.EventFilter.muonInput = cms.InputTag("selectedPatMuons")
+    
+if not 'Loose' in options.skim and ('Electron' in options.skim or 'Lepton' in options.skim):
+    process.EventFilter.minNElectrons       = cms.int32(1)
+    process.EventFilter.minElectronPt       = cms.double(30.)
+    process.EventFilter.maxAbsElectronEta   = cms.double(2.5)#within tracker volume
+    process.EventFilter.electronInput = cms.InputTag("selectedPatElectronsLoosePFlow")
+    
+if not 'Loose' in options.skim and ('Muon' in options.skim or 'Lepton' in options.skim):
+    process.EventFilter.minNMuons       = cms.int32(1)
+    process.EventFilter.minMuonPt       = cms.double(20.)#triggers are 17GeV
+    process.EventFilter.maxAbsMuonEta   = cms.double(2.1)#new triggers have this restriction anyway
+    process.EventFilter.muonInput = cms.InputTag("selectedPatMuonsLoosePFlow")
+if 'Lepton' in options.skim:
+    process.EventFilter.counteitherleptontype = cms.untracked.bool(True)
+    
+
+ 
+#jet skim
+#unprescaled triggers are >=3/>=2 jets for electron/muon triggers
+skim = options.skim.lower()   
+if 'jet' in skim:
+    find = skim.find('jet')
+    nJets = int(skim[find - 1])
+    process.EventFilter.jetInput = cms.InputTag("selectedPatJetsPFlow")
+    process.EventFilter.minNJets = cms.int32(nJets)
+    process.EventFilter.minJetPt = cms.double(30.)# identical (within JEC) to trigger
+    process.EventFilter.maxAbsJetEta = cms.double(2.6)# identical to trigger
+#if options.skim == 'ElectronOrMuon':
+#    #take either muon or electron:
+#    process.EventFilter.counteitherleptontype = cms.untracked.bool(True)
+#else:
+#    process.EventFilter.counteitherleptontype = cms.untracked.bool(False)
+    
+#if options.skim == 'ElectronOnly':
+#    process.EventFilter.minNElectrons = cms.int32(1)
+#    process.EventFilter.minNMuons = cms.int32(-1)
+#    
+#if options.skim == 'MuonOnly':
+#    process.EventFilter.minNElectrons = cms.int32(-1)
+#    process.EventFilter.minNMuons = cms.int32(1)
+    
+#if options.skim in ['ElectronAndMuon', 'ElectronOrMuon']:
+#    process.EventFilter.minNElectrons = cms.int32(1)
+#    process.EventFilter.minNMuons = cms.int32(1)
+    
+if options.skim == '' or options.skim == 'NoSkim':
+    skimOutput = 'NoSkim'
+    
+if not skimOutput == 'NoSkim':
+    print '='*10, 'Skim definition', '='*10
+    print 'Electron skim:'
+    print '\t >=', str(process.EventFilter.minNMuons),' electron with ',
+    print 'p_T > ', str(process.EventFilter.minElectronPt),
+    print '|eta| < ' , str(process.EventFilter.maxAbsElectronEta)
+    print '\t input collection:', str(process.EventFilter.electronInput)
+    print
+    print 'Muon skim:'
+    print '\t >=', str(process.EventFilter.minNElectrons),' muon with ',
+    print 'p_T > ', str(process.EventFilter.minMuonPt),
+    print '|eta| < ' , str(process.EventFilter.maxAbsMuonEta)
+    print '\t input collection:', str(process.EventFilter.muonInput)
+    print
+    print 'Jet skim:'
+    print '\t >=', str(process.EventFilter.minNJets),' jet with ',
+    print 'p_T > ', str(process.EventFilter.minJetPt),
+    print '|eta| < ' , str(process.EventFilter.maxAbsJetEta)
+    print '\t input collection:', str(process.EventFilter.jetInput)
+
+
 
 
 # switch on PAT trigger
@@ -205,7 +274,7 @@ process.goodOfflinePrimaryVertices = cms.EDFilter(
     filterParams = pvSelector.clone( maxZ = cms.double(24.0),
                                      minNdof = cms.double(4.0) # this is >= 4
                                      ),
-    src=cms.InputTag(pvSrc)
+    src=cms.InputTag('offlinePrimaryVertices')
     )
 
 
@@ -322,12 +391,12 @@ process.looseLeptonSequence = cms.Sequence(
 ###############################
 #this has to run after PF2PAT and before removeMCMatching
 #see https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookPAT38xChanges#Details_with_PF2PAT
-#from PhysicsTools.PatAlgos.tools.jetTools import switchJetCollection
-#switchJetCollection( process,
-#                     jetCollection = cms.InputTag( 'ak5CaloJets' ),
-#                     jetCorrLabel = caloJetCorrection,
-#                     doBTagging = True,
-#                     doType1MET=False, )
+from PhysicsTools.PatAlgos.tools.jetTools import switchJetCollection
+switchJetCollection( process,
+                     jetCollection = cms.InputTag( 'ak5CaloJets' ),
+                     jetCorrLabel = caloJetCorrection,
+                     doBTagging = True,
+                     doType1MET=False, )
 
 # turn to false when running on data
 if options.useData :
@@ -626,7 +695,7 @@ process.patMuonsLoosePFlow.userData.userFloats.src = ['cosmicCompatibility',
 
 ### AK5 Jets
 #calo jets
-#process.selectedPatJets.cut = cms.string("pt > 20 & abs(eta) < 2.5")
+process.selectedPatJets.cut = cms.string("pt > 20 & abs(eta) < 2.5")
 #PF jets
 process.selectedPatJetsPFlow.cut = cms.string("pt > 20 & abs(eta) < 2.5")
 process.patJetsPFlow.addTagInfos = True
@@ -714,7 +783,7 @@ process.patseq = cms.Sequence(
     getattr(process,"patPF2PATSequence"+postfix)*
     process.looseLeptonSequence*
     process.patDefaultSequence*
-#    process.goodPatJets *
+    process.goodPatJets *
     process.goodPatJetsPFlow*
     process.EventFilter*
     process.goodPatJetsCA8PF*
@@ -757,15 +826,12 @@ process.load('BristolAnalysis.NTupleTools.Ntuple_cff')
 process.rootTupleVertex.InputTag = cms.InputTag('goodOfflinePrimaryVertices')
 process.rootTupleVertex.Prefix = cms.string('goodOfflinePrimaryVertices.')
 #calo jets
-#process.rootTupleCaloJets.InputTag = cms.InputTag('goodPatJets')
-#process.rootTupleCaloJets.Prefix = cms.string('goodPatJets.')
-#process.rootTupleCaloJets.ReadJECuncertainty = cms.bool(options.use41x)
+process.rootTupleCaloJets.InputTag = cms.InputTag('goodPatJets')
+process.rootTupleCaloJets.Prefix = cms.string('goodPatJets.')
+process.rootTupleCaloJets.ReadJECuncertainty = cms.bool(options.use41x)
 #PF2PAT jets
 process.rootTuplePF2PATJets.InputTag = cms.InputTag('goodPatJetsPFlow')
 process.rootTuplePF2PATJets.Prefix = cms.string('goodPatJetsPFlow.')
-#no JEC uncertainty available for PF jets yet in 42X
-#process.rootTuplePF2PATJets.ReadJECuncertainty = cms.bool(options.use41x)
-
 #Cambridge-Aachen cone 0.8 jets
 process.rootTupleCA8PFJets = process.rootTuplePF2PATJets.clone()
 process.rootTupleCA8PFJets.InputTag = cms.InputTag('goodPatJetsCA8PF')
@@ -789,15 +855,22 @@ process.rootTupleGenParticles.maxAbsoluteEta = cms.double(100)
 #GSF Electrons
 process.rootTupleElectrons.InputTag = cms.InputTag('selectedPatElectrons')
 process.rootTupleElectrons.Prefix = cms.string('selectedPatElectrons.')
+#isolated PF Electrons
+process.rootTuplePFElectrons.InputTag = cms.InputTag('selectedPatElectronsPFlow')
+process.rootTuplePFElectrons.Prefix = cms.string('selectedPatElectronsPFlow.')
 #non-isolated PF electrons
-process.rootTuplePFElectrons.InputTag = cms.InputTag('selectedPatElectronsLoosePFlow')
-process.rootTuplePFElectrons.Prefix = cms.string('selectedPatElectronsLoosePFlow.')
+process.rootTuplePFLooseElectrons.InputTag = cms.InputTag('selectedPatElectronsLoosePFlow')
+process.rootTuplePFLooseElectrons.Prefix = cms.string('selectedPatElectronsLoosePFlow.')
+
 #muons
 process.nTupleMuons.InputTag = cms.InputTag('selectedPatMuons')
 process.nTupleMuons.Prefix = cms.string('selectedPatMuons.')
+#standard PF muons
+process.nTuplePFMuons.InputTag = cms.InputTag('selectedPatMuonsPFlow')
+process.nTuplePFMuons.Prefix = cms.string('selectedPatMuonsPFlow.')
 #non isolated PF muons
-process.nTuplePFMuons.InputTag = cms.InputTag('selectedPatMuonsLoosePFlow')
-process.nTuplePFMuons.Prefix = cms.string('selectedPatMuonsLoosePFlow.')
+process.nTuplePFLooseMuons.InputTag = cms.InputTag('selectedPatMuonsLoosePFlow')
+process.nTuplePFLooseMuons.Prefix = cms.string('selectedPatMuonsLoosePFlow.')
 #PF taus
 process.rootTupleTaus.InputTag = cms.InputTag('selectedPatTausPFlow')
 process.rootTupleTaus.Prefix = cms.string('selectedPatTausPFlow.')
@@ -824,12 +897,14 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         #electrons
         'keep *_rootTupleElectrons_*_*',
         'keep *_rootTuplePFElectrons_*_*',
+        'keep *_rootTuplePFLooseElectrons_*_*',
         #MET
         'keep *_rootTupleCaloMET_*_*',
         'keep *_rootTuplePFMET_*_*',
         #muons
         'keep *_nTupleMuons_*_*',
         'keep *_nTuplePFMuons_*_*',
+        'keep *_nTuplePFLooseMuons_*_*',
         #taus
         'keep *_rootTupleTaus_*_*',
         #photons
@@ -854,7 +929,7 @@ process.rootNTuples = cms.Sequence((
     #vertices
     process.rootTupleVertex +
     #jets
-#    process.rootTupleCaloJets +
+    process.rootTupleCaloJets +
     process.rootTuplePF2PATJets +
     process.rootTupleCA8PFJets + 
 #    process.rootTupleCA8PFJetsPruned +
@@ -862,15 +937,17 @@ process.rootNTuples = cms.Sequence((
     #electrons
     process.rootTupleElectrons +
     process.rootTuplePFElectrons +
+    process.rootTuplePFLooseElectrons +
     #muons
-    process.nTuplePFMuons + 
+    process.nTuplePFMuons +
+    process.nTuplePFLooseMuons +  
     process.nTupleMuons +
     #taus
     process.rootTupleTaus +
     #photons
     process.rootTuplePhotons +
     #MET
-#    process.rootTupleCaloMET + 
+    process.rootTupleCaloMET + 
     process.rootTuplePFMET +
     #Event
     process.rootTupleEvent +
@@ -888,6 +965,12 @@ if options.useData:
     process.rootNTuples.remove( process.rootTupleGenParticles )
     process.rootNTuples.remove( process.rootTupleGenJetSequence )
     process.rootNTuples.remove( process.rootTupleGenMETTrue )
+    
+if not options.writeFat:
+    process.rootNTuples.remove( process.rootTupleCaloJets )
+    process.rootNTuples.remove( process.rootTupleCaloMET )
+    process.rootNTuples.remove( process.rootTupleElectrons )
+    process.rootNTuples.remove( process.nTupleMuons )
     
 # HLT Trigger Report
 process.hlTrigReport = cms.EDAnalyzer("HLTrigReport",
