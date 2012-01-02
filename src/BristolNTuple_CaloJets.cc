@@ -260,7 +260,7 @@ void BristolNTuple_CaloJets::produce(edm::Event& iEvent, const edm::EventSetup& 
     //jet ID variables
     iEvent.put(emf, prefix + "EMF" + suffix);
     iEvent.put(restrictedEMF, prefix + "RestrictedEMF" + suffix);
-    iEvent.put(energyFractionHadronic, prefix + "HADF" + suffix);
+    iEvent.put(energyFractionHadronic, prefix + "EnergyFractionHadronic" + suffix);
     iEvent.put(n90Hits, prefix + "n90Hits" + suffix);
     iEvent.put(fHPD, prefix + "fHPD" + suffix);
     iEvent.put(fRBX, prefix + "fRBX" + suffix);
