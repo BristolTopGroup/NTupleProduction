@@ -30,7 +30,7 @@ BristolNTuple_CaloJets::BristolNTuple_CaloJets(const edm::ParameterSet& iConfig)
     produces<std::vector<double> > (prefix + "PxRAW" + suffix);
     produces<std::vector<double> > (prefix + "PyRAW" + suffix);
     produces<std::vector<double> > (prefix + "PzRAW" + suffix);
-    produces<std::vector<double> > (prefix + "EnergyRaw" + suffix);
+    produces<std::vector<double> > (prefix + "EnergyRAW" + suffix);
     //extra properties
     produces<std::vector<double> > (prefix + "Charge" + suffix);
     produces<std::vector<double> > (prefix + "Mass" + suffix);
