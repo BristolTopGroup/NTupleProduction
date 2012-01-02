@@ -14,6 +14,12 @@ rootTupleElectrons = cms.EDProducer("BristolNTuple_Electrons",
     LikelihoodInputTag = cms.InputTag('egammaIDLikelihood'),
 )
 
+rootTuplePFLooseElectrons = rootTupleElectrons.clone(
+    InputTag = cms.InputTag('selectedPatElectronsPF'),
+    Prefix = cms.string('PFElectron.'),
+    storePFIsolation = cms.bool(True)
+)
+
 rootTuplePFElectrons = rootTupleElectrons.clone(
     InputTag = cms.InputTag('selectedPatElectronsPF'),
     Prefix = cms.string('PFElectron.'),

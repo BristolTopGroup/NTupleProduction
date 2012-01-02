@@ -12,6 +12,12 @@ nTupleMuons = cms.EDProducer("BristolNTuple_Muons",
     storePFIsolation = cms.bool(False)
 )
 
+nTuplePFLooseMuons = nTupleMuons.clone(
+    InputTag = cms.InputTag('selectedPatMuonsPF'),
+    Prefix = cms.string('PFLooseMuon.'),
+    storePFIsolation = cms.bool(True)
+)
+
 nTuplePFMuons = nTupleMuons.clone(
     InputTag = cms.InputTag('selectedPatMuonsPF'),
     Prefix = cms.string('PFMuon.'),
