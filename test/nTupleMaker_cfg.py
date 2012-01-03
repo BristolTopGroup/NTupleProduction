@@ -242,6 +242,8 @@ if not skimOutput == 'NoSkim':
     print '|eta| < ' , str(process.EventFilter.maxAbsMuonEta)
     print '\t input collection:', str(process.EventFilter.muonInput)
     print
+    print 'Use either lepton type:', str(process.EventFilter.counteitherleptontype)
+    print
     print 'Jet skim:'
     print '\t >=', str(process.EventFilter.minNJets),' jet with ',
     print 'p_T > ', str(process.EventFilter.minJetPt),
