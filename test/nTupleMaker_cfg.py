@@ -465,7 +465,19 @@ for iele in [ process.patElectrons,
             eidHyperTight1MC = cms.InputTag("eidHyperTight1MC"),
             eidHyperTight2MC = cms.InputTag("eidHyperTight2MC"),
             eidHyperTight3MC = cms.InputTag("eidHyperTight3MC"),
-            eidHyperTight4MC = cms.InputTag("eidHyperTight4MC")        
+            eidHyperTight4MC = cms.InputTag("eidHyperTight4MC"),
+            #other ID
+            eidVeryLoose = cms.InputTag("eidVeryLoose"),
+            eidLoose = cms.InputTag("eidLoose"),
+            eidMedium = cms.InputTag("eidMedium"),
+            eidTight = cms.InputTag("eidTight"),
+            eidSuperTight = cms.InputTag("eidSuperTight"),
+            eidHyperTight1 = cms.InputTag("eidHyperTight1"),
+            eidHyperTight2 = cms.InputTag("eidHyperTight2"),
+            eidHyperTight3 = cms.InputTag("eidHyperTight3"),
+            eidHyperTight4 = cms.InputTag("eidHyperTight4")               
+
+
             )
 
 

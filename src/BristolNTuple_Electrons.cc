@@ -45,6 +45,7 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 	produces < std::vector<double> > (prefix + "DeltaPhiTrkSC" + suffix);
 	produces < std::vector<double> > (prefix + "DeltaEtaTrkSC" + suffix);
 	produces <std::vector<int> >    ( prefix + "PassID" + suffix );
+	produces <std::vector<int> >    ( prefix + "PassIDMC" + suffix );
 	produces <std::vector<bool> >    ( prefix + "eidVeryLooseMC" + suffix );
 	produces <std::vector<bool> >    ( prefix + "eidLooseMC" + suffix );
 	produces <std::vector<bool> >    ( prefix + "eidMediumMC" + suffix );
@@ -150,6 +151,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > deltaPhiTrkSC(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > deltaEtaTrkSC(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > passID(new std::vector<int>());
+	std::auto_ptr < std::vector<int> > passIDMC(new std::vector<int>());
 	std::auto_ptr < std::vector<bool> > eidVeryLooseMC(new std::vector<bool>());
 	std::auto_ptr < std::vector<bool> > eidLooseMC(new std::vector<bool>());
 	std::auto_ptr < std::vector<bool> > eidMediumMC(new std::vector<bool>());
@@ -269,58 +271,81 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
             /* passID for different electron IDs is assigned bitwise
              * https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideCategoryBasedElectronID
-             * bit 0: eidVeryLooseMC
-             * bit 1: eidLooseMC
-             * bit 2: eidMediumMC
-             * bit 3: eidTightMC
-             * bit 4: eidSuperTightMC
-             * bit 5: eidHyperTight1MC
-             * bit 6: eidHyperTight2MC
-             * bit 7: eidHyperTight3MC
-             * bit 8: eidHyperTight4MC
+             * bit 0: eidVeryLoose
+             * bit 1: eidLoose
+             * bit 2: eidMedium
+             * bit 3: eidTight
+             * bit 4: eidSuperTight
+             * bit 5: eidHyperTight1
+             * bit 6: eidHyperTight2
+             * bit 7: eidHyperTight3
+             * bit 8: eidHyperTight4
              */
+            if (it->electronID("eidVeryLoose") > 0)   passId = passId | 1 << 0;
+            if (it->electronID("eidLoose") > 0)       passId = passId | 1 << 1;
+            if (it->electronID("eidMedium") > 0)      passId = passId | 1 << 2;
+            if (it->electronID("eidTight") > 0)       passId = passId | 1 << 3;
+            if (it->electronID("eidSuperTight") > 0)  passId = passId | 1 << 4;
+            if (it->electronID("eidHyperTight1") > 0) passId = passId | 1 << 5;
+            if (it->electronID("eidHyperTight2") > 0) passId = passId | 1 << 6;
+            if (it->electronID("eidHyperTight3") > 0) passId = passId | 1 << 7;
+            if (it->electronID("eidHyperTight4") > 0) passId = passId | 1 << 8;
+
+            int passIdMC = 0;
+            /* passID for different electron IDs is assigned bitwise
+			 * https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideCategoryBasedElectronID
+			 * bit 0: eidVeryLooseMC
+			 * bit 1: eidLooseMC
+			 * bit 2: eidMediumMC
+			 * bit 3: eidTightMC
+			 * bit 4: eidSuperTightMC
+			 * bit 5: eidHyperTight1MC
+			 * bit 6: eidHyperTight2MC
+			 * bit 7: eidHyperTight3MC
+			 * bit 8: eidHyperTight4MC
+			 */
             if (it->electronID("eidVeryLooseMC") > 0) {
-				passId = passId | 1 << 0;
+				passIdMC = passIdMC | 1 << 0;
 				eidVeryLooseMC->push_back(true);
 			} else
 				eidVeryLooseMC->push_back(false);
 			if (it->electronID("eidLooseMC") > 0) {
-				passId = passId | 1 << 1;
+				passIdMC = passIdMC | 1 << 1;
 				eidLooseMC->push_back(true);
 			} else
 				eidLooseMC->push_back(false);
 			if (it->electronID("eidMediumMC") > 0) {
-				passId = passId | 1 << 2;
+				passIdMC = passIdMC | 1 << 2;
 				eidMediumMC->push_back(true);
 			} else
 				eidMediumMC->push_back(false);
 			if (it->electronID("eidTightMC") > 0) {
-				passId = passId | 1 << 3;
+				passIdMC = passIdMC | 1 << 3;
 				eidTightMC->push_back(true);
 			} else
 				eidTightMC->push_back(false);
 			if (it->electronID("eidSuperTightMC") > 0) {
-				passId = passId | 1 << 4;
+				passIdMC = passIdMC | 1 << 4;
 				eidSuperTightMC->push_back(true);
 			} else
 				eidSuperTightMC->push_back(false);
 			if (it->electronID("eidHyperTight1MC") > 0) {
-				passId = passId | 1 << 5;
+				passIdMC = passIdMC | 1 << 5;
 				eidHyperTight1MC->push_back(true);
 			} else
 				eidHyperTight1MC->push_back(false);
 			if (it->electronID("eidHyperTight2MC") > 0) {
-				passId = passId | 1 << 6;
+				passIdMC = passIdMC | 1 << 6;
 				eidHyperTight2MC->push_back(true);
 			} else
 				eidHyperTight2MC->push_back(false);
 			if (it->electronID("eidHyperTight3MC") > 0) {
-				passId = passId | 1 << 7;
+				passIdMC = passIdMC | 1 << 7;
 				eidHyperTight3MC->push_back(true);
 			} else
 				eidHyperTight3MC->push_back(false);
 			if (it->electronID("eidHyperTight4MC") > 0) {
-				passId = passId | 1 << 8;
+				passIdMC = passIdMC | 1 << 8;
 				eidHyperTight4MC->push_back(true);
 			} else
 				eidHyperTight4MC->push_back(false);
@@ -397,6 +422,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
             deltaPhiTrkSC->push_back(it->deltaPhiSuperClusterTrackAtVtx());
             deltaEtaTrkSC->push_back(it->deltaEtaSuperClusterTrackAtVtx());
             passID->push_back( passId );
+            passIDMC->push_back( passIdMC );
             likelihood->push_back(likelihood_);
             numberOfBrems->push_back( it->numberOfBrems() );
 
@@ -534,6 +560,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
     iEvent.put(deltaPhiTrkSC, prefix + "DeltaPhiTrkSC" + suffix);
     iEvent.put(deltaEtaTrkSC, prefix + "DeltaEtaTrkSC" + suffix);
     iEvent.put( passID, prefix + "PassID" + suffix );
+    iEvent.put( passIDMC, prefix + "PassIDMC" + suffix );
     iEvent.put( eidVeryLooseMC, prefix + "eidVeryLooseMC" + suffix );
     iEvent.put( eidLooseMC, prefix + "eidLooseMC" + suffix );
     iEvent.put( eidMediumMC, prefix + "eidMediumMC" + suffix );
