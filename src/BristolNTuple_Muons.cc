@@ -279,13 +279,13 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 			ecalIso03->push_back(it->isolationR03().emEt);
 			hcalIso03->push_back(it->isolationR03().hadEt);
 			hoIso03->push_back( it->isolationR03().hoEt );
-			relIso03->push_back((it->dr03HcalTowerSumEt() + it->dr03EcalRecHitSumEt() + it->dr03TkSumPt()) / it->pt());
+			relIso03->push_back((it->isolationR03().sumPt + it->isolationR03().emEt + it->isolationR03().hadEt) / it->pt());
 			//bigger cone
 			trkIso05->push_back(it->isolationR05().sumPt);
 			ecalIso05->push_back(it->isolationR05().emEt);
 			hcalIso05->push_back(it->isolationR05().hadEt);
 			hoIso05->push_back( it->isolationR05().hoEt );
-			relIso05->push_back((it->dr05HcalTowerSumEt() + it->dr05EcalRecHitSumEt() + it->dr05TkSumPt()) / it->pt());
+			relIso05->push_back((it->isolationR05().sumPt + it->isolationR05().emEt + it->isolationR05().hadEt) / it->pt());
 
             if (storePFIsolation) {
                 pat::IsolationKeys isokeyPfChargedHadronIso = pat::IsolationKeys(4);
