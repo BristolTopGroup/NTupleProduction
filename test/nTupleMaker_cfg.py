@@ -440,8 +440,18 @@ if options.useData :
     
 
 process.load('RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentificationV06_cfi')
+process.load('RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentification_cfi')
 
 process.eidCiCSequence = cms.Sequence(
+    process.eidVeryLoose *
+    process.eidLoose *
+    process.eidMedium *
+    process.eidTight *
+    process.eidSuperTight *
+    process.eidHyperTight1 *
+    process.eidHyperTight2 *
+    process.eidHyperTight3 *
+    process.eidHyperTight4 *
     process.eidVeryLooseMC *
     process.eidLooseMC *
     process.eidMediumMC*
