@@ -183,40 +183,44 @@ process.EventFilter.minNElectrons           = cms.int32(-1)
 process.EventFilter.minNMuons               = cms.int32(-1)
 process.EventFilter.minNJets                = cms.int32(-1)
 process.EventFilter.counteitherleptontype   = cms.untracked.bool(False)
-skimOutput = ''
 
-if 'LooseElectron' in options.skim or 'LooseLepton' in options.skim:
-    process.EventFilter.minNElectrons       = cms.int32(1)
-    process.EventFilter.minElectronPt       = cms.double(20.)
+#skim option is not case-sensitive
+skim = options.skim.lower()
+if 'electron' in skim or 'lepton' in skim:
     process.EventFilter.maxAbsElectronEta   = cms.double(2.5)#within tracker volume
-    process.EventFilter.electronInput = cms.InputTag("selectedPatElectrons")#GSF electrons
+    #electron multiplicity
+    if 'di' in skim:
+        process.EventFilter.minNElectrons       = cms.int32(2)
+    else:
+        process.EventFilter.minNElectrons       = cms.int32(1)
+        
+    if 'loose' in skim:#loose Pt cut
+        process.EventFilter.minElectronPt       = cms.double(20.)
+        process.EventFilter.electronInput = cms.InputTag("selectedPatElectrons")#GSF electrons
+    else:
+        process.EventFilter.minElectronPt       = cms.double(30.)
+        process.EventFilter.electronInput = cms.InputTag("selectedPatElectronsLoosePFlow")
     
+if 'muon'  in skim or 'lepton' in skim:
+    #muon multiplicity
+    if 'di' in skim:
+        process.EventFilter.minNMuons       = cms.int32(2)
+    else:
+        process.EventFilter.minNMuons       = cms.int32(1)
+    if 'loose' in skim:#loose Pt cut and eta cut
+        process.EventFilter.maxAbsMuonEta   = cms.double(2.5)#within tracker volume
+        process.EventFilter.minMuonPt       = cms.double(10.)
+        process.EventFilter.muonInput = cms.InputTag("selectedPatMuons")
+    else:
+        process.EventFilter.minMuonPt       = cms.double(20.)#triggers are 17GeV
+        process.EventFilter.maxAbsMuonEta   = cms.double(2.1)#new triggers have this restriction anyway
+        process.EventFilter.muonInput = cms.InputTag("selectedPatMuonsLoosePFlow")
     
-if 'LooseMuon'  in options.skim or 'LooseLepton' in options.skim:
-    process.EventFilter.minNMuons       = cms.int32(1)
-    process.EventFilter.minMuonPt       = cms.double(10.)
-    process.EventFilter.maxAbsMuonEta   = cms.double(2.5)#within tracker volume
-    process.EventFilter.muonInput = cms.InputTag("selectedPatMuons")
-    
-if not 'Loose' in options.skim and ('Electron' in options.skim or 'Lepton' in options.skim):
-    process.EventFilter.minNElectrons       = cms.int32(1)
-    process.EventFilter.minElectronPt       = cms.double(30.)
-    process.EventFilter.maxAbsElectronEta   = cms.double(2.5)#within tracker volume
-    process.EventFilter.electronInput = cms.InputTag("selectedPatElectronsLoosePFlow")
-    
-if not 'Loose' in options.skim and ('Muon' in options.skim or 'Lepton' in options.skim):
-    process.EventFilter.minNMuons       = cms.int32(1)
-    process.EventFilter.minMuonPt       = cms.double(20.)#triggers are 17GeV
-    process.EventFilter.maxAbsMuonEta   = cms.double(2.1)#new triggers have this restriction anyway
-    process.EventFilter.muonInput = cms.InputTag("selectedPatMuonsLoosePFlow")
-if 'Lepton' in options.skim:
+if 'lepton' in skim:
     process.EventFilter.counteitherleptontype = cms.untracked.bool(True)
-    
-
  
 #jet skim
 #unprescaled triggers are >=3/>=2 jets for electron/muon triggers
-skim = options.skim.lower()   
 if 'jet' in skim:
     find = skim.find('jet')
     nJets = int(skim[find - 1])
@@ -224,28 +228,9 @@ if 'jet' in skim:
     process.EventFilter.minNJets = cms.int32(nJets)
     process.EventFilter.minJetPt = cms.double(30.)# identical (within JEC) to trigger
     process.EventFilter.maxAbsJetEta = cms.double(2.6)# identical to trigger
-#if options.skim == 'ElectronOrMuon':
-#    #take either muon or electron:
-#    process.EventFilter.counteitherleptontype = cms.untracked.bool(True)
-#else:
-#    process.EventFilter.counteitherleptontype = cms.untracked.bool(False)
     
-#if options.skim == 'ElectronOnly':
-#    process.EventFilter.minNElectrons = cms.int32(1)
-#    process.EventFilter.minNMuons = cms.int32(-1)
-#    
-#if options.skim == 'MuonOnly':
-#    process.EventFilter.minNElectrons = cms.int32(-1)
-#    process.EventFilter.minNMuons = cms.int32(1)
     
-#if options.skim in ['ElectronAndMuon', 'ElectronOrMuon']:
-#    process.EventFilter.minNElectrons = cms.int32(1)
-#    process.EventFilter.minNMuons = cms.int32(1)
-    
-if options.skim == '' or options.skim == 'NoSkim':
-    skimOutput = 'NoSkim'
-    
-if not skimOutput == 'NoSkim':
+if not (options.skim == '' or options.skim == 'NoSkim'):
     print '='*10, 'Skim definition', '='*10
     print 'Electron skim:'
     print '\t >=', str(process.EventFilter.minNMuons),' electron with ',
@@ -266,7 +251,8 @@ if not skimOutput == 'NoSkim':
     print 'p_T > ', str(process.EventFilter.minJetPt),
     print '|eta| < ' , str(process.EventFilter.maxAbsJetEta)
     print '\t input collection:', str(process.EventFilter.jetInput)
-
+else:
+    print 'No skim used.'
 
 
 
