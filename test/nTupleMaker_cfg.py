@@ -34,7 +34,7 @@ options.register ('use41x',
                   "Use the 41x options")
 
 options.register ('Fall11',
-                  False,
+                  True,
                   VarParsing.multiplicity.singleton,
                   VarParsing.varType.bool,
                   "Use Fall11 MC")
@@ -177,15 +177,6 @@ process.EventFilter.VertexInput = cms.InputTag('goodOfflinePrimaryVertices')
 process.EventFilter.VertexMinimumNDOF = cms.uint32(4)# this is >= 4
 process.EventFilter.VertexMaxAbsZ = cms.double(24)
 process.EventFilter.VertexMaxAbsRho = cms.double(2)
-
-#electron skim
-#process.EventFilter.electronInput = cms.InputTag("selectedPatElectronsLoosePFlow")
-#process.EventFilter.minElectronPt = cms.double(30.)#triggers are 25 GeV
-    
-#muon skim
-#process.EventFilter.muonInput = cms.InputTag("selectedPatMuonsLoosePFlow")
-#process.EventFilter.minMuonPt = cms.double(20.)#triggers are 17GeV
-#process.EventFilter.maxAbsMuonEta = cms.double(2.1)#new triggers have this restriction anyway
 
 #reset to 0 skim
 process.EventFilter.minNElectrons           = cms.int32(-1)
