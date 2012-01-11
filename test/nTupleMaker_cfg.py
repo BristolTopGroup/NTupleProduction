@@ -64,27 +64,27 @@ options.parseArguments()
 #
 # configure Jet Energy Corrections
 #
-process.load("CondCore.DBCommon.CondDBCommon_cfi")
-process.jec = cms.ESSource("PoolDBESSource",
-   DBParameters = cms.PSet(
-       messageLevel = cms.untracked.int32(0)
-   ),
-   timetype = cms.string('runnumber'),
-   toGet = cms.VPSet(
-       cms.PSet(
-           record = cms.string('JetCorrectionsRecord'),
-           tag    = cms.string('JetCorrectorParametersCollection_Jec11_V12_AK5PF'),
-           label  = cms.untracked.string('AK5PF')
-       ),
-       cms.PSet(
-           record = cms.string('JetCorrectionsRecord'),
-           tag    = cms.string('JetCorrectorParametersCollection_Jec11_V12_AK5Calo'),
-           label  = cms.untracked.string('AK5Calo')
-       )
-   ),
-   connect = cms.string('sqlite_fip:Jec11_V12_20111220.db')
-)
-process.es_prefer_jec = cms.ESPrefer('PoolDBESSource', 'jec')
+#process.load("CondCore.DBCommon.CondDBCommon_cfi")
+#process.jec = cms.ESSource("PoolDBESSource",
+#   DBParameters = cms.PSet(
+#       messageLevel = cms.untracked.int32(0)
+#   ),
+#   timetype = cms.string('runnumber'),
+#   toGet = cms.VPSet(
+#       cms.PSet(
+#           record = cms.string('JetCorrectionsRecord'),
+#           tag    = cms.string('JetCorrectorParametersCollection_Jec11_V12_AK5PF'),
+#           label  = cms.untracked.string('AK5PF')
+#       ),
+#       cms.PSet(
+#           record = cms.string('JetCorrectionsRecord'),
+#           tag    = cms.string('JetCorrectorParametersCollection_Jec11_V12_AK5Calo'),
+#           label  = cms.untracked.string('AK5Calo')
+#       )
+#   ),
+#   connect = cms.string('sqlite_fip:Jec11_V12_20111220.db')
+#)
+#process.es_prefer_jec = cms.ESPrefer('PoolDBESSource', 'jec')
 
 
 if not options.useData :
@@ -140,12 +140,9 @@ if not options.use41x :
     # 4.2.x configuration
     fileTag = '42x'
     if options.useData :
-        process.GlobalTag.globaltag = cms.string( 'GR_R_42_V21A::All' )
+        process.GlobalTag.globaltag = cms.string( 'GR_R_42_V23::All' )
     else :
-        if options.Fall11:
-            process.GlobalTag.globaltag = cms.string( 'START42_V15B::All' )
-        else:
-            process.GlobalTag.globaltag = cms.string( 'START42_V13::All' )
+        process.GlobalTag.globaltag = cms.string( 'START42_V17::All' )
 
 else :
     # 4.1.x configuration
