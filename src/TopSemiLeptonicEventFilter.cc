@@ -124,7 +124,7 @@ bool TopSemiLeptonicEventFilter::filter(edm::Event& iEvent, const edm::EventSetu
     else
 		return false;
 
-    if ((selectedElectron.convDist() < 0.02 && selectedElectron.convDcot() < 0.02) || muonPlusJetsSelection_)
+    if (!(selectedElectron.convDist() < 0.02 && selectedElectron.convDcot() < 0.02) || muonPlusJetsSelection_)
 		passes_.at(Selection::ConvRejectionPartnerTrack)++;
     else
 		return false;
@@ -253,7 +253,7 @@ pat::ElectronCollection TopSemiLeptonicEventFilter::getGoodIsolatedElectrons(con
 		bool passesPtAndEta = electron.pt() > minElectronPt_ && fabs(electron.eta()) < maxAbsElectronEta_;
 		bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442
 				|| fabs(electron.superCluster()->eta()) > 1.5660;
-		bool passesD0 = electron.dB(pat::Electron::BS2D) < 0.02;
+		bool passesD0 = electron.dB(pat::Electron::BS2D) < 0.02;//cm
 		bool passesID = electron.electronID("eidHyperTight1MC") > 0;
 		double relIso = (electron.chargedHadronIso() + electron.neutralHadronIso() + electron.photonIso())
 				/ electron.et();
@@ -311,7 +311,7 @@ pat::MuonCollection TopSemiLeptonicEventFilter::getLooseMuons(const pat::MuonCol
 	for (unsigned index = 0; index < muons.size(); ++index) {
 		const pat::Muon muon = muons.at(index);
 		bool isGlobal = muon.isGood("AllGlobalMuons") > 0;
-		bool ptAndEta = muon.pt() > 10.0 && fabs(muon.eta() < 2.5);
+		bool ptAndEta = muon.pt() > 10.0 && fabs(muon.eta()) < 2.5;
 		double relIso = (muon.chargedHadronIso() + muon.neutralHadronIso() + muon.photonIso()) / muon.pt();
 		bool passIso = relIso < 0.2;
 
