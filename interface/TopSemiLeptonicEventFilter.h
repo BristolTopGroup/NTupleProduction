@@ -79,7 +79,7 @@ private:
 
     double tightElectronIso_, looseElectronIso_, tightMuonIso_, looseMuonIso_;
 
-    bool electronPlusJetsSelection_, muonPlusJetsSelection_, useTrigger_;
+    bool electronPlusJetsSelection_, muonPlusJetsSelection_, useTrigger_, useCiCElectronID_;
 
     const unsigned int vtxMinNDOF_;
     const double vtxMaxAbsZ_, vtxMaxAbsRho_;

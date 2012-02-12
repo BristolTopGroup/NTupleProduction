@@ -37,6 +37,7 @@ TopSemiLeptonicEventFilter::TopSemiLeptonicEventFilter(const edm::ParameterSet& 
     electronPlusJetsSelection_(true),
     muonPlusJetsSelection_(false),
     useTrigger_(false),
+    useCiCElectronID_(iConfig.getParameter<bool>("useCiCElectronID")),
     vtxMinNDOF_(iConfig.getParameter<unsigned int>("VertexMinimumNDOF")),
     vtxMaxAbsZ_(iConfig.getParameter<double>("VertexMaxAbsZ")),
     vtxMaxAbsRho_(iConfig.getParameter<double>("VertexMaxAbsRho")),
@@ -254,7 +255,31 @@ pat::ElectronCollection TopSemiLeptonicEventFilter::getGoodIsolatedElectrons(con
 		bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442
 				|| fabs(electron.superCluster()->eta()) > 1.5660;
 		bool passesD0 = electron.dB(pat::Electron::BS2D) < 0.02;//cm
-		bool passesID = electron.electronID("eidHyperTight1MC") > 0;
+
+
+		bool passesID = false;
+		if(useCiCElectronID_)
+			passesID = electron.electronID("eidHyperTight1MC") > 0;
+		else{//SimpleCutBasedID WP70
+			bool passesSigmaIEta(false);
+			bool passesDPhiIn(false);
+			bool passesDEtaIn(false);
+			bool passesHadOverEm(false);
+
+			if (fabs(electron.superCluster()->eta()) < 1.4442) {
+				passesSigmaIEta = electron.sigmaIetaIeta() < 0.01;
+				passesDPhiIn = fabs(electron.deltaPhiSuperClusterTrackAtVtx()) < 0.03;
+				passesDEtaIn = fabs(electron.deltaEtaSuperClusterTrackAtVtx()) < 0.004;
+				passesHadOverEm = electron.hadronicOverEm() < 0.025;
+			} else {
+				passesSigmaIEta = electron.sigmaIetaIeta() < 0.03;
+				passesDPhiIn = fabs(electron.deltaPhiSuperClusterTrackAtVtx()) < 0.02;
+				passesDEtaIn = fabs(electron.deltaEtaSuperClusterTrackAtVtx()) < 0.005;
+				passesHadOverEm = electron.hadronicOverEm() < 0.025;
+			}
+			passesID = passesSigmaIEta && passesDPhiIn && passesDEtaIn && passesHadOverEm;
+		}
+
 		double relIso = (electron.chargedHadronIso() + electron.neutralHadronIso() + electron.photonIso())
 				/ electron.et();
 
@@ -279,7 +304,28 @@ pat::ElectronCollection TopSemiLeptonicEventFilter::getLooseElectrons(const pat:
 		bool passesPtAndEta = electron.pt() > 20 && fabs(electron.eta()) < 2.5;
 		bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442
 				|| fabs(electron.superCluster()->eta()) > 1.5660;
-		bool passesID = electron.electronID("eidLooseMC") > 0;
+		bool passesID = false;
+		if(useCiCElectronID_)
+			passesID = electron.electronID("eidLooseMC") > 0;
+		else {//SimpleCutBasedID WP95
+			bool passesSigmaIEta(false);
+			bool passesDPhiIn(false);
+			bool passesDEtaIn(false);
+			bool passesHadOverEm(false);
+
+			if (fabs(electron.superCluster()->eta()) < 1.4442) {
+				passesSigmaIEta = electron.sigmaIetaIeta() < 0.01;
+				passesDPhiIn = fabs(electron.deltaPhiSuperClusterTrackAtVtx()) < 0.8;
+				passesDEtaIn = fabs(electron.deltaEtaSuperClusterTrackAtVtx()) < 0.007;
+				passesHadOverEm = electron.hadronicOverEm() < 0.15;
+			} else {
+				passesSigmaIEta = electron.sigmaIetaIeta() < 0.03;
+				passesDPhiIn = fabs(electron.deltaPhiSuperClusterTrackAtVtx()) < 0.7;
+				passesDEtaIn = fabs(electron.deltaEtaSuperClusterTrackAtVtx()) < 0.01;
+				passesHadOverEm = electron.hadronicOverEm() < 0.07;
+			}
+			passesID = passesSigmaIEta && passesDPhiIn && passesDEtaIn && passesHadOverEm;
+		}
 		double relIso = (electron.chargedHadronIso() + electron.neutralHadronIso() + electron.photonIso())
 				/ electron.et();
 
