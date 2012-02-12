@@ -117,7 +117,7 @@ if not options.use41x :
         process.GlobalTag.globaltag = cms.string( 'GR_R_42_V23::All' )
     else :
         #process.GlobalTag.globaltag = cms.string( 'START42_V17::All' )
-    process.GlobalTag.globaltag = cms.string( 'START44_V12::All' )
+        process.GlobalTag.globaltag = cms.string( 'START44_V12::All' )
 
 else :
     # 4.1.x configuration
@@ -243,9 +243,9 @@ applyPostfix( process, 'patMuons', postfix ).isolationValues.pfPhotons          
 applyPostfix( process, 'patMuons', postfix ).isolationValues.pfChargedHadrons   = cms.InputTag( 'muPFIsoValueCharged03' + postfix )
 
 #electrons
-applyPostfix( process, 'isoValElectronWithCharged', postfix ).deposits[0].deltaR = 0.3
-applyPostfix( process, 'isoValElectronWithNeutral', postfix ).deposits[0].deltaR = 0.3
-applyPostfix( process, 'isoValElectronWithPhotons', postfix ).deposits[0].deltaR = 0.3
+#applyPostfix( process, 'isoValElectronWithCharged', postfix ).deposits[0].deltaR = 0.3
+#applyPostfix( process, 'isoValElectronWithNeutral', postfix ).deposits[0].deltaR = 0.3
+#applyPostfix( process, 'isoValElectronWithPhotons', postfix ).deposits[0].deltaR = 0.3
 
 process.pfPileUpPFlow.Enable = True
 process.pfPileUpPFlow.Vertices = 'goodOfflinePrimaryVertices'
