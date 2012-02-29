@@ -340,6 +340,20 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			l3absJEC_vec->push_back(it->correctedJet("L3Absolute").pt() / it->correctedJet("L2Relative").pt());
 			l2relJEC_vec->push_back(it->correctedJet("L2Relative").pt() / it->correctedJet("L1FastJet").pt());
 			l1offJEC_vec->push_back(it->correctedJet("L1FastJet").pt() / it->correctedJet("Uncorrected").pt());
+			//TODO: add absolute JEC factor:
+			/*// get a copy of the uncorrected p4
+			      reco::Candidate::LorentzVector uncorrJet = ijet->correctedP4(0);
+			      // Then get the correction (L1+L2+L3 [+L2L3 for data])
+			      jec_->setJetEta( uncorrJet.eta() );
+			      jec_->setJetPt ( uncorrJet.pt() );
+			      jec_->setJetE  ( uncorrJet.energy() );
+			      jec_->setJetA  ( ijet->jetArea() );
+			      jec_->setRho   ( *(rhoHandle.product()) );
+			      jec_->setNPV   ( pvHandle->size() );
+			      double corr = jec_->getCorrection();
+			      // Here will be the working variable for all the jet energy effects
+			      reco::Candidate::LorentzVector scaledJetP4 = uncorrJet * corr; */
+
 
 			//jet ID variables
 			chargedEmEnergyFraction->push_back(it->chargedEmEnergyFraction());
