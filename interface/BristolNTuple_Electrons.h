@@ -14,7 +14,7 @@ class BristolNTuple_Electrons : public edm::EDProducer {
   const edm::InputTag   trkInputTag, dcsInputTag, inputTag;
   const std::string     prefix,suffix;
   const unsigned int    maxSize;
-  const bool storePFIsolation;
+  const bool storePFIsolation_, debugRelease_;
   const edm::InputTag  vtxInputTag, beamSpotInputTag, conversionsInputTag, likelihoodInputTag;
 };
 

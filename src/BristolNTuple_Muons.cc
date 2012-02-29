@@ -9,18 +9,19 @@
 #include "DataFormats/PatCandidates/interface/Isolation.h"
 
 BristolNTuple_Muons::BristolNTuple_Muons(const edm::ParameterSet& iConfig) :
-    inputTag(iConfig.getParameter<edm::InputTag> ("InputTag")),
-    prefix(iConfig.getParameter<std::string> ("Prefix")),
-    suffix(iConfig.getParameter<std::string> ("Suffix")),
-    maxSize(iConfig.getParameter<unsigned int> ("MaxSize")),
-    muonID  (iConfig.getParameter<std::string>  ("MuonID")),
-    beamSpotCorr (iConfig.getParameter<bool>    ("BeamSpotCorr")),
-    storePFIsolation(iConfig.getParameter<bool> ("storePFIsolation")),
-    useCocktailRefits ( iConfig.getParameter<bool>("UseCocktailRefits")),
-    vtxInputTag(iConfig.getParameter<edm::InputTag> ("VertexInputTag")) {
+		inputTag(iConfig.getParameter < edm::InputTag > ("InputTag")), //
+		prefix(iConfig.getParameter < std::string > ("Prefix")), //
+		suffix(iConfig.getParameter < std::string > ("Suffix")), //
+		maxSize(iConfig.getParameter<unsigned int>("MaxSize")), //
+		muonID(iConfig.getParameter < std::string > ("MuonID")), //
+		beamSpotCorr(iConfig.getParameter<bool>("BeamSpotCorr")), //
+		storePFIsolation(iConfig.getParameter<bool>("storePFIsolation")), //
+		useCocktailRefits(iConfig.getParameter<bool>("UseCocktailRefits")), //
+		vtxInputTag(iConfig.getParameter < edm::InputTag > ("VertexInputTag")) //
+{
 
 	//kinematic variables
-    produces < std::vector<double> > (prefix + "Px" + suffix);
+	produces < std::vector<double> > (prefix + "Px" + suffix);
 	produces < std::vector<double> > (prefix + "Py" + suffix);
 	produces < std::vector<double> > (prefix + "Pz" + suffix);
 	produces < std::vector<double> > (prefix + "Energy" + suffix);
@@ -32,11 +33,11 @@ BristolNTuple_Muons::BristolNTuple_Muons(const edm::ParameterSet& iConfig) :
 	produces < std::vector<bool> > (prefix + "isTrackerMuon" + suffix);
 	produces < std::vector<int> > (prefix + "NumberOfMatches" + suffix); // in reference selection
 	produces < std::vector<int> > (prefix + "NumberOfMatchedStations" + suffix); // in Aachen selection
-	produces < std::vector<double> > (prefix + "CosmicCompatibility" + suffix);
-	produces < std::vector<double> > (prefix + "TimeCompatibility" + suffix);
-	produces < std::vector<double> > (prefix + "BackToBackCompatibility" + suffix);
-	produces < std::vector<double> > (prefix + "OverlapCompatibility" + suffix);
-	produces <std::vector<bool> >    ( prefix + "PassID" + suffix );
+//	produces < std::vector<double> > (prefix + "CosmicCompatibility" + suffix);
+//	produces < std::vector<double> > (prefix + "TimeCompatibility" + suffix);
+//	produces < std::vector<double> > (prefix + "BackToBackCompatibility" + suffix);
+//	produces < std::vector<double> > (prefix + "OverlapCompatibility" + suffix);
+	produces < std::vector<bool> > (prefix + "PassID" + suffix);
 
 	//muon isolation variables
 
@@ -69,6 +70,14 @@ BristolNTuple_Muons::BristolNTuple_Muons(const edm::ParameterSet& iConfig) :
 		produces < std::vector<double> > (prefix + "PfNeutralHadronIso05" + suffix);
 		produces < std::vector<double> > (prefix + "PFGammaIso05" + suffix);
 		produces < std::vector<double> > (prefix + "PFRelIso05" + suffix);
+
+		//directional isolation
+		produces < std::vector<double> > (prefix + "DirectionalPFIso02" + suffix);
+		produces < std::vector<double> > (prefix + "DirectionalPFIso02FallOff" + suffix);
+		produces < std::vector<double> > (prefix + "PfRelIso02FallOff" + suffix);
+		produces < std::vector<double> > (prefix + "DirectionalPFIso03" + suffix);
+		produces < std::vector<double> > (prefix + "DirectionalPFIso03FallOff" + suffix);
+		produces < std::vector<double> > (prefix + "PfRelIso03FallOff" + suffix);
 	}
 
 	//associated track
@@ -77,7 +86,6 @@ BristolNTuple_Muons::BristolNTuple_Muons(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "Track.Dz" + suffix);
 	produces < std::vector<double> > (prefix + "Track.DzError" + suffix);
 	produces < std::vector<double> > (prefix + "Track.ValidFractionOfHits" + suffix);
-
 
 	//associated global track
 	produces < std::vector<int> > (prefix + "GlobalTrack.NumberOfValidMuonHits" + suffix); // in reference selection
@@ -127,10 +135,10 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	std::auto_ptr < std::vector<bool> > isTrackerMuon(new std::vector<bool>());
 	std::auto_ptr < std::vector<int> > numberOfMatches(new std::vector<int>());
 	std::auto_ptr < std::vector<int> > numberOfMatchedStations(new std::vector<int>());
-	std::auto_ptr < std::vector<double> > cosmicCompatibility(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > timeCompatibility(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > backToBackCompatibility(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > overlapCompatibility(new std::vector<double>());
+//	std::auto_ptr < std::vector<double> > cosmicCompatibility(new std::vector<double>());
+//	std::auto_ptr < std::vector<double> > timeCompatibility(new std::vector<double>());
+//	std::auto_ptr < std::vector<double> > backToBackCompatibility(new std::vector<double>());
+//	std::auto_ptr < std::vector<double> > overlapCompatibility(new std::vector<double>());
 	std::auto_ptr < std::vector<bool> > passID(new std::vector<bool>());
 
 	//muon isolation variables
@@ -138,13 +146,13 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	std::auto_ptr < std::vector<double> > trkIso03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > ecalIso03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > hcalIso03(new std::vector<double>());
-	std::auto_ptr<std::vector<double> >  hoIso03    ( new std::vector<double>()  );
+	std::auto_ptr < std::vector<double> > hoIso03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > relIso03(new std::vector<double>());
 	//bigger cone
 	std::auto_ptr < std::vector<double> > trkIso05(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > ecalIso05(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > hcalIso05(new std::vector<double>());
-	std::auto_ptr<std::vector<double> >  hoIso05    ( new std::vector<double>()  );
+	std::auto_ptr < std::vector<double> > hoIso05(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > relIso05(new std::vector<double>());
 
 	//muonn PF isolation variables
@@ -163,140 +171,167 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	std::auto_ptr < std::vector<double> > PFGammaIso05(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PFRelIso05(new std::vector<double>());
 
+	std::auto_ptr < std::vector<double> > DirectionalPFIso02(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > DirectionalPFIso02FallOff(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > PfRelIso02FallOff(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > DirectionalPFIso03(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > DirectionalPFIso03FallOff(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > PfRelIso03FallOff(new std::vector<double>());
+
 	//associated track
 	std::auto_ptr < std::vector<double> > trkD0(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > trkD0Error(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > trkDz(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > trkDzError(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > trackValidFractionOfHits(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > trackValidFractionOfHits(new std::vector<double>());
 
-    //associated global track
-    std::auto_ptr < std::vector<int> > globalTrackNumberOfValidMuonHits(new std::vector<int>());
-    std::auto_ptr < std::vector<double> > globalChi2(new std::vector<double>());
+	//associated global track
+	std::auto_ptr < std::vector<int> > globalTrackNumberOfValidMuonHits(new std::vector<int>());
+	std::auto_ptr < std::vector<double> > globalChi2(new std::vector<double>());
 
-    //associated inner track
-    std::auto_ptr < std::vector<int> > innerTrackNumberOfValidHits(new std::vector<int>());
-    std::auto_ptr < std::vector<int> > innerTrackPixelLayersWithMeasurement(new std::vector<int>());
+	//associated inner track
+	std::auto_ptr < std::vector<int> > innerTrackNumberOfValidHits(new std::vector<int>());
+	std::auto_ptr < std::vector<int> > innerTrackPixelLayersWithMeasurement(new std::vector<int>());
 
-    //muon vertex variables
-    std::auto_ptr < std::vector<int> > vtxIndex(new std::vector<int>());
-    std::auto_ptr<std::vector<double> >  vtxDistZ  ( new std::vector<double>()  );
-    std::auto_ptr < std::vector<double> > primaryVertexDXY(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > primaryVertexDXYError(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > beamSpotDXY(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > beamSpotDXYError(new std::vector<double>());
+	//muon vertex variables
+	std::auto_ptr < std::vector<int> > vtxIndex(new std::vector<int>());
+	std::auto_ptr < std::vector<double> > vtxDistZ(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > primaryVertexDXY(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > primaryVertexDXYError(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > beamSpotDXY(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > beamSpotDXYError(new std::vector<double>());
 
-    //muon cocktail variables
-    std::auto_ptr < std::vector<double> > ctPx(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > ctPy(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > ctPz(new std::vector<double>());
-    std::auto_ptr < std::vector<int> > ctCharge(new std::vector<int>());
-    std::auto_ptr < std::vector<int> > ctNumberOfValidTrackerHits(new std::vector<int>());
-    std::auto_ptr < std::vector<double> > ctTrkD0(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > ctTrkD0Error(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > ctTrkDz(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > ctTrkDzError(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > ctNormalizedChi2(new std::vector<double>());
+	//muon cocktail variables
+	std::auto_ptr < std::vector<double> > ctPx(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > ctPy(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > ctPz(new std::vector<double>());
+	std::auto_ptr < std::vector<int> > ctCharge(new std::vector<int>());
+	std::auto_ptr < std::vector<int> > ctNumberOfValidTrackerHits(new std::vector<int>());
+	std::auto_ptr < std::vector<double> > ctTrkD0(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > ctTrkD0Error(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > ctTrkDz(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > ctTrkDzError(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > ctNormalizedChi2(new std::vector<double>());
 
-    //-----------------------------------------------------------------
-    edm::Handle < std::vector<pat::Muon> > muons;
-    iEvent.getByLabel(inputTag, muons);
+	//-----------------------------------------------------------------
+	edm::Handle < std::vector<pat::Muon> > muons;
+	iEvent.getByLabel(inputTag, muons);
 
-    edm::Handle < reco::VertexCollection > primaryVertices;
-    iEvent.getByLabel(vtxInputTag, primaryVertices);
+	edm::Handle < reco::VertexCollection > primaryVertices;
+	iEvent.getByLabel(vtxInputTag, primaryVertices);
 
-    edm::Handle < reco::BeamSpot > beamSpot;
+	edm::Handle < reco::BeamSpot > beamSpot;
 	iEvent.getByLabel("offlineBeamSpot", beamSpot);
 
-    if (muons.isValid()) {
-        edm::LogInfo("BristolNTuple_MuonsExtraInfo") << "Total # Muons: " << muons->size();
+	edm::Handle < reco::PFCandidateCollection > pfCandidates;
+	iEvent.getByLabel("particleFlow", pfCandidates);
 
-        for (std::vector<pat::Muon>::const_iterator it = muons->begin(); it != muons->end(); ++it) {
-            // exit from loop when you reach the required number of muons
-            if (px->size() >= maxSize)
-                break;
-            if (!it->isGlobalMuon())
-                continue;
+	if (muons.isValid()) {
+		edm::LogInfo("BristolNTuple_MuonsExtraInfo") << "Total # Muons: " << muons->size();
 
-            double trkd0 = it->track()->d0();
+		for (std::vector<pat::Muon>::const_iterator it = muons->begin(); it != muons->end(); ++it) {
+			// exit from loop when you reach the required number of muons
+			if (px->size() >= maxSize)
+				break;
+			if (!it->isGlobalMuon())
+				continue;
 
-            if (beamSpotCorr && beamSpot.isValid()) {
+			double trkd0 = it->track()->d0();
+
+			if (beamSpotCorr && beamSpot.isValid()) {
 				trkd0 = -(it->track()->dxy(beamSpot->position()));
-			}
-			else if (beamSpotCorr && !beamSpot.isValid())
+			} else if (beamSpotCorr && !beamSpot.isValid())
 				edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the offlineBeamSpot";
 
+			double minVtxDist3D = 9999.;
+			int vtxIndex_ = -1;
+			double vtxDistXY_ = -9999.;
+			double vtxDistZ_ = -9999.;
 
-            double minVtxDist3D = 9999.;
-            int vtxIndex_ = -1;
-            double vtxDistXY_ = -9999.;
-            double vtxDistZ_ = -9999.;
+			if (primaryVertices.isValid()) {
+				edm::LogInfo("RootTupleMakerV2_MuonsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
 
-            if (primaryVertices.isValid()) {
-                edm::LogInfo("RootTupleMakerV2_MuonsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
+				for (reco::VertexCollection::const_iterator v_it = primaryVertices->begin();
+						v_it != primaryVertices->end(); ++v_it) {
 
-                for (reco::VertexCollection::const_iterator v_it = primaryVertices->begin(); v_it
-                        != primaryVertices->end(); ++v_it) {
+					double distXY = it->track()->dxy(v_it->position());
+					double distZ = it->track()->dz(v_it->position());
+					double dist3D = sqrt(pow(distXY, 2) + pow(distZ, 2));
 
-                    double distXY = it->track()->dxy(v_it->position());
-                    double distZ = it->track()->dz(v_it->position());
-                    double dist3D = sqrt(pow(distXY, 2) + pow(distZ, 2));
+					if (dist3D < minVtxDist3D) {
+						minVtxDist3D = dist3D;
+						vtxIndex_ = int(std::distance(primaryVertices->begin(), v_it));
+						vtxDistXY_ = distXY;
+						vtxDistZ_ = distZ;
+					}
+				}
+			} else {
+				edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the product " << vtxInputTag;
+			}
 
-                    if (dist3D < minVtxDist3D) {
-                        minVtxDist3D = dist3D;
-                        vtxIndex_ = int(std::distance(primaryVertices->begin(), v_it));
-                        vtxDistXY_ = distXY;
-                        vtxDistZ_ = distZ;
-                    }
-                }
-            } else {
-                edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the product " << vtxInputTag;
-            }
+			//kinematic variables
+			px->push_back(it->px());
+			py->push_back(it->py());
+			pz->push_back(it->pz());
+			energy->push_back(it->energy());
+			//extra properties
+			charge->push_back(it->charge());
 
-            //kinematic variables
-            px->push_back(it->px());
-            py->push_back(it->py());
-            pz->push_back(it->pz());
-            energy->push_back(it->energy());
-            //extra properties
-            charge->push_back(it->charge());
-
-            //muon ID variables
-            isGlobalMuon->push_back(it->isGlobalMuon());
+			//muon ID variables
+			isGlobalMuon->push_back(it->isGlobalMuon());
 			isTrackerMuon->push_back(it->isTrackerMuon());
 			numberOfMatches->push_back(it->numberOfMatches());
 			numberOfMatchedStations->push_back(it->numberOfMatchedStations());
-			cosmicCompatibility->push_back(it->userFloat("cosmicCompatibility"));
-			timeCompatibility->push_back(it->userFloat("timeCompatibility"));
-			backToBackCompatibility->push_back(it->userFloat("backToBackCompatibility"));
-			overlapCompatibility->push_back(it->userFloat("overlapCompatibility"));
+//			cosmicCompatibility->push_back(it->userFloat("cosmicCompatibility"));
+//			timeCompatibility->push_back(it->userFloat("timeCompatibility"));
+//			backToBackCompatibility->push_back(it->userFloat("backToBackCompatibility"));
+//			overlapCompatibility->push_back(it->userFloat("overlapCompatibility"));
 			passID->push_back(it->muonID(muonID));
-
 
 			//muon isolation variables
 			//default
 			trkIso03->push_back(it->isolationR03().sumPt);
 			ecalIso03->push_back(it->isolationR03().emEt);
 			hcalIso03->push_back(it->isolationR03().hadEt);
-			hoIso03->push_back( it->isolationR03().hoEt );
-			relIso03->push_back((it->isolationR03().sumPt + it->isolationR03().emEt + it->isolationR03().hadEt) / it->pt());
+			hoIso03->push_back(it->isolationR03().hoEt);
+			relIso03->push_back(
+					(it->isolationR03().sumPt + it->isolationR03().emEt + it->isolationR03().hadEt) / it->pt());
 			//bigger cone
 			trkIso05->push_back(it->isolationR05().sumPt);
 			ecalIso05->push_back(it->isolationR05().emEt);
 			hcalIso05->push_back(it->isolationR05().hadEt);
-			hoIso05->push_back( it->isolationR05().hoEt );
-			relIso05->push_back((it->isolationR05().sumPt + it->isolationR05().emEt + it->isolationR05().hadEt) / it->pt());
+			hoIso05->push_back(it->isolationR05().hoEt);
+			relIso05->push_back(
+					(it->isolationR05().sumPt + it->isolationR05().emEt + it->isolationR05().hadEt) / it->pt());
 
-            if (storePFIsolation) {
-                pat::IsolationKeys isokeyPfChargedHadronIso = pat::IsolationKeys(4);
+			if (storePFIsolation) {
+				pat::IsolationKeys isokeyPfChargedHadronIso = pat::IsolationKeys(4);
 				pat::IsolationKeys isokeyPfNeutralHadronIso = pat::IsolationKeys(5);
 				pat::IsolationKeys isokeyPFGammaIso = pat::IsolationKeys(6);
 
 				double pfRelIso03(0), pfRelIso04(0), pfRelIso05(0);
+				double directionalPFIso02(0), directionalPFIso02FallOff(0), pfIso02FallOff(0);
+				double directionalPFIso03(0), directionalPFIso03FallOff(0), pfIso03FallOff(0);
 
 				const reco::IsoDeposit * PfChargedHadronIsolation = it->isoDeposit(isokeyPfChargedHadronIso);
 				const reco::IsoDeposit * PfNeutralHadronIsolation = it->isoDeposit(isokeyPfNeutralHadronIso);
 				const reco::IsoDeposit * PFGammaIsolation = it->isoDeposit(isokeyPFGammaIso);
+
+				directionalPFIso02 = customIsolation(*it, pfCandidates, 0.2, true, false, reco::PFCandidate::e);
+				directionalPFIso02FallOff = customIsolation(*it, pfCandidates, 0.2, true, true, reco::PFCandidate::e);
+				pfIso02FallOff = customIsolation(*it, pfCandidates, 0.2, false, true, reco::PFCandidate::e);
+
+				directionalPFIso03 = customIsolation(*it, pfCandidates, 0.3, true, false, reco::PFCandidate::e);
+				directionalPFIso03FallOff = customIsolation(*it, pfCandidates, 0.3, true, true, reco::PFCandidate::e);
+				pfIso03FallOff = customIsolation(*it, pfCandidates, 0.3, false, true, reco::PFCandidate::e);
+
+				DirectionalPFIso02->push_back(directionalPFIso02);
+				DirectionalPFIso02FallOff->push_back(directionalPFIso02FallOff);
+				PfRelIso02FallOff->push_back(pfIso02FallOff);
+				DirectionalPFIso03->push_back(directionalPFIso03);
+				DirectionalPFIso03FallOff->push_back(directionalPFIso03FallOff);
+				PfRelIso03FallOff->push_back(pfIso03FallOff);
+
 				if (PfChargedHadronIsolation) {
 					PfChargedHadronIso03->push_back(PfChargedHadronIsolation->depositWithin(0.3));
 					PfChargedHadronIso04->push_back(PfChargedHadronIsolation->depositWithin(0.4));
@@ -332,26 +367,26 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 				PFRelIso04->push_back(pfRelIso04 / it->pt());
 				PFRelIso05->push_back(pfRelIso05 / it->pt());
 
-            }
+			}
 
-            //associated track
-            trkD0->push_back(trkd0);
+			//associated track
+			trkD0->push_back(trkd0);
 			trkD0Error->push_back(it->track()->d0Error());
 			trkDz->push_back(it->track()->dz());
 			trkDzError->push_back(it->track()->dzError());
-			trackValidFractionOfHits->push_back (  validFraction ( it->track() ));
-
+			trackValidFractionOfHits->push_back(validFraction(it->track()));
 
 			//associated global track
-            globalChi2->push_back(it->globalTrack()->normalizedChi2());
-            globalTrackNumberOfValidMuonHits->push_back(it->globalTrack()->hitPattern().numberOfValidMuonHits());
+			globalChi2->push_back(it->globalTrack()->normalizedChi2());
+			globalTrackNumberOfValidMuonHits->push_back(it->globalTrack()->hitPattern().numberOfValidMuonHits());
 
-            //associated inner track
-            innerTrackNumberOfValidHits->push_back( it->innerTrack()->numberOfValidHits() );
-            innerTrackPixelLayersWithMeasurement->push_back( it->innerTrack()->hitPattern().pixelLayersWithMeasurement() );
+			//associated inner track
+			innerTrackNumberOfValidHits->push_back(it->innerTrack()->numberOfValidHits());
+			innerTrackPixelLayersWithMeasurement->push_back(
+					it->innerTrack()->hitPattern().pixelLayersWithMeasurement());
 
-            //muon vertex variables
-            vtxIndex->push_back(vtxIndex_);
+			//muon vertex variables
+			vtxIndex->push_back(vtxIndex_);
 			vtxDistZ->push_back(vtxDistZ_);
 			primaryVertexDXY->push_back(it->dB());
 			primaryVertexDXYError->push_back(it->edB());
@@ -379,45 +414,42 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 				ctNormalizedChi2->push_back(cocktail_track->normalizedChi2());
 			}
 
+		}
+	} else {
+		edm::LogError("BristolNTuple_MuonsExtraError") << "Error! Can't get the product " << inputTag;
+	}
 
+	//-----------------------------------------------------------------
+	// put vectors in the event
+	//kinematic variables
+	iEvent.put(px, prefix + "Px" + suffix);
+	iEvent.put(py, prefix + "Py" + suffix);
+	iEvent.put(pz, prefix + "Pz" + suffix);
+	iEvent.put(energy, prefix + "Energy" + suffix);
 
-        }
-    } else {
-        edm::LogError("BristolNTuple_MuonsExtraError") << "Error! Can't get the product " << inputTag;
-    }
+	//extra properties
+	iEvent.put(charge, prefix + "Charge" + suffix);
 
-    //-----------------------------------------------------------------
-    // put vectors in the event
-    //kinematic variables
-    iEvent.put(px, prefix + "Px" + suffix);
-    iEvent.put(py, prefix + "Py" + suffix);
-    iEvent.put(pz, prefix + "Pz" + suffix);
-    iEvent.put( energy, prefix + "Energy" + suffix );
+	//muon ID variables
+	iEvent.put(isGlobalMuon, prefix + "isGlobalMuon" + suffix);
+	iEvent.put(isTrackerMuon, prefix + "isTrackerMuon" + suffix);
+	iEvent.put(numberOfMatches, prefix + "NumberOfMatches" + suffix);
+	iEvent.put(numberOfMatchedStations, prefix + "NumberOfMatchedStations" + suffix);
+//    iEvent.put( cosmicCompatibility, prefix + "CosmicCompatibility" + suffix );
+//    iEvent.put( timeCompatibility, prefix + "TimeCompatibility" + suffix );
+//    iEvent.put( backToBackCompatibility, prefix + "BackToBackCompatibility" + suffix );
+//    iEvent.put( overlapCompatibility, prefix + "OverlapCompatibility" + suffix );
+	iEvent.put(passID, prefix + "PassID" + suffix);
 
-    //extra properties
-    iEvent.put( charge, prefix + "Charge" + suffix );
-
-    //muon ID variables
-    iEvent.put( isGlobalMuon, prefix + "isGlobalMuon" + suffix );
-    iEvent.put( isTrackerMuon, prefix + "isTrackerMuon" + suffix );
-    iEvent.put( numberOfMatches, prefix + "NumberOfMatches" + suffix );
-    iEvent.put( numberOfMatchedStations, prefix + "NumberOfMatchedStations" + suffix );
-    iEvent.put( cosmicCompatibility, prefix + "CosmicCompatibility" + suffix );
-    iEvent.put( timeCompatibility, prefix + "TimeCompatibility" + suffix );
-    iEvent.put( backToBackCompatibility, prefix + "BackToBackCompatibility" + suffix );
-    iEvent.put( overlapCompatibility, prefix + "OverlapCompatibility" + suffix );
-    iEvent.put( passID, prefix + "PassID" + suffix );
-
-
-    //muon isolation variables
-    //default
-    iEvent.put(trkIso03, prefix + "TrkIso03" + suffix);
-    iEvent.put(ecalIso03, prefix + "EcalIso03" + suffix);
-    iEvent.put(hcalIso03, prefix + "HcalIso03" + suffix);
-    iEvent.put(hoIso03, prefix + "HOIso03" + suffix);
-    iEvent.put(relIso03, prefix + "RelIso03" + suffix);
-    //bigger cone
-    iEvent.put(trkIso05, prefix + "TrkIso05" + suffix);
+	//muon isolation variables
+	//default
+	iEvent.put(trkIso03, prefix + "TrkIso03" + suffix);
+	iEvent.put(ecalIso03, prefix + "EcalIso03" + suffix);
+	iEvent.put(hcalIso03, prefix + "HcalIso03" + suffix);
+	iEvent.put(hoIso03, prefix + "HOIso03" + suffix);
+	iEvent.put(relIso03, prefix + "RelIso03" + suffix);
+	//bigger cone
+	iEvent.put(trkIso05, prefix + "TrkIso05" + suffix);
 	iEvent.put(ecalIso05, prefix + "EcalIso05" + suffix);
 	iEvent.put(hcalIso05, prefix + "HcalIso05" + suffix);
 	iEvent.put(hoIso05, prefix + "HOIso05" + suffix);
@@ -439,6 +471,13 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 		iEvent.put(PfNeutralHadronIso05, prefix + "PfNeutralHadronIso05" + suffix);
 		iEvent.put(PFGammaIso05, prefix + "PFGammaIso05" + suffix);
 		iEvent.put(PFRelIso05, prefix + "PFRelIso05" + suffix);
+
+		iEvent.put(DirectionalPFIso02, prefix + "DirectionalPFIso02" + suffix);
+		iEvent.put(DirectionalPFIso02FallOff, prefix + "DirectionalPFIso02FallOff" + suffix);
+		iEvent.put(PfRelIso02FallOff, prefix + "PfRelIso02FallOff" + suffix);
+		iEvent.put(DirectionalPFIso03, prefix + "DirectionalPFIso03" + suffix);
+		iEvent.put(DirectionalPFIso03FallOff, prefix + "DirectionalPFIso03FallOff" + suffix);
+		iEvent.put(PfRelIso03FallOff, prefix + "PfRelIso03FallOff" + suffix);
 	}
 
 	//associated track
