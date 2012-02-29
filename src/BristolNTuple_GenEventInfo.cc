@@ -123,10 +123,9 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 		} else {
 			edm::LogError("BristolNTuple_PileUpError") << "Error! Can't get the product " << pileupInfoSrc_;
 		}
-		float ave_nvtx = sum_nvtx / 3.;
 		edm::EventBase* iEventB = dynamic_cast<edm::EventBase*> (&iEvent);
 		*PUWeightInTimeOnly.get() = lumiWeightOneX_.weight(*iEventB);
-		*PUWeight3BX.get() = lumiWeight3X_.weight3BX(ave_nvtx);
+		*PUWeight3BX.get() = lumiWeight3X_.weightOOT(*iEventB);
 		*PUWeight3D.get() = lumiWeight3D_.weight3D((*iEventB));
 		*PUWeightShiftUp.get() = PShiftUp_.ShiftWeight(npv0);
 		*PUWeightShiftDown.get() = PShiftDown_.ShiftWeight(npv0);
@@ -186,7 +185,7 @@ void BristolNTuple_GenEventInfo::initLumiWeights() {
 
 	lumiWeightOneX_ = edm::LumiReWeighting(mcDistr1BX, dataDistr1BX);
 	lumiWeight3X_ = edm::LumiReWeighting(mcDistr, dataDistr);
-	lumiWeight3D_ = edm::Lumi3DReWeighting(mcDistr, dataDistr);
+	lumiWeight3D_ = edm::Lumi3DReWeighting(mcDistr, dataDistr, "Weights3D.root");
 
 	lumiWeight3D_.weight3D_init(1);
 
