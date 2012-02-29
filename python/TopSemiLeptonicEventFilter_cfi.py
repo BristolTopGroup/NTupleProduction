@@ -10,7 +10,7 @@ EventFilter = cms.EDFilter('TopSemiLeptonicEventFilter',
 #    minNJets = cms.int32(-1),
 #    maxNJets = cms.int32(-1),
     minJetPt   = cms.double(30.),
-    maxAbsJetEta  = cms.double(2.4.),
+    maxAbsJetEta  = cms.double(2.4),
 
     # Specify number of electrons
 #    minNElectrons = cms.int32(-1),
@@ -25,6 +25,7 @@ EventFilter = cms.EDFilter('TopSemiLeptonicEventFilter',
     maxAbsMuonEta      = cms.double(2.1),
     #flags
     debug    = cms.untracked.bool(False),
+    useCiCElectronID = cms.untracked.bool(True),
 #    counteitherleptontype    = cms.untracked.bool(True),
     #Primary Vertex filtering
     VertexInput = cms.InputTag('offlinePrimaryVertices'),
