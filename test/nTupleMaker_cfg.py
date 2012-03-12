@@ -315,7 +315,7 @@ print "setting up loose leptons"
 # In order to have a coherent semileptonic channel also, add
 # some "loose" leptons to do QCD estimates.
 process.pfIsolatedMuonsLoosePFlow = process.pfIsolatedMuonsPFlow.clone(
-    combinedIsolationCut=cms.double(999.0) 
+    isolationCut=cms.double(999.0) 
     )
 
 process.patMuonsLoosePFlow = process.patMuonsPFlow.clone(
@@ -337,7 +337,7 @@ process.selectedPatMuonsLoosePFlow = process.selectedPatMuonsPFlow.clone(
 
 #electrons
 process.pfIsolatedElectronsLoosePFlow = process.pfIsolatedElectronsPFlow.clone(
-    combinedIsolationCut=cms.double(999.0) 
+    isolationCut=cms.double(999.0) 
     )
 
 process.patElectronsLoosePFlow = process.patElectronsPFlow.clone(
