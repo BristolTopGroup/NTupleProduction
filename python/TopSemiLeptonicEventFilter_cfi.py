@@ -25,7 +25,7 @@ EventFilter = cms.EDFilter('TopSemiLeptonicEventFilter',
     maxAbsMuonEta      = cms.double(2.1),
     #flags
     debug    = cms.untracked.bool(False),
-    useCiCElectronID = cms.untracked.bool(True),
+    useCiCElectronID = cms.bool(True),
 #    counteitherleptontype    = cms.untracked.bool(True),
     #Primary Vertex filtering
     VertexInput = cms.InputTag('offlinePrimaryVertices'),
