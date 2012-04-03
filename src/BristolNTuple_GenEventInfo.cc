@@ -185,7 +185,7 @@ void BristolNTuple_GenEventInfo::initLumiWeights() {
 
 	lumiWeightOneX_ = edm::LumiReWeighting(mcDistr1BX, dataDistr1BX);
 	lumiWeight3X_ = edm::LumiReWeighting(mcDistr, dataDistr);
-	lumiWeight3D_ = edm::Lumi3DReWeighting(mcDistr, dataDistr, "Weights3D.root");
+	lumiWeight3D_ = edm::Lumi3DReWeighting(mcDistr, dataDistr);
 
 	lumiWeight3D_.weight3D_init(1);
 
