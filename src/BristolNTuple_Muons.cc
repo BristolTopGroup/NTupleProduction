@@ -1,5 +1,6 @@
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_Muons.h"
-#include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
+#include "Leptoquarks/RootTupleMakerV2/interface/PatUtilities.h"
+#include "BristolAnalysis/NTupleTools/interface/DirectionalIsolation.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
@@ -245,7 +246,7 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
 			double minVtxDist3D = 9999.;
 			int vtxIndex_ = -1;
-			double vtxDistXY_ = -9999.;
+//			double vtxDistXY_ = -9999.;
 			double vtxDistZ_ = -9999.;
 
 			if (primaryVertices.isValid()) {
@@ -261,7 +262,7 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 					if (dist3D < minVtxDist3D) {
 						minVtxDist3D = dist3D;
 						vtxIndex_ = int(std::distance(primaryVertices->begin(), v_it));
-						vtxDistXY_ = distXY;
+//						vtxDistXY_ = distXY;
 						vtxDistZ_ = distZ;
 					}
 				}
