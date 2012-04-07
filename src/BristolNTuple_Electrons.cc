@@ -1,5 +1,5 @@
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_Electrons.h"
-#include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
+#include "BristolAnalysis/NTupleTools/interface/DirectionalIsolation.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -46,7 +46,7 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 	produces < std::vector<double> > (prefix + "DeltaEtaTrkSC" + suffix);
 	produces < std::vector<unsigned int> > (prefix + "PassID" + suffix);
 	produces < std::vector<unsigned int> > (prefix + "PassIDMC" + suffix);
-	if (debugRelease_) {// explicit storage of ID variables which are usually stored in a single integer
+	if (debugRelease_) { // explicit storage of ID variables which are usually stored in a single integer
 		produces < std::vector<bool> > (prefix + "eidVeryLooseMC" + suffix);
 		produces < std::vector<bool> > (prefix + "eidLooseMC" + suffix);
 		produces < std::vector<bool> > (prefix + "eidMediumMC" + suffix);
@@ -115,6 +115,8 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 	produces < std::vector<double> > (prefix + "SCEta" + suffix);
 	produces < std::vector<double> > (prefix + "SCPhi" + suffix);
 	produces < std::vector<double> > (prefix + "SCPt" + suffix);
+	produces < std::vector<double> > (prefix + "SCP" + suffix);
+	produces < std::vector<double> > (prefix + "SCEnergy" + suffix);
 	produces < std::vector<double> > (prefix + "SCRawEnergy" + suffix);
 
 	//electron vertex variables
@@ -124,6 +126,9 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 	produces < std::vector<double> > (prefix + "PrimaryVertexDXYError" + suffix);
 	produces < std::vector<double> > (prefix + "BeamSpotDXY" + suffix);
 	produces < std::vector<double> > (prefix + "BeamSpotDXYError" + suffix);
+	//quantities corrected for position of primary vertex
+	produces < std::vector<double> > (prefix + "PrimaryVertexDXYCorr" + suffix);
+	produces < std::vector<double> > (prefix + "VtxDistZCorr" + suffix);
 }
 
 void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -217,6 +222,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > scEta(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > scPhi(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > scPt(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > scP(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > scEnergy(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > scRawEnergy(new std::vector<double>());
 
 	//electron vertex variables
@@ -226,6 +233,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > primaryVertexDXYError(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > beamSpotDXY(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > beamSpotDXYError(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > vtxDistZCorr(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > primaryVertexDXYCorr(new std::vector<double>());
 
 	//-----------------------------------------------------------------
 	edm::Handle < std::vector<pat::Electron> > electrons;
@@ -371,12 +380,20 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			// Vertex association
 			double minVtxDist3D = 9999.;
 			int vtxIndex_ = -1;
-			double vtxDistXY_ = -9999.;
+//			double vtxDistXY_ = -9999.;
 			double vtxDistZ_ = -9999.;
+			double vtxDistXY_Corr = -9999.;
+			double vtxDistZ_Corr = -9999.;
 
 			if (primaryVertices.isValid()) {
 				edm::LogInfo("RootTupleMakerV2_ElectronsInfo") << "Total # Primary Vertices: "
 						<< primaryVertices->size();
+				reco::Vertex pv = primaryVertices->front();
+				vtxDistXY_Corr = it->gsfTrack()->d0() - pv.x() * sin(it->gsfTrack()->phi())
+						+ pv.y() * cos(it->gsfTrack()->phi());
+				vtxDistZ_Corr = (it->vz() - pv.z())
+						- ((it->vx() - pv.x()) * it->px() + (it->vy() - pv.y()) * it->py()) / it->pt() / it->pt()
+								* it->pz();
 
 				for (reco::VertexCollection::const_iterator v_it = primaryVertices->begin();
 						v_it != primaryVertices->end(); ++v_it) {
@@ -388,7 +405,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 					if (dist3D < minVtxDist3D) {
 						minVtxDist3D = dist3D;
 						vtxIndex_ = int(std::distance(primaryVertices->begin(), v_it));
-						vtxDistXY_ = distXY;
+//						vtxDistXY_ = distXY;
 						vtxDistZ_ = distZ;
 					}
 				}
@@ -524,6 +541,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			scEta->push_back(it->superCluster()->eta());
 			scPhi->push_back(it->superCluster()->phi());
 			scPt->push_back(it->superCluster()->energy() / cosh(it->superCluster()->eta()));
+			scP->push_back(it->eSuperClusterOverP()/it->superCluster()->energy());
+			scEnergy->push_back(it->superCluster()->energy());
 			scRawEnergy->push_back(it->superCluster()->rawEnergy());
 
 			// Vertex association variables
@@ -533,6 +552,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			primaryVertexDXYError->push_back(it->edB());
 			beamSpotDXY->push_back(it->dB(pat::Electron::BS2D));
 			beamSpotDXYError->push_back(it->edB(pat::Electron::BS2D));
+			vtxDistZCorr->push_back(vtxDistZ_Corr);
+			primaryVertexDXYCorr->push_back(vtxDistXY_Corr);
 
 		}
 	} else {
@@ -633,6 +654,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	iEvent.put(scEta, prefix + "SCEta" + suffix);
 	iEvent.put(scPhi, prefix + "SCPhi" + suffix);
 	iEvent.put(scPt, prefix + "SCPt" + suffix);
+	iEvent.put(scP, prefix + "SCP" + suffix);
+	iEvent.put(scEnergy, prefix + "SCEnergy" + suffix);
 	iEvent.put(scRawEnergy, prefix + "SCRawEnergy" + suffix);
 
 	//calorimeter variables
@@ -642,5 +665,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	iEvent.put(primaryVertexDXYError, prefix + "PrimaryVertexDXYError" + suffix);
 	iEvent.put(beamSpotDXY, prefix + "BeamSpotDXY" + suffix);
 	iEvent.put(beamSpotDXYError, prefix + "BeamSpotDXYError" + suffix);
+	iEvent.put(vtxDistZCorr, prefix + "VtxDistZCorr" + suffix);
+	iEvent.put(primaryVertexDXYCorr, prefix + "PrimaryVertexDXYCorr" + suffix);
 
 }
