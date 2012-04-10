@@ -80,6 +80,38 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     'HLT_Mu17_eta2p1_DiCentralPFJet30_v',
     'HLT_Mu17_eta2p1_TriCentralPFJet30_v',
     'HLT_Mu17_eta2p1_QuadCentralPFJet30_v',
+    #========== 2012 data ==============
+    #data parking
+    'HLT_Ele27_WP80_v',
+    'HLT_IsoMu20_eta2p1_v'#needed for trigger efficiency
+    #5E33 menu new triggers (rest is included in 2011 menu)
+    'HLT_Ele25_CaloIdVT_TrkIdT_TriCentralJet50_40_30_v',
+    'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralJet50_40_30_v',
+    #
+    'HLT_Mu20_eta2p1_TriCentralPFJet30_v',
+    'HLT_Mu20_eta2p1_TriCentralPFJet50_40_30_v',
+    'HLT_IsoMu20_eta2p1_CentralPFJet30_BTagIPIter_v',
+    'HLT_IsoMu20_eta2p1_CentralPFJet30_v',
+    'HLT_IsoMu20_eta2p1_DiCentralPFJet30_v',
+    'HLT_IsoMu20_eta2p1_TriCentralPFJet30_v',
+    'HLT_IsoMu20_eta2p1_TriCentralPFJet50_40_30_v',
+    #7E33 menu
+    'HLT_Ele25_CaloIdVT_TrkIdT_TriCentralPFNoPUJet30_v',
+    'HLT_Ele25_CaloIdVT_TrkIdT_TriCentralPFNoPUJet50_40_30_v',
+    'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralPFNoPUJet30_v',
+    'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralPFNoPUJet30_v',
+    'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFNoPUJet30_v',
+    'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFNoPUJet50_40_30_v',
+    #
+    'HLT_Mu20_eta2p1_TriCentralPFNoPUJet30_v',
+    'HLT_Mu20_eta2p1_TriCentralPFNoPUJet50_40_30_v',
+    'HLT_IsoMu20_eta2p1_CentralPFNoPUJet30_BTagIPIter_v',
+    'HLT_IsoMu20_eta2p1_CentralPFNoPUJet30_v',
+    'HLT_IsoMu20_eta2p1_DiCentralPFNoPUJet30_v',
+    'HLT_IsoMu20_eta2p1_TriCentralPFNoPUJet30_v',
+    'HLT_IsoMu20_eta2p1_TriCentralPFNoPUJet50_40_30_v',
+    
+    
  ),                              
     HLTPathsOfInterest_Other = cms.vstring(
                                            #2010 data RunA + RunB
