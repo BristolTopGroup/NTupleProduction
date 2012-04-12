@@ -3,6 +3,8 @@
 # configure Jet Energy Corrections
 #--------------------------------------------------------------------------------
 def configureCustomJEC(process, cms):
+    database = 'sqlite_fip:Jec11_V12_20111220.db'
+    print 'Using "%s" as JEC database' % database
     process.load("CondCore.DBCommon.CondDBCommon_cfi")
     process.jec = cms.ESSource("PoolDBESSource",
             DBParameters = cms.PSet(
@@ -21,6 +23,6 @@ def configureCustomJEC(process, cms):
            label  = cms.untracked.string('AK5Calo')
        )
    ),
-   connect = cms.string('sqlite_fip:Jec11_V12_20111220.db')
+   connect = cms.string(database)
    )
     process.es_prefer_jec = cms.ESPrefer('PoolDBESSource', 'jec')
