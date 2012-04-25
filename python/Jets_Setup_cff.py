@@ -2,6 +2,10 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 from PhysicsTools.PatAlgos.tools.coreTools import *
+from RecoJets.JetProducers.PFJetParameters_cfi import *
+from RecoJets.JetProducers.CaloJetParameters_cfi import *
+from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
+from RecoJets.JetProducers.GenJetParameters_cfi import *
 
 #this has to run AFTER setup_PF2PAT
 def setup_jets(process, cms, useData, postfix="PFlow"):
@@ -39,11 +43,7 @@ def setup_jets(process, cms, useData, postfix="PFlow"):
     ###############################
 
     from RecoJets.JetProducers.SubJetParameters_cfi import SubJetParameters
-    from RecoJets.JetProducers.PFJetParameters_cfi import *
-    from RecoJets.JetProducers.CaloJetParameters_cfi import *
-    from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
-    #from RecoJets.JetProducers.CATopJetParameters_cfi import *
-    from RecoJets.JetProducers.GenJetParameters_cfi import *
+    
 
     ###############################
     #### Calo Jet Setup    ########
