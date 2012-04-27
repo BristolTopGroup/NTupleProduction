@@ -59,6 +59,8 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 	}
 	produces < std::vector<double> > (prefix + "Likelihood" + suffix);
 	produces < std::vector<int> > (prefix + "NumberOfBrems" + suffix);
+	produces < std::vector<double> > (prefix + "mvaTrigV0" + suffix);
+	produces < std::vector<double> > (prefix + "mvaNonTrigV0" + suffix);
 
 	//electron isolation variables
 	produces < std::vector<double> > (prefix + "TrkIso03" + suffix);
@@ -91,6 +93,10 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 		produces < std::vector<double> > (prefix + "DirectionalPFIso03" + suffix);
 		produces < std::vector<double> > (prefix + "DirectionalPFIso03FallOff" + suffix);
 		produces < std::vector<double> > (prefix + "PfRelIso03FallOff" + suffix);
+		//PU charged hadron isolation
+		produces < std::vector<double> > (prefix + "PfPUChargedHadronIso03" + suffix);
+		produces < std::vector<double> > (prefix + "PfPUChargedHadronIso04" + suffix);
+		produces < std::vector<double> > (prefix + "PfPUChargedHadronIso05" + suffix);
 	}
 
 	//high energy electron isolation variables
@@ -108,8 +114,10 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 	produces < std::vector<double> > (prefix + "DCotTheta" + suffix);
 	produces < std::vector<double> > (prefix + "ConvRadius" + suffix);
 	produces < std::vector<int> > (prefix + "MissingHits" + suffix);
+	//this might be identical to passConversionVeto
 	produces < std::vector<bool> > (prefix + "HasMatchedConvPhot" + suffix);
 	produces < std::vector<double> > (prefix + "shFracInnerHits" + suffix);
+	produces < std::vector<bool> > (prefix + "passConversionVeto" + suffix);
 
 //calorimeter variables
 	produces < std::vector<double> > (prefix + "SCEta" + suffix);
@@ -162,6 +170,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<bool> > eidHyperTight4MC(new std::vector<bool>());
 	std::auto_ptr < std::vector<double> > likelihood(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > numberOfBrems(new std::vector<int>());
+	std::auto_ptr < std::vector<double> > mvaTrigV0(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > mvaNonTrigV0(new std::vector<double>());
 
 	//electron isolation variables
 	std::auto_ptr < std::vector<double> > trkIso04(new std::vector<double>());
@@ -196,6 +206,10 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > DirectionalPFIso03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > DirectionalPFIso03FallOff(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PfRelIso03FallOff(new std::vector<double>());
+	//PU charged hadron isolation
+	std::auto_ptr < std::vector<double> > PfPUChargedHadronIso03(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > PfPUChargedHadronIso04(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > PfPUChargedHadronIso05(new std::vector<double>());
 
 //    std::auto_ptr < std::vector<double> > dB(new std::vector<double>());
 
@@ -217,6 +231,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > conversionRadius(new std::vector<double>());
 	std::auto_ptr < std::vector<bool> > hasMatchedConvPhot(new std::vector<bool>());
 	std::auto_ptr < std::vector<double> > shFracInnerHits(new std::vector<double>());
+	std::auto_ptr < std::vector<bool> > passConversionVeto(new std::vector<bool>());
 
 //calorimeter variables
 	std::auto_ptr < std::vector<double> > scEta(new std::vector<double>());
@@ -440,6 +455,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			passIDMC->push_back(passIdMC);
 			likelihood->push_back(likelihood_);
 			numberOfBrems->push_back(it->numberOfBrems());
+			mvaTrigV0->push_back(it->electronID("mvaTrigV0"));
+			mvaNonTrigV0->push_back(it->electronID("mvaNonTrigV0"));
 
 			//electron isolation variables
 			trkIso03->push_back(it->dr03TkSumPt());
@@ -453,17 +470,18 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 			//electron PF isolation variables
 			if (storePFIsolation_) {
-				pat::IsolationKeys isokeyPfChargedHadronIso = pat::IsolationKeys(4);
-				pat::IsolationKeys isokeyPfNeutralHadronIso = pat::IsolationKeys(5);
-				pat::IsolationKeys isokeyPFGammaIso = pat::IsolationKeys(6);
+				//pat::IsolationKeys isokeyPfChargedHadronIso = pat::IsolationKeys(4);
+				//pat::IsolationKeys isokeyPfNeutralHadronIso = pat::IsolationKeys(5);
+				//pat::IsolationKeys isokeyPFGammaIso = pat::IsolationKeys(6);
 
 				double pfRelIso03(0), pfRelIso04(0), pfRelIso05(0);
 				double directionalPFIso02(0), directionalPFIso02FallOff(0), pfIso02FallOff(0);
 				double directionalPFIso03(0), directionalPFIso03FallOff(0), pfIso03FallOff(0);
 
-				const reco::IsoDeposit * PfChargedHadronIsolation = it->isoDeposit(isokeyPfChargedHadronIso);
-				const reco::IsoDeposit * PfNeutralHadronIsolation = it->isoDeposit(isokeyPfNeutralHadronIso);
-				const reco::IsoDeposit * PFGammaIsolation = it->isoDeposit(isokeyPFGammaIso);
+				const reco::IsoDeposit * PfChargedHadronIsolation = it->isoDeposit(pat::IsolationKeys::PfChargedHadronIso);
+				const reco::IsoDeposit * PfNeutralHadronIsolation = it->isoDeposit(pat::IsolationKeys::PfNeutralHadronIso);
+				const reco::IsoDeposit * PFGammaIsolation = it->isoDeposit(pat::IsolationKeys::PfGammaIso);
+				const reco::IsoDeposit * PfPUChargedHadronIso = it->isoDeposit(pat::IsolationKeys::PfPUChargedHadronIso);
 
 				directionalPFIso02 = customIsolation(*it, pfCandidates, 0.2, true, false, reco::PFCandidate::e);
 				directionalPFIso02FallOff = customIsolation(*it, pfCandidates, 0.2, true, true, reco::PFCandidate::e);
@@ -516,6 +534,14 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 				PFRelIso03->push_back(pfRelIso03 / it->et());
 				PFRelIso04->push_back(pfRelIso04 / it->et());
 				PFRelIso05->push_back(pfRelIso05 / it->et());
+
+				if (PfPUChargedHadronIso) {
+					PfPUChargedHadronIso03->push_back(PfPUChargedHadronIso->depositWithin(0.3));
+					PfPUChargedHadronIso04->push_back(PfPUChargedHadronIso->depositWithin(0.4));
+					PfPUChargedHadronIso05->push_back(PfPUChargedHadronIso->depositWithin(0.5));
+				} else
+					edm::LogError("BristolNTuple_ElectronsExtraError") << "Error! Can't get the isolation deposit "
+							<< "PfPUChargedHadronIso";
 			}
 
 			// Iso variables (Heep)
@@ -536,6 +562,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			conversionRadius->push_back(it->convRadius());
 			hasMatchedConvPhot->push_back(matchesConv);
 			shFracInnerHits->push_back(it->shFracInnerHits());
+//			bool passesConversionVeto = !ConversionTools::hasMatchedConversion(it,hConversions,beamspot.position());
+			passConversionVeto->push_back(it->passConversionVeto());
 
 			// SC associated with electron
 			scEta->push_back(it->superCluster()->eta());
@@ -594,6 +622,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	}
 	iEvent.put(likelihood, prefix + "Likelihood" + suffix);
 	iEvent.put(numberOfBrems, prefix + "NumberOfBrems" + suffix);
+	iEvent.put(mvaTrigV0, prefix + "mvaTrigV0" + suffix);
+	iEvent.put(mvaNonTrigV0, prefix + "mvaNonTrigV0" + suffix);
 
 	//electron isolation variables
 	iEvent.put(trkIso04, prefix + "TrkIso04" + suffix);
@@ -629,6 +659,10 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 		iEvent.put(DirectionalPFIso03, prefix + "DirectionalPFIso03" + suffix);
 		iEvent.put(DirectionalPFIso03FallOff, prefix + "DirectionalPFIso03FallOff" + suffix);
 		iEvent.put(PfRelIso03FallOff, prefix + "PfRelIso03FallOff" + suffix);
+		iEvent.put(PfPUChargedHadronIso03, prefix + "PfPUChargedHadronIso03" + suffix);
+		iEvent.put(PfPUChargedHadronIso04, prefix + "PfPUChargedHadronIso04" + suffix);
+		iEvent.put(PfPUChargedHadronIso05, prefix + "PfPUChargedHadronIso05" + suffix);
+
 	}
 
 	//high energy electron isolation variables
@@ -649,6 +683,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	iEvent.put(conversionRadius, prefix + "ConvRadius" + suffix);
 	iEvent.put(hasMatchedConvPhot, prefix + "HasMatchedConvPhot" + suffix);
 	iEvent.put(shFracInnerHits, prefix + "shFracInnerHits" + suffix);
+	iEvent.put(passConversionVeto, prefix + "passConversionVeto" + suffix);
 
 	//calorimeter variables
 	iEvent.put(scEta, prefix + "SCEta" + suffix);
@@ -669,3 +704,4 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	iEvent.put(primaryVertexDXYCorr, prefix + "PrimaryVertexDXYCorr" + suffix);
 
 }
+
