@@ -74,6 +74,11 @@ options.register ('maxLooseLeptonRelIso',
                   VarParsing.varType.float,
                   "Maximum (PF)relIso value for leptons to be stored.")
 
+options.register ('printEventContent',
+                  False,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.bool,
+                  "Outputs the event content at the end of the path")
 
 options.parseArguments()
 
@@ -179,12 +184,19 @@ process.hlTrigReport = cms.EDAnalyzer("HLTrigReport",
 )
 
 
+process.printEventContent = cms.EDAnalyzer("EventContentAnalyzer")
+
 process.p0 = cms.Path(
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
                       process.patseq * 
+                      process.producePatPFMETCorrections *
+                      process.printEventContent *
                       process.rootNTuples
                       )
+
+if not options.printEventContent:
+    process.p0.remove(process.printEventContent)
 
 process.out.SelectEvents.SelectEvents = cms.vstring('p0')
 
