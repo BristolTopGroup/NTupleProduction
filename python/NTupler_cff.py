@@ -70,6 +70,8 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
             #MET
             'keep *_rootTupleCaloMET_*_*',
             'keep *_rootTuplePFMET_*_*',
+            'keep *_rootTuplePFType1CorrectedMET_*_*',
+            'keep *_rootTuplePFType1p2CorrectedMET_*_*',
             #muons
             'keep *_nTupleMuons_*_*',
             'keep *_nTuplePFMuons_*_*',
@@ -118,6 +120,8 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
         #MET
         process.rootTupleCaloMET + 
         process.rootTuplePFMET + 
+        process.rootTuplePFType1CorrectedMET +
+        process.rootTuplePFType1p2CorrectedMET +
         #Event
         process.rootTupleEvent + 
         #trigger

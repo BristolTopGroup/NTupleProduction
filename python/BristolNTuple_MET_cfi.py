@@ -20,3 +20,17 @@ rootTuplePFMET = cms.EDProducer( "BristolNTuple_MET",
     Suffix = cms.string( '' ),
     StoreUncorrectedMET = cms.bool( True )
  )
+
+rootTuplePFType1CorrectedMET = cms.EDProducer( "BristolNTuple_MET",
+    InputTag = cms.InputTag( 'patType1CorrectedPFMet' ),
+    Prefix = cms.string( 'patType1CorrectedPFMet.' ),
+    Suffix = cms.string( '' ),
+    StoreUncorrectedMET = cms.bool( False )
+ )
+
+rootTuplePFType1p2CorrectedMET = cms.EDProducer( "BristolNTuple_MET",
+    InputTag = cms.InputTag( 'patType1p2CorrectedPFMet' ),
+    Prefix = cms.string( 'patType1p2CorrectedPFMet.' ),
+    Suffix = cms.string( '' ),
+    StoreUncorrectedMET = cms.bool( False )
+ )

@@ -66,3 +66,5 @@ def selectObjects(process, cms):
                                             filterParams=pfJetIDSelector.clone(),
                                             src=cms.InputTag("selectedPatJetsCA8PF")
                                             )
+    process.selectedPatJetsForMETtype1p2Corr.src = cms.InputTag('selectedPatJetsPFlow')
+    process.selectedPatJetsForMETtype2Corr.src = cms.InputTag('selectedPatJetsPFlow')

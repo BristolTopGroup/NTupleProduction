@@ -26,6 +26,11 @@ def setup_PF2PAT(process, cms, options, postfix="PFlow", removeTausFromJetCollec
         
     #False == taus also in jet collection
     process.pfNoTauPFlow.enable = removeTausFromJetCollection
+    process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
+    process.patPFJetMETtype1p2Corr.type1JetPtThreshold = cms.double(10.0)
+    process.patPFJetMETtype1p2Corr.skipEM = cms.bool(False)
+    process.patPFJetMETtype1p2Corr.skipMuons = cms.bool(False)
+    process.patPFMet.addGenMET = cms.bool(not options.useData)
 
 
 def setup_looseLeptons(process, cms, postfix="PFlow", maxLooseLeptonRelIso=999):

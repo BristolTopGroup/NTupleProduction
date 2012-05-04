@@ -5,8 +5,6 @@ def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
     print "Setting up Event Filters"
     print '=' * 60
     process.HBHENoiseFilterResultProducer = setup_HBHENoiseFilter(process, cms)
-#    process.scrapingVeto = setup_scrapingveto(process, cms)
-    #setup_CSCBeamHaloFilter(process, cms)
     process.HcalLaserEventFilter = setup_HcalLaserFilter(process, cms)
     process.EcalDeadCellBoundaryEnergyFilter = setup_ECALDeadCellFilter(process, cms)
     process.trackingFailureFilter = setup_trackingFailureFilter(process, cms)
@@ -71,15 +69,6 @@ def setup_scrapingveto(process, cms):
      thresh=cms.untracked.double(0.25)
      )
     return scrapingVeto
-
-#this filter has no tagging mode
-#def setup_CSCBeamHaloFilter(process, cms):
-#    print '=' * 60
-#    print "Setting up CSCTightHalo Filter"
-#    print '=' * 60
-#    from RecoMET.METAnalyzers.CSCHaloFilter_cfi import CSCTightHaloFilter
-#    #turn off filtering, instead create flag
-#    return CSCTightHaloFilter
 
 def setup_HcalLaserFilter(process, cms):
     print '=' * 60
