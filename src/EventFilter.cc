@@ -4,61 +4,58 @@
 
 // user include files
 
-
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/METReco/interface/BeamHaloSummary.h"
 
 using namespace edm;
 using namespace std;
 
 EventFilter::EventFilter(const edm::ParameterSet& iConfig) :
-    jetInput_(iConfig.getParameter<edm::InputTag> ("jetInput")),
-    electronInput_(iConfig.getParameter<edm::InputTag> ("electronInput")),
-    muonInput_(iConfig.getParameter<edm::InputTag> ("muonInput")),
-    vertexInput_(iConfig.getParameter<edm::InputTag>("VertexInput")),
-    hcalNoiseInput_(iConfig.getParameter<edm::InputTag>("HcalNoiseInput")),
-    trkInput_(iConfig.getParameter<edm::InputTag>("TracksInput")),
-    minNJets_(iConfig.getParameter<int> ("minNJets")),
-    maxNJets_(iConfig.getParameter<int> ("maxNJets")),
-    minNElectrons_(iConfig.getParameter<int> ("minNElectrons")),
-    maxNElectrons_(iConfig.getParameter<int> ("maxNElectrons")),
-    minNMuons_(iConfig.getParameter<int> ("minNMuons")),
-    maxNMuons_(iConfig.getParameter<int> ("maxNMuons")),
-    minJetPt(iConfig.getParameter<double> ("minJetPt")),
-    maxAbsJetEta(iConfig.getParameter<double> ("maxAbsJetEta")),
-    minElectronPt_(iConfig.getParameter<double> ("minElectronPt")),
-    maxAbsElectronEta_(iConfig.getParameter<double> ("maxAbsElectronEta")),
-    minMuonPt_(iConfig.getParameter<double> ("minMuonPt")),
-    maxAbsMuonEta_(iConfig.getParameter<double> ("maxAbsMuonEta")),
-    vtxMinNDOF(iConfig.getParameter<unsigned int>("VertexMinimumNDOF")),
-    vtxMaxAbsZ(iConfig.getParameter<double>("VertexMaxAbsZ")),
-    vtxMaxAbsRho(iConfig.getParameter<double>("VertexMaxAbsRho")),
-    numTracks(iConfig.getParameter<unsigned int>("NumTracks")),
-    hpTrackThreshold(iConfig.getParameter<double>("HPTrackThreshold")),
+		hcalNoiseInput_(iConfig.getParameter < edm::InputTag > ("HCALNoiseFilterInput")), //
+		hcalLaserFilterInput_(iConfig.getParameter < edm::InputTag > ("HCALLaserFilterInput")), //
+		ecalDeadCellFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellFilterInput")), //
+		trackingFailureFilter_(iConfig.getParameter < edm::InputTag > ("TrackingFailureFilterInput")), //
+		trkInput_(iConfig.getParameter < edm::InputTag > ("TracksInput")), //
+		vertexInput_(iConfig.getParameter < edm::InputTag > ("VertexInput")), //
+		jetInput_(iConfig.getParameter < edm::InputTag > ("jetInput")), //
+		electronInput_(iConfig.getParameter < edm::InputTag > ("electronInput")), //
+		muonInput_(iConfig.getParameter < edm::InputTag > ("muonInput")), //
+		minNVertices_(iConfig.getParameter<int>("minNVertices")), //
+		maxNVertices_(iConfig.getParameter<int>("maxNVertices")), //
+		minNJets_(iConfig.getParameter<int>("minNJets")), //
+		maxNJets_(iConfig.getParameter<int>("maxNJets")), //
+		minNElectrons_(iConfig.getParameter<int>("minNElectrons")), //
+		maxNElectrons_(iConfig.getParameter<int>("maxNElectrons")), //
+		minNMuons_(iConfig.getParameter<int>("minNMuons")), //
+		maxNMuons_(iConfig.getParameter<int>("maxNMuons")), //
+		minJetPt_(iConfig.getParameter<double>("minJetPt")), //
+		maxAbsJetEta_(iConfig.getParameter<double>("maxAbsJetEta")), //
+		minElectronPt_(iConfig.getParameter<double>("minElectronPt")), //
+		maxAbsElectronEta_(iConfig.getParameter<double>("maxAbsElectronEta")), //
+		minMuonPt_(iConfig.getParameter<double>("minMuonPt")), //
+		maxAbsMuonEta_(iConfig.getParameter<double>("maxAbsMuonEta")), //
+		debug_(iConfig.getParameter<bool>("debug")), //
+		counteitherleptontype_(iConfig.getParameter<bool>("counteitherleptontype")), //
+		useTrackingFailureFilter_(iConfig.getParameter<bool>("useTrackingFailureFilter")), //
+		useOptionalMETFilters_(iConfig.getParameter<bool>("useOptionalMETFilters")),//
+		eventCount_(), //
+		hCount() {
 
-    debug_(iConfig.getUntrackedParameter<bool> ("debug")),
-    counteitherleptontype_(iConfig.getUntrackedParameter<bool> ("counteitherleptontype")),
-    totalCount(0),
-    passHBHENoiseFilter(0),
-    passScrapingVeto(0),
-    passGoodPrimaryVertex(0),
-    passElectronCuts(0),
-    passMuonCuts(0),
-    passJetCuts(0),
-    hCount(){
+	edm::Service < TFileService > histServ;
 
-    edm::Service<TFileService> histServ;
+	hCount = histServ->make < TH1I
+			> ("EventCounter", "Event Counter", Filters::NUMBER_OF_FILTERS, -0.5, Filters::NUMBER_OF_FILTERS - 0.5);
 
-    hCount = histServ->make<TH1I> ("EventCounter", "Event Counter", 7, -0.5, 6.5);
-    hCount->GetXaxis()->SetBinLabel(1, "all events");
-    hCount->GetXaxis()->SetBinLabel(2, "HBHENoiseFilter");
-    hCount->GetXaxis()->SetBinLabel(3, "ScrapingVeto");
-    hCount->GetXaxis()->SetBinLabel(4, "GoodPrimaryVertex");
-    hCount->GetXaxis()->SetBinLabel(5, "ElectronCuts");
-    hCount->GetXaxis()->SetBinLabel(6, "MuonCuts");
-    hCount->GetXaxis()->SetBinLabel(7, "JetCuts");
+	eventCount_.resize(Filters::NUMBER_OF_FILTERS);
+	for (unsigned int index = 0; index < Filters::NUMBER_OF_FILTERS; ++index) {
+		unsigned int bin = index + 1;
+		eventCount_.at(index) = 0;
+		std::string filterName = Filters::names[index];
+		hCount->GetXaxis()->SetBinLabel(bin, filterName.c_str());
+	}
 }
 
 EventFilter::~EventFilter() {
@@ -66,116 +63,181 @@ EventFilter::~EventFilter() {
 }
 
 bool EventFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
-    ++totalCount;
+	for (unsigned int index = 0; index < Filters::NUMBER_OF_FILTERS; ++index) {
+		bool passes = passesSelectionStep(iEvent, (Filters::value) index);
+		if (passes)
+			++eventCount_.at(index);
+		else {
+			//disable filter, as it doesn't work correctly
+			if (index == Filters::passCSCBeamHaloFilter)
+				continue;
 
-    edm::Handle<bool> hbheFilterResult;
-    iEvent.getByLabel(hcalNoiseInput_, hbheFilterResult);
+			//will not use the filter decision but will still save the outcome
+			if(useOptionalMETFilters_ == false && (index >= Filters::passCSCBeamHaloFilter && index <= Filters::passTrackingFailureFilter))
+				continue;
 
-    if (hbheFilterResult.isValid()) {
-        edm::LogInfo("EventFilter") << "Successfully obtained " << hcalNoiseInput_;
-
-    } else {
-        edm::LogError("BristolNTuple_EventSelectionError") << "Error! Can't get the product " << hcalNoiseInput_;
-    }
-
-    if(*hbheFilterResult == false)
-        return false;
-    ++passHBHENoiseFilter;
-
-    // Scraping Events Part
-    edm::Handle < reco::TrackCollection > tracks;
-    iEvent.getByLabel(trkInput_, tracks);
-    double fraction = 1.;
-
-    if (tracks.isValid()) {
-        edm::LogInfo("EventFilter") << "Total # Tracks: " << tracks->size();
-
-        int numhighpurity = 0;
-
-        reco::TrackBase::TrackQuality trackQuality = reco::TrackBase::qualityByName("highPurity");
-
-        if (tracks->size() > numTracks) {
-            for (reco::TrackCollection::const_iterator it = tracks->begin(); it != tracks->end(); ++it) {
-                if (it->quality(trackQuality))
-                    numhighpurity++;
-            }
-            fraction = (double) numhighpurity / (double) tracks->size();
-
-        }
-    } else {
-        edm::LogError("EventFilterError") << "Error! Can't get the product " << trkInput_;
-    }
-    if (fraction < hpTrackThreshold)
-        return false;
-
-
-    ++passScrapingVeto;
-
-    // Good Primary Vertex Part
-    edm::Handle < reco::VertexCollection > primaryVertices;
-    iEvent.getByLabel(vertexInput_, primaryVertices);
-    int numGoodVertices(0);
-
-    if (primaryVertices.isValid()) {
-        edm::LogInfo("EventFilter") << "Total # Primary Vertices: " << primaryVertices->size();
-
-
-        for (reco::VertexCollection::const_iterator it = primaryVertices->begin(); it != primaryVertices->end(); ++it) {
-            if (!(it->isFake()) && it->ndof() >= vtxMinNDOF && fabs(it->z()) <= vtxMaxAbsZ && fabs(it->position().rho())
-                    <= vtxMaxAbsRho)
-                ++numGoodVertices;
-        }
-    } else {
-        edm::LogError("EventFilterError") << "Error! Can't get the product " << vertexInput_;
-    }
-    if(numGoodVertices < 1)
-        return false;
-
-    ++passGoodPrimaryVertex;
-
-    edm::Handle < edm::View<reco::Candidate> > jets;
-    iEvent.getByLabel(jetInput_, jets);
-
-    edm::Handle < edm::View<reco::Candidate> > electrons;
-    iEvent.getByLabel(electronInput_, electrons);
-
-    edm::Handle < edm::View<reco::Candidate> > muons;
-	iEvent.getByLabel(muonInput_, muons);
-
-    int nelectrons = 0;
-
-    for (edm::View<reco::Candidate>::const_iterator it = electrons->begin(); it != electrons->end(); ++it) {
-        if (debug_)
-            cout << "Electron:" << endl;
-        if (debug_)
-            cout << "pT: " << it->pt() << " eta: " << it->eta() << " phi: " << it->phi() << endl;
-
-        if (it->pt() > minElectronPt_ && fabs(it->eta()) < maxAbsElectronEta_) {
-            ++nelectrons;
-        }
-    }
-
-    if (debug_)
-        cout << "# Electrons = " << nelectrons << endl;
-
-    if (counteitherleptontype_ == false) {
-		if (minNElectrons_ > -1 && nelectrons < minNElectrons_)
 			return false;
-		if (maxNElectrons_ > -1 && nelectrons > maxNElectrons_)
-			return false;
-
-		++passElectronCuts;
+		}
 	}
 
+	if (debug_)
+		cout << "Event PASSED!" << endl;
+	return true;
+}
 
+bool EventFilter::passesSelectionStep(edm::Event& event, Filters::value filter) {
+	switch (filter) {
+	case Filters::allEvents:
+		return true;
+	case Filters::passHBHENoiseFilter:
+		return passesFilter(event, hcalNoiseInput_);
+	case Filters::passCSCBeamHaloFilter:
+		return passesCSCTightBeamHaloID(event);
+	case Filters::passHCALLaserFilter:
+		return passesFilter(event, hcalLaserFilterInput_);
+	case Filters::passECALDeadCellFilter:
+		return passesFilter(event, ecalDeadCellFilterInput_);
+	case Filters::passTrackingFailureFilter:
+		if (useTrackingFailureFilter_)
+			return passesFilter(event, trackingFailureFilter_);
+		else
+			return true;
+	case Filters::passScrapingVeto:
+		return passesScrapingVeto(event);
+	case Filters::passGoodPrimaryVertex:
+		return passesGoodPrimaryVertex(event);
+	case Filters::passElectronCuts:
+		if (counteitherleptontype_)
+			return passesElectronCuts(event) || passesMuonCuts(event);
 
-    int nmuons = 0;
+		return passesElectronCuts(event);
+	case Filters::passMuonCuts:
+		if (counteitherleptontype_)
+			return passesElectronCuts(event) || passesMuonCuts(event);
+
+		return passesMuonCuts(event);
+	case Filters::passJetCuts:
+		return passesJetCuts(event);
+	default:
+		return false;
+	}
+}
+
+bool EventFilter::passesFilter(edm::Event& event, edm::InputTag filter) {
+	bool result(false);
+	edm::Handle<bool> filterResult;
+	event.getByLabel(filter, filterResult);
+	if (filterResult.isValid()) {
+		edm::LogInfo("EventFilter") << "Successfully obtained " << filter;
+		result = *filterResult;
+	} else
+		edm::LogError("BristolNTuple_EventSelectionError") << "Error! Can't get the product " << filter;
+
+	return result;
+}
+
+bool EventFilter::passesCSCTightBeamHaloID(edm::Event& event) {
+	bool result(false);
+	edm::Handle < reco::BeamHaloSummary > TheBeamHaloSummary;
+	event.getByLabel("BeamHaloSummary", TheBeamHaloSummary);
+	if (TheBeamHaloSummary.isValid()) {
+		edm::LogInfo("EventFilter") << "Successfully obtained BeamHaloSummary";
+		const reco::BeamHaloSummary TheSummary = (*TheBeamHaloSummary.product());
+		result = TheSummary.CSCTightHaloId();
+	} else
+		edm::LogError("BristolNTuple_EventSelectionError") << "Error! Can't get the product BeamHaloSummary";
+
+	return result;
+}
+
+bool EventFilter::passesScrapingVeto(edm::Event& event) {
+	bool result(false);
+	edm::Handle < reco::TrackCollection > tracks;
+	event.getByLabel(trkInput_, tracks);
+	double fraction = 1.;
+	unsigned int numTracks(10);
+	double hpTrackThreshold(0.25);
+
+	if (tracks.isValid()) {
+		edm::LogInfo("EventFilter") << "Total # Tracks: " << tracks->size();
+
+		int numhighpurity = 0;
+
+		reco::TrackBase::TrackQuality trackQuality = reco::TrackBase::qualityByName("highPurity");
+
+		if (tracks->size() > numTracks) {
+			for (reco::TrackCollection::const_iterator it = tracks->begin(); it != tracks->end(); ++it) {
+				if (it->quality(trackQuality))
+					numhighpurity++;
+			}
+			fraction = (double) numhighpurity / (double) tracks->size();
+
+		}
+	} else {
+		edm::LogError("EventFilterError") << "Error! Can't get the product " << trkInput_;
+	}
+	if (fraction >= hpTrackThreshold)
+		result = true;
+	return result;
+}
+
+bool EventFilter::passesGoodPrimaryVertex(edm::Event& event) {
+	bool result(false);
+	edm::Handle < reco::VertexCollection > primaryVertices;
+	event.getByLabel(vertexInput_, primaryVertices);
+	if (primaryVertices.isValid()) {
+		int nVertices = primaryVertices->size();
+		edm::LogInfo("EventFilter") << "Total # Primary Vertices: " << nVertices;
+		if (nVertices >= minNVertices_)
+			result = true;
+		if (maxNVertices_ > -1 && nVertices > maxNVertices_)
+			result = false;
+	} else
+		edm::LogError("EventFilterError") << "Error! Can't get the product " << vertexInput_;
+	return result;
+}
+
+bool EventFilter::passesElectronCuts(edm::Event& event) {
+	bool result(false);
+	int nelectrons(0);
+
+	edm::Handle < edm::View<reco::Candidate> > electrons;
+	event.getByLabel(electronInput_, electrons);
+
+	for (edm::View<reco::Candidate>::const_iterator it = electrons->begin(); it != electrons->end(); ++it) {
+		if (debug_) {
+			cout << "Electron:" << endl;
+			cout << "pT: " << it->pt() << " eta: " << it->eta() << " phi: " << it->phi() << endl;
+		}
+
+		if (it->pt() > minElectronPt_ && fabs(it->eta()) < maxAbsElectronEta_) {
+			++nelectrons;
+		}
+	}
+
+	if (debug_)
+		cout << "# Electrons = " << nelectrons << endl;
+
+	if (nelectrons >= minNElectrons_)
+		result = true;
+	if (maxNElectrons_ > -1 && nelectrons > maxNElectrons_)
+		result = false;
+
+	return result;
+}
+
+bool EventFilter::passesMuonCuts(edm::Event& event) {
+	bool result(false);
+	int nmuons(0);
+
+	edm::Handle < edm::View<reco::Candidate> > muons;
+	event.getByLabel(muonInput_, muons);
 
 	for (edm::View<reco::Candidate>::const_iterator it = muons->begin(); it != muons->end(); ++it) {
-		if (debug_)
+		if (debug_) {
 			cout << "Muon:" << endl;
-		if (debug_)
 			cout << "pT: " << it->pt() << " eta: " << it->eta() << " phi: " << it->phi() << endl;
+		}
 
 		if (it->pt() > minMuonPt_ && fabs(it->eta()) < maxAbsMuonEta_) {
 			++nmuons;
@@ -185,55 +247,39 @@ bool EventFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	if (debug_)
 		cout << "# Muons = " << nmuons << endl;
 
-	if (counteitherleptontype_ == false) {
-		if (minNMuons_ > -1 && nmuons < minNMuons_)
-			return false;
-		if (maxNMuons_ > -1 && nmuons > maxNMuons_)
-			return false;
+	if (nmuons >= minNMuons_)
+		result = true;
+	if (maxNMuons_ > -1 && nmuons > maxNMuons_)
+		result = false;
+	return result;
+}
 
-		++passMuonCuts;
+bool EventFilter::passesJetCuts(edm::Event& event) {
+	bool result(false);
+
+	edm::Handle < edm::View<reco::Candidate> > jets;
+	event.getByLabel(jetInput_, jets);
+
+	int njets(0);
+
+	for (edm::View<reco::Candidate>::const_iterator it = jets->begin(); it != jets->end(); ++it) {
+		if (debug_) {
+			cout << "Jet:" << endl;
+			cout << "pT: " << it->pt() << " eta: " << it->eta() << " phi: " << it->phi() << endl;
+		}
+		if (it->pt() > minJetPt_ && fabs(it->eta()) < maxAbsJetEta_)
+			++njets;
+
 	}
 
+	if (debug_)
+		cout << "# Jets = " << njets << endl;
 
-
-	if (counteitherleptontype_ == true) {
-		if ((minNMuons_ > -1 && nmuons < minNMuons_) && (minNElectrons_ > -1 && nelectrons < minNElectrons_))
-			return false;
-		if ((maxNMuons_ > -1 && nmuons > maxNMuons_) && (maxNElectrons_ > -1 && nelectrons > maxNElectrons_))
-			return false;
-
-		if (!(minNMuons_ > -1 && nmuons < minNMuons_) && !(maxNMuons_ > -1 && nmuons > maxNMuons_))
-			++passMuonCuts;
-
-		if (!(minNElectrons_ > -1 && nelectrons < minNElectrons_)
-				&& !(maxNElectrons_ > -1 && nelectrons > maxNElectrons_))
-			++passElectronCuts;
-	}
-
-    int njets = 0;
-
-    for (edm::View<reco::Candidate>::const_iterator it = jets->begin(); it != jets->end(); ++it) {
-        if (debug_)
-            cout << "Jet:" << endl;
-        if (debug_)
-            cout << "pT: " << it->pt() << " eta: " << it->eta() << " phi: " << it->phi() << endl;
-        if (it->pt() > minJetPt && fabs(it->eta()) < maxAbsJetEta) {
-            ++njets;
-        }
-    }
-
-    if (debug_)
-        cout << "# Jets = " << njets << endl;
-    // If not enough jets found (or too many found), return false
-    if (minNJets_ > -1 && njets < minNJets_)
-        return false;
-    if (maxNJets_ > -1 && njets > maxNJets_)
-        return false;
-
-    ++passJetCuts;
-    if (debug_)
-        cout << "PASSED!" << endl;
-    return true;
+	if (njets >= minNJets_)
+		result = true;
+	if (maxNJets_ > -1 && njets > maxNJets_)
+		result = false;
+	return result;
 }
 
 // ------------ method called once each job just before starting event loop  ------------
@@ -242,22 +288,83 @@ void EventFilter::beginJob() {
 
 // ------------ method called once each job just after ending the event loop  ------------
 void EventFilter::endJob() {
-    hCount->SetBinContent(1, totalCount);
-    hCount->SetBinContent(2, passHBHENoiseFilter);
-    hCount->SetBinContent(3, passScrapingVeto);
-    hCount->SetBinContent(4, passGoodPrimaryVertex);
-    hCount->SetBinContent(5, passElectronCuts);
-    hCount->SetBinContent(6, passMuonCuts);
-    hCount->SetBinContent(7, passJetCuts);
+	if(useOptionalMETFilters_ == false){
+		cout << "Not using the optional MET filters!" << endl;
+		cout << "Events won't fail these filters, but the result will be recorded." << endl;
+	}
 
-    cout << "Total events = " << totalCount << endl;
-    cout << "passed  HBHENoiseFilter= " << passHBHENoiseFilter << endl;
-    cout << "passed  ScrapingVeto= " << passScrapingVeto << endl;
-    cout << "passed  GoodPrimaryVertex= " << passGoodPrimaryVertex << endl;
-    cout << "passed  ElectronCuts= " << passElectronCuts << endl;
-    cout << "passed  MuonCuts= " << passMuonCuts << endl;
-    cout << "passed  JetCuts= " << passJetCuts << endl;
+	for (unsigned int index = 0; index < eventCount_.size(); ++index) {
+		unsigned int bin = index + 1;
+		unsigned int nEvents = eventCount_.at(index);
+		std::string filterName = Filters::names[index];
+		hCount->SetBinContent(bin, nEvents);
+		cout << filterName << " = " << nEvents << endl;
+	}
 }
 
+// ------------ method called when starting to processes a run  ------------
+bool EventFilter::beginRun(edm::Run&, edm::EventSetup const&) {
+	return true;
+}
+
+// ------------ method called when ending the processing of a run  ------------
+bool EventFilter::endRun(edm::Run&, edm::EventSetup const&) {
+	return true;
+}
+
+// ------------ method called when starting to processes a luminosity block  ------------
+bool EventFilter::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&) {
+	return true;
+}
+
+// ------------ method called when ending the processing of a luminosity block  ------------
+bool EventFilter::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&) {
+	return true;
+}
+
+// ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
+void EventFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+	//The following says we do not know what parameters are allowed so do no validation
+	// Please change this to state exactly what you do use, even if it is no parameters
+	edm::ParameterSetDescription desc;
+	desc.add < edm::InputTag
+			> ("HCALNoiseFilterInput", edm::InputTag("HBHENoiseFilterResultProducer", "HBHENoiseFilterResult"));
+	desc.add < edm::InputTag > ("HCALLaserFilterInput", edm::InputTag("HcalLaserEventFilter"));
+	desc.add < edm::InputTag > ("ECALDeadCellFilterInput", edm::InputTag("EcalDeadCellBoundaryEnergyFilter"));
+	desc.add < edm::InputTag > ("TrackingFailureFilterInput", edm::InputTag("trackingFailureFilter"));
+	desc.add < edm::InputTag > ("TracksInput", edm::InputTag("generalTracks"));
+
+	desc.add < edm::InputTag > ("VertexInput", edm::InputTag("goodOfflinePrimaryVertices"));
+	desc.add < edm::InputTag > ("jetInput", edm::InputTag("selectedPatJets"));
+	desc.add < edm::InputTag > ("electronInput", edm::InputTag("selectedPatElectrons"));
+	desc.add < edm::InputTag > ("muonInput", edm::InputTag("selectedPatMuons"));
+
+	desc.add<int>("minNVertices", 1);
+	desc.add<int>("maxNVertices", -1);
+
+	desc.add<int>("minNJets", -1);
+	desc.add<int>("maxNJets", -1);
+
+	desc.add<int>("minNElectrons", -1);
+	desc.add<int>("maxNElectrons", -1);
+
+	desc.add<int>("minNMuons", -1);
+	desc.add<int>("maxNMuons", -1);
+
+	desc.add<double>("minJetPt", -1);
+	desc.add<double>("maxAbsJetEta", -1);
+
+	desc.add<double>("minElectronPt", -1);
+	desc.add<double>("maxAbsElectronEta", -1);
+
+	desc.add<double>("minMuonPt", -1);
+	desc.add<double>("maxAbsMuonEta", -1);
+
+	desc.add<bool>("debug", false);
+	desc.add<bool>("counteitherleptontype", true);
+	desc.add<bool>("useTrackingFailureFilter", false);
+	desc.add<bool>("useOptionalMETFilters", false);
+	descriptions.addDefault(desc);
+}
 //define this as a plug-in
-DEFINE_FWK_MODULE( EventFilter);
+DEFINE_FWK_MODULE (EventFilter);

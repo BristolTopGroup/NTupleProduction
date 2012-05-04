@@ -5,12 +5,15 @@
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
+#include "DataFormats/METReco/interface/BeamHaloSummary.h"
 
-BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig):
-    dcsInputTag(iConfig.getParameter<edm::InputTag> ("DCSInputTag")),
-    prefix(iConfig.getParameter<std::string> ("Prefix")),
-    suffix(iConfig.getParameter<std::string> ("Suffix"))
-{
+BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig) :
+		dcsInputTag(iConfig.getParameter < edm::InputTag > ("DCSInputTag")), //
+		hcalLaserFilterInput_(iConfig.getParameter < edm::InputTag > ("HCALLaserFilterInput")), //
+		ecalDeadCellFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellFilterInput")), //
+		trackingFailureFilter_(iConfig.getParameter < edm::InputTag > ("TrackingFailureFilterInput")), //
+		prefix(iConfig.getParameter < std::string > ("Prefix")), //
+		suffix(iConfig.getParameter < std::string > ("Suffix")) {
 	produces<double>(prefix + "MagneticField" + suffix);
 	produces<unsigned int>(prefix + "Run" + suffix);
 	produces<unsigned int>(prefix + "Number" + suffix);
@@ -20,6 +23,12 @@ BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig):
 	produces<double>(prefix + "Time" + suffix);
 	produces<bool>(prefix + "isData" + suffix);
 	produces<double>(prefix + "rho" + suffix);
+
+	//optinal MET filter decisions
+	produces<bool>(prefix + "HCALLaserFilter" + suffix);
+	produces<bool>(prefix + "ECALDeadCellFilter" + suffix);
+	produces<bool>(prefix + "TrackingFailureFilter" + suffix);
+	produces<bool>(prefix + "CSCTightHaloId" + suffix);
 }
 
 void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -58,7 +67,7 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	std::auto_ptr<double> magField(new double(evt_bField));
 
 	std::auto_ptr<unsigned int> run(new unsigned int(iEvent.id().run()));
-	std::auto_ptr<unsigned int> event(new unsigned int(iEvent.id().event()));
+	std::auto_ptr<unsigned int> eventNumber(new unsigned int(iEvent.id().event()));
 	std::auto_ptr<unsigned int> ls(new unsigned int(iEvent.luminosityBlock()));
 
 	double sec = iEvent.time().value() >> 32;
@@ -75,14 +84,48 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	iEvent.getByLabel(edm::InputTag("kt6PFJets", "rho"), rhoH);
 	std::auto_ptr<double> rho(new double(*rhoH.product()));
 
+	std::auto_ptr<bool> HCALLaserFilter(new bool(passesFilter(iEvent, hcalLaserFilterInput_)));
+	std::auto_ptr<bool> ECALDeadCellFilter(new bool(passesFilter(iEvent, ecalDeadCellFilterInput_)));
+	std::auto_ptr<bool> TrackingFailureFilter(new bool(passesFilter(iEvent, trackingFailureFilter_)));
+
+	bool cscTightID(false);
+	edm::Handle < reco::BeamHaloSummary > TheBeamHaloSummary;
+	iEvent.getByLabel("BeamHaloSummary", TheBeamHaloSummary);
+	if (TheBeamHaloSummary.isValid()) {
+		edm::LogInfo("EventFilter") << "Successfully obtained BeamHaloSummary";
+		const reco::BeamHaloSummary TheSummary = (*TheBeamHaloSummary.product());
+		cscTightID = TheSummary.CSCTightHaloId();
+	} else
+		edm::LogError("BristolNTuple_EventSelectionError") << "Error! Can't get the product BeamHaloSummary";
+
+	std::auto_ptr<bool> CSCTightHaloId(new bool(cscTightID));
+
 	//-----------------------------------------------------------------
 	iEvent.put(magField, prefix + "MagneticField" + suffix);
 	iEvent.put(run, prefix + "Run" + suffix);
-	iEvent.put(event, prefix + "Number" + suffix);
+	iEvent.put(eventNumber, prefix + "Number" + suffix);
 	iEvent.put(ls, prefix + "LumiSection" + suffix);
 	iEvent.put(bunch, prefix + "Bunch" + suffix);
 	iEvent.put(orbit, prefix + "Orbit" + suffix);
 	iEvent.put(time, prefix + "Time" + suffix);
 	iEvent.put(isdata, prefix + "isData" + suffix);
 	iEvent.put(rho, prefix + "rho" + suffix);
+
+	iEvent.put(HCALLaserFilter, prefix + "HCALLaserFilter" + suffix);
+	iEvent.put(ECALDeadCellFilter, prefix + "ECALDeadCellFilter" + suffix);
+	iEvent.put(TrackingFailureFilter, prefix + "TrackingFailureFilter" + suffix);
+	iEvent.put(CSCTightHaloId, prefix + "CSCTightHaloId" + suffix);
+}
+
+bool BristolNTuple_Event::passesFilter(edm::Event& event, edm::InputTag filter) {
+	bool result(false);
+	edm::Handle<bool> filterResult;
+	event.getByLabel(filter, filterResult);
+	if (filterResult.isValid()) {
+		edm::LogInfo("EventFilter") << "Successfully obtained " << filter;
+		result = *filterResult;
+	} else
+		edm::LogError("BristolNTuple_EventSelectionError") << "Error! Can't get the product " << filter;
+
+	return result;
 }

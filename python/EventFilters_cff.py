@@ -1,9 +1,38 @@
-def setup_eventfilters(process, cms, options):
+#better if the function would return a cms.Sequence
+
+def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
     print '=' * 60
     print "Setting up Event Filters"
     print '=' * 60
-    setup_HBHENoiseFilter(process, cms)
-    setup_skim(process, cms, options)
+    process.HBHENoiseFilterResultProducer = setup_HBHENoiseFilter(process, cms)
+#    process.scrapingVeto = setup_scrapingveto(process, cms)
+    #setup_CSCBeamHaloFilter(process, cms)
+    process.HcalLaserEventFilter = setup_HcalLaserFilter(process, cms)
+    process.EcalDeadCellBoundaryEnergyFilter = setup_ECALDeadCellFilter(process, cms)
+    process.trackingFailureFilter = setup_trackingFailureFilter(process, cms)
+    process.EventFilter = setup_skim(process, cms, options)
+    
+    process.EventFilter.HCALNoiseFilterInput = cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult')
+    process.EventFilter.HCALLaserFilterInput = cms.InputTag('HcalLaserEventFilter')
+    process.EventFilter.ECALDeadCellFilterInput = cms.InputTag('EcalDeadCellBoundaryEnergyFilter')
+    process.EventFilter.TrackingFailureFilterInput = cms.InputTag('trackingFailureFilter')
+    process.EventFilter.useTrackingFailureFilter = cms.bool(True)
+    #disable optional MET filters for now
+    process.EventFilter.useOptionalMETFilters = cms.bool(False)
+    
+    print "Creating event filter sequence (merging all previous)."
+  #  print process.muonsFromCosmics*process.BeamHaloId
+#    process.printEventContent = cms.EDAnalyzer("EventContentAnalyzer")
+    EventFilters = cms.Sequence(
+                process.trackingFailureFilter * 
+                process.HBHENoiseFilterResultProducer * 
+ #                               process.scrapingVeto * 
+                                process.HcalLaserEventFilter * 
+                                process.EcalDeadCellBoundaryEnergyFilter * 
+#                                process.printEventContent * 
+                                process.EventFilter
+                                )
+    return EventFilters
     
 def setup_HBHENoiseFilter(process, cms):
     print '=' * 60
@@ -12,7 +41,7 @@ def setup_HBHENoiseFilter(process, cms):
     # HB + HE noise filtering
     #values taken from
     #https://twiki.cern.ch/twiki/bin/view/CMS/HBHEAnomalousSignals2011
-    process.HBHENoiseFilterResultProducer = cms.EDProducer(
+    HBHENoiseFilterResultProducer = cms.EDProducer(
         'HBHENoiseFilterResultProducer',
         noiselabel=cms.InputTag('hcalnoise', '', 'RECO'),
         minRatio=cms.double(-999),
@@ -29,6 +58,63 @@ def setup_HBHENoiseFilter(process, cms):
         minIsolatedNoiseSumEt=cms.double(9999),
         useTS4TS5=cms.bool(True)
         )
+    return HBHENoiseFilterResultProducer
+    
+def setup_scrapingveto(process, cms):
+    print '=' * 60
+    print "Setting up scraping Filter"
+    print '=' * 60
+    scrapingVeto = cms.EDFilter("FilterOutScraping",
+     applyfilter=cms.untracked.bool(False),
+     debugOn=cms.untracked.bool(False),
+     numtrack=cms.untracked.uint32(10),
+     thresh=cms.untracked.double(0.25)
+     )
+    return scrapingVeto
+
+#this filter has no tagging mode
+#def setup_CSCBeamHaloFilter(process, cms):
+#    print '=' * 60
+#    print "Setting up CSCTightHalo Filter"
+#    print '=' * 60
+#    from RecoMET.METAnalyzers.CSCHaloFilter_cfi import CSCTightHaloFilter
+#    #turn off filtering, instead create flag
+#    return CSCTightHaloFilter
+
+def setup_HcalLaserFilter(process, cms):
+    print '=' * 60
+    print "Setting up HcalLaser Filter"
+    print '=' * 60
+    
+    from RecoMET.METFilters.hcalLaserEventFilter_cfi import hcalLaserEventFilter
+    hcalLaserEventFilter.taggingMode = cms.bool(True)
+    
+    return hcalLaserEventFilter
+
+def setup_ECALDeadCellFilter(process, cms):
+    print '=' * 60
+    print "Setting up ECALDeadCell Filter"
+    print '=' * 60
+    #https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFilters#ECAL_dead_cell_filter
+    from RecoMET.METFilters.EcalDeadCellBoundaryEnergyFilter_cfi import EcalDeadCellBoundaryEnergyFilter
+    EcalDeadCellBoundaryEnergyFilter.taggingMode = cms.bool(True)
+    EcalDeadCellBoundaryEnergyFilter.cutBoundEnergyDeadCellsEB = cms.untracked.double(10)
+    EcalDeadCellBoundaryEnergyFilter.cutBoundEnergyDeadCellsEE = cms.untracked.double(10)
+    EcalDeadCellBoundaryEnergyFilter.cutBoundEnergyGapEB = cms.untracked.double(100)
+    EcalDeadCellBoundaryEnergyFilter.cutBoundEnergyGapEE = cms.untracked.double(100)
+    EcalDeadCellBoundaryEnergyFilter.enableGap = cms.untracked.bool(False)
+    EcalDeadCellBoundaryEnergyFilter.limitDeadCellToChannelStatusEB = cms.vint32(12, 14)
+    EcalDeadCellBoundaryEnergyFilter.limitDeadCellToChannelStatusEE = cms.vint32(12, 14)
+
+    return EcalDeadCellBoundaryEnergyFilter
+
+def setup_trackingFailureFilter(process, cms):
+    from RecoMET.METFilters.trackingFailureFilter_cfi import trackingFailureFilter
+    trackingFailureFilter.JetSource = cms.InputTag('ak5PFJets')
+    trackingFailureFilter.TrackSource           = cms.InputTag('generalTracks')
+    trackingFailureFilter.VertexSource          = cms.InputTag('goodOfflinePrimaryVertices')
+    trackingFailureFilter.taggingMode = cms.bool(True)
+    return trackingFailureFilter
     
 def setup_skim(process, cms, options):
     print '=' * 60
@@ -36,88 +122,81 @@ def setup_skim(process, cms, options):
     print '=' * 60
     skim = options.skim
     process.load("BristolAnalysis.NTupleTools.EventFilter_cfi")
-    #Event cleaning
-    process.EventFilter.NumTracks = cms.uint32(10)
-    process.EventFilter.HPTrackThreshold = cms.double(0.2)
-    #for DAV vertices, obsolete?
-    #pvSrc = 'offlinePrimaryVertices'
+    from BristolAnalysis.NTupleTools.EventFilter_cfi import EventFilter
     #at least one good primary vertex
-    process.EventFilter.VertexInput = cms.InputTag('goodOfflinePrimaryVertices')
-    process.EventFilter.VertexMinimumNDOF = cms.uint32(4)# this is >= 4
-    process.EventFilter.VertexMaxAbsZ = cms.double(24)
-    process.EventFilter.VertexMaxAbsRho = cms.double(2)
-    
+    EventFilter.VertexInput = cms.InputTag('goodOfflinePrimaryVertices')
     #reset to 0 skim
-    process.EventFilter.minNElectrons = cms.int32(-1)
-    process.EventFilter.minNMuons = cms.int32(-1)
-    process.EventFilter.minNJets = cms.int32(-1)
-    process.EventFilter.counteitherleptontype = cms.untracked.bool(False)
+    EventFilter.minNElectrons = cms.int32(-1)
+    EventFilter.minNMuons = cms.int32(-1)
+    EventFilter.minNJets = cms.int32(-1)
+    EventFilter.counteitherleptontype = cms.bool(False)
     
     skim = skim.lower()
     if 'electron' in skim or 'lepton' in skim:
-        process.EventFilter.maxAbsElectronEta   = cms.double(2.5)#within tracker volume
+        EventFilter.maxAbsElectronEta = cms.double(2.5)#within tracker volume
         #electron multiplicity
         if 'di' in skim:
-            process.EventFilter.minNElectrons       = cms.int32(2)
+            EventFilter.minNElectrons = cms.int32(2)
         else:
-            process.EventFilter.minNElectrons       = cms.int32(1)
+            EventFilter.minNElectrons = cms.int32(1)
         
         if 'loose' in skim:#loose Pt cut
-            process.EventFilter.minElectronPt       = cms.double(20.)
-            process.EventFilter.electronInput = cms.InputTag("selectedPatElectrons")#GSF electrons
+            EventFilter.minElectronPt = cms.double(20.)
+            EventFilter.electronInput = cms.InputTag("selectedPatElectrons")#GSF electrons
         else:
-            process.EventFilter.minElectronPt       = cms.double(30.)
-            process.EventFilter.electronInput = cms.InputTag("selectedPatElectronsLoosePFlow")
+            EventFilter.minElectronPt = cms.double(30.)
+            EventFilter.electronInput = cms.InputTag("selectedPatElectronsLoosePFlow")
     
     if 'muon'  in skim or 'lepton' in skim:
         #muon multiplicity
         if 'di' in skim:
-            process.EventFilter.minNMuons       = cms.int32(2)
+            EventFilter.minNMuons = cms.int32(2)
         else:
-            process.EventFilter.minNMuons       = cms.int32(1)
+            EventFilter.minNMuons = cms.int32(1)
         if 'loose' in skim:#loose Pt cut and eta cut
-            process.EventFilter.maxAbsMuonEta   = cms.double(2.5)#within tracker volume
-            process.EventFilter.minMuonPt       = cms.double(10.)
-            process.EventFilter.muonInput = cms.InputTag("selectedPatMuons")
+            EventFilter.maxAbsMuonEta = cms.double(2.5)#within tracker volume
+            EventFilter.minMuonPt = cms.double(10.)
+            EventFilter.muonInput = cms.InputTag("selectedPatMuons")
         else:
-            process.EventFilter.minMuonPt       = cms.double(20.)#triggers are 17GeV
-            process.EventFilter.maxAbsMuonEta   = cms.double(2.1)#new triggers have this restriction anyway
-            process.EventFilter.muonInput = cms.InputTag("selectedPatMuonsLoosePFlow")
+            EventFilter.minMuonPt = cms.double(20.)#triggers are 17GeV
+            EventFilter.maxAbsMuonEta = cms.double(2.1)#new triggers have this restriction anyway
+            EventFilter.muonInput = cms.InputTag("selectedPatMuonsLoosePFlow")
     
     if 'lepton' in skim:
-        process.EventFilter.counteitherleptontype = cms.untracked.bool(True)
+        EventFilter.counteitherleptontype = cms.bool(True)
  
     #jet skim
     #unprescaled triggers are >=3/>=2 jets for electron/muon triggers
     if 'jet' in skim:
         find = skim.find('jet')
         nJets = int(skim[find - 1])
-        process.EventFilter.jetInput = cms.InputTag("selectedPatJetsPFlow")
-        process.EventFilter.minNJets = cms.int32(nJets)
-        process.EventFilter.minJetPt = cms.double(30.)# identical (within JEC) to trigger
-        process.EventFilter.maxAbsJetEta = cms.double(2.6)# identical to trigger
+        EventFilter.jetInput = cms.InputTag("selectedPatJetsPFlow")
+        EventFilter.minNJets = cms.int32(nJets)
+        EventFilter.minJetPt = cms.double(30.)# identical (within JEC) to trigger
+        EventFilter.maxAbsJetEta = cms.double(2.6)# identical to trigger
     
     
     if not (skim == '' or skim == 'noskim'):
-        print '='*10, 'Skim definition', '='*10
+        print '=' * 10, 'Skim definition', '=' * 10
         print 'Electron skim:'
-        print '\t >=', str(process.EventFilter.minNMuons),' electron with ',
-        print 'p_T > ', str(process.EventFilter.minElectronPt),
-        print '|eta| < ' , str(process.EventFilter.maxAbsElectronEta)
-        print '\t input collection:', str(process.EventFilter.electronInput)
+        print '\t >=', str(EventFilter.minNMuons), ' electron with ',
+        print 'p_T > ', str(EventFilter.minElectronPt),
+        print '|eta| < ' , str(EventFilter.maxAbsElectronEta)
+        print '\t input collection:', str(EventFilter.electronInput)
         print
         print 'Muon skim:'
-        print '\t >=', str(process.EventFilter.minNElectrons),' muon with ',
-        print 'p_T > ', str(process.EventFilter.minMuonPt),
-        print '|eta| < ' , str(process.EventFilter.maxAbsMuonEta)
-        print '\t input collection:', str(process.EventFilter.muonInput)
+        print '\t >=', str(EventFilter.minNElectrons), ' muon with ',
+        print 'p_T > ', str(EventFilter.minMuonPt),
+        print '|eta| < ' , str(EventFilter.maxAbsMuonEta)
+        print '\t input collection:', str(EventFilter.muonInput)
         print
-        print 'Use either lepton type:', str(process.EventFilter.counteitherleptontype)
+        print 'Use either lepton type:', str(EventFilter.counteitherleptontype)
         print
         print 'Jet skim:'
-        print '\t >=', str(process.EventFilter.minNJets),' jet with ',
-        print 'p_T > ', str(process.EventFilter.minJetPt),
-        print '|eta| < ' , str(process.EventFilter.maxAbsJetEta)
-        print '\t input collection:', str(process.EventFilter.jetInput)
+        print '\t >=', str(EventFilter.minNJets), ' jet with ',
+        print 'p_T > ', str(EventFilter.minJetPt),
+        print '|eta| < ' , str(EventFilter.maxAbsJetEta)
+        print '\t input collection:', str(EventFilter.jetInput)
     else:
         print 'No skim used.'
+    return EventFilter

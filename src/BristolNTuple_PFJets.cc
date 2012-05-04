@@ -73,8 +73,8 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
     produces<std::vector<double> > (prefix + "JetProbabilityBTag" + suffix);
     produces<std::vector<double> > (prefix + "JetBProbabilityBTag" + suffix);
 
-    produces < std::vector<double> > (prefix + "SoftElectronByIP3dBJetTag" + suffix);
-	produces < std::vector<double> > (prefix + "SoftElectronByPtBJetTag" + suffix);
+//    produces < std::vector<double> > (prefix + "SoftElectronByIP3dBJetTag" + suffix);
+//	produces < std::vector<double> > (prefix + "SoftElectronByPtBJetTag" + suffix);
 
 	produces < std::vector<double> > (prefix + "SoftMuonBJetTag" + suffix);
 	produces < std::vector<double> > (prefix + "SoftMuonByIP3dBJetTag" + suffix);
@@ -148,8 +148,8 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<double> > jetProbabilityBTag(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > jetBProbabilityBTag(new std::vector<double>());
 
-	std::auto_ptr < std::vector<double> > softElectronByIP3dBJetTags(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > softElectronByPtBJetTags(new std::vector<double>());
+//	std::auto_ptr < std::vector<double> > softElectronByIP3dBJetTags(new std::vector<double>());
+//	std::auto_ptr < std::vector<double> > softElectronByPtBJetTags(new std::vector<double>());
 
 	std::auto_ptr < std::vector<double> > softMuonBJetTag(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > softMuonByIP3dBJetTags(new std::vector<double>());
@@ -388,8 +388,8 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			jetProbabilityBTag->push_back(it->bDiscriminator("jetProbabilityBJetTags")); // checked 19.09.2011
 			jetBProbabilityBTag->push_back(it->bDiscriminator("jetBProbabilityBJetTags")); // checked 19.09.2011
 
-			softElectronByIP3dBJetTags->push_back(it->bDiscriminator("softElectronByIP3dBJetTags")); // corrected 19.09.2011
-			softElectronByPtBJetTags->push_back(it->bDiscriminator("softElectronByPtBJetTags")); // introduced 19.09.2011
+//			softElectronByIP3dBJetTags->push_back(it->bDiscriminator("softElectronByIP3dBJetTags")); // corrected 19.09.2011
+//			softElectronByPtBJetTags->push_back(it->bDiscriminator("softElectronByPtBJetTags")); // introduced 19.09.2011
 
 			softMuonBJetTag->push_back(it->bDiscriminator("softMuonBJetTags")); // checked 19.09.2011
 			softMuonByIP3dBJetTags->push_back(it->bDiscriminator("softMuonByIP3dBJetTags")); // corrected 19.09.2011
@@ -466,8 +466,8 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(simpleSecondaryVertexHighPurBTag, prefix + "SimpleSecondaryVertexHighPurBTag" + suffix);
 	iEvent.put(jetProbabilityBTag, prefix + "JetProbabilityBTag" + suffix);
 	iEvent.put(jetBProbabilityBTag, prefix + "JetBProbabilityBTag" + suffix);
-	iEvent.put(softElectronByIP3dBJetTags, prefix + "SoftElectronByIP3dBJetTag" + suffix);
-	iEvent.put(softElectronByPtBJetTags, prefix + "SoftElectronByPtBJetTag" + suffix);
+//	iEvent.put(softElectronByIP3dBJetTags, prefix + "SoftElectronByIP3dBJetTag" + suffix);
+//	iEvent.put(softElectronByPtBJetTags, prefix + "SoftElectronByPtBJetTag" + suffix);
 	iEvent.put(softMuonBJetTag, prefix + "SoftMuonBJetTag" + suffix);
 	iEvent.put(softMuonByIP3dBJetTags, prefix + "SoftMuonByIP3dBJetTag" + suffix);
 	iEvent.put(softMuonByPtBJetTags, prefix + "SoftMuonByPtBJetTag" + suffix);

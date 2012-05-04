@@ -10,35 +10,76 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "TH1.h"
+#include <vector>
+
+namespace Filters {
+enum value {
+	allEvents,
+	passHBHENoiseFilter,
+	passCSCBeamHaloFilter,
+	passHCALLaserFilter,
+	passECALDeadCellFilter,
+	passTrackingFailureFilter,
+	passScrapingVeto,
+	passGoodPrimaryVertex,
+	passElectronCuts,
+	passMuonCuts,
+	passJetCuts,
+	NUMBER_OF_FILTERS
+};
+
+const std::string names[NUMBER_OF_FILTERS] = { "All Events", //
+		"HBHENoiseFilter", //
+		"CSCBeamHaloFilter", //
+		"HCALLaserFilter", //
+		"ECALDeadCellFilter", //
+		"TrackingFailureFilter", //
+		"ScrapingVeto", //
+		"GoodPrimaryVertex", //
+		"ElectronCuts", //
+		"MuonCuts", //
+		"JetCuts" };
+}
 
 class EventFilter: public edm::EDFilter {
 public:
-    explicit EventFilter(const edm::ParameterSet&);
-    virtual ~EventFilter();
+	explicit EventFilter(const edm::ParameterSet&);
+	virtual ~EventFilter();
+	static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
 private:
-    virtual void beginJob();
-    virtual bool filter(edm::Event&, const edm::EventSetup&);
-    virtual void endJob();
+	virtual void beginJob();
+	virtual bool filter(edm::Event&, const edm::EventSetup&);
+	virtual void endJob();
 
-    edm::InputTag jetInput_, electronInput_, muonInput_, vertexInput_, hcalNoiseInput_, trkInput_;
+	virtual bool beginRun(edm::Run&, edm::EventSetup const&);
+	virtual bool endRun(edm::Run&, edm::EventSetup const&);
+	virtual bool beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
+	virtual bool endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
 
-    int minNJets_, maxNJets_, minNElectrons_, maxNElectrons_, minNMuons_, maxNMuons_;
+	bool passesSelectionStep(edm::Event& event, Filters::value filter);
+	bool passesFilter(edm::Event& event, edm::InputTag filter);
 
-    double minJetPt, maxAbsJetEta, minElectronPt_, maxAbsElectronEta_, minMuonPt_, maxAbsMuonEta_;
+	bool passesCSCTightBeamHaloID(edm::Event& event);
+	bool passesScrapingVeto(edm::Event& event);
+	bool passesGoodPrimaryVertex(edm::Event& event);
+	bool passesElectronCuts(edm::Event& event);
+	bool passesMuonCuts(edm::Event& event);
+	bool passesJetCuts(edm::Event& event);
 
-    const unsigned int vtxMinNDOF;
-    const double vtxMaxAbsZ, vtxMaxAbsRho;
+	edm::InputTag hcalNoiseInput_, hcalLaserFilterInput_, ecalDeadCellFilterInput_, //
+			trackingFailureFilter_, //
+			trkInput_, vertexInput_, //
+			jetInput_, electronInput_, muonInput_;
 
-    const unsigned int numTracks;
-    const double hpTrackThreshold;
+	int minNVertices_, maxNVertices_, minNJets_, maxNJets_, minNElectrons_, maxNElectrons_, minNMuons_, maxNMuons_;
 
-    bool debug_, counteitherleptontype_;
+	double minJetPt_, maxAbsJetEta_, minElectronPt_, maxAbsElectronEta_, minMuonPt_, maxAbsMuonEta_;
 
-    int totalCount, passHBHENoiseFilter, passScrapingVeto, passGoodPrimaryVertex;
-    int passElectronCuts, passMuonCuts, passJetCuts;
+	bool debug_, counteitherleptontype_, useTrackingFailureFilter_, useOptionalMETFilters_;
+	std::vector<int> eventCount_;
 
-    TH1I* hCount;
+	TH1I* hCount;
 };
 
 #endif

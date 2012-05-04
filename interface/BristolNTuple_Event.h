@@ -10,9 +10,13 @@ class BristolNTuple_Event : public edm::EDProducer {
   explicit BristolNTuple_Event(const edm::ParameterSet&);
 
  private:
+  bool passesFilter(edm::Event& event, edm::InputTag filter);
   void produce( edm::Event &, const edm::EventSetup & );
   const edm::InputTag   dcsInputTag;
+  edm::InputTag hcalLaserFilterInput_, ecalDeadCellFilterInput_, trackingFailureFilter_;
+
   const std::string     prefix,suffix;
+
 };
 
 #endif

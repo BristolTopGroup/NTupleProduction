@@ -32,7 +32,7 @@ def createSkim(process, skim, cms):
             process.EventFilter.muonInput = cms.InputTag("selectedPatMuonsLoosePFlow")
     
     if 'lepton' in skim:
-        process.EventFilter.counteitherleptontype = cms.untracked.bool(True)
+        process.EventFilter.counteitherleptontype = cms.bool(True)
  
     #jet skim
     #unprescaled triggers are >=3/>=2 jets for electron/muon triggers

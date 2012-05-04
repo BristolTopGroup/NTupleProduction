@@ -120,7 +120,7 @@ process.goodOfflinePrimaryVertices = cms.EDFilter(
 
 #EventFilters and skim
 from BristolAnalysis.NTupleTools.EventFilters_cff import *
-setup_eventfilters(process, cms, options)
+process.EventFilters = setup_eventfilters(process, cms, options)
 #PF2PAT
 from BristolAnalysis.NTupleTools.PF2PAT_Setup_cff import *
 setup_PF2PAT(process, cms, options, postfix=postfix, removeTausFromJetCollection=removeTausFromJetCollection)
@@ -150,7 +150,7 @@ process.patseq = cms.Sequence(
     process.patDefaultSequence * 
     process.goodPatJets * 
     process.goodPatJetsPFlow * 
-    process.EventFilter * 
+    process.EventFilters *
     process.goodPatJetsCA8PF * 
     process.flavorHistorySeq# * 
     )
