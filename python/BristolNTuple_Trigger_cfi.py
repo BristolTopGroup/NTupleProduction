@@ -103,6 +103,8 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFNoPUJet30_v',
     'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFNoPUJet50_40_30_v',
     #
+    'HLT_Ele25_CaloIdVL_CaloIsoT_TrkIdVL_TrkIsoT_TriCentralPFNoPUJet30_v',
+    #
     'HLT_Mu20_eta2p1_TriCentralPFNoPUJet30_v',
     'HLT_Mu20_eta2p1_TriCentralPFNoPUJet50_40_30_v',
     'HLT_IsoMu20_eta2p1_CentralPFNoPUJet30_BTagIPIter_v',
@@ -110,6 +112,14 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     'HLT_IsoMu20_eta2p1_DiCentralPFNoPUJet30_v',
     'HLT_IsoMu20_eta2p1_TriCentralPFNoPUJet30_v',
     'HLT_IsoMu20_eta2p1_TriCentralPFNoPUJet50_40_30_v',
+    #
+    'HLT_Mu17_eta2p1_TriCentralPFNoPUJet30_v',
+    'HLT_Mu17_eta2p1_TriCentralPFNoPUJet50_40_30_v',
+    'HLT_IsoMu17_eta2p1_CentralPFNoPUJet30_BTagIPIter_v',
+    'HLT_IsoMu17_eta2p1_CentralPFNoPUJet30_v',
+    'HLT_IsoMu17_eta2p1_DiCentralPFNoPUJet30_v',
+    'HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30_v',
+    'HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet50_40_30_v',
     
     
  ),                              
