@@ -143,7 +143,8 @@ bool EventFilter::passesCSCTightBeamHaloID(edm::Event& event) {
 	if (TheBeamHaloSummary.isValid()) {
 		edm::LogInfo("EventFilter") << "Successfully obtained BeamHaloSummary";
 		const reco::BeamHaloSummary TheSummary = (*TheBeamHaloSummary.product());
-		result = TheSummary.CSCTightHaloId();
+		//event is NOT identified as beam halo
+		result = !TheSummary.CSCTightHaloId();
 	} else
 		edm::LogError("BristolNTuple_EventSelectionError") << "Error! Can't get the product BeamHaloSummary";
 
