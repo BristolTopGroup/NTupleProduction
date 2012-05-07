@@ -10,23 +10,6 @@ def setup_electronID(process, cms):
     process.load('RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentification_cfi')
     process.load('EGamma.EGammaAnalysisTools.electronIdMVAProducer_cfi') 
 
-    process.mvaTrigV0.mvaWeightFile = mvaWeightFile = cms.vstring(
-                                  "BristolAnalysis/NTupleTools/data/ElectronMVA/Electrons_BDTG_TrigV0_Cat1.weights.xml",
-                                  "BristolAnalysis/NTupleTools/data/ElectronMVA/Electrons_BDTG_TrigV0_Cat2.weights.xml",
-                                  "BristolAnalysis/NTupleTools/data/ElectronMVA/Electrons_BDTG_TrigV0_Cat3.weights.xml",
-                                  "BristolAnalysis/NTupleTools/data/ElectronMVA/Electrons_BDTG_TrigV0_Cat4.weights.xml",
-                                  "BristolAnalysis/NTupleTools/data/ElectronMVA/Electrons_BDTG_TrigV0_Cat5.weights.xml",
-                                  "BristolAnalysis/NTupleTools/data/ElectronMVA/Electrons_BDTG_TrigV0_Cat6.weights.xml",
-                            )
-
-    process.mvaNonTrigV0.mvaWeightFile = mvaWeightFile = cms.vstring(
-                                  "BristolAnalysis/NTupleTools/data/ElectronMVA/Electrons_BDTG_NonTrigV0_Cat1.weights.xml",
-                                  "BristolAnalysis/NTupleTools/data/ElectronMVA/Electrons_BDTG_NonTrigV0_Cat2.weights.xml",
-                                  "BristolAnalysis/NTupleTools/data/ElectronMVA/Electrons_BDTG_NonTrigV0_Cat3.weights.xml",
-                                  "BristolAnalysis/NTupleTools/data/ElectronMVA/Electrons_BDTG_NonTrigV0_Cat4.weights.xml",
-                                  "BristolAnalysis/NTupleTools/data/ElectronMVA/Electrons_BDTG_NonTrigV0_Cat5.weights.xml",
-                                  "BristolAnalysis/NTupleTools/data/ElectronMVA/Electrons_BDTG_NonTrigV0_Cat6.weights.xml",
-                            )
     process.eidMVASequence = cms.Sequence(  process.mvaTrigV0 + process.mvaNonTrigV0 )
 
     process.eidCiCSequence = cms.Sequence(
