@@ -7,6 +7,8 @@ from PhysicsTools.PatAlgos.tools.coreTools import *
 GLOBALTAG_DATA = 'GR_R_52_V7::All'
 GLOBALTAG_MC = 'START52_V9::All'
 FILETAG = '52X'
+TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/ElectronHad_Run2012A_52X_PromptReco-v1_AOD.root'
+TEST_MC_FILE =  'file:///storage/TopQuarkGroup/DYJets_M50_Summer12.root'
 #use jet energy correction from database (loaded from BristolAnalysis/NTupleTools/python_custom_JEC_cff.py)
 #==False -> use JEC from Global Tag 
 USE_JEC_FROM_DB = False
@@ -69,7 +71,7 @@ options.register ('skim',
                   "Skim definition")
 
 options.register ('maxLooseLeptonRelIso',
-                  999.,
+                  5.,
                   VarParsing.multiplicity.singleton,
                   VarParsing.varType.float,
                   "Maximum (PF)relIso value for leptons to be stored.")
@@ -80,7 +82,20 @@ options.register ('printEventContent',
                   VarParsing.varType.bool,
                   "Outputs the event content at the end of the path")
 
+options.register ('use44X',
+                  False,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.bool,
+                  "Will use set-up for CMSSW 44X if true")
+
 options.parseArguments()
+
+if options.use44X:
+    GLOBALTAG_DATA = 'GR_R_44_V15::All'
+    GLOBALTAG_MC = 'START44_V13::All'
+    FILETAG = '44X'
+    TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/ElectronHad_Run2011A_44X_AOD.root'
+    TEST_MC_FILE = 'file:///storage/TopQuarkGroup/TTJets_TuneZ1_Fall11_44X_AODSIM.root'
 
 maxLooseLeptonRelIso = options.maxLooseLeptonRelIso
 
@@ -91,11 +106,11 @@ if USE_JEC_FROM_DB:
     
 if not options.useData :
     process.source.fileNames = [
-            'file:///storage/TopQuarkGroup/DYJets_M50_Summer12.root'
+            TEST_MC_FILE
             ]
 else:
     process.source.fileNames = [
-            'file:///storage/TopQuarkGroup/ElectronHad_Run2012A_52X_PromptReco-v1_AOD.root'
+            TEST_DATA_FILE
             ]
     
 # add the flavor history
