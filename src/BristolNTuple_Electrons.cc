@@ -3,7 +3,7 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
-
+#include "DataFormats/PatCandidates/interface/Isolation.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/Scalers/interface/DcsStatus.h"
@@ -470,18 +470,19 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 			//electron PF isolation variables
 			if (storePFIsolation_) {
-				//pat::IsolationKeys isokeyPfChargedHadronIso = pat::IsolationKeys(4);
-				//pat::IsolationKeys isokeyPfNeutralHadronIso = pat::IsolationKeys(5);
-				//pat::IsolationKeys isokeyPFGammaIso = pat::IsolationKeys(6);
+				pat::IsolationKeys isokeyPfChargedHadronIso = pat::IsolationKeys(4);
+				pat::IsolationKeys isokeyPfNeutralHadronIso = pat::IsolationKeys(5);
+				pat::IsolationKeys isokeyPFGammaIso = pat::IsolationKeys(6);
+				pat::IsolationKeys isokeyPfPUChargedHadronIso = pat::IsolationKeys(12);
 
 				double pfRelIso03(0), pfRelIso04(0), pfRelIso05(0);
 				double directionalPFIso02(0), directionalPFIso02FallOff(0), pfIso02FallOff(0);
 				double directionalPFIso03(0), directionalPFIso03FallOff(0), pfIso03FallOff(0);
 
-				const reco::IsoDeposit * PfChargedHadronIsolation = it->isoDeposit(pat::IsolationKeys::PfChargedHadronIso);
-				const reco::IsoDeposit * PfNeutralHadronIsolation = it->isoDeposit(pat::IsolationKeys::PfNeutralHadronIso);
-				const reco::IsoDeposit * PFGammaIsolation = it->isoDeposit(pat::IsolationKeys::PfGammaIso);
-				const reco::IsoDeposit * PfPUChargedHadronIso = it->isoDeposit(pat::IsolationKeys::PfPUChargedHadronIso);
+				const reco::IsoDeposit * PfChargedHadronIsolation = it->isoDeposit(isokeyPfChargedHadronIso);
+				const reco::IsoDeposit * PfNeutralHadronIsolation = it->isoDeposit(isokeyPfNeutralHadronIso);
+				const reco::IsoDeposit * PFGammaIsolation = it->isoDeposit(isokeyPFGammaIso);
+				const reco::IsoDeposit * PfPUChargedHadronIso = it->isoDeposit(isokeyPfPUChargedHadronIso);
 
 				directionalPFIso02 = customIsolation(*it, pfCandidates, 0.2, true, false, reco::PFCandidate::e);
 				directionalPFIso02FallOff = customIsolation(*it, pfCandidates, 0.2, true, true, reco::PFCandidate::e);
@@ -569,7 +570,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			scEta->push_back(it->superCluster()->eta());
 			scPhi->push_back(it->superCluster()->phi());
 			scPt->push_back(it->superCluster()->energy() / cosh(it->superCluster()->eta()));
-			scP->push_back(it->eSuperClusterOverP()/it->superCluster()->energy());
+			scP->push_back(it->eSuperClusterOverP() / it->superCluster()->energy());
 			scEnergy->push_back(it->superCluster()->energy());
 			scRawEnergy->push_back(it->superCluster()->rawEnergy());
 
