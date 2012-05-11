@@ -8,31 +8,21 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     HLTPathsOfInterest_Signal = cms.vstring(
     #========== 2011 data ==============  
     #ElectronHad PD
-    'HLT_Ele25_CaloIdVT_TrkIdT_CentralJet40_BTagIP_v', #12
-    'HLT_Ele25_CaloIdVT_TrkIdT_CentralJet30_v', #13
-    'HLT_Ele25_CaloIdVT_TrkIdT_CentralDiJet30_v', #14
-    'HLT_Ele25_CaloIdVT_TrkIdT_CentralTriJet30_v', #15
+    'HLT_Ele25_CaloIdVT_TrkIdT_CentralJet30_v', 
+    'HLT_Ele25_CaloIdVT_TrkIdT_CentralDiJet30_v',
+    'HLT_Ele25_CaloIdVT_TrkIdT_CentralTriJet30_v',
     #renaming for 1E33
-    'HLT_Ele25_CaloIdVT_TrkIdT_CentralJet30_BTagIP_v', #16
-    'HLT_Ele25_CaloIdVT_TrkIdT_DiCentralJet30_v',#17
-    'HLT_Ele25_CaloIdVT_TrkIdT_TriCentralJet30_v', #18
-    'HLT_Ele25_CaloIdVT_TrkIdT_QuadCentralJet30_v', #19
+    'HLT_Ele25_CaloIdVT_TrkIdT_DiCentralJet30_v',
+    'HLT_Ele25_CaloIdVT_TrkIdT_TriCentralJet30_v',
+    'HLT_Ele25_CaloIdVT_TrkIdT_QuadCentralJet30_v',
     #new iso triggers:
-    'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_BTagIP_v',#20
-    'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_v',#21
-    'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralJet30_v',#22
-    'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralJet30_v',#23
-    'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_QuadCentralJet30_v',#24
-    #Higgs trigger
-    'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v',#25
-    #EWK triggers
-    'HLT_Ele25_WP80_PFMT40_v',#26
-    'HLT_Ele27_WP70_PFMT40_PFMHT20_v',#27
+    'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_v',
+    'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralJet30_v',
+    'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralJet30_v',
+    'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_QuadCentralJet30_v',
     #SingleElectron PD
-    'HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v', #28
-    'HLT_Ele25_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v',#29
-    'HLT_Ele32_CaloIdVL_CaloIsoVL_TrkIdVL_TrkIsoVL_v',#30
-    'HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v',#31
+    'HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v',
+    'HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v',
     #5E33 change to PF jets @ HLT
     'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralPFJet30_v',
     'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_DiCentralPFJet30_v',
@@ -45,21 +35,12 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     'HLT_Ele25_CaloIdVT_TrkIdT_QuadCentralPFJet30_v',
     #Muon Triggers
     #SingleMuon - last unprescaled in 1E33 menu
-    'HLT_Mu15_v', 
-    'HLT_Mu20_v',
     'HLT_IsoMu17_v', 
-    'HLT_IsoMu15_v', 
-    'HLT_IsoMu24_v',
-    'HLT_IsoMu24_eta2p1_v',
-    'HLT_IsoMu30_eta2p1_v',
     #MuHad
-    'HLT_IsoMu17_CentralJet40_BTagIP_v', #32
-    'HLT_Mu17_CentralJet30_v', #33
-    'HLT_Mu17_CentralJet40_BTagIP_v', #34
-    'HLT_Mu17_DiCentralJet30_v', #35
-    'HLT_Mu17_TriCentralJet30_v', #36
+    'HLT_Mu17_CentralJet30_v', 
+    'HLT_Mu17_DiCentralJet30_v',
+    'HLT_Mu17_TriCentralJet30_v',
     #2E33
-    'HLT_IsoMu17_CentralJet30_BTagIP_v',
     'HLT_IsoMu17_CentralJet30_v',
     'HLT_IsoMu17_DiCentralJet30_v',
     'HLT_IsoMu17_QuadCentralJet30_v',
@@ -83,14 +64,13 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     #========== 2012 data ==============
     #data parking
     'HLT_Ele27_WP80_v',
-    'HLT_IsoMu20_eta2p1_v'#needed for trigger efficiency
+    'HLT_IsoMu20_eta2p1_v',#needed for trigger efficiency
     #5E33 menu new triggers (rest is included in 2011 menu)
     'HLT_Ele25_CaloIdVT_TrkIdT_TriCentralJet50_40_30_v',
-    'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralJet50_40_30_v',
+    'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentrlJet50_40_30_v',#new backup trigger
     #
     'HLT_Mu20_eta2p1_TriCentralPFJet30_v',
     'HLT_Mu20_eta2p1_TriCentralPFJet50_40_30_v',
-    'HLT_IsoMu20_eta2p1_CentralPFJet30_BTagIPIter_v',
     'HLT_IsoMu20_eta2p1_CentralPFJet30_v',
     'HLT_IsoMu20_eta2p1_DiCentralPFJet30_v',
     'HLT_IsoMu20_eta2p1_TriCentralPFJet30_v',
@@ -103,11 +83,12 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFNoPUJet30_v',
     'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFNoPUJet50_40_30_v',
     #
-    'HLT_Ele25_CaloIdVL_CaloIsoT_TrkIdVL_TrkIsoT_TriCentralPFNoPUJet30_v',
+    'HLT_Ele25_CaloIdVL_CaloIsoT_TrkIdVL_TrkIsoT_TriCentralPFNoPUJet30_v',#anti-ID trigger DEV
+    'HLT_Ele25_CaloIdVT_CaloIsoVL_TrkIdVL_TrkIsoT_TriCentralPFNoPUJet30_v',#stop signal trigger
+    'HLT_Ele25_CaloIdVT_CaloIsoVL_TrkIdVL_TrkIsoT_TriCentralPFNoPUJet50_40_30_v',#stop signal trigger (backup)
     #
     'HLT_Mu20_eta2p1_TriCentralPFNoPUJet30_v',
     'HLT_Mu20_eta2p1_TriCentralPFNoPUJet50_40_30_v',
-    'HLT_IsoMu20_eta2p1_CentralPFNoPUJet30_BTagIPIter_v',
     'HLT_IsoMu20_eta2p1_CentralPFNoPUJet30_v',
     'HLT_IsoMu20_eta2p1_DiCentralPFNoPUJet30_v',
     'HLT_IsoMu20_eta2p1_TriCentralPFNoPUJet30_v',
@@ -115,7 +96,6 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     #
     'HLT_Mu17_eta2p1_TriCentralPFNoPUJet30_v',
     'HLT_Mu17_eta2p1_TriCentralPFNoPUJet50_40_30_v',
-    'HLT_IsoMu17_eta2p1_CentralPFNoPUJet30_BTagIPIter_v',
     'HLT_IsoMu17_eta2p1_CentralPFNoPUJet30_v',
     'HLT_IsoMu17_eta2p1_DiCentralPFNoPUJet30_v',
     'HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30_v',
