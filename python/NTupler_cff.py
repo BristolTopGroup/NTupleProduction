@@ -122,6 +122,18 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
         process.rootTuplePFMET + 
         process.rootTuplePFType1CorrectedMET +
         process.rootTuplePFType1p2CorrectedMET +
+        process.rootTupleType1p2CorrectedPFMetElectronEnUp +
+        process.rootTupleType1p2CorrectedPFMetElectronEnDown +
+        process.rootTupleType1p2CorrectedPFMetMuonEnUp +
+        process.rootTupleType1p2CorrectedPFMetMuonEnDown +
+        process.rootTupleType1p2CorrectedPFMetTauEnUp +
+        process.rootTupleType1p2CorrectedPFMetTauEnDown +
+        process.rootTupleType1p2CorrectedPFMetJetResUp +
+        process.rootTupleType1p2CorrectedPFMetJetResDown +
+        process.rootTupleType1p2CorrectedPFMetJetEnUp +
+        process.rootTupleType1p2CorrectedPFMetJetEnDown +
+        process.rootTupleType1p2CorrectedPFMetUnclusteredEnUp +
+        process.rootTupleType1p2CorrectedPFMetUnclusteredEnDown +
         #Event
         process.rootTupleEvent + 
         #trigger
@@ -142,6 +154,8 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
         process.rootNTuples.remove(process.rootTupleGenParticles)
         process.rootNTuples.remove(process.rootTupleGenJetSequence)
         process.rootNTuples.remove(process.rootTupleGenMETTrue)
+        process.rootNTuples.remove(process.rootTupleType1p2CorrectedPFMetJetResUp)
+        process.rootNTuples.remove(process.rootTupleType1p2CorrectedPFMetJetResDown)
         
     if not options.writeFat:#write only PF particles
         process.rootNTuples.remove(process.rootTupleCaloJets)

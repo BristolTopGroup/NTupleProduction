@@ -6,12 +6,14 @@
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 #include "DataFormats/METReco/interface/BeamHaloSummary.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
 
 BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig) :
 		dcsInputTag(iConfig.getParameter < edm::InputTag > ("DCSInputTag")), //
 		hcalLaserFilterInput_(iConfig.getParameter < edm::InputTag > ("HCALLaserFilterInput")), //
 		ecalDeadCellFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellFilterInput")), //
 		trackingFailureFilter_(iConfig.getParameter < edm::InputTag > ("TrackingFailureFilterInput")), //
+		METInputForSumET_(iConfig.getParameter < edm::InputTag > ("METInputForSumET")), //
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //
 		suffix(iConfig.getParameter < std::string > ("Suffix")) {
 	produces<double>(prefix + "MagneticField" + suffix);
@@ -23,6 +25,7 @@ BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig) :
 	produces<double>(prefix + "Time" + suffix);
 	produces<bool>(prefix + "isData" + suffix);
 	produces<double>(prefix + "rho" + suffix);
+	produces<double>(prefix + "SumET" + suffix);
 
 	//optinal MET filter decisions
 	produces<bool>(prefix + "HCALLaserFilter" + suffix);
@@ -66,23 +69,25 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	}
 	std::auto_ptr<double> magField(new double(evt_bField));
 
-	std::auto_ptr<unsigned int> run(new unsigned int(iEvent.id().run()));
-	std::auto_ptr<unsigned int> eventNumber(new unsigned int(iEvent.id().event()));
-	std::auto_ptr<unsigned int> ls(new unsigned int(iEvent.luminosityBlock()));
-
 	double sec = iEvent.time().value() >> 32;
 	double usec = 0xFFFFFFFF & iEvent.time().value();
 	double conv = 1e6;
 
+	edm::Handle<double> rhoH;
+	iEvent.getByLabel(edm::InputTag("kt6PFJets", "rho"), rhoH);
+
+	edm::Handle < std::vector<pat::MET> > mets;
+	iEvent.getByLabel(METInputForSumET_, mets);
+
+	std::auto_ptr<unsigned int> run(new unsigned int(iEvent.id().run()));
+	std::auto_ptr<unsigned int> eventNumber(new unsigned int(iEvent.id().event()));
+	std::auto_ptr<unsigned int> ls(new unsigned int(iEvent.luminosityBlock()));
 	std::auto_ptr<unsigned int> bunch(new unsigned int(iEvent.bunchCrossing()));
 	std::auto_ptr<unsigned int> orbit(new unsigned int(iEvent.orbitNumber()));
 	std::auto_ptr<double> time(new double(sec + usec / conv));
-
 	std::auto_ptr<bool> isdata(new bool(iEvent.isRealData()));
-
-	edm::Handle<double> rhoH;
-	iEvent.getByLabel(edm::InputTag("kt6PFJets", "rho"), rhoH);
 	std::auto_ptr<double> rho(new double(*rhoH.product()));
+	std::auto_ptr<double> SumET(new double(mets->at(0).sumEt()));
 
 	std::auto_ptr<bool> HCALLaserFilter(new bool(passesFilter(iEvent, hcalLaserFilterInput_)));
 	std::auto_ptr<bool> ECALDeadCellFilter(new bool(passesFilter(iEvent, ecalDeadCellFilterInput_)));
@@ -110,6 +115,7 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	iEvent.put(time, prefix + "Time" + suffix);
 	iEvent.put(isdata, prefix + "isData" + suffix);
 	iEvent.put(rho, prefix + "rho" + suffix);
+	iEvent.put(SumET, prefix + "SumET" + suffix);
 
 	iEvent.put(HCALLaserFilter, prefix + "HCALLaserFilter" + suffix);
 	iEvent.put(ECALDeadCellFilter, prefix + "ECALDeadCellFilter" + suffix);

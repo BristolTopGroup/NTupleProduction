@@ -9,6 +9,10 @@ GLOBALTAG_MC = 'START52_V9::All'
 FILETAG = '52X'
 TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/ElectronHad_Run2012A_52X_PromptReco-v1_AOD.root'
 TEST_MC_FILE =  'file:///storage/TopQuarkGroup/DYJets_M50_Summer12.root'
+#CERN
+#TEST_DATA_FILE = '/store/data/Run2012A/ElectronHad/AOD/PromptReco-v1/000/193/336/C47F154E-A697-E111-83F5-001D09F24D8A.root'
+#TEST_MC_FILE =  '/store/mc/Summer12/TTJets_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S7_START52_V5-v1/0000/FEC0CBA1-5A81-E111-8D3A-0018F3D0968E.root'
+
 #use jet energy correction from database (loaded from BristolAnalysis/NTupleTools/python_custom_JEC_cff.py)
 #==False -> use JEC from Global Tag 
 USE_JEC_FROM_DB = False
@@ -96,6 +100,9 @@ if options.use44X:
     FILETAG = '44X'
     TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/ElectronHad_Run2011A_44X_AOD.root'
     TEST_MC_FILE = 'file:///storage/TopQuarkGroup/TTJets_TuneZ1_Fall11_44X_AODSIM.root'
+    #CERN
+    #TEST_DATA_FILE = '/store/data/Run2011A/ElectronHad/AOD/08Nov2011-v1/0012/C481C0D4-1D1A-E111-8B01-E0CB4E1A1190.root'
+    #TEST_MC_FILE =  '/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0003/FEE78BEE-0237-E111-9CBC-003048678F06.root'
 
 maxLooseLeptonRelIso = options.maxLooseLeptonRelIso
 
@@ -155,6 +162,9 @@ setup_electronID(process, cms)
 from BristolAnalysis.NTupleTools.ObjectSelection_cff import *
 selectObjects(process, cms)
 
+from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
+runMEtUncertainties(process, doSmearJets=not options.useData, jetCollection='goodPatJetsPFlow',addToPatDefaultSequence = False)
+
 # turn to false when running on data
 if options.useData :
     removeMCMatching(process, ['All'])
@@ -170,6 +180,7 @@ process.patseq = cms.Sequence(
     process.patDefaultSequence * 
     process.goodPatJets * 
     process.goodPatJetsPFlow * 
+    process.metUncertaintySequence *
     process.EventFilters *
     process.goodPatJetsCA8PF * 
     process.flavorHistorySeq# * 
@@ -183,6 +194,9 @@ if not makePATTuple:
     #NTuple content
     from BristolAnalysis.NTupleTools.NTupler_cff import *
     setup_ntupler(process, cms, options, includeCA08Jets)
+else:
+    from BristolAnalysis.NTupleTools.PatTuple_cff import *
+    setup_pattuple(process, cms, options)
 
 if not includeCA08Jets:
     process.patseq.remove(process.goodPatJetsCA8PF)
@@ -248,9 +262,6 @@ else:
 process.options.wantSummary = True
 process.out.dropMetaData = cms.untracked.string("DROPPED")
 process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMConverter_*_*")
-
-from BristolAnalysis.NTupleTools.PatTuple_cff import *
-setup_pattuple(process, cms, options)
 
 if not makePATTuple:
     #do not write PAT-tuple information
