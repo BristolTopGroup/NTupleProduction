@@ -34,10 +34,6 @@ BristolNTuple_Muons::BristolNTuple_Muons(const edm::ParameterSet& iConfig) :
 	produces < std::vector<bool> > (prefix + "isTrackerMuon" + suffix);
 	produces < std::vector<int> > (prefix + "NumberOfMatches" + suffix); // in reference selection
 	produces < std::vector<int> > (prefix + "NumberOfMatchedStations" + suffix); // in Aachen selection
-//	produces < std::vector<double> > (prefix + "CosmicCompatibility" + suffix);
-//	produces < std::vector<double> > (prefix + "TimeCompatibility" + suffix);
-//	produces < std::vector<double> > (prefix + "BackToBackCompatibility" + suffix);
-//	produces < std::vector<double> > (prefix + "OverlapCompatibility" + suffix);
 	produces < std::vector<bool> > (prefix + "PassID" + suffix);
 
 	//muon isolation variables
@@ -136,10 +132,6 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	std::auto_ptr < std::vector<bool> > isTrackerMuon(new std::vector<bool>());
 	std::auto_ptr < std::vector<int> > numberOfMatches(new std::vector<int>());
 	std::auto_ptr < std::vector<int> > numberOfMatchedStations(new std::vector<int>());
-//	std::auto_ptr < std::vector<double> > cosmicCompatibility(new std::vector<double>());
-//	std::auto_ptr < std::vector<double> > timeCompatibility(new std::vector<double>());
-//	std::auto_ptr < std::vector<double> > backToBackCompatibility(new std::vector<double>());
-//	std::auto_ptr < std::vector<double> > overlapCompatibility(new std::vector<double>());
 	std::auto_ptr < std::vector<bool> > passID(new std::vector<bool>());
 
 	//muon isolation variables
@@ -436,10 +428,6 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	iEvent.put(isTrackerMuon, prefix + "isTrackerMuon" + suffix);
 	iEvent.put(numberOfMatches, prefix + "NumberOfMatches" + suffix);
 	iEvent.put(numberOfMatchedStations, prefix + "NumberOfMatchedStations" + suffix);
-//    iEvent.put( cosmicCompatibility, prefix + "CosmicCompatibility" + suffix );
-//    iEvent.put( timeCompatibility, prefix + "TimeCompatibility" + suffix );
-//    iEvent.put( backToBackCompatibility, prefix + "BackToBackCompatibility" + suffix );
-//    iEvent.put( overlapCompatibility, prefix + "OverlapCompatibility" + suffix );
 	iEvent.put(passID, prefix + "PassID" + suffix);
 
 	//muon isolation variables

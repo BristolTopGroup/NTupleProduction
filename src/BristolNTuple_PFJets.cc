@@ -12,69 +12,64 @@
 #include <iostream>
 
 BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
-    inputTag(iConfig.getParameter<edm::InputTag> ("InputTag")),
-    prefix(iConfig.getParameter<std::string> ("Prefix")),
-    suffix(iConfig.getParameter<std::string> ("Suffix")),
-    maxSize(iConfig.getParameter<unsigned int> ("MaxSize")),
-    jecUncPath(iConfig.getParameter<std::string>("JECUncertainty")),
-    readJECuncertainty (iConfig.getParameter<bool>   ("ReadJECuncertainty")),
-    doVertexAssociation(iConfig.getParameter<bool>   ("DoVertexAssociation")),
-    vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
-{
+		inputTag(iConfig.getParameter < edm::InputTag > ("InputTag")), //
+		prefix(iConfig.getParameter < std::string > ("Prefix")), //
+		suffix(iConfig.getParameter < std::string > ("Suffix")), //
+		maxSize(iConfig.getParameter<unsigned int>("MaxSize")), //
+		jecUncPath(iConfig.getParameter < std::string > ("JECUncertainty")), //
+		readJECuncertainty(iConfig.getParameter<bool>("ReadJECuncertainty")), //
+		doVertexAssociation(iConfig.getParameter<bool>("DoVertexAssociation")), //
+		vtxInputTag(iConfig.getParameter < edm::InputTag > ("VertexInputTag")) {
 	//kinematic variables
-    produces<std::vector<double> > (prefix + "Px" + suffix);
-    produces<std::vector<double> > (prefix + "Py" + suffix);
-    produces<std::vector<double> > (prefix + "Pz" + suffix);
-    produces<std::vector<double> > (prefix + "Energy" + suffix);
-    //kinematic variables before corrections
+	produces < std::vector<double> > (prefix + "Px" + suffix);
+	produces < std::vector<double> > (prefix + "Py" + suffix);
+	produces < std::vector<double> > (prefix + "Pz" + suffix);
+	produces < std::vector<double> > (prefix + "Energy" + suffix);
+	//kinematic variables before corrections
 	produces < std::vector<double> > (prefix + "PxRAW" + suffix);
 	produces < std::vector<double> > (prefix + "PyRAW" + suffix);
 	produces < std::vector<double> > (prefix + "PzRAW" + suffix);
 	produces < std::vector<double> > (prefix + "EnergyRAW" + suffix);
 	//extra properties
-    produces<std::vector<double> > (prefix + "Charge" + suffix);
-    produces<std::vector<double> > (prefix + "Mass" + suffix);
-    produces<std::vector<int> > (prefix + "PartonFlavour" + suffix);
-    //jet energy correction and uncertainties
-    produces<std::vector<double> > (prefix + "JECUnc" + suffix);
-    produces<std::vector<double> > (prefix + "L2L3ResJEC" + suffix);
-    produces<std::vector<double> > (prefix + "L3AbsJEC" + suffix);
-    produces<std::vector<double> > (prefix + "L2RelJEC" + suffix);
-    produces<std::vector<double> > (prefix + "L1OffJEC" + suffix);
-    //jet ID variables
-    produces<std::vector<double> > (prefix + "ChargedEmEnergyFraction" + suffix);
-    produces<std::vector<double> > (prefix + "ChargedHadronEnergyFraction" + suffix);
-    produces<std::vector<double> > (prefix + "ChargedMuEnergyFraction" + suffix);
-    produces<std::vector<double> > (prefix + "ElectronEnergyFraction" + suffix);
-    produces<std::vector<double> > (prefix + "MuonEnergyFraction" + suffix);
-    produces<std::vector<double> > (prefix + "NeutralEmEnergyFraction" + suffix);
-    produces<std::vector<double> > (prefix + "NeutralHadronEnergyFraction" + suffix);
-    produces<std::vector<double> > (prefix + "PhotonEnergyFraction" + suffix);
-    produces<std::vector<int> > (prefix + "ChargedHadronMultiplicity" + suffix);
-    produces<std::vector<int> > (prefix + "ChargedMultiplicity" + suffix);
-    produces<std::vector<int> > (prefix + "ElectronMultiplicity" + suffix);
-    produces<std::vector<int> > (prefix + "MuonMultiplicity" + suffix);
-    produces<std::vector<int> > (prefix + "NeutralHadronMultiplicity" + suffix);
-    produces<std::vector<int> > (prefix + "NeutralMultiplicity" + suffix);
-    produces<std::vector<int> > (prefix + "PhotonMultiplicity" + suffix);
-    produces<std::vector<int> > (prefix + "NConstituents" + suffix);
-    produces<std::vector<double> > (prefix + "ChargedEmEnergyFractionRAW" + suffix);
-    produces<std::vector<double> > (prefix + "ChargedHadronEnergyFractionRAW" + suffix);
-    produces<std::vector<double> > (prefix + "NeutralEmEnergyFractionRAW" + suffix);
-    produces<std::vector<double> > (prefix + "NeutralHadronEnergyFractionRAW" + suffix);
-    produces<std::vector<int> > (prefix + "PassLooseID" + suffix);
-    produces<std::vector<int> > (prefix + "PassTightID" + suffix);
-    //b-tagging information
-    //names are changing between major software releases
-    produces<std::vector<double> > (prefix + "TrackCountingHighEffBTag" + suffix);
-    produces<std::vector<double> > (prefix + "TrackCountingHighPurBTag" + suffix);
-    produces<std::vector<double> > (prefix + "SimpleSecondaryVertexHighEffBTag" + suffix);
-    produces<std::vector<double> > (prefix + "SimpleSecondaryVertexHighPurBTag" + suffix);
-    produces<std::vector<double> > (prefix + "JetProbabilityBTag" + suffix);
-    produces<std::vector<double> > (prefix + "JetBProbabilityBTag" + suffix);
-
-//    produces < std::vector<double> > (prefix + "SoftElectronByIP3dBJetTag" + suffix);
-//	produces < std::vector<double> > (prefix + "SoftElectronByPtBJetTag" + suffix);
+	produces < std::vector<double> > (prefix + "Charge" + suffix);
+	produces < std::vector<double> > (prefix + "Mass" + suffix);
+	produces < std::vector<int> > (prefix + "PartonFlavour" + suffix);
+	//jet energy correction and uncertainties
+	produces < std::vector<double> > (prefix + "JECUnc" + suffix);
+	produces < std::vector<double> > (prefix + "L2L3ResJEC" + suffix);
+	produces < std::vector<double> > (prefix + "L3AbsJEC" + suffix);
+	produces < std::vector<double> > (prefix + "L2RelJEC" + suffix);
+	produces < std::vector<double> > (prefix + "L1OffJEC" + suffix);
+	//jet ID variables
+	produces < std::vector<double> > (prefix + "ChargedEmEnergyFraction" + suffix);
+	produces < std::vector<double> > (prefix + "ChargedHadronEnergyFraction" + suffix);
+	produces < std::vector<double> > (prefix + "ChargedMuEnergyFraction" + suffix);
+	produces < std::vector<double> > (prefix + "ElectronEnergyFraction" + suffix);
+	produces < std::vector<double> > (prefix + "MuonEnergyFraction" + suffix);
+	produces < std::vector<double> > (prefix + "NeutralEmEnergyFraction" + suffix);
+	produces < std::vector<double> > (prefix + "NeutralHadronEnergyFraction" + suffix);
+	produces < std::vector<double> > (prefix + "PhotonEnergyFraction" + suffix);
+	produces < std::vector<int> > (prefix + "ChargedHadronMultiplicity" + suffix);
+	produces < std::vector<int> > (prefix + "ChargedMultiplicity" + suffix);
+	produces < std::vector<int> > (prefix + "ElectronMultiplicity" + suffix);
+	produces < std::vector<int> > (prefix + "MuonMultiplicity" + suffix);
+	produces < std::vector<int> > (prefix + "NeutralHadronMultiplicity" + suffix);
+	produces < std::vector<int> > (prefix + "NeutralMultiplicity" + suffix);
+	produces < std::vector<int> > (prefix + "PhotonMultiplicity" + suffix);
+	produces < std::vector<int> > (prefix + "NConstituents" + suffix);
+	produces < std::vector<double> > (prefix + "ChargedEmEnergyFractionRAW" + suffix);
+	produces < std::vector<double> > (prefix + "ChargedHadronEnergyFractionRAW" + suffix);
+	produces < std::vector<double> > (prefix + "NeutralEmEnergyFractionRAW" + suffix);
+	produces < std::vector<double> > (prefix + "NeutralHadronEnergyFractionRAW" + suffix);
+	produces < std::vector<int> > (prefix + "PassLooseID" + suffix);
+	produces < std::vector<int> > (prefix + "PassTightID" + suffix);
+	//b-tagging information
+	produces < std::vector<double> > (prefix + "TrackCountingHighEffBTag" + suffix);
+	produces < std::vector<double> > (prefix + "TrackCountingHighPurBTag" + suffix);
+	produces < std::vector<double> > (prefix + "SimpleSecondaryVertexHighEffBTag" + suffix);
+	produces < std::vector<double> > (prefix + "SimpleSecondaryVertexHighPurBTag" + suffix);
+	produces < std::vector<double> > (prefix + "JetProbabilityBTag" + suffix);
+	produces < std::vector<double> > (prefix + "JetBProbabilityBTag" + suffix);
 
 	produces < std::vector<double> > (prefix + "SoftMuonBJetTag" + suffix);
 	produces < std::vector<double> > (prefix + "SoftMuonByIP3dBJetTag" + suffix);
@@ -83,16 +78,16 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "CombinedSecondaryVertexBJetTag" + suffix);
 
 	//jet-vertex association
-    if (doVertexAssociation) {
-        produces<std::vector<double> > (prefix + "BestVertexTrackAssociationFactor" + suffix);
-        produces<std::vector<int> > (prefix + "BestVertexTrackAssociationIndex" + suffix);
-        produces<std::vector<double> > (prefix + "ClosestVertexWeighted3DSeparation" + suffix);
-        produces<std::vector<double> > (prefix + "ClosestVertexWeightedXYSeparation" + suffix);
-        produces<std::vector<double> > (prefix + "ClosestVertexWeightedZSeparation" + suffix);
-        produces<std::vector<int> > (prefix + "ClosestVertex3DIndex" + suffix);
-        produces<std::vector<int> > (prefix + "ClosestVertexXYIndex" + suffix);
-        produces<std::vector<int> > (prefix + "ClosestVertexZIndex" + suffix);
-    }
+	if (doVertexAssociation) {
+		produces < std::vector<double> > (prefix + "BestVertexTrackAssociationFactor" + suffix);
+		produces < std::vector<int> > (prefix + "BestVertexTrackAssociationIndex" + suffix);
+		produces < std::vector<double> > (prefix + "ClosestVertexWeighted3DSeparation" + suffix);
+		produces < std::vector<double> > (prefix + "ClosestVertexWeightedXYSeparation" + suffix);
+		produces < std::vector<double> > (prefix + "ClosestVertexWeightedZSeparation" + suffix);
+		produces < std::vector<int> > (prefix + "ClosestVertex3DIndex" + suffix);
+		produces < std::vector<int> > (prefix + "ClosestVertexXYIndex" + suffix);
+		produces < std::vector<int> > (prefix + "ClosestVertexZIndex" + suffix);
+	}
 
 }
 
@@ -140,16 +135,13 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<double> > neutralHadronEnergyFractionRAW(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > passLooseID(new std::vector<int>());
 	std::auto_ptr < std::vector<int> > passTightID(new std::vector<int>());
-	 //b-tagging information
+	//b-tagging information
 	std::auto_ptr < std::vector<double> > trackCountingHighEffBTag(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > trackCountingHighPurBTag(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > simpleSecondaryVertexHighEffBTag(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > simpleSecondaryVertexHighPurBTag(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > jetProbabilityBTag(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > jetBProbabilityBTag(new std::vector<double>());
-
-//	std::auto_ptr < std::vector<double> > softElectronByIP3dBJetTags(new std::vector<double>());
-//	std::auto_ptr < std::vector<double> > softElectronByPtBJetTags(new std::vector<double>());
 
 	std::auto_ptr < std::vector<double> > softMuonBJetTag(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > softMuonByIP3dBJetTags(new std::vector<double>());
@@ -342,18 +334,17 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			l1offJEC_vec->push_back(it->correctedJet("L1FastJet").pt() / it->correctedJet("Uncorrected").pt());
 			//TODO: add absolute JEC factor:
 			/*// get a copy of the uncorrected p4
-			      reco::Candidate::LorentzVector uncorrJet = ijet->correctedP4(0);
-			      // Then get the correction (L1+L2+L3 [+L2L3 for data])
-			      jec_->setJetEta( uncorrJet.eta() );
-			      jec_->setJetPt ( uncorrJet.pt() );
-			      jec_->setJetE  ( uncorrJet.energy() );
-			      jec_->setJetA  ( ijet->jetArea() );
-			      jec_->setRho   ( *(rhoHandle.product()) );
-			      jec_->setNPV   ( pvHandle->size() );
-			      double corr = jec_->getCorrection();
-			      // Here will be the working variable for all the jet energy effects
-			      reco::Candidate::LorentzVector scaledJetP4 = uncorrJet * corr; */
-
+			 reco::Candidate::LorentzVector uncorrJet = ijet->correctedP4(0);
+			 // Then get the correction (L1+L2+L3 [+L2L3 for data])
+			 jec_->setJetEta( uncorrJet.eta() );
+			 jec_->setJetPt ( uncorrJet.pt() );
+			 jec_->setJetE  ( uncorrJet.energy() );
+			 jec_->setJetA  ( ijet->jetArea() );
+			 jec_->setRho   ( *(rhoHandle.product()) );
+			 jec_->setNPV   ( pvHandle->size() );
+			 double corr = jec_->getCorrection();
+			 // Here will be the working variable for all the jet energy effects
+			 reco::Candidate::LorentzVector scaledJetP4 = uncorrJet * corr; */
 
 			//jet ID variables
 			chargedEmEnergyFraction->push_back(it->chargedEmEnergyFraction());
