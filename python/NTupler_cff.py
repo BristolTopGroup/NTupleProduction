@@ -72,6 +72,7 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
             'keep *_rootTuplePFMET_*_*',
             'keep *_rootTuplePFType1CorrectedMET_*_*',
             'keep *_rootTuplePFType1p2CorrectedMET_*_*',
+            'keep *_rootTupleType1p2CorrectedPFMet*_*_*',
             #muons
             'keep *_nTupleMuons_*_*',
             'keep *_nTuplePFMuons_*_*',
