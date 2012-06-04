@@ -103,13 +103,20 @@ if options.use44X:
     #CERN
     #TEST_DATA_FILE = '/store/data/Run2011A/ElectronHad/AOD/08Nov2011-v1/0012/C481C0D4-1D1A-E111-8B01-E0CB4E1A1190.root'
     #TEST_MC_FILE =  '/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0003/FEE78BEE-0237-E111-9CBC-003048678F06.root'
+else:#temporary for new JEC
+    USE_JEC_FROM_DB = True
 
 maxLooseLeptonRelIso = options.maxLooseLeptonRelIso
 
 if USE_JEC_FROM_DB:
     print "Loading JEC from database"
     from BristolAnalysis.NTupleTools.custom_JEC_cff import *
-    configureCustomJEC(process, cms)
+    database = ''
+    if options.useData:
+        database = 'BristolAnalysis/NTupleTools/data/JEC/Summer12_V3_DATA.db'
+    else:
+        database = 'BristolAnalysis/NTupleTools/data/JEC/Summer12_V3_MC.db'
+    configureCustomJEC(process, cms, database)
     
 if not options.useData :
     process.source.fileNames = [

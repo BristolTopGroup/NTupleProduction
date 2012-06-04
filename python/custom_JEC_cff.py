@@ -2,8 +2,8 @@
 #
 # configure Jet Energy Corrections
 #--------------------------------------------------------------------------------
-def configureCustomJEC(process, cms):
-    database = 'sqlite_fip:Jec11_V12_20111220.db'
+def configureCustomJEC(process, cms, database = 'Jec11_V12_20111220.db'):
+    database = 'sqlite_fip:' + database
     print 'Using "%s" as JEC database' % database
     process.load("CondCore.DBCommon.CondDBCommon_cfi")
     process.jec = cms.ESSource("PoolDBESSource",
