@@ -114,9 +114,10 @@ if USE_JEC_FROM_DB:
     database = ''
     if options.useData:
         database = 'BristolAnalysis/NTupleTools/data/JEC/Summer12_V3_DATA.db'
+        configureCustomJEC_DATA(process, cms, database)
     else:
         database = 'BristolAnalysis/NTupleTools/data/JEC/Summer12_V3_MC.db'
-    configureCustomJEC(process, cms, database)
+        configureCustomJEC_MC(process, cms, database)
     
 if not options.useData :
     process.source.fileNames = [
