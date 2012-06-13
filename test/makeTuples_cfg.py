@@ -4,8 +4,8 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from PhysicsTools.PatAlgos.tools.coreTools import *
 #set up analysis
 #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions
-GLOBALTAG_DATA = 'GR_R_52_V7::All'
-GLOBALTAG_MC = 'START52_V9::All'
+GLOBALTAG_DATA = 'GR_R_52_V9::All'
+GLOBALTAG_MC = 'START52_V11::All'
 FILETAG = '52X'
 TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/ElectronHad_Run2012A_52X_PromptReco-v1_AOD.root'
 TEST_MC_FILE =  'file:///storage/TopQuarkGroup/test/DYJets_M-50_8TeV_Summer12.root'
@@ -103,8 +103,6 @@ if options.use44X:
     #CERN
     #TEST_DATA_FILE = '/store/data/Run2011A/ElectronHad/AOD/08Nov2011-v1/0012/C481C0D4-1D1A-E111-8B01-E0CB4E1A1190.root'
     #TEST_MC_FILE =  '/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0003/FEE78BEE-0237-E111-9CBC-003048678F06.root'
-else:#temporary for new JEC
-    USE_JEC_FROM_DB = True
 
 maxLooseLeptonRelIso = options.maxLooseLeptonRelIso
 
