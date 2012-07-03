@@ -8,7 +8,7 @@ from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 from RecoJets.JetProducers.GenJetParameters_cfi import *
 
 #this has to run AFTER setup_PF2PAT
-def setup_jets(process, cms, useData, postfix="PFlow"):
+def setup_jets(process, cms, options, postfix="PFlow"):
     print '=' * 60
     print "Setting up Jets"
     print '=' * 60
@@ -16,7 +16,7 @@ def setup_jets(process, cms, useData, postfix="PFlow"):
     inputJetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'])
     caloJetCorrection = ('AK5Calo', ['L1Offset' , 'L2Relative', 'L3Absolute'])
     
-    if useData :#data set up
+    if options.useData :#data set up
         inputJetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual'])
         caloJetCorrection = ('AK5Calo', ['L1Offset' , 'L2Relative', 'L3Absolute', 'L2L3Residual'])   
          
@@ -25,9 +25,13 @@ def setup_jets(process, cms, useData, postfix="PFlow"):
     print caloJetCorrection
     print 'PF Jets'
     print inputJetCorrLabel
-    
-    process.patJetCorrFactorsPFlow.payload = inputJetCorrLabel[0]
-    process.patJetCorrFactorsPFlow.levels = inputJetCorrLabel[1]
+
+    if options.use44X:
+        process.patJetCorrFactorsPFlow.payload = inputJetCorrLabel[0]
+        process.patJetCorrFactorsPFlow.levels = inputJetCorrLabel[1]
+        process.patJetCorrFactorsPFlow.rho = cms.InputTag("kt6PFJets", "rho")
+
+    #lots of stuff down here is obsolete for 52x - need to clean up
     
     ###############################
     ########## Gen Setup ##########
@@ -111,7 +115,8 @@ def setup_jets(process, cms, useData, postfix="PFlow"):
                  )
 
 
-    process.patJetCorrFactorsCA8PF.rho = cms.InputTag("kt6PFJetsPFlow", "rho")
+    if options.use44X:
+        process.patJetCorrFactorsCA8PF.rho = cms.InputTag("kt6PFJetsPFlow", "rho")
     
     ###############################
     ### TagInfo and Matching Setup#
@@ -121,7 +126,7 @@ def setup_jets(process, cms, useData, postfix="PFlow"):
     for jetcoll in (process.patJetsPFlow,
                     process.patJetsCA8PF
                     ) :
-        if useData == False :
+        if options.useData == False :
             jetcoll.embedGenJetMatch = True
             jetcoll.getJetMCFlavour = True
             jetcoll.addGenPartonMatch = True

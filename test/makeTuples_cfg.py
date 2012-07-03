@@ -4,10 +4,10 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from PhysicsTools.PatAlgos.tools.coreTools import *
 #set up analysis
 #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions
-GLOBALTAG_DATA = 'GR_R_52_V9::All'
-GLOBALTAG_MC = 'START52_V11::All'
+GLOBALTAG_DATA = 'GR_R_52_V9D::All'
+GLOBALTAG_MC = 'START52_V11C::All'
 FILETAG = '52X'
-TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/ElectronHad_Run2012A_52X_PromptReco-v1_AOD.root'
+TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/SingleElectron_Run2012B_196531_524_PromptReco-v1_AOD.root'
 TEST_MC_FILE =  'file:///storage/TopQuarkGroup/test/DYJets_M-50_8TeV_Summer12.root'
 #CERN
 #TEST_DATA_FILE = '/store/data/Run2012A/ElectronHad/AOD/PromptReco-v1/000/193/336/C47F154E-A697-E111-83F5-001D09F24D8A.root'
@@ -49,6 +49,12 @@ options.register ('writeFat',
                   VarParsing.multiplicity.singleton,
                   VarParsing.varType.bool,
                   "Calo Jets and leptons")
+
+options.register ('useGSFelectrons',
+                  False,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.bool,
+                  "Use GSF instead of PF electrons in PAT")
 
 options.register ('writeIsolatedPFLeptons',
                   False,
@@ -157,10 +163,10 @@ process.EventFilters = setup_eventfilters(process, cms, options)
 #PF2PAT
 from BristolAnalysis.NTupleTools.PF2PAT_Setup_cff import *
 setup_PF2PAT(process, cms, options, postfix=postfix, removeTausFromJetCollection=removeTausFromJetCollection)
-setup_looseLeptons(process, cms, postfix=postfix, maxLooseLeptonRelIso=maxLooseLeptonRelIso)
+setup_looseLeptons(process, cms, options, postfix=postfix, maxLooseLeptonRelIso=maxLooseLeptonRelIso)
 #Jets
 from BristolAnalysis.NTupleTools.Jets_Setup_cff import *
-setup_jets(process, cms, options.useData, postfix=postfix)
+setup_jets(process, cms, options, postfix=postfix)
 #electron ID
 from BristolAnalysis.NTupleTools.ElectronID_cff import *
 setup_electronID(process, cms)
@@ -170,6 +176,9 @@ selectObjects(process, cms)
 
 from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
 runMEtUncertainties(process, doSmearJets=not options.useData, jetCollection='goodPatJetsPFlow',addToPatDefaultSequence = False)
+
+#fix for loose pfIsolatedMuons for the newer tags
+process.patMuonsLoosePFlow.pfMuonSource = cms.InputTag("pfIsolatedMuonsLoosePFlow")
 
 # turn to false when running on data
 if options.useData :
@@ -225,7 +234,9 @@ process.p0 = cms.Path(
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
                       process.patseq * 
-                      process.producePatPFMETCorrections *
+#                      process.producePatPFMETCorrections *
+                      getattr(process,"producePatPFMETCorrections"+postfix) *
+                      getattr(process,"patMETs"+postfix) *
                       process.printEventContent *
                       process.rootNTuples
                       )
