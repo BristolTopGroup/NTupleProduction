@@ -139,18 +139,18 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
         process.rootTuplePFMetUnclusteredEnUp +
         process.rootTuplePFMetUnclusteredEnDown +
         #Type 1 MET uncertainties
-        process.rootTupleType1pCorrectedPFMetElectronEnUp +
-        process.rootTupleType1pCorrectedPFMetElectronEnDown +
-        process.rootTupleType1pCorrectedPFMetMuonEnUp +
-        process.rootTupleType1pCorrectedPFMetMuonEnDown +
-        process.rootTupleType1pCorrectedPFMetTauEnUp +
-        process.rootTupleType1pCorrectedPFMetTauEnDown +
-        process.rootTupleType1pCorrectedPFMetJetResUp +
-        process.rootTupleType1pCorrectedPFMetJetResDown +
-        process.rootTupleType1pCorrectedPFMetJetEnUp +
-        process.rootTupleType1pCorrectedPFMetJetEnDown +
-        process.rootTupleType1pCorrectedPFMetUnclusteredEnUp +
-        process.rootTupleType1pCorrectedPFMetUnclusteredEnDown +
+        process.rootTupleType1CorrectedPFMetElectronEnUp +
+        process.rootTupleType1CorrectedPFMetElectronEnDown +
+        process.rootTupleType1CorrectedPFMetMuonEnUp +
+        process.rootTupleType1CorrectedPFMetMuonEnDown +
+        process.rootTupleType1CorrectedPFMetTauEnUp +
+        process.rootTupleType1CorrectedPFMetTauEnDown +
+        process.rootTupleType1CorrectedPFMetJetResUp +
+        process.rootTupleType1CorrectedPFMetJetResDown +
+        process.rootTupleType1CorrectedPFMetJetEnUp +
+        process.rootTupleType1CorrectedPFMetJetEnDown +
+        process.rootTupleType1CorrectedPFMetUnclusteredEnUp +
+        process.rootTupleType1CorrectedPFMetUnclusteredEnDown +
         #Type 1 + 2 MET uncertainties
         process.rootTupleType1p2CorrectedPFMetElectronEnUp +
         process.rootTupleType1p2CorrectedPFMetElectronEnDown +
@@ -186,8 +186,8 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
         process.rootNTuples.remove(process.rootTupleGenMETTrue)
         process.rootNTuples.remove(process.rootTuplePFMetJetResUp)
         process.rootNTuples.remove(process.rootTuplePFMetJetResDown)
-        process.rootNTuples.remove(process.rootTupleType1pCorrectedPFMetJetResUp)
-        process.rootNTuples.remove(process.rootTupleType1pCorrectedPFMetJetResDown)
+        process.rootNTuples.remove(process.rootTupleType1CorrectedPFMetJetResUp)
+        process.rootNTuples.remove(process.rootTupleType1CorrectedPFMetJetResDown)
         process.rootNTuples.remove(process.rootTupleType1p2CorrectedPFMetJetResUp)
         process.rootNTuples.remove(process.rootTupleType1p2CorrectedPFMetJetResDown)
         

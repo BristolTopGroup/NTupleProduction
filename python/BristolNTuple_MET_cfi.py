@@ -98,75 +98,75 @@ rootTuplePFMetUnclusteredEnDown = cms.EDProducer("BristolNTuple_MET",
     Suffix=cms.string(''),
  )
 #Type I MET uncertainties
-rootTupleType1pCorrectedPFMetElectronEnUp = cms.EDProducer("BristolNTuple_MET",
-    InputTag=cms.InputTag('patType1pCorrectedPFMetElectronEnUp'),
-    Prefix=cms.string('patType1pCorrectedPFMetElectronEnUp.'),
+rootTupleType1CorrectedPFMetElectronEnUp = cms.EDProducer("BristolNTuple_MET",
+    InputTag=cms.InputTag('patType1CorrectedPFMetElectronEnUp'),
+    Prefix=cms.string('patType1CorrectedPFMetElectronEnUp.'),
     Suffix=cms.string(''),
  )
 
-rootTupleType1pCorrectedPFMetElectronEnDown = cms.EDProducer("BristolNTuple_MET",
-    InputTag=cms.InputTag('patType1pCorrectedPFMetElectronEnDown'),
-    Prefix=cms.string('patType1pCorrectedPFMetElectronEnDown.'),
+rootTupleType1CorrectedPFMetElectronEnDown = cms.EDProducer("BristolNTuple_MET",
+    InputTag=cms.InputTag('patType1CorrectedPFMetElectronEnDown'),
+    Prefix=cms.string('patType1CorrectedPFMetElectronEnDown.'),
     Suffix=cms.string(''),
  )
 
-rootTupleType1pCorrectedPFMetMuonEnUp = cms.EDProducer("BristolNTuple_MET",
-    InputTag=cms.InputTag('patType1pCorrectedPFMetMuonEnUp'),
-    Prefix=cms.string('patType1pCorrectedPFMetMuonEnUp.'),
+rootTupleType1CorrectedPFMetMuonEnUp = cms.EDProducer("BristolNTuple_MET",
+    InputTag=cms.InputTag('patType1CorrectedPFMetMuonEnUp'),
+    Prefix=cms.string('patType1CorrectedPFMetMuonEnUp.'),
     Suffix=cms.string(''),
  )
 
-rootTupleType1pCorrectedPFMetMuonEnDown = cms.EDProducer("BristolNTuple_MET",
-    InputTag=cms.InputTag('patType1pCorrectedPFMetMuonEnDown'),
-    Prefix=cms.string('patType1pCorrectedPFMetMuonEnDown.'),
+rootTupleType1CorrectedPFMetMuonEnDown = cms.EDProducer("BristolNTuple_MET",
+    InputTag=cms.InputTag('patType1CorrectedPFMetMuonEnDown'),
+    Prefix=cms.string('patType1CorrectedPFMetMuonEnDown.'),
     Suffix=cms.string(''),
  )
 
-rootTupleType1pCorrectedPFMetTauEnUp = cms.EDProducer("BristolNTuple_MET",
-    InputTag=cms.InputTag('patType1pCorrectedPFMetTauEnUp'),
-    Prefix=cms.string('patType1pCorrectedPFMetTauEnUp.'),
+rootTupleType1CorrectedPFMetTauEnUp = cms.EDProducer("BristolNTuple_MET",
+    InputTag=cms.InputTag('patType1CorrectedPFMetTauEnUp'),
+    Prefix=cms.string('patType1CorrectedPFMetTauEnUp.'),
     Suffix=cms.string(''),
  )
 
-rootTupleType1pCorrectedPFMetTauEnDown = cms.EDProducer("BristolNTuple_MET",
-    InputTag=cms.InputTag('patType1pCorrectedPFMetTauEnDown'),
-    Prefix=cms.string('patType1pCorrectedPFMetTauEnDown.'),
+rootTupleType1CorrectedPFMetTauEnDown = cms.EDProducer("BristolNTuple_MET",
+    InputTag=cms.InputTag('patType1CorrectedPFMetTauEnDown'),
+    Prefix=cms.string('patType1CorrectedPFMetTauEnDown.'),
     Suffix=cms.string(''),
  )
 
-rootTupleType1pCorrectedPFMetJetResUp = cms.EDProducer("BristolNTuple_MET",
-    InputTag=cms.InputTag('patType1pCorrectedPFMetJetResUp'),
-    Prefix=cms.string('patType1pCorrectedPFMetJetResUp.'),
+rootTupleType1CorrectedPFMetJetResUp = cms.EDProducer("BristolNTuple_MET",
+    InputTag=cms.InputTag('patType1CorrectedPFMetJetResUp'),
+    Prefix=cms.string('patType1CorrectedPFMetJetResUp.'),
     Suffix=cms.string(''),
  )
 
-rootTupleType1pCorrectedPFMetJetResDown = cms.EDProducer("BristolNTuple_MET",
-    InputTag=cms.InputTag('patType1pCorrectedPFMetJetResDown'),
-    Prefix=cms.string('patType1pCorrectedPFMetJetResDown.'),
+rootTupleType1CorrectedPFMetJetResDown = cms.EDProducer("BristolNTuple_MET",
+    InputTag=cms.InputTag('patType1CorrectedPFMetJetResDown'),
+    Prefix=cms.string('patType1CorrectedPFMetJetResDown.'),
     Suffix=cms.string(''),
  )
 
-rootTupleType1pCorrectedPFMetJetEnUp = cms.EDProducer("BristolNTuple_MET",
-    InputTag=cms.InputTag('patType1pCorrectedPFMetJetEnUp'),
-    Prefix=cms.string('patType1pCorrectedPFMetJetEnUp.'),
+rootTupleType1CorrectedPFMetJetEnUp = cms.EDProducer("BristolNTuple_MET",
+    InputTag=cms.InputTag('patType1CorrectedPFMetJetEnUp'),
+    Prefix=cms.string('patType1CorrectedPFMetJetEnUp.'),
     Suffix=cms.string(''),
  )
 
-rootTupleType1pCorrectedPFMetJetEnDown = cms.EDProducer("BristolNTuple_MET",
-    InputTag=cms.InputTag('patType1pCorrectedPFMetJetEnDown'),
-    Prefix=cms.string('patType1pCorrectedPFMetJetEnDown.'),
+rootTupleType1CorrectedPFMetJetEnDown = cms.EDProducer("BristolNTuple_MET",
+    InputTag=cms.InputTag('patType1CorrectedPFMetJetEnDown'),
+    Prefix=cms.string('patType1CorrectedPFMetJetEnDown.'),
     Suffix=cms.string(''),
  )
 
-rootTupleType1pCorrectedPFMetUnclusteredEnUp = cms.EDProducer("BristolNTuple_MET",
-    InputTag=cms.InputTag('patType1pCorrectedPFMetUnclusteredEnUp'),
-    Prefix=cms.string('patType1pCorrectedPFMetUnclusteredEnUp.'),
+rootTupleType1CorrectedPFMetUnclusteredEnUp = cms.EDProducer("BristolNTuple_MET",
+    InputTag=cms.InputTag('patType1CorrectedPFMetUnclusteredEnUp'),
+    Prefix=cms.string('patType1CorrectedPFMetUnclusteredEnUp.'),
     Suffix=cms.string(''),
  )
 
-rootTupleType1pCorrectedPFMetUnclusteredEnDown = cms.EDProducer("BristolNTuple_MET",
-    InputTag=cms.InputTag('patType1pCorrectedPFMetUnclusteredEnDown'),
-    Prefix=cms.string('patType1pCorrectedPFMetUnclusteredEnDown.'),
+rootTupleType1CorrectedPFMetUnclusteredEnDown = cms.EDProducer("BristolNTuple_MET",
+    InputTag=cms.InputTag('patType1CorrectedPFMetUnclusteredEnDown'),
+    Prefix=cms.string('patType1CorrectedPFMetUnclusteredEnDown.'),
     Suffix=cms.string(''),
  )
 #Type 1 + 2 MET uncertainties
