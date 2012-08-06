@@ -10,15 +10,15 @@ BristolNTuple_GenMET::BristolNTuple_GenMET(const edm::ParameterSet& iConfig) :
     prefix  (iConfig.getParameter<std::string>  ("Prefix")),
     suffix  (iConfig.getParameter<std::string>  ("Suffix"))
 {
-    produces <std::vector<double> > ( prefix + "Ex" + suffix );
-    produces <std::vector<double> > ( prefix + "Ey" + suffix );
+    produces <double> ( prefix + "Ex" + suffix );
+    produces <double> ( prefix + "Ey" + suffix );
 }
 
 void BristolNTuple_GenMET::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-    std::auto_ptr < std::vector<double> > px(new std::vector<double>());
-    std::auto_ptr < std::vector<double> > py(new std::vector<double>());
+    std::auto_ptr <double> px(new double());
+    std::auto_ptr <double> py(new double());
 
     //-----------------------------------------------------------------
     if (!iEvent.isRealData()) {
@@ -27,13 +27,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
         if (mets.isValid()) {
             edm::LogInfo("BristolNTuple_GenMETExtraInfo") << "Total # GenMETs: " << mets->size();
-
-            for (reco::GenMETCollection::const_iterator it = mets->begin(); it != mets->end(); ++it) {
-
-                // fill in all the vectors
-                px->push_back(it->px());
-                py->push_back(it->py());
-            }
+            reco::GenMET met(mets->at(0));
+            *px = met.px();
+            *py = met.py();
+//            for (reco::GenMETCollection::const_iterator it = mets->begin(); it != mets->end(); ++it) {
+//
+//                // fill in all the vectors
+//                px->push_back(it->px());
+//                py->push_back(it->py());
+//            }
         } else {
             edm::LogError("BristolNTuple_GenMETExtraError") << "Error! Can't get the product " << inputTag;
         }

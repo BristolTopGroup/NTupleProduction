@@ -57,7 +57,7 @@ options.register ('useGSFelectrons',
                   "Use GSF instead of PF electrons in PAT")
 
 options.register ('writeIsolatedPFLeptons',
-                  False,
+                  True,
                   VarParsing.multiplicity.singleton,
                   VarParsing.varType.bool,
                   "Output isolated PF leptons")

@@ -72,6 +72,8 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
             'keep *_rootTuplePFMET_*_*',
             'keep *_rootTuplePFType1CorrectedMET_*_*',
             'keep *_rootTuplePFType1p2CorrectedMET_*_*',
+            'keep *_rootTuplePFMet*_*_*',
+            'keep *_rootTupleType1CorrectedPFMet*_*_*',
             'keep *_rootTupleType1p2CorrectedPFMet*_*_*',
             #muons
             'keep *_nTupleMuons_*_*',
@@ -123,6 +125,33 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
         process.rootTuplePFMET + 
         process.rootTuplePFType1CorrectedMET +
         process.rootTuplePFType1p2CorrectedMET +
+        #MET uncertainties
+        process.rootTuplePFMetElectronEnUp +
+        process.rootTuplePFMetElectronEnDown +
+        process.rootTuplePFMetMuonEnUp +
+        process.rootTuplePFMetMuonEnDown +
+        process.rootTuplePFMetTauEnUp +
+        process.rootTuplePFMetTauEnDown +
+        process.rootTuplePFMetJetResUp +
+        process.rootTuplePFMetJetResDown +
+        process.rootTuplePFMetJetEnUp +
+        process.rootTuplePFMetJetEnDown +
+        process.rootTuplePFMetUnclusteredEnUp +
+        process.rootTuplePFMetUnclusteredEnDown +
+        #Type 1 MET uncertainties
+        process.rootTupleType1pCorrectedPFMetElectronEnUp +
+        process.rootTupleType1pCorrectedPFMetElectronEnDown +
+        process.rootTupleType1pCorrectedPFMetMuonEnUp +
+        process.rootTupleType1pCorrectedPFMetMuonEnDown +
+        process.rootTupleType1pCorrectedPFMetTauEnUp +
+        process.rootTupleType1pCorrectedPFMetTauEnDown +
+        process.rootTupleType1pCorrectedPFMetJetResUp +
+        process.rootTupleType1pCorrectedPFMetJetResDown +
+        process.rootTupleType1pCorrectedPFMetJetEnUp +
+        process.rootTupleType1pCorrectedPFMetJetEnDown +
+        process.rootTupleType1pCorrectedPFMetUnclusteredEnUp +
+        process.rootTupleType1pCorrectedPFMetUnclusteredEnDown +
+        #Type 1 + 2 MET uncertainties
         process.rootTupleType1p2CorrectedPFMetElectronEnUp +
         process.rootTupleType1p2CorrectedPFMetElectronEnDown +
         process.rootTupleType1p2CorrectedPFMetMuonEnUp +
@@ -155,6 +184,10 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
         process.rootNTuples.remove(process.rootTupleGenParticles)
         process.rootNTuples.remove(process.rootTupleGenJetSequence)
         process.rootNTuples.remove(process.rootTupleGenMETTrue)
+        process.rootNTuples.remove(process.rootTuplePFMetJetResUp)
+        process.rootNTuples.remove(process.rootTuplePFMetJetResDown)
+        process.rootNTuples.remove(process.rootTupleType1pCorrectedPFMetJetResUp)
+        process.rootNTuples.remove(process.rootTupleType1pCorrectedPFMetJetResDown)
         process.rootNTuples.remove(process.rootTupleType1p2CorrectedPFMetJetResUp)
         process.rootNTuples.remove(process.rootTupleType1p2CorrectedPFMetJetResDown)
         
