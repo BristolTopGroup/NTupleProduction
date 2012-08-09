@@ -105,8 +105,11 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     'HLT_Ele25_CaloIdVT_TrkIdT_TriCentralPFNoPUJet30_30_20_v',
     'HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30_30_20_v',
     'HLT_Mu17_eta2p1_TriCentralPFNoPUJet30_30_20_v',
-    
-    
+    #new for 2011 SingleMu analysis
+    'HLT_IsoMu24_v',
+    'HLT_IsoMu24_eta2p1_v',
+    'HLT_IsoMu30_v'
+    'HLT_IsoMu30_eta2p1_v',
  ),                              
     HLTPathsOfInterest_Other = cms.vstring(
                                            #2010 data RunA + RunB
