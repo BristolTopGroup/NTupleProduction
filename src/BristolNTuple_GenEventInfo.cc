@@ -16,7 +16,7 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 			dataPileUpFile_(iConfig.getParameter<std::string> ("dataPileUpFile")), //
 			lumiWeightOneX_(), //
 			lumiWeight3X_(), //
-			lumiWeight3D_(),//
+			//lumiWeight3D_(),//
 			PShiftUp_(iConfig.getParameter<double> ("PossionShiftUp")), //
 			PShiftDown_(iConfig.getParameter<double> ("PossionShiftDown"))//
 {
@@ -24,7 +24,6 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 	produces<double> (prefix_ + "PtHat" + suffix_);
 	produces<double> (prefix_ + "PUWeightInTimeOnly" + suffix_);
 	produces<double> (prefix_ + "PUWeight3BX" + suffix_);
-	produces<double> (prefix_ + "PUWeight3D" + suffix_);
 	produces<double> (prefix_ + "PUWeightShiftUp" + suffix_);
 	produces<double> (prefix_ + "PUWeightShiftDown" + suffix_);
 	produces<std::vector<double> > (prefix_ + "PDFWeights" + suffix_);
@@ -43,7 +42,6 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	std::auto_ptr<double> ptHat(new double());
 	std::auto_ptr<double> PUWeightInTimeOnly(new double());
 	std::auto_ptr<double> PUWeight3BX(new double());
-	std::auto_ptr<double> PUWeight3D(new double());
 	std::auto_ptr<double> PUWeightShiftUp(new double());
 	std::auto_ptr<double> PUWeightShiftDown(new double());
 	std::auto_ptr<std::vector<double> > pdfWeights(new std::vector<double>());
@@ -57,7 +55,6 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	*ptHat.get() = 0.;
 	*PUWeightInTimeOnly.get() = 0.;
 	*PUWeight3BX.get() = 0.;
-	*PUWeight3D.get() = 0.;
 	*PUWeightShiftUp.get() = 0.;
 	*PUWeightShiftDown.get() = 0.;
 
@@ -126,7 +123,6 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 		edm::EventBase* iEventB = dynamic_cast<edm::EventBase*> (&iEvent);
 		*PUWeightInTimeOnly.get() = lumiWeightOneX_.weight(*iEventB);
 		*PUWeight3BX.get() = lumiWeight3X_.weightOOT(*iEventB);
-		*PUWeight3D.get() = lumiWeight3D_.weight3D((*iEventB));
 		*PUWeightShiftUp.get() = PShiftUp_.ShiftWeight(npv0);
 		*PUWeightShiftDown.get() = PShiftDown_.ShiftWeight(npv0);
 	}
@@ -136,7 +132,6 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	iEvent.put(ptHat, prefix_ + "PtHat" + suffix_);
 	iEvent.put(PUWeightInTimeOnly, prefix_ + "PUWeightInTimeOnly" + suffix_);
 	iEvent.put(PUWeight3BX, prefix_ + "PUWeight3BX" + suffix_);
-	iEvent.put(PUWeight3D, prefix_ + "PUWeight3D" + suffix_);
 	iEvent.put(PUWeightShiftUp, prefix_ + "PUWeightShiftUp" + suffix_);
 	iEvent.put(PUWeightShiftDown, prefix_ + "PUWeightShiftDown" + suffix_);
 	iEvent.put(pdfWeights, prefix_ + "PDFWeights" + suffix_);
@@ -185,9 +180,5 @@ void BristolNTuple_GenEventInfo::initLumiWeights() {
 
 	lumiWeightOneX_ = edm::LumiReWeighting(mcDistr1BX, dataDistr1BX);
 	lumiWeight3X_ = edm::LumiReWeighting(mcDistr, dataDistr);
-	lumiWeight3D_ = edm::Lumi3DReWeighting(mcDistr, dataDistr);
-
-	lumiWeight3D_.weight3D_init(1);
 
 }
-

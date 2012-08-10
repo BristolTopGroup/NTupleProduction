@@ -5,7 +5,6 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
-#include "PhysicsTools/Utilities/interface/Lumi3DReWeighting.h"
 #include <boost/array.hpp>
 
 class BristolNTuple_GenEventInfo: public edm::EDProducer {
@@ -22,7 +21,6 @@ private:
 	const std::string prefix_, suffix_, dataPileUpFile_;
 	edm::LumiReWeighting lumiWeightOneX_;//different MC input for in-time
 	edm::LumiReWeighting lumiWeight3X_;//different MC input for average pile-up
-	edm::Lumi3DReWeighting lumiWeight3D_;// 3D reweighting is using average pile-up input
 	reweight::PoissonMeanShifter PShiftUp_;
 	reweight::PoissonMeanShifter PShiftDown_;
 
