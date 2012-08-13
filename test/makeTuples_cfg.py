@@ -231,8 +231,15 @@ process.hlTrigReport = cms.EDAnalyzer("HLTrigReport",
 
 
 process.printEventContent = cms.EDAnalyzer("EventContentAnalyzer")
+process.pdfWeights = cms.EDProducer("PdfWeightProducer",
+                                    PdfInfoTag = cms.untracked.InputTag("generator"),
+                                    PdfSetNames = cms.untracked.vstring(
+                                         "cteq66.LHgrid", # 44 members
+                                         )
+                                    )
 
 process.p0 = cms.Path(
+                      process.pdfWeights *
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
                       process.patseq * 
@@ -245,6 +252,8 @@ process.p0 = cms.Path(
 
 if not options.printEventContent:
     process.p0.remove(process.printEventContent)
+if options.useData:
+    process.p0.remove(process.pdfWeights)
 
 process.out.SelectEvents.SelectEvents = cms.vstring('p0')
 
