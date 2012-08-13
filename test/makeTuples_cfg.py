@@ -8,7 +8,7 @@ GLOBALTAG_DATA = 'GR_R_52_V9D::All'
 GLOBALTAG_MC = 'START52_V11C::All'
 FILETAG = '52X'
 TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/SingleElectron_Run2012B_196531_524_PromptReco-v1_AOD.root'
-TEST_MC_FILE =  'file:///storage/TopQuarkGroup/test/DYJets_M-50_8TeV_Summer12.root'
+TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/DYJets_M-50_8TeV_Summer12.root'
 #CERN
 #TEST_DATA_FILE = '/store/data/Run2012A/ElectronHad/AOD/PromptReco-v1/000/193/336/C47F154E-A697-E111-83F5-001D09F24D8A.root'
 #TEST_MC_FILE =  '/store/mc/Summer12/TTJets_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S7_START52_V5-v1/0000/FEC0CBA1-5A81-E111-8D3A-0018F3D0968E.root'
@@ -147,13 +147,13 @@ else :
 from PhysicsTools.SelectorUtils.pvSelector_cfi import pvSelector
     
 process.goodOfflinePrimaryVertices = cms.EDFilter(
-  "PrimaryVertexObjectFilter", 
+  "PrimaryVertexObjectFilter",
   filterParams=cms.PSet(
-                        minNdof=cms.double(4.), 
-                        maxZ=cms.double(24.), 
+                        minNdof=cms.double(4.),
+                        maxZ=cms.double(24.),
                         maxRho=cms.double(2.)
-                        ), 
-  filter=cms.bool(True), 
+                        ),
+  filter=cms.bool(True),
   src=cms.InputTag('offlinePrimaryVertices')
 )
 
@@ -175,10 +175,12 @@ from BristolAnalysis.NTupleTools.ObjectSelection_cff import *
 selectObjects(process, cms)
 
 from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
-runMEtUncertainties(process, doSmearJets=not options.useData, jetCollection='goodPatJetsPFlow',addToPatDefaultSequence = False)
+runMEtUncertainties(process, doSmearJets=not options.useData, jetCollection='goodPatJetsPFlow', addToPatDefaultSequence=False)
 
 #fix for loose pfIsolatedMuons for the newer tags
-process.patMuonsLoosePFlow.pfMuonSource = cms.InputTag("pfIsolatedMuonsLoosePFlow")
+process.patMuonsLoosePFlow.pfMuonSource = cms.InputTag("pfIsolatedMuonsLoose" + postfix)
+#fix for loose pfIsolatedElectrons for the newer tags
+process.patElectronsLoosePFlow.pfElectronSource = cms.InputTag("pfIsolatedElectronsLoose" + postfix)
 
 # turn to false when running on data
 if options.useData :
@@ -195,8 +197,8 @@ process.patseq = cms.Sequence(
     process.patDefaultSequence * 
     process.goodPatJets * 
     process.goodPatJetsPFlow * 
-    process.metUncertaintySequence *
-    process.EventFilters *
+    process.metUncertaintySequence * 
+    process.EventFilters * 
     process.goodPatJetsCA8PF * 
     process.flavorHistorySeq# * 
     )
@@ -235,9 +237,9 @@ process.p0 = cms.Path(
                       process.egammaIDLikelihood * 
                       process.patseq * 
 #                      process.producePatPFMETCorrections *
-                      getattr(process,"producePatPFMETCorrections"+postfix) *
-                      getattr(process,"patMETs"+postfix) *
-                      process.printEventContent *
+                      getattr(process, "producePatPFMETCorrections" + postfix) * 
+                      getattr(process, "patMETs" + postfix) * 
+                      process.printEventContent * 
                       process.rootNTuples
                       )
 
