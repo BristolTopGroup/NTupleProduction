@@ -1,0 +1,27 @@
+crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/DYJetsToLL_TuneZ2_M-50_7TeV_madgraph_tauola_Fall11_LeptonPlus3JetsSkim.cfg
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/GJets_TuneZ2_HT-40To100_7TeV_madgraph_Fall11_LeptonPlus3JetsSkim.cfg &> gjets_40to100.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/GJets_TuneZ2_HT-100To200_7TeV_madgraph_Fall11_LeptonPlus3JetsSkim.cfg &> gjets_100to200.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/GJets_TuneZ2_HT-200_7TeV_madgraph_Fall11_LeptonPlus3JetsSkim.cfg &> gjets_200.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/QCD_20to30_BCtoE_TuneZ2_7TeV_pythia6_Fall11_LeptonPlus3JetsSkim.cfg &> qcd_20to30_bcetoe.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/QCD_20to30_EMEnriched_TuneZ2_7TeV_pythia6_Fall11_LeptonPlus3JetsSkim.cfg &> qcd_20to30_EM.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/QCD_30to80_BCtoE_TuneZ2_7TeV_pythia6_Fall11_LeptonPlus3JetsSkim.cfg &> qcd_30to70_bcetoe.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/QCD_30to80_EMEnriched_TuneZ2_7TeV_pythia6_Fall11_LeptonPlus3JetsSkim.cfg &> qcd_30to80_EM.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/QCD_80to170_BCtoE_TuneZ2_7TeV_pythia6_Fall11_LeptonPlus3JetsSkim.cfg &> qcd_80to170_bcetoe.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/QCD_80to170_EMEnriched_TuneZ2_7TeV_pythia6_Fall11_LeptonPlus3JetsSkim.cfg &> qcd_80to170_EM.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/QCD_Pt-20_MuEnrichedPt-15_TuneZ2_7TeV_pythia6_Fall11_LeptonPlus3JetsSkim.cfg &> qcd_mu.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/T_TuneZ2_s-channel_7TeV_powheg-tauola_Fall11_LeptonPlus3JetsSkim.cfg &> singleT_s.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/T_TuneZ2_t-channel_7TeV_-powheg-tauola_Fall11_LeptonPlus3JetsSkim.cfg &> singleT_t.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/T_TuneZ2_tW-channel-DR_7TeV-powheg-tauola_Fall11_LeptonPlus3JetsSkim.cfg &> singleT_tW.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/Tbar_TuneZ2_s-channel_7TeV_powheg-tauola_Fall11_LeptonPlus3JetsSkim.cfg &> singleTbar_s.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/Tbar_TuneZ2_t-channel_7TeV_-powheg-tauola_Fall11_LeptonPlus3JetsSkim.cfg &> singleTbar_t.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/Tbar_TuneZ2_tW-channel-DR_7TeV-powheg-tauola_Fall11_LeptonPlus3JetsSkim.cfg &> singleTbar_tW.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/TTbarInclWIncl_TuneZ2_7TeV_madgraph_tauola_Fall11_LeptonPlus3JetsSkim.cfg &> ttbarW.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/TTbarZIncl_TuneZ2_7TeV_madgraph_tauola_Fall11_LeptonPlus3JetsSkim.cfg &> ttbarZ.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/TTJets_TuneZ2_7TeV_madgraph_tauola_Fall11_LeptonPlus3JetsSkim.cfg &> ttbar.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/W1Jet_TuneZ2_7TeV_madgraph_tauola_Fall11_LeptonPlus3JetsSkim.cfg  &> w1jet.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/W2Jets_TuneZ2_7TeV_madgraph_tauola_Fall11_LeptonPlus3JetsSkim.cfg  &> w2jet.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/W3Jets_TuneZ2_7TeV_madgraph_tauola_Fall11_LeptonPlus3JetsSkim.cfg  &> w3jet.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/W4Jets_TuneZ2_7TeV_madgraph_tauola_Fall11_LeptonPlus3JetsSkim.cfg  &> w4jet.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/WW_TuneZ2_7TeV-pythia6-tauola_Fall11_LeptonPlus3JetsSkim.cfg &> ww.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/WZ_TuneZ2_7TeV-pythia6-tauola_Fall11_LeptonPlus3JetsSkim.cfg &> wz.log &
+nohup crab -create -cfg BristolAnalysis/NTupleTools/Configuration/defaultMC_Fall11/ZZ_TuneZ2_7TeV-pythia6-tauola_Fall11_LeptonPlus3JetsSkim.cfg &> zz.log &
