@@ -239,11 +239,10 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
                                     )
 
 process.p0 = cms.Path(
-                      process.pdfWeights *
+		      process.pdfWeights *
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
                       process.patseq * 
-#                      process.producePatPFMETCorrections *
                       getattr(process, "producePatPFMETCorrections" + postfix) * 
                       getattr(process, "patMETs" + postfix) * 
                       process.printEventContent * 
