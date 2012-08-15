@@ -22,7 +22,6 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
     #selection on GenParticles
     process.rootTupleGenParticles.minPt = cms.double(-1)
     process.rootTupleGenParticles.maxAbsoluteEta = cms.double(100)
-    
     #GSF Electrons
     process.rootTupleElectrons.InputTag = cms.InputTag('selectedPatElectrons')
     process.rootTupleElectrons.Prefix = cms.string('selectedPatElectrons.')
@@ -32,7 +31,6 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
     #non-isolated PF electrons
     process.rootTuplePFLooseElectrons.InputTag = cms.InputTag('selectedPatElectronsLoosePFlow')
     process.rootTuplePFLooseElectrons.Prefix = cms.string('selectedPatElectronsLoosePFlow.')
-    
     #muons
     process.nTupleMuons.InputTag = cms.InputTag('selectedPatMuons')
     process.nTupleMuons.Prefix = cms.string('selectedPatMuons.')
@@ -50,6 +48,8 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
     process.rootTuplePhotons.Prefix = cms.string('patPhotons.')
     #trigger
     process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults', '', options.hltProcess)
+    #GEN event
+    process.rootTupleGenEventInfo.StorePDFWeights = cms.bool(options.storePDFWeights)
     
     process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         outputCommands=cms.untracked.vstring(

@@ -104,6 +104,18 @@ def setup_trackingFailureFilter(process, cms):
     trackingFailureFilter.VertexSource          = cms.InputTag('goodOfflinePrimaryVertices')
     trackingFailureFilter.taggingMode = cms.bool(True)
     return trackingFailureFilter
+
+def setup_eeBadScFilter(process, cms):
+    from RecoMET.METFilters.eeBadScFilter_cfi import eeBadScFilter
+    eeBadScFilter.taggingMode = cms.bool (True)
+    return eeBadScFilter
+
+def setup_ecalLaserCorrFilter(process, cms):
+    from SandBox.Skims.ecalLaserCorrFilter_cfi import ecalLaserCorrFilter
+    ecalLaserCorrFilter.TaggingMode = cms.bool (True)
+    ecalLaserCorrFilter.Debug = cms.bool (False)
+    return ecalLaserCorrFilter
+
     
 def setup_skim(process, cms, options):
     print '=' * 60

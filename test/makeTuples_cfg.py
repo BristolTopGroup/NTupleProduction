@@ -97,6 +97,11 @@ options.register ('use44X',
                   VarParsing.multiplicity.singleton,
                   VarParsing.varType.bool,
                   "Will use set-up for CMSSW 44X if true")
+options.register ('storePDFWeights',
+                  False,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.bool,
+                  "Will store the PDF weights from cteq6.6")
 
 options.parseArguments()
 
@@ -239,7 +244,7 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
                                     )
 
 process.p0 = cms.Path(
-		      process.pdfWeights *
+                      process.pdfWeights *
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
                       process.patseq * 
@@ -251,7 +256,7 @@ process.p0 = cms.Path(
 
 if not options.printEventContent:
     process.p0.remove(process.printEventContent)
-if options.useData:
+if options.useData or not options.storePDFWeights:
     process.p0.remove(process.pdfWeights)
 
 process.out.SelectEvents.SelectEvents = cms.vstring('p0')
