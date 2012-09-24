@@ -15,5 +15,4 @@
 <use name="JetMETCorrections/Objects"/>
 <use name="PhysicsTools/Utilities"/>
 <use name="lhapdf"/>
-<flags EDM_PLUGIN="1"/>
 
