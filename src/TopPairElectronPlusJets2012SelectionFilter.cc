@@ -66,7 +66,7 @@ TopPairElectronPlusJets2012SelectionFilter::TopPairElectronPlusJets2012Selection
 	}
 	produces<bool>(prefix_ + "FullSelection");
 	produces<unsigned int>(prefix_ + "NumberOfBtags");
-	//produces < pat::JetCollection > (prefix_ + "cleanedJets");
+	produces < pat::JetCollection > (prefix_ + "cleanedJets");
 }
 
 void TopPairElectronPlusJets2012SelectionFilter::fillDescriptions(edm::ConfigurationDescriptions & descriptions) {
@@ -109,7 +109,7 @@ bool TopPairElectronPlusJets2012SelectionFilter::filter(edm::Event& iEvent, cons
 	setupEventContent(iEvent);
 	unsigned int numberOfBtags(cleanedBJets_.size());
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfBtags)), prefix_ + "NumberOfBtags");
-	//iEvent.put(std::auto_ptr < pat::JetCollection > (*cleanedJets_), prefix_ + "cleanedJets");
+	std::auto_ptr <pat::JetCollection> jetoutput(new pat::JetCollection());
 	bool passesSelection(true);
 
 	for (unsigned int step = 0; step < TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
@@ -125,6 +125,9 @@ bool TopPairElectronPlusJets2012SelectionFilter::filter(edm::Event& iEvent, cons
 		iEvent.put(passesStep, prefix_ + TTbarEPlusJetsReferenceSelection::StringSteps[step]);
 	}
 	iEvent.put(std::auto_ptr<bool>(new bool(passesSelection)), prefix_ + "FullSelection");
+	for (unsigned int index = 0; index < cleanedJets_.size(); ++index)
+		jetoutput->push_back(cleanedJets_.at(index));
+	iEvent.put(jetoutput, prefix_ + "cleanedJets");
 
 	return taggingMode_ || passesSelection;
 }
@@ -498,4 +501,3 @@ bool TopPairElectronPlusJets2012SelectionFilter::beginRun(edm::Run& iRun, const 
 
 //define this as a plug-in
 DEFINE_FWK_MODULE (TopPairElectronPlusJets2012SelectionFilter);
-
