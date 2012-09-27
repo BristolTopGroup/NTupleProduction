@@ -5,6 +5,10 @@
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/GsfTrackReco/interface/GsfTrackFwd.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Utilities/interface/InputTag.h"
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
 
 reco::TrackRef pmcTrack(const pat::Muon& mu, int & refit_id );
 
@@ -36,5 +40,10 @@ double validFraction ( const T & track ) {
   return valid/(1.0*(valid+lost+lostIn+lostOut));
   
 }
+
+bool passesFilter(const edm::Event& event, const edm::InputTag filter);
+
+bool triggerFired(const std::string& triggerWildCard, const HLTConfigProvider& hltConfig, const edm::TriggerResults& triggerResults);
+unsigned int findTrigger(const std::string& triggerWildCard, const HLTConfigProvider& hltConfig);
 
 #endif 
