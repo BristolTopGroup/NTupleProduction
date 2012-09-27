@@ -45,10 +45,10 @@ TopPairElectronPlusJets2012SelectionFilter::TopPairElectronPlusJets2012Selection
 		debug_(iConfig.getUntrackedParameter<bool>("debug")), //
 		taggingMode_(iConfig.getUntrackedParameter<bool>("taggingMode")), //
 		passes_(), //
-		runNumber_(0),//
-		isRealData_(false),//
-hasSignalElectron_(false),//
-rho_(0),//
+		runNumber_(0), //
+		isRealData_(false), //
+		hasSignalElectron_(false), //
+		rho_(0), //
 		jets_(), //,
 		cleanedJets_(), //
 		cleanedBJets_(), //
@@ -57,9 +57,9 @@ rho_(0),//
 		looseElectrons_(), //
 		muons_(), //
 		looseMuons_(), //
-		signalElectron_(),//
-hltConfig_(),//
-triggerResults_() {
+		signalElectron_(), //
+		hltConfig_(), //
+		triggerResults_() {
 	for (unsigned int step = 0; step < TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
 		passes_.at(step) = 0;
 		produces<bool>(prefix_ + TTbarEPlusJetsReferenceSelection::StringSteps[step]);
@@ -107,7 +107,7 @@ TopPairElectronPlusJets2012SelectionFilter::~TopPairElectronPlusJets2012Selectio
 
 bool TopPairElectronPlusJets2012SelectionFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	setupEventContent(iEvent);
-   	unsigned int numberOfBtags(cleanedBJets_.size());
+	unsigned int numberOfBtags(cleanedBJets_.size());
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfBtags)), prefix_ + "NumberOfBtags");
 	//iEvent.put(std::auto_ptr < pat::JetCollection > (*cleanedJets_), prefix_ + "cleanedJets");
 	bool passesSelection(true);
@@ -138,7 +138,7 @@ void TopPairElectronPlusJets2012SelectionFilter::setupEventContent(edm::Event& i
 
 	edm::Handle<double> rhoH;
 	iEvent.getByLabel(edm::InputTag("kt6PFJets", "rho"), rhoH);
-        rho_ = *rhoH.product();
+	rho_ = *rhoH.product();
 
 	edm::Handle < pat::JetCollection > jets;
 	iEvent.getByLabel(jetInput_, jets);
@@ -152,18 +152,18 @@ void TopPairElectronPlusJets2012SelectionFilter::setupEventContent(edm::Event& i
 	iEvent.getByLabel(muonInput_, muons);
 	muons_ = *muons;
 
-getLooseElectrons();
-getLooseMuons();
+	getLooseElectrons();
+	getLooseMuons();
 	//this is the correct order: goodIsolatedElectrons, signalElectron, cleanedJets, cleanedBJets
-goodIsolatedElectrons();
-hasSignalElectron_ = goodIsolatedElectrons_.size() > 0;
+	goodIsolatedElectrons();
+	hasSignalElectron_ = goodIsolatedElectrons_.size() > 0;
 
 	signalElectron_ = goodIsolatedElectrons_.front();
-cleanedJets();
-cleanedBJets();
+	cleanedJets();
+	cleanedBJets();
 }
 
-void TopPairElectronPlusJets2012SelectionFilter::getLooseElectrons(){
+void TopPairElectronPlusJets2012SelectionFilter::getLooseElectrons() {
 	looseElectrons_.clear();
 
 	for (unsigned index = 0; index < electrons_.size(); ++index) {
@@ -232,7 +232,7 @@ double TopPairElectronPlusJets2012SelectionFilter::getRelativeIsolation(const pa
 }
 
 void TopPairElectronPlusJets2012SelectionFilter::getLooseMuons() {
-looseMuons_.clear();
+	looseMuons_.clear();
 
 	for (unsigned index = 0; index < muons_.size(); ++index) {
 		const pat::Muon muon = muons_.at(index);
@@ -267,7 +267,7 @@ double TopPairElectronPlusJets2012SelectionFilter::getRelativeIsolation(const pa
 }
 
 void TopPairElectronPlusJets2012SelectionFilter::goodIsolatedElectrons() {
-goodIsolatedElectrons_.clear();
+	goodIsolatedElectrons_.clear();
 	for (unsigned index = 0; index < electrons_.size(); ++index) {
 		const pat::Electron electron = electrons_.at(index);
 		if (debug_) {
@@ -291,7 +291,7 @@ bool TopPairElectronPlusJets2012SelectionFilter::isGoodElectron(const pat::Elect
 }
 
 void TopPairElectronPlusJets2012SelectionFilter::cleanedJets() {
-cleanedJets_.clear();
+	cleanedJets_.clear();
 	for (unsigned index = 0; index < jets_.size(); ++index) {
 		const pat::Jet jet = jets_.at(index);
 		if (!isGoodJet(jet))
@@ -307,7 +307,7 @@ cleanedJets_.clear();
 }
 
 void TopPairElectronPlusJets2012SelectionFilter::cleanedBJets() {
-cleanedBJets_.clear();
+	cleanedBJets_.clear();
 	for (unsigned index = 0; index < cleanedJets_.size(); ++index) {
 		const pat::Jet jet = cleanedJets_.at(index);
 		if (jet.bDiscriminator("combinedSecondaryVertexBJetTags") > 0.679)
@@ -321,7 +321,8 @@ bool TopPairElectronPlusJets2012SelectionFilter::isGoodJet(const pat::Jet& jet) 
 	return passesPtAndEta;
 }
 
-bool TopPairElectronPlusJets2012SelectionFilter::passesSelectionStep(edm::Event& iEvent, unsigned int selectionStep) const {
+bool TopPairElectronPlusJets2012SelectionFilter::passesSelectionStep(edm::Event& iEvent,
+		unsigned int selectionStep) const {
 	TTbarEPlusJetsReferenceSelection::Step step = TTbarEPlusJetsReferenceSelection::Step(selectionStep);
 	switch (step) {
 	case TTbarEPlusJetsReferenceSelection::EventCleaningAndTrigger:
@@ -360,17 +361,17 @@ bool TopPairElectronPlusJets2012SelectionFilter::passesEventCleaning(edm::Event&
 		return false;
 
 	// Good Primary Vertex Part - goodness done at PAT selection level
-	if (!passesFilter(iEvent,goodOfflinePrimaryVerticesFilter_))
+	if (!passesFilter(iEvent, goodOfflinePrimaryVerticesFilter_))
 		return false;
 
 	bool passesMETFilters(true);
 	if (useMETFilters_) {
-		passesMETFilters = passesMETFilters && passesFilter(iEvent,hcalNoiseInput_);
-		passesMETFilters = passesMETFilters && passesFilter(iEvent,hcalLaserFilterInput_);
-		passesMETFilters = passesMETFilters && passesFilter(iEvent,ecalDeadCellFilterInput_);
-		passesMETFilters = passesMETFilters && passesFilter(iEvent,trackingFailureFilter_);
+		passesMETFilters = passesMETFilters && passesFilter(iEvent, hcalNoiseInput_);
+		passesMETFilters = passesMETFilters && passesFilter(iEvent, hcalLaserFilterInput_);
+		passesMETFilters = passesMETFilters && passesFilter(iEvent, ecalDeadCellFilterInput_);
+		passesMETFilters = passesMETFilters && passesFilter(iEvent, trackingFailureFilter_);
 		if (useEEBadScFilter_)
-			passesMETFilters = passesMETFilters && passesFilter(iEvent,eeBadScFilter_);
+			passesMETFilters = passesMETFilters && passesFilter(iEvent, eeBadScFilter_);
 
 		//beam halo ID
 		bool cscTightID(false);
@@ -429,10 +430,10 @@ bool TopPairElectronPlusJets2012SelectionFilter::passesDileptonVeto() const {
 }
 
 bool TopPairElectronPlusJets2012SelectionFilter::passesConversionVeto() const {
-	if(hasSignalElectron_)
-	return signalElectron_.passConversionVeto()
-			&& signalElectron_.gsfTrack()->trackerExpectedHitsInner().numberOfHits() < 1;
-return false;
+	if (hasSignalElectron_)
+		return signalElectron_.passConversionVeto()
+				&& signalElectron_.gsfTrack()->trackerExpectedHitsInner().numberOfHits() < 1;
+	return false;
 
 }
 
@@ -492,7 +493,7 @@ bool TopPairElectronPlusJets2012SelectionFilter::beginRun(edm::Run& iRun, const 
 				<< "Error! HLT config extraction with process name " << hltInputTag_.process() << " failed";
 		// In this case, all access methods will return empty values!
 	}
-return true;
+	return true;
 }
 
 //define this as a plug-in

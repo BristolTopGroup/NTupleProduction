@@ -10,13 +10,10 @@
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 
-reco::TrackRef pmcTrack(const pat::Muon& mu, int & refit_id );
+reco::TrackRef pmcTrack(const pat::Muon& mu, int & refit_id);
 
-reco::TrackRef tevOptimized(const reco::TrackRef& trackerTrack,
-			    const reco::TrackRef& gmrTrack,
-			    const reco::TrackRef& fmsTrack,
-			    const reco::TrackRef& pmrTrack,
-			    int & refit_id );
+reco::TrackRef tevOptimized(const reco::TrackRef& trackerTrack, const reco::TrackRef& gmrTrack,
+		const reco::TrackRef& fmsTrack, const reco::TrackRef& pmrTrack, int & refit_id);
 
 //------------------------------------------------------------------
 // The code below does the work of TrackBase::validFraction()
@@ -26,24 +23,27 @@ reco::TrackRef tevOptimized(const reco::TrackRef& trackerTrack,
 //     use TrackBase::validFraction(), not this function
 //------------------------------------------------------------------
 
-template < class T > 
-double validFraction ( const T & track ) { 
-  
-  if ( track.isNull() ) return -2 ;
+template<class T>
+double validFraction(const T & track) {
 
-  int valid   = track->hitPattern().numberOfValidTrackerHits();
-  int lost    = track->hitPattern().numberOfLostTrackerHits ();
-  int lostIn  = track->trackerExpectedHitsInner().numberOfLostTrackerHits();
-  int lostOut = track->trackerExpectedHitsOuter().numberOfLostTrackerHits();
- 
-  if ((valid+lost+lostIn+lostOut)==0) return -1;
-  return valid/(1.0*(valid+lost+lostIn+lostOut));
-  
+	if (track.isNull())
+		return -2;
+
+	int valid = track->hitPattern().numberOfValidTrackerHits();
+	int lost = track->hitPattern().numberOfLostTrackerHits();
+	int lostIn = track->trackerExpectedHitsInner().numberOfLostTrackerHits();
+	int lostOut = track->trackerExpectedHitsOuter().numberOfLostTrackerHits();
+
+	if ((valid + lost + lostIn + lostOut) == 0)
+		return -1;
+	return valid / (1.0 * (valid + lost + lostIn + lostOut));
+
 }
 
 bool passesFilter(const edm::Event& event, const edm::InputTag filter);
 
-bool triggerFired(const std::string& triggerWildCard, const HLTConfigProvider& hltConfig, const edm::TriggerResults& triggerResults);
+bool triggerFired(const std::string& triggerWildCard, const HLTConfigProvider& hltConfig,
+		const edm::TriggerResults& triggerResults);
 unsigned int findTrigger(const std::string& triggerWildCard, const HLTConfigProvider& hltConfig);
 
 #endif 
