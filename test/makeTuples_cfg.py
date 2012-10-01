@@ -10,8 +10,8 @@ FILETAG = '52X'
 TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/SingleElectron_Run2012B_196531_524_PromptReco-v1_AOD.root'
 TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/DYJets_M-50_8TeV_Summer12.root'
 #CERN
-#TEST_DATA_FILE = '/store/data/Run2012A/ElectronHad/AOD/PromptReco-v1/000/193/336/C47F154E-A697-E111-83F5-001D09F24D8A.root'
-#TEST_MC_FILE =  '/store/mc/Summer12/TTJets_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S7_START52_V5-v1/0000/FEC0CBA1-5A81-E111-8D3A-0018F3D0968E.root'
+TEST_DATA_FILE = '/store/data/Run2012A/ElectronHad/AOD/PromptReco-v1/000/193/336/C47F154E-A697-E111-83F5-001D09F24D8A.root'
+TEST_MC_FILE = '/store/mc/Summer12/TTJets_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S7_START52_V9-v1/0000/FEDDBC6A-9290-E111-B7FD-0018F3D09628.root'
 
 #use jet energy correction from database (loaded from BristolAnalysis/NTupleTools/python_custom_JEC_cff.py)
 #==False -> use JEC from Global Tag 
@@ -254,14 +254,14 @@ process.makingNTuples = cms.Path(
                       process.rootNTuples
                       )
 
-process.unfoldingAnalysis = cms.Path(
-                      process.pdfWeights *
-                      process.hlTrigReport * 
-                      process.egammaIDLikelihood * 
-                      process.patseq * 
-                      getattr(process, "producePatPFMETCorrections" + postfix) * 
-                      getattr(process, "patMETs" + postfix) 
-                      )
+#process.unfoldingAnalysis = cms.Path(
+#                      process.pdfWeights *
+#                      process.hlTrigReport * 
+#                      process.egammaIDLikelihood * 
+#                      process.patseq * 
+#                      getattr(process, "producePatPFMETCorrections" + postfix) * 
+#                      getattr(process, "patMETs" + postfix) 
+#                      )
 
 if not options.printEventContent:
     process.makingNTuples.remove(process.printEventContent)
