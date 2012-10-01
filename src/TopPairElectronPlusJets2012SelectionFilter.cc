@@ -365,14 +365,14 @@ bool TopPairElectronPlusJets2012SelectionFilter::passesEventCleaning(edm::Event&
 	// Good Primary Vertex Part - goodness done at PAT selection level
 	bool passesPrimaryVertexRequirement(false);
 	edm::Handle < reco::VertexCollection > primaryVertices;
-	event.getByLabel(VertexInput_, primaryVertices);
+	iEvent.getByLabel(VertexInput_, primaryVertices);
 	if (primaryVertices.isValid()) {
 		int nVertices = primaryVertices->size();
 		edm::LogInfo("TopPairElectronPlusJets2012SelectionFilter") << "Total # Primary Vertices: " << nVertices;
 		if (nVertices > 0)
 			passesPrimaryVertexRequirement = true;
 	} else
-		edm::LogError("EventFilterError") << "Error! Can't get the product " << vertexInput_;
+		edm::LogError("EventFilterError") << "Error! Can't get the product " << VertexInput_;
 	if (!passesPrimaryVertexRequirement)
 		return false;
 
