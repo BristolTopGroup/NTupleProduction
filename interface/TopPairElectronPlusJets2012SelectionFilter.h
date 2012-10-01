@@ -94,7 +94,7 @@ private:
 	virtual void setupEventContent(edm::Event& iEvent);
 
 	//config
-	edm::InputTag jetInput_, electronInput_, muonInput_, hltInputTag_, goodOfflinePrimaryVerticesFilter_,
+	edm::InputTag jetInput_, electronInput_, muonInput_, hltInputTag_, VertexInput_,
 			scrapingFilter_, hcalNoiseInput_;
 	edm::InputTag hcalLaserFilterInput_, ecalDeadCellFilterInput_, trackingFailureFilter_, eeBadScFilter_;
 

@@ -23,7 +23,7 @@ TopPairElectronPlusJets2012SelectionFilter::TopPairElectronPlusJets2012Selection
 		electronInput_(iConfig.getParameter < edm::InputTag > ("electronInput")), //
 		muonInput_(iConfig.getParameter < edm::InputTag > ("muonInput")), //
 		hltInputTag_(iConfig.getParameter < edm::InputTag > ("HLTInput")), //
-		goodOfflinePrimaryVerticesFilter_(iConfig.getParameter < edm::InputTag > ("goodOfflinePrimaryVerticesFilter")), //
+		VertexInput_(iConfig.getParameter < edm::InputTag > ("goodOfflinePrimaryVerticesFilter")), //
 		scrapingFilter_(iConfig.getParameter < edm::InputTag > ("scrapingFilter")), //
 		hcalNoiseInput_(iConfig.getParameter < edm::InputTag > ("HcalNoiseInput")), //
 		hcalLaserFilterInput_(iConfig.getParameter < edm::InputTag > ("HCALLaserFilterInput")), //
@@ -75,8 +75,8 @@ void TopPairElectronPlusJets2012SelectionFilter::fillDescriptions(edm::Configura
 	desc.add < InputTag > ("electronInput");
 	desc.add < InputTag > ("muonInput");
 	desc.add < InputTag > ("HLTInput");
-	desc.add < InputTag > ("goodOfflinePrimaryVerticesFilter");
-	desc.add < InputTag > ("scrapingFilter");
+	desc.add < InputTag > ("VertexInput");
+	desc.add < InputTag > ("scrapingFilterInput");
 	desc.add < InputTag > ("HcalNoiseInput");
 	desc.add < InputTag > ("HCALLaserFilterInput");
 	desc.add < InputTag > ("ECALDeadCellFilterInput");
@@ -95,7 +95,7 @@ void TopPairElectronPlusJets2012SelectionFilter::fillDescriptions(edm::Configura
 	desc.add<bool>("useMETFilters", false);
 	desc.add<bool>("useEEBadScFilter", false);
 
-	desc.addUntracked < std::string > ("prefix", "TopPairElectronPlusJets2012Selection.passes");
+	desc.addUntracked < std::string > ("prefix", "TopPairElectronPlusJets2012Selection.");
 	desc.addUntracked<bool>("debug", false);
 	desc.addUntracked<bool>("taggingMode", false);
 	descriptions.add("applyTopPairElectronPlusJets2012Selection", desc);
@@ -109,7 +109,7 @@ bool TopPairElectronPlusJets2012SelectionFilter::filter(edm::Event& iEvent, cons
 	setupEventContent(iEvent);
 	unsigned int numberOfBtags(cleanedBJets_.size());
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfBtags)), prefix_ + "NumberOfBtags");
-	std::auto_ptr <pat::JetCollection> jetoutput(new pat::JetCollection());
+	std::auto_ptr < pat::JetCollection > jetoutput(new pat::JetCollection());
 	bool passesSelection(true);
 
 	for (unsigned int step = 0; step < TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
@@ -320,7 +320,7 @@ void TopPairElectronPlusJets2012SelectionFilter::cleanedBJets() {
 
 bool TopPairElectronPlusJets2012SelectionFilter::isGoodJet(const pat::Jet& jet) const {
 	//both cuts are done at PAT config level (selectedPATJets) this is just for safety
-	bool passesPtAndEta(jet.pt() > 20. && fabs(jet.eta() < 2.4));
+	bool passesPtAndEta(jet.pt() > 20. && fabs(jet.eta() < 2.5));
 	return passesPtAndEta;
 }
 
@@ -358,13 +358,22 @@ bool TopPairElectronPlusJets2012SelectionFilter::passesSelectionStep(edm::Event&
 }
 
 bool TopPairElectronPlusJets2012SelectionFilter::passesEventCleaning(edm::Event& iEvent) const {
-
 	// Scraping veto
 	if (!passesFilter(iEvent, scrapingFilter_))
 		return false;
 
 	// Good Primary Vertex Part - goodness done at PAT selection level
-	if (!passesFilter(iEvent, goodOfflinePrimaryVerticesFilter_))
+	bool passesPrimaryVertexRequirement(false);
+	edm::Handle < reco::VertexCollection > primaryVertices;
+	event.getByLabel(VertexInput_, primaryVertices);
+	if (primaryVertices.isValid()) {
+		int nVertices = primaryVertices->size();
+		edm::LogInfo("TopPairElectronPlusJets2012SelectionFilter") << "Total # Primary Vertices: " << nVertices;
+		if (nVertices > 0)
+			passesPrimaryVertexRequirement = true;
+	} else
+		edm::LogError("EventFilterError") << "Error! Can't get the product " << vertexInput_;
+	if (!passesPrimaryVertexRequirement)
 		return false;
 
 	bool passesMETFilters(true);
@@ -387,6 +396,7 @@ bool TopPairElectronPlusJets2012SelectionFilter::passesEventCleaning(edm::Event&
 		} else
 			edm::LogError("TopPairElectronPlusJets2012SelectionFilter_Error")
 					<< "Error! Can't get the product BeamHaloSummary";
+		//passes MET filters and is not BeamHalo
 		passesMETFilters = passesMETFilters && !cscTightID;
 	}
 

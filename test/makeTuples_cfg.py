@@ -243,7 +243,7 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
                                          )
                                     )
 
-process.p0 = cms.Path(
+process.makingNTuples = cms.Path(
                       process.pdfWeights *
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
@@ -254,12 +254,21 @@ process.p0 = cms.Path(
                       process.rootNTuples
                       )
 
-if not options.printEventContent:
-    process.p0.remove(process.printEventContent)
-if options.useData or not options.storePDFWeights:
-    process.p0.remove(process.pdfWeights)
+process.unfoldingAnalysis = cms.Path(
+                      process.pdfWeights *
+                      process.hlTrigReport * 
+                      process.egammaIDLikelihood * 
+                      process.patseq * 
+                      getattr(process, "producePatPFMETCorrections" + postfix) * 
+                      getattr(process, "patMETs" + postfix) 
+                      )
 
-process.out.SelectEvents.SelectEvents = cms.vstring('p0')
+if not options.printEventContent:
+    process.makingNTuples.remove(process.printEventContent)
+if options.useData or not options.storePDFWeights:
+    process.makingNTuples.remove(process.pdfWeights)
+
+process.out.SelectEvents.SelectEvents = cms.vstring('makingNTuples')
 
 
 process.TFileService = cms.Service("TFileService",
