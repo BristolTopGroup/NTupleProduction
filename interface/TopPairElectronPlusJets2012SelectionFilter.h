@@ -19,6 +19,7 @@
 
 namespace TTbarEPlusJetsReferenceSelection {
 enum Step {
+	AllEvents,
 	EventCleaningAndTrigger,
 	OneIsolatedElectron,
 	LooseMuonVeto,
@@ -34,6 +35,7 @@ enum Step {
 };
 
 const std::string StringSteps[NUMBER_OF_SELECTION_STEPS] = { //
+		"AllEvents",//
 		"EventCleaningAndTrigger", //
 				"OneIsolatedElectron", //
 				"LooseMuonVeto", //

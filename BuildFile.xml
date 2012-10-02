@@ -16,3 +16,8 @@
 <use name="PhysicsTools/Utilities"/>
 <use name="lhapdf"/>
 
+<export>
+   <lib name="BristolAnalysisNTupleTools"/>
+   <use name="FWCore/MessageLogger"/>
+   <use name="root"/>
+</export>

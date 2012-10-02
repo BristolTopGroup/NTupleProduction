@@ -1,0 +1,15 @@
+<use name="CondCore/PluginSystem"/>
+<use name="DataFormats/PatCandidates"/>
+<use name="FWCore/ServiceRegistry"/>
+<use name="FWCore/MessageLogger"/>
+<use name="FWCore/ParameterSet"/>
+<use name="FWCore/Framework"/>
+<use name="FWCore/Utilities"/>
+<use name="PhysicsTools/PatUtils"/>
+<use name="BristolAnalysis/NTupleTools"/>
+<use name="SimDataFormats/GeneratorProducts"/>
+<use name="root"/>
+
+<library file="*.cc" name="BristolAnalysisNTupleToolsPlugins">
+  <flags EDM_PLUGIN="1"/>
+</library>

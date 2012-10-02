@@ -328,6 +328,8 @@ bool TopPairElectronPlusJets2012SelectionFilter::passesSelectionStep(edm::Event&
 		unsigned int selectionStep) const {
 	TTbarEPlusJetsReferenceSelection::Step step = TTbarEPlusJetsReferenceSelection::Step(selectionStep);
 	switch (step) {
+	case TTbarEPlusJetsReferenceSelection::AllEvents:
+		return true;
 	case TTbarEPlusJetsReferenceSelection::EventCleaningAndTrigger:
 		return passesEventCleaning(iEvent) && passesTriggerSelection();
 	case TTbarEPlusJetsReferenceSelection::OneIsolatedElectron:
