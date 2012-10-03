@@ -32,7 +32,7 @@ def setup_UnfoldingAnalysis(process, cms, options):
     process.eventWeightPU.MCSampleFile = cms.FileInPath("TopAnalysis/TopUtils/data/MC_PUDist_Default2011.root")
     #process.eventWeightPU.MCSampleFile = cms.FileInPath("TopAnalysis/TopUtils/data/MC_PUDist_Summer2012.root")
     process.eventWeightPU.MCSampleHistoName = cms.string("histo_Fall11_true")
-    process.eventWeightPU.DataFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp_2011_truth_finebin.root")
+    process.eventWeightPU.DataFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/PileUp_2011_truth_finebin.root")
     process.eventWeightPU.DataHistoName = cms.string("pileup")
     process.eventWeightPU.CreateWeight3DHisto = cms.bool(False)
     process.eventWeightPU.Weight3DHistoFile = cms.FileInPath("Weight3D_Fall11.root")
@@ -48,8 +48,8 @@ def setup_UnfoldingAnalysis(process, cms, options):
     process.unfoldingAnalysisSequence = cms.Sequence(process.eventFiltersIntaggingMode*
                                                      process.eventWeightBtag*
                                                      process.eventWeightPU*
-                                                     unfoldingAnalyserElectronChannel*
-                                                     unfoldingAnalyserMuonChannel)
+                                                     process.unfoldingAnalyserElectronChannel*
+                                                     process.unfoldingAnalyserMuonChannel)
     
     
     
