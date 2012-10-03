@@ -5,7 +5,7 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJets2012SelectionFi
     jetInput=cms.InputTag("selectedPatJetsPFlow"),
     electronInput=cms.InputTag("selectedPatElectronsLoosePFlow"),
     muonInput=cms.InputTag("selectedPatMuonsLoosePFlow"),
-    HLTInputTag=cms.InputTag('TriggerResults', '', 'HLT'),
+    HLTInput=cms.InputTag('TriggerResults', '', 'HLT'),
     VertexInput=cms.InputTag('goodOfflinePrimaryVertices'),
     #event cleaning filters
     scrapingFilterInput=cms.InputTag('scrapingFilter'),
