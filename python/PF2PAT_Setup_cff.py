@@ -19,7 +19,7 @@ def setup_PF2PAT(process, cms, options, postfix="PFlow", removeTausFromJetCollec
     # Separate configs for 44X and 52X (as per different JEC prescriptions)
     # see https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections
     process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
-    if options.use44X:
+    if options.CMSSW == '44X':
         usePF2PAT(process, runPF2PAT=True, jetAlgo='AK5', runOnMC=not options.useData, postfix=postfix, typeIMetCorrections=False)
         process.pfPileUpPFlow.Enable = True
         process.pfPileUpPFlow.Vertices = vertexCollection

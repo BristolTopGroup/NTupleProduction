@@ -4,14 +4,15 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from PhysicsTools.PatAlgos.tools.coreTools import *
 #set up analysis
 #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions
-GLOBALTAG_DATA = 'GR_R_52_V9D::All'
-GLOBALTAG_MC = 'START52_V11C::All'
-FILETAG = '52X'
+GLOBALTAG_DATA = 'FT_R_53_V6C::All' #2012 A and B: data re-reco with CMSSW_5_3_3_patch1
+# GLOBALTAG_DATA = 'FT_R_53_V10:All' #2012 C v1: data re-reco with CMSSW_5_3_2_patch4
+GLOBALTAG_MC = 'START53_V11::All'
+FILETAG = '53X'
 TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/SingleElectron_Run2012B_196531_524_PromptReco-v1_AOD.root'
-TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/DYJets_M-50_8TeV_Summer12.root'
+TEST_MC_FILE = 'file:///storage/TopQuarkGroup/mc/8TeV/SynchEx/Summer12_DR53X_TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_AODSIM_PU_S10_START53_V7A-v1.root'
 #CERN
 TEST_DATA_FILE = '/store/data/Run2012A/ElectronHad/AOD/PromptReco-v1/000/193/336/C47F154E-A697-E111-83F5-001D09F24D8A.root'
-TEST_MC_FILE = '/store/mc/Summer12/TTJets_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S7_START52_V9-v1/0000/FEDDBC6A-9290-E111-B7FD-0018F3D09628.root'
+TEST_MC_FILE = 'file:///afs/cern.ch/user/s/senkin/workspace/public/Summer12_DR53X_TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_AODSIM_PU_S10_START53_V7A-v1.root'
 
 #use jet energy correction from database (loaded from BristolAnalysis/NTupleTools/python_custom_JEC_cff.py)
 #==False -> use JEC from Global Tag 
@@ -92,11 +93,12 @@ options.register ('printEventContent',
                   VarParsing.varType.bool,
                   "Outputs the event content at the end of the path")
 
-options.register ('use44X',
-                  False,
+options.register ('CMSSW',
+                  '53X',
                   VarParsing.multiplicity.singleton,
-                  VarParsing.varType.bool,
-                  "Will use set-up for CMSSW 44X if true")
+                  VarParsing.varType.string,
+                  "CMSSW version used: 53X (default), 52X or 44X")
+
 options.register ('storePDFWeights',
                   False,
                   VarParsing.multiplicity.singleton,
@@ -105,7 +107,7 @@ options.register ('storePDFWeights',
 
 options.parseArguments()
 
-if options.use44X:
+if options.CMSSW == '44X':
     GLOBALTAG_DATA = 'GR_R_44_V15::All'
     GLOBALTAG_MC = 'START44_V13::All'
     FILETAG = '44X'
@@ -114,6 +116,16 @@ if options.use44X:
     #CERN
     #TEST_DATA_FILE = '/store/data/Run2011A/ElectronHad/AOD/08Nov2011-v1/0012/C481C0D4-1D1A-E111-8B01-E0CB4E1A1190.root'
     #TEST_MC_FILE =  '/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0003/FEE78BEE-0237-E111-9CBC-003048678F06.root'
+
+if options.CMSSW == '52X':
+    GLOBALTAG_DATA = 'GR_R_52_V9D::All'
+    GLOBALTAG_MC = 'START52_V11C::All'
+    FILETAG = '52X'
+    TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/SingleElectron_Run2012B_196531_524_PromptReco-v1_AOD.root'
+    TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/DYJets_M-50_8TeV_Summer12.root'
+    #CERN
+    TEST_DATA_FILE = '/store/data/Run2012A/ElectronHad/AOD/PromptReco-v1/000/193/336/C47F154E-A697-E111-83F5-001D09F24D8A.root'
+    TEST_MC_FILE = '/store/mc/Summer12/TTJets_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S7_START52_V9-v1/0000/FEDDBC6A-9290-E111-B7FD-0018F3D09628.root'
 
 maxLooseLeptonRelIso = options.maxLooseLeptonRelIso
 

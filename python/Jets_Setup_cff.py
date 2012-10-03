@@ -26,7 +26,7 @@ def setup_jets(process, cms, options, postfix="PFlow"):
     print 'PF Jets'
     print inputJetCorrLabel
 
-    if options.use44X:
+    if options.CMSSW == '44X':
         process.patJetCorrFactorsPFlow.payload = inputJetCorrLabel[0]
         process.patJetCorrFactorsPFlow.levels = inputJetCorrLabel[1]
         process.patJetCorrFactorsPFlow.rho = cms.InputTag("kt6PFJets", "rho")
@@ -115,7 +115,7 @@ def setup_jets(process, cms, options, postfix="PFlow"):
                  )
 
 
-    if options.use44X:
+    if options.CMSSW == '44X':
         process.patJetCorrFactorsCA8PF.rho = cms.InputTag("kt6PFJetsPFlow", "rho")
     
     ###############################

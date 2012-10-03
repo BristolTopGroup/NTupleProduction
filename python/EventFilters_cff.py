@@ -54,7 +54,12 @@ def setup_HBHENoiseFilter(process, cms):
         minNumIsolatedNoiseChannels=cms.int32(9999),
         minIsolatedNoiseSumE=cms.double(9999),
         minIsolatedNoiseSumEt=cms.double(9999),
-        useTS4TS5=cms.bool(True)
+        useTS4TS5=cms.bool(True),
+        #these additional parameters were introduced for 53X configuration - should technically be still alright for older CMSSW versions
+        IgnoreTS4TS5ifJetInLowBVRegion=cms.bool(False),
+        jetlabel = cms.InputTag('ak5PFJets'),
+        maxjetindex = cms.int32(0), # maximum jet index that will be checked for 'IgnoreTS4TS5ifJetInLowBVRegion'
+        maxNHF = cms.double(0.9) # maximum allowed jet->neutralHadronEnergyFraction()
         )
     return HBHENoiseFilterResultProducer
     
