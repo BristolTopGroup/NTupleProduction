@@ -24,7 +24,7 @@ def setup_UnfoldingAnalysis(process, cms, options):
     
     process.eventWeightBtag.numberOfTagsInput = cms.InputTag(selectionPrefix + 'NumberOfBtags')
     process.eventWeightBtag.jetInput = cms.InputTag(selectionPrefix + 'cleanedJets')
-    process.eventWeightBtag.targetBtagMultiplicity = cms.uint(2) #>=2
+    process.eventWeightBtag.targetBtagMultiplicity = cms.uint32(2) #>=2
     process.eventWeightBtag.BJetSystematic = cms.int(0)
     
     #PU event weight
