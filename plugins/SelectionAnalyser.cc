@@ -9,7 +9,8 @@ using namespace edm;
 using namespace std;
 
 SelectionAnalyser::SelectionAnalyser(const edm::ParameterSet& iConfig) :
-		EventWeightInput_(iConfig.getParameter < InputTag > ("EventWeightInput")), //
+		PUWeightInput_(iConfig.getParameter < edm::InputTag > ("PUWeightInput")), //
+//		BtagWeightInput_(iConfig.getParameter < edm::InputTag > ("BtagWeightInput")), //
 		selectionFlags_(iConfig.getParameter < vector<InputTag> > ("selectionFlags")), //
 		selectionNames_(iConfig.getParameter < vector<string> > ("selectionNames")), //
 		numberOfCuts_(selectionNames_.size()), //
@@ -22,7 +23,8 @@ SelectionAnalyser::SelectionAnalyser(const edm::ParameterSet& iConfig) :
 
 void SelectionAnalyser::fillDescriptions(edm::ConfigurationDescriptions & descriptions) {
 	edm::ParameterSetDescription desc;
-	desc.add < InputTag > ("EventWeightInput");
+	desc.add < InputTag > ("PUWeightInput");
+//	desc.add < InputTag > ("BtagWeightInput");
 	desc.add < vector<InputTag> > ("selectionFlags");
 	desc.add < vector<string> > ("selectionNames");
 
@@ -50,6 +52,7 @@ void SelectionAnalyser::beginJob() {
 	consecutiveCuts_unweighted_->Sumw2();
 	individualCuts_unweighted_->Sumw2();
 
+	//setting bin names
 	for (unsigned int cut = 0; cut < numberOfCuts_; ++cut) {
 		consecutiveCuts_->GetXaxis()->SetBinLabel(cut, selectionNames_.at(cut).c_str());
 		individualCuts_->GetXaxis()->SetBinLabel(cut, selectionNames_.at(cut).c_str());
@@ -63,12 +66,20 @@ void SelectionAnalyser::endJob() {
 }
 
 void SelectionAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&) {
-	edm::Handle<double> eventWeightHandle;
-	iEvent.getByLabel(EventWeightInput_, eventWeightHandle);
-	double weight(*eventWeightHandle);
+	edm::Handle<double> puWeightHandle;
+	iEvent.getByLabel(PUWeightInput_, puWeightHandle);
+
+//	edm::Handle<double> btagWeightHandle;
+//	iEvent.getByLabel(BtagWeightInput_, btagWeightHandle);
+
+	double puWeight(*puWeightHandle);
+//	double btagWeight(*btagWeightHandle);
+//	double weight(puWeight * btagWeight);
+	double weight(puWeight);
 
 	bool passesSelectionUpTo(true);
 	for (unsigned int cut = 0; cut < numberOfCuts_; ++cut) {
+
 		bool selectionResult = passesFilter(iEvent, selectionFlags_.at(cut));
 		passesSelectionUpTo = passesSelectionUpTo && selectionResult;
 		if (selectionResult) {
@@ -82,4 +93,4 @@ void SelectionAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	}
 }
 
-DEFINE_FWK_MODULE(SelectionAnalyser);
+DEFINE_FWK_MODULE (SelectionAnalyser);

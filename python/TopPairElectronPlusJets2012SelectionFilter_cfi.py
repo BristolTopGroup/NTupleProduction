@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-EventFilter = cms.EDFilter('TopPairElectronPlusJets2012SelectionFilter',
+topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJets2012SelectionFilter',
     # Specify input collections
     jetInput=cms.InputTag("selectedPatJetsPFlow"),
     electronInput=cms.InputTag("selectedPatElectronsLoosePFlow"),
