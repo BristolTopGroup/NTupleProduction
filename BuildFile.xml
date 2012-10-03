@@ -17,7 +17,6 @@
 <use name="lhapdf"/>
 
 <export>
-   <lib name="BristolAnalysisNTupleTools"/>
-   <use name="FWCore/MessageLogger"/>
-   <use name="root"/>
+   <lib   name="1"/>
 </export>
+
