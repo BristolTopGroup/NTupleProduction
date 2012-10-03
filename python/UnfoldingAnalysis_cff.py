@@ -8,7 +8,7 @@ def setup_UnfoldingAnalysis(process, cms, options):
     process.load('BristolAnalysis.NTupleTools.ttDecayChannelFilters_cff')
     process.load('BristolAnalysis.NTupleTools.TopPairElectronPlusJets2012SelectionFilter_cfi')
     process.load('BristolAnalysis.NTupleTools.BTagWeight_Producer_cfi')
-    process.load('TopAnalysis.TopUtils.python.EventWeightPU_cfi')
+    process.load('TopAnalysis.TopUtils.EventWeightPU_cfi')
     process.load('BristolAnalysis.NTupleTools.UnfoldingAnalyser_cfi')
     
     #filters only in tagging mode
