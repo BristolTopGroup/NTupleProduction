@@ -4,6 +4,7 @@ def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
     print '=' * 60
     print "Setting up Event Filters"
     print '=' * 60
+    process.scrapingVeto = setup_scrapingveto(process, cms)
     process.HBHENoiseFilterResultProducer = setup_HBHENoiseFilter(process, cms)
     process.HcalLaserEventFilter = setup_HcalLaserFilter(process, cms)
     process.EcalDeadCellBoundaryEnergyFilter = setup_ECALDeadCellFilter(process, cms)
@@ -19,15 +20,12 @@ def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
     process.EventFilter.useOptionalMETFilters = cms.bool(False)
     
     print "Creating event filter sequence (merging all previous)."
-  #  print process.muonsFromCosmics*process.BeamHaloId
-#    process.printEventContent = cms.EDAnalyzer("EventContentAnalyzer")
     EventFilters = cms.Sequence(
                 process.trackingFailureFilter * 
                 process.HBHENoiseFilterResultProducer * 
- #                               process.scrapingVeto * 
+                                process.scrapingVeto * 
                                 process.HcalLaserEventFilter * 
                                 process.EcalDeadCellBoundaryEnergyFilter * 
-#                                process.printEventContent * 
                                 process.EventFilter
                                 )
     return EventFilters
