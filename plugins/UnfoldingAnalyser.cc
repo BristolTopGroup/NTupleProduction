@@ -7,7 +7,7 @@
 #include "DataFormats/PatCandidates/interface/MET.h"
 
 #include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
-
+#include <iostream>
 using namespace edm;
 using namespace std;
 
@@ -60,7 +60,7 @@ void UnfoldingAnalyser::beginJob() {
 	if (!fs) {
 		throw edm::Exception(edm::errors::Configuration, "TFile Service is not registered in cfg file");
 	}
-
+	cout << "This is not how you debug" << endl;
 	truth_ = fs->make < TH1F > ("truth", "True distribution;GEN(MET);# Events", 2000, 0., 2000.);
 	measured_ = fs->make < TH1F > ("measured", "Measured distribution;RECO(MET);# Events", 2000, 0., 2000.);
 	fake_ = fs->make < TH1F > ("fake", "background distribution;RECO(MET);# Events", 2000, 0., 2000.);
@@ -70,17 +70,21 @@ void UnfoldingAnalyser::beginJob() {
 			> ("contamination_inRecoMET", "background distribution;RECO(MET);# Events", 2000, 0., 2000.);
 
 	response_ = fs->make < TH2F > ("response", "response;RECO(MET);GEN(MET)", 2000, 0., 2000., 2000, 0., 2000.);
-	float METBinEdges[6] = { 0, 25, 45, 70, 100, 2000 };
+	
+//histograms with asymmetric bins (final measurement)
+	cout << "But what other options do I have?" << endl;
+float METBinEdges[6] = { 0, 25, 45, 70, 100, 2000 };
 
 	truth_AsymBins_ = fs->make < TH1F > ("truth", "True distribution;GEN(MET);# Events", 5, METBinEdges);
-	measured_ = fs->make < TH1F > ("measured", "Measured distribution;RECO(MET);# Events", 5, METBinEdges);
+	measured_AsymBins_ = fs->make < TH1F > ("measured", "Measured distribution;RECO(MET);# Events", 5, METBinEdges);
 	fake_AsymBins_ = fs->make < TH1F > ("fake", "background distribution;RECO(MET);# Events", 5, METBinEdges);
 	contamination_AsymBins_inGenMET_ = fs->make < TH1F
 			> ("contamination_AsymBins_inGenMET", "background distribution;GEN(MET);# Events", 5, METBinEdges);
 	contamination_AsymBins_inRecoMET_ = fs->make < TH1F
 			> ("contamination_AsymBins_inRecoMET", "background distribution;RECO(MET);# Events", 5, METBinEdges);
-	response_ = fs->make < TH2F > ("response", "response;RECO(MET);GEN(MET)", 5, METBinEdges, 5, METBinEdges);
+	response_AsymBins_ = fs->make < TH2F > ("response", "response;RECO(MET);GEN(MET)", 5, METBinEdges, 5, METBinEdges);
 
+cout << "Well, you could use 'scram b' as a compiler on your machine within an IDE" << endl;
 	truth_->Sumw2();
 	measured_->Sumw2();
 	fake_->Sumw2();
@@ -94,6 +98,7 @@ void UnfoldingAnalyser::beginJob() {
 	contamination_AsymBins_inGenMET_->Sumw2();
 	contamination_AsymBins_inRecoMET_->Sumw2();
 	response_AsymBins_->Sumw2();
+cout << "However, you need to be able to install CMSSW on your machine." << endl;
 }
 
 void UnfoldingAnalyser::endJob() {

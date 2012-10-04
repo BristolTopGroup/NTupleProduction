@@ -92,12 +92,11 @@ options.register ('printEventContent',
                   VarParsing.varType.bool,
                   "Outputs the event content at the end of the path")
 
-options.register ('CMSSW',
-                  '53X',
+options.register ('use44X',
+                  False,
                   VarParsing.multiplicity.singleton,
-                  VarParsing.varType.string,
-                  "CMSSW version used: 53X (default), 52X or 44X")
-
+                  VarParsing.varType.bool,
+                  "Will use set-up for CMSSW 44X if true")
 options.register ('storePDFWeights',
                   False,
                   VarParsing.multiplicity.singleton,
@@ -106,7 +105,7 @@ options.register ('storePDFWeights',
 
 options.parseArguments()
 
-if options.CMSSW == '44X':
+if options.use44X:
     GLOBALTAG_DATA = 'GR_R_44_V15::All'
     GLOBALTAG_MC = 'START44_V13::All'
     FILETAG = '44X'
@@ -115,16 +114,6 @@ if options.CMSSW == '44X':
     #CERN
     #TEST_DATA_FILE = '/store/data/Run2011A/ElectronHad/AOD/08Nov2011-v1/0012/C481C0D4-1D1A-E111-8B01-E0CB4E1A1190.root'
     #TEST_MC_FILE =  '/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0003/FEE78BEE-0237-E111-9CBC-003048678F06.root'
-
-if options.CMSSW == '52X':
-    GLOBALTAG_DATA = 'GR_R_52_V9D::All'
-    GLOBALTAG_MC = 'START52_V11C::All'
-    FILETAG = '52X'
-    TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/SingleElectron_Run2012B_196531_524_PromptReco-v1_AOD.root'
-    TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/DYJets_M-50_8TeV_Summer12.root'
-    #CERN
-    TEST_DATA_FILE = '/store/data/Run2012A/ElectronHad/AOD/PromptReco-v1/000/193/336/C47F154E-A697-E111-83F5-001D09F24D8A.root'
-    TEST_MC_FILE = '/store/mc/Summer12/TTJets_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S7_START52_V9-v1/0000/FEDDBC6A-9290-E111-B7FD-0018F3D09628.root'
 
 maxLooseLeptonRelIso = options.maxLooseLeptonRelIso
 
@@ -214,7 +203,6 @@ process.patseq = cms.Sequence(
     process.goodPatJets * 
     process.goodPatJetsPFlow * 
     process.metUncertaintySequence * 
-    process.EventFilters * 
     process.goodPatJetsCA8PF * 
     process.flavorHistorySeq# * 
     )
@@ -302,6 +290,7 @@ process.unfoldingAnalysis = cms.Path(
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
                       process.patseq * 
+                      process.EventFilters * 
                       getattr(process, "producePatPFMETCorrections" + postfix) * 
                       getattr(process, "patMETs" + postfix)*
                       process.unfoldingAnalysisSequence 

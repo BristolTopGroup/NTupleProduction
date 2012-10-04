@@ -1,4 +1,4 @@
-#include "BristolAnalysis/NTupleTools/interface/TopPairElectronPlusJets2012SelectionFilter.h"
+#include "BristolAnalysis/NTupleTools/plugins/TopPairElectronPlusJets2012SelectionFilter.h"
 #include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
 // system include files
 #include <memory>
@@ -255,9 +255,8 @@ void TopPairElectronPlusJets2012SelectionFilter::getLooseMuons() {
 }
 
 bool TopPairElectronPlusJets2012SelectionFilter::isLooseMuon(const pat::Muon& muon) const {
-	bool passesPtAndEta = muon.pt() > 20 && fabs(muon.eta()) < 2.5;
-	//		bool notInCrack = fabs(muon.superCluster()->eta()) < 1.4442 || fabs(muon.superCluster()->eta()) > 1.5660;
-	bool passesID = muon.muonID("mvaTrigV0") > 0.0;
+	bool passesPtAndEta = muon.pt() > 10 && fabs(muon.eta()) < 2.5;
+	bool passesID = muon.isPFMuon() && (muon.isGlobalMuon() || muon.isTrackerMuon());
 	bool passesIso = getRelativeIsolation(muon) < looseMuonIso_;
 	return passesPtAndEta && passesID && passesIso;
 }

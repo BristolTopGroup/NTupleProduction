@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-unfoldingAnalyser = cms.EDProducer("UnfoldingAnalyser",
+unfoldingAnalyser = cms.EDAnalyzer("UnfoldingAnalyser",
     PUWeightInput = cms.InputTag( 'eventWeightPU' ),
 #    BtagWeightInput = cms.InputTag( 'eventWeightBtag' ),
     genMetInput = cms.InputTag( 'genMetTrue' ),

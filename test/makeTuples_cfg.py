@@ -215,6 +215,7 @@ process.patseq = cms.Sequence(
     process.goodPatJets * 
     process.goodPatJetsPFlow * 
     process.metUncertaintySequence * 
+    process.EventFilters * 
     process.goodPatJetsCA8PF * 
     process.flavorHistorySeq# * 
     )
@@ -259,7 +260,6 @@ process.makingNTuples = cms.Path(
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
                       process.patseq * 
-                      process.EventFilters * 
                       getattr(process, "producePatPFMETCorrections" + postfix) * 
                       getattr(process, "patMETs" + postfix) * 
                       process.printEventContent * 
@@ -319,3 +319,4 @@ process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMCo
 if not makePATTuple:
     #do not write PAT-tuple information
     del process.outpath
+

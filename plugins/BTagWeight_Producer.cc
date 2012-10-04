@@ -15,7 +15,7 @@ BTagWeight_Producer::BTagWeight_Producer(const edm::ParameterSet& iConfig) :
 		prefix_(iConfig.getParameter < string > ("prefix")), //
 		targetBtagMultiplicity_(iConfig.getParameter<unsigned int>("targetBtagMultiplicity")), //
 		BJetSystematic_(iConfig.getParameter<int>("BJetSystematic")) {
-	produces<double>(prefix_ + "BTagWeight");
+	produces<double>();
 }
 
 void BTagWeight_Producer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -58,7 +58,7 @@ void BTagWeight_Producer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
 	std::auto_ptr<double> btagWeightProduct(new double(btagWeight));
 	//-----------------------------------------------------------------
-	iEvent.put(btagWeightProduct, prefix_ + "BTagWeight");
+	iEvent.put(btagWeightProduct);
 }
 
 void BTagWeight_Producer::fillDescriptions(edm::ConfigurationDescriptions & descriptions) {
@@ -71,4 +71,6 @@ void BTagWeight_Producer::fillDescriptions(edm::ConfigurationDescriptions & desc
 
 	descriptions.add("BTagWeight_Producer", desc);
 }
+
+DEFINE_FWK_MODULE (BTagWeight_Producer);
 

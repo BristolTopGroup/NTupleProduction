@@ -8,8 +8,8 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJets2012SelectionFi
     HLTInput=cms.InputTag('TriggerResults', '', 'HLT'),
     VertexInput=cms.InputTag('goodOfflinePrimaryVertices'),
     #event cleaning filters
-    scrapingFilterInput=cms.InputTag('scrapingFilter'),
-    HCALNoiseFilterInput=cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult'),
+    scrapingFilterInput=cms.InputTag('scrapingVeto'),
+    HcalNoiseInput=cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult'),
     HCALLaserFilterInput=cms.InputTag('HcalLaserEventFilter'),
     ECALDeadCellFilterInput=cms.InputTag('EcalDeadCellBoundaryEnergyFilter'),
     TrackingFailureFilterInput=cms.InputTag('trackingFailureFilter'),
