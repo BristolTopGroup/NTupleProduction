@@ -111,11 +111,11 @@ bool TopPairElectronPlusJets2012SelectionFilter::filter(edm::Event& iEvent, cons
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfBtags)), prefix_ + "NumberOfBtags");
 	std::auto_ptr < pat::JetCollection > jetoutput(new pat::JetCollection());
 
-
 	bool passesSelection(true);
 
 	for (unsigned int step = 0; step < TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
-		cout << "Doing selection step: " << TTbarEPlusJetsReferenceSelection::StringSteps[step] << endl;
+		if (debug_)
+			cout << "Doing selection step: " << TTbarEPlusJetsReferenceSelection::StringSteps[step] << endl;
 		bool passesStep(passesSelectionStep(iEvent, step));
 		passesSelection = passesSelection && passesStep;
 		passes_.at(step) = passesStep;
@@ -136,7 +136,8 @@ bool TopPairElectronPlusJets2012SelectionFilter::filter(edm::Event& iEvent, cons
 }
 
 void TopPairElectronPlusJets2012SelectionFilter::setupEventContent(edm::Event& iEvent) {
-cout << "Setting up the event content" << endl;
+	if (debug_)
+		cout << "Setting up the event content" << endl;
 	runNumber_ = iEvent.run();
 	isRealData_ = iEvent.isRealData();
 	edm::Handle < edm::TriggerResults > triggerResults;
@@ -158,21 +159,26 @@ cout << "Setting up the event content" << endl;
 	edm::Handle < pat::MuonCollection > muons;
 	iEvent.getByLabel(muonInput_, muons);
 	muons_ = *muons;
-
-cout << "Getting loose electrons" << endl;
+	if (debug_)
+		cout << "Getting loose electrons" << endl;
 	getLooseElectrons();
-cout << "Getting loose muons" << endl;
+	if (debug_)
+		cout << "Getting loose muons" << endl;
 	getLooseMuons();
 	//this is the correct order: goodIsolatedElectrons, signalElectron, cleanedJets, cleanedBJets
-cout << "Getting isolated electrons" << endl;
+	if (debug_)
+		cout << "Getting isolated electrons" << endl;
 	goodIsolatedElectrons();
-cout << "Getting signal electron" << endl;
+	if (debug_)
+		cout << "Getting signal electron" << endl;
 	hasSignalElectron_ = goodIsolatedElectrons_.size() > 0;
-	if(hasSignalElectron_)
-	signalElectron_ = goodIsolatedElectrons_.front();
-cout << "Getting clean jets" << endl;
+	if (hasSignalElectron_)
+		signalElectron_ = goodIsolatedElectrons_.front();
+	if (debug_)
+		cout << "Getting clean jets" << endl;
 	cleanedJets();
-cout << "Getting clean B jets" << endl;
+	if (debug_)
+		cout << "Getting clean B jets" << endl;
 	cleanedBJets();
 }
 

@@ -75,14 +75,14 @@ void UnfoldingAnalyser::beginJob() {
 	cout << "But what other options do I have?" << endl;
 float METBinEdges[6] = { 0, 25, 45, 70, 100, 2000 };
 
-	truth_AsymBins_ = fs->make < TH1F > ("truth", "True distribution;GEN(MET);# Events", 5, METBinEdges);
-	measured_AsymBins_ = fs->make < TH1F > ("measured", "Measured distribution;RECO(MET);# Events", 5, METBinEdges);
-	fake_AsymBins_ = fs->make < TH1F > ("fake", "background distribution;RECO(MET);# Events", 5, METBinEdges);
+	truth_AsymBins_ = fs->make < TH1F > ("truth_AsymBins", "True distribution;GEN(MET);# Events", 5, METBinEdges);
+	measured_AsymBins_ = fs->make < TH1F > ("measured_AsymBins", "Measured distribution;RECO(MET);# Events", 5, METBinEdges);
+	fake_AsymBins_ = fs->make < TH1F > ("fake_AsymBins", "background distribution;RECO(MET);# Events", 5, METBinEdges);
 	contamination_AsymBins_inGenMET_ = fs->make < TH1F
 			> ("contamination_AsymBins_inGenMET", "background distribution;GEN(MET);# Events", 5, METBinEdges);
 	contamination_AsymBins_inRecoMET_ = fs->make < TH1F
 			> ("contamination_AsymBins_inRecoMET", "background distribution;RECO(MET);# Events", 5, METBinEdges);
-	response_AsymBins_ = fs->make < TH2F > ("response", "response;RECO(MET);GEN(MET)", 5, METBinEdges, 5, METBinEdges);
+	response_AsymBins_ = fs->make < TH2F > ("response_AsymBins", "response;RECO(MET);GEN(MET)", 5, METBinEdges, 5, METBinEdges);
 
 cout << "Well, you could use 'scram b' as a compiler on your machine within an IDE" << endl;
 	truth_->Sumw2();

@@ -64,3 +64,12 @@ bool TopDecayChannelFilter<S>::filter(edm::Event& iEvent, const edm::EventSetup&
 	return taggingMode_ || filterDecision;
 }
 
+//template<typename S>
+//void TopDecayChannelFilter<S>::fillDescriptions(edm::ConfigurationDescriptions & descriptions) {
+//	edm::ParameterSetDescription desc;
+//	desc.add < InputTag > ("src");
+//	desc.add < bool > ("useTtGenEvent", false);
+//	desc.add < bool > ("taggingMode", false);
+//	descriptions.add("TopDecayChannelFilter", desc);
+//}
+
