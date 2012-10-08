@@ -50,7 +50,7 @@ void EventWeight_Producer_PU::produce(edm::Event& evt, const edm::EventSetup& se
 
 //  std::auto_ptr<double> EventWeight_Producer_PU(new double); 
 
-  if(error_code != 0) wght_ = 1;
+  if(error_code != 0 || evt.isRealData()) wght_ = 1;
   else{
   
     edm::Handle<edm::View<PileupSummaryInfo> > pPUInfo;

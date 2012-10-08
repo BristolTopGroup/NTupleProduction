@@ -12,8 +12,8 @@ BTagWeight_Producer::BTagWeight_Producer(const edm::ParameterSet& iConfig) :
 		jetInput_(iConfig.getParameter < InputTag > ("jetInput")), //
 		prefix_(iConfig.getParameter < string > ("prefix")), //
 		targetBtagMultiplicity_(iConfig.getParameter<unsigned int>("targetBtagMultiplicity")), //
-		BJetSystematic_(iConfig.getParameter<int>("BJetSystematic")),//
-		LightJetSystematic_(iConfig.getParameter<int>("LightJetSystematic")){
+		BJetSystematic_(iConfig.getParameter<int>("BJetSystematic")), //
+		LightJetSystematic_(iConfig.getParameter<int>("LightJetSystematic")) {
 	produces<double>();
 }
 
@@ -23,24 +23,19 @@ void BTagWeight_Producer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	unsigned int numberOfBjets(*numberOfBtags);
 
 	std::vector<double> bjetWeights;
+	double btagWeight(1.);
+
 	if (!iEvent.isRealData()) {
 		//get jets and numberOfBtags
 		edm::Handle < pat::JetCollection > jets;
 		iEvent.getByLabel(jetInput_, jets);
 		bjetWeights = BjetWeights(*jets, numberOfBjets, BJetSystematic_, LightJetSystematic_);
-	} else {
-		for (unsigned int btag = 0; btag <= numberOfBjets; ++btag) {
-			if (btag == numberOfBjets)
-				bjetWeights.push_back(1.);
-			else
-				bjetWeights.push_back(0);
-		}
-	}
 
-	double btagWeight(0.);
-	//calculate inclusive weights
-	for (unsigned int btag = targetBtagMultiplicity_; btag <= numberOfBjets; ++btag) {
-		btagWeight += bjetWeights.at(btag);
+		btagWeight = 0;
+		//calculate inclusive weights
+		for (unsigned int btag = targetBtagMultiplicity_; btag <= numberOfBjets; ++btag) {
+			btagWeight += bjetWeights.at(btag);
+		}
 	}
 
 	std::auto_ptr<double> btagWeightProduct(new double(btagWeight));
@@ -50,9 +45,9 @@ void BTagWeight_Producer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
 void BTagWeight_Producer::fillDescriptions(edm::ConfigurationDescriptions & descriptions) {
 	edm::ParameterSetDescription desc;
-	desc.add<InputTag> ("numberOfTagsInput");
-	desc.add<InputTag> ("jetInput");
-	desc.add<string> ("prefix", "BTagWeight_Producer");
+	desc.add < InputTag > ("numberOfTagsInput");
+	desc.add < InputTag > ("jetInput");
+	desc.add < string > ("prefix", "BTagWeight_Producer");
 	desc.add<unsigned int>("targetBtagMultiplicity", 0);
 	desc.add<int>("BJetSystematic", 0);
 	desc.add<int>("LightJetSystematic", 0);

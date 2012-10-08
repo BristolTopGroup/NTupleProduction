@@ -3,7 +3,7 @@ def setup_UnfoldingAnalysis(process, cms, options):
     print "Setting up UnfoldingAnalysis"
     print '=' * 60
     ######################################################################################################
-    ################################## nTuple Configuration ##############################################
+    ################################## Configuration ##############################################
     ######################################################################################################
     process.load('BristolAnalysis.NTupleTools.ttDecayChannelFilters_cff')
     process.load('BristolAnalysis.NTupleTools.TopPairElectronPlusJets2012SelectionFilter_cfi')
@@ -31,26 +31,35 @@ def setup_UnfoldingAnalysis(process, cms, options):
     process.unfoldingAnalyserMuonChannel.selectionFlagInput = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'FullSelection', 'PAT')
     
     #PU event weight
-    process.eventWeightPU.MCSampleTag = cms.string("Fall11") # valid identifier: Fall11, Summer12                             
+    if options.CMSSW == '44X':
+        process.eventWeightPU.MCSampleTag = cms.string("Fall11") # valid identifier: Fall11, Summer12
+        process.MCSampleTag = cms.string('Fall11')    
+    else:
+        process.eventWeightPU.MCSampleTag = cms.string("Summer12")
+        process.topPairEPlusJetsSelection.MCSampleTag = cms.string('Summer12')  
     #process.eventWeightPU.MCSampleFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Summer2012.root")
     
+    process.MCFiltersInTaggingMode = cms.Sequence(process.ttFullHadronicFilter * 
+                                                   process.ttFullLeptonicFilter * 
+                                                     process.ttSemiLeptonicElectronFilter * 
+                                                     process.ttSemiLeptonicMuonFilter * 
+                                                     process.ttSemiLeptonicTauFilter)
     
-    process.eventFiltersIntaggingMode = cms.Sequence(process.ttFullHadronicFilter*
-                                                     process.ttFullLeptonicFilter*
-                                                     process.ttSemiLeptonicElectronFilter*
-                                                     process.ttSemiLeptonicMuonFilter*
-                                                     process.ttSemiLeptonicTauFilter*
-                                                     process.topPairEPlusJetsSelection )
+    process.eventFiltersIntaggingMode = cms.Sequence(MCFiltersInTaggingMode * 
+                                                     process.topPairEPlusJetsSelection)
     
-    process.unfoldingAnalysisSequence = cms.Sequence(process.eventFiltersIntaggingMode*
-                                                     process.eventWeightBtag*
-                                                     process.eventWeightPU*
-						     process.printEventContent*
-                                                     process.unfoldingAnalyserElectronChannel*
+    process.unfoldingAnalysisSequence = cms.Sequence(process.eventFiltersIntaggingMode * 
+                                                     process.eventWeightBtag * 
+                                                     process.eventWeightPU * 
+						                             process.printEventContent * 
+                                                     process.unfoldingAnalyserElectronChannel * 
                                                      process.unfoldingAnalyserMuonChannel)
     
     
     if not options.printEventContent:
         process.unfoldingAnalysisSequence.remove(process.printEventContent)
+
+    if options.useData:
+        process.eventFiltersIntaggingMode.remove(process.MCFiltersInTaggingMode)
     #if not TTJet in options.dataType
     

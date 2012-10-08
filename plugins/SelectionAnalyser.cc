@@ -37,14 +37,14 @@ void SelectionAnalyser::beginJob() {
 	// Histograms for PU Events
 
 	consecutiveCuts_ = fs->make < TH1F
-			> ("consecutiveCuts", "Selection cutflow;cut;# Events", numberOfCuts_ + 1, -1.5, numberOfCuts_ - 0.5);
+			> ("consecutiveCuts", "Selection cutflow; ;# Events", numberOfCuts_ , -0.5, numberOfCuts_ - 0.5);
 	individualCuts_ = fs->make < TH1F
-			> ("individualCuts", "Selection cutflow;cut;# Events", numberOfCuts_ + 1, -1.5, numberOfCuts_ - 0.5);
+			> ("individualCuts", "Selection cutflow; ;# Events", numberOfCuts_ , -0.5, numberOfCuts_ - 0.5);
 	consecutiveCuts_unweighted_ = fs->make < TH1F
-			> ("consecutiveCuts_unweighted", "Selection cutflow;cut;# Events", numberOfCuts_ + 1, -1.5, numberOfCuts_
+			> ("consecutiveCuts_unweighted", "Selection cutflow; ;# Events", numberOfCuts_ , -0.5, numberOfCuts_
 					- 0.5);
 	individualCuts_unweighted_ = fs->make < TH1F
-			> ("individualCuts_unweighted", "Selection cutflow;cut;# Events", numberOfCuts_ + 1, -1.5, numberOfCuts_
+			> ("individualCuts_unweighted", "Selection cutflow; ;# Events", numberOfCuts_ , -0.5, numberOfCuts_
 					- 0.5);
 
 	consecutiveCuts_->Sumw2();
@@ -54,10 +54,10 @@ void SelectionAnalyser::beginJob() {
 
 	//setting bin names
 	for (unsigned int cut = 0; cut < numberOfCuts_; ++cut) {
-		consecutiveCuts_->GetXaxis()->SetBinLabel(cut, selectionNames_.at(cut).c_str());
-		individualCuts_->GetXaxis()->SetBinLabel(cut, selectionNames_.at(cut).c_str());
-		consecutiveCuts_unweighted_->GetXaxis()->SetBinLabel(cut, selectionNames_.at(cut).c_str());
-		individualCuts_unweighted_->GetXaxis()->SetBinLabel(cut, selectionNames_.at(cut).c_str());
+		consecutiveCuts_->GetXaxis()->SetBinLabel(cut + 1, selectionNames_.at(cut).c_str());
+		individualCuts_->GetXaxis()->SetBinLabel(cut + 1, selectionNames_.at(cut).c_str());
+		consecutiveCuts_unweighted_->GetXaxis()->SetBinLabel(cut + 1, selectionNames_.at(cut).c_str());
+		individualCuts_unweighted_->GetXaxis()->SetBinLabel(cut + 1, selectionNames_.at(cut).c_str());
 	}
 }
 

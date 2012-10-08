@@ -1,5 +1,5 @@
-#ifndef BristolTopPairElectronPlusJets2012SelectionFilter
-#define BristolTopPairElectronPlusJets2012SelectionFilter
+#ifndef BristolTopPairMuonPlusJets2012SelectionFilter
+#define BristolTopPairMuonPlusJets2012SelectionFilter
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDFilter.h"
@@ -17,14 +17,13 @@
 #include <boost/array.hpp>
 #include <string>
 
-namespace TTbarEPlusJetsReferenceSelection {
+namespace TTbarMuPlusJetsReferenceSelection {
 enum Step {
 	AllEvents,
 	EventCleaningAndTrigger,
-	OneIsolatedElectron,
-	LooseMuonVeto,
+	OneIsolatedMuon,
 	DiLeptonVeto,
-	ConversionVeto,
+	LooseElectronVeto,
 	AtLeastOneGoodJet,
 	AtLeastTwoGoodJets,
 	AtLeastThreeGoodJets,
@@ -37,10 +36,9 @@ enum Step {
 const std::string StringSteps[NUMBER_OF_SELECTION_STEPS] = { //
 		"AllEvents", //
 				"EventCleaningAndTrigger", //
-				"OneIsolatedElectron", //
-				"LooseMuonVeto", //
+				"OneIsolatedMuon", //
 				"DiLeptonVeto", //
-				"ConversionVeto", //
+				"LooseElectronVeto", //
 				"AtLeastOneGoodJet", //
 				"AtLeastTwoGoodJets", //
 				"AtLeastThreeGoodJets", //
@@ -50,10 +48,10 @@ const std::string StringSteps[NUMBER_OF_SELECTION_STEPS] = { //
 		};
 }
 
-class TopPairElectronPlusJets2012SelectionFilter: public edm::EDFilter {
+class TopPairMuonPlusJets2012SelectionFilter: public edm::EDFilter {
 public:
-	explicit TopPairElectronPlusJets2012SelectionFilter(const edm::ParameterSet&);
-	virtual ~TopPairElectronPlusJets2012SelectionFilter();
+	explicit TopPairMuonPlusJets2012SelectionFilter(const edm::ParameterSet&);
+	virtual ~TopPairMuonPlusJets2012SelectionFilter();
 
 	virtual void beginJob();
 	virtual bool filter(edm::Event&, const edm::EventSetup&);
@@ -63,8 +61,7 @@ public:
 	static void fillDescriptions(edm::ConfigurationDescriptions & descriptions);
 
 	virtual bool isGoodJet(const pat::Jet& jet) const;
-	virtual bool isGoodElectron(const pat::Electron& electron) const;
-
+	virtual bool isGoodMuon(const pat::Muon& muon) const;
 	//definitions of loose objects
 	virtual bool isLooseElectron(const pat::Electron& electron) const;
 	virtual bool isLooseMuon(const pat::Muon& muon) const;
@@ -73,7 +70,7 @@ public:
 	virtual double getRelativeIsolation(const pat::Muon& muon) const;
 	virtual void getLooseElectrons();
 	virtual void getLooseMuons();
-	virtual void goodIsolatedElectrons();
+	virtual void goodIsolatedMuons();
 	virtual void cleanedJets();
 	virtual void cleanedBJets();
 
@@ -85,7 +82,6 @@ public:
 	virtual bool hasExactlyOneIsolatedLepton() const;
 	virtual bool passesLooseLeptonVeto() const;
 	virtual bool passesDileptonVeto() const;
-	virtual bool passesConversionVeto() const;
 	virtual bool hasAtLeastOneGoodJet() const;
 	virtual bool hasAtLeastTwoGoodJets() const;
 	virtual bool hasAtLeastThreeGoodJets() const;
@@ -102,7 +98,7 @@ private:
 
 	double min1JetPt_, min2JetPt_, min3JetPt_, min4JetPt_;
 
-	double tightElectronIso_, looseElectronIso_, looseMuonIso_;
+	double tightMuonIso_, looseElectronIso_, looseMuonIso_;
 	bool useDeltaBetaCorrections_, useRhoActiveAreaCorrections_, useMETFilters_, useEEBadScFilter_;
 
 	std::string prefix_, MCSampleTag_;
@@ -110,16 +106,17 @@ private:
 	bool debug_, taggingMode_;
 
 	//internal
-	boost::array<bool, TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS> passes_;
+	boost::array<bool, TTbarMuPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS> passes_;
 	unsigned int runNumber_;
-	bool isRealData_, hasSignalElectron_;
+	bool isRealData_, hasSignalMuon_, hasGoodPV_;
 	double rho_;
 	pat::JetCollection jets_, cleanedJets_, cleanedBJets_;
-	pat::ElectronCollection electrons_, goodIsolatedElectrons_, looseElectrons_;
-	pat::MuonCollection muons_, looseMuons_;
-	pat::Electron signalElectron_;
+	pat::ElectronCollection electrons_, looseElectrons_;
+	pat::MuonCollection muons_, goodIsolatedMuons_, looseMuons_;
+	pat::Muon signalMuon_;
 	HLTConfigProvider hltConfig_;
 	edm::TriggerResults triggerResults_;
+	reco::Vertex primaryVertex_;
 
 };
 
