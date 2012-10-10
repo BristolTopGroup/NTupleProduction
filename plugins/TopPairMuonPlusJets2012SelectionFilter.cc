@@ -487,13 +487,16 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesTriggerSelection() const {
 			//Fall11 MC
 			return triggerFired("HLT_IsoMu24", hltConfig_, triggerResults_);
 		} else {
-			//Summer11 MC
-			bool fired_START52_V5 = triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFJet30", hltConfig_, triggerResults_);
-			bool fired_START52_V9 = triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFJet30", hltConfig_, triggerResults_)
-					|| triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFNoPUJet30", hltConfig_, triggerResults_);
-			bool fired_START53_V7A = triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30_30_20", hltConfig_,
-					triggerResults_);
-			return fired_START52_V5 || fired_START52_V9 || fired_START53_V7A;
+			//do not use HLTs in Summer12 MC as they don't use JEC
+			//https://hypernews.cern.ch/HyperNews/CMS/get/top-trigger/66.html
+			return true;
+			//Summer12 MC
+//			bool fired_START52_V5 = triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFJet30", hltConfig_, triggerResults_);
+//			bool fired_START52_V9 = triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFJet30", hltConfig_, triggerResults_)
+//					|| triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFNoPUJet30", hltConfig_, triggerResults_);
+//			bool fired_START53_V7A = triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30_30_20", hltConfig_,
+//					triggerResults_);
+//			return fired_START52_V5 || fired_START52_V9 || fired_START53_V7A;
 		}
 	}
 

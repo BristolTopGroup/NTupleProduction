@@ -484,18 +484,21 @@ bool TopPairElectronPlusJets2012SelectionFilter::passesTriggerSelection() const 
 			return triggerFired("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralJet30", hltConfig_,
 					triggerResults_);
 		} else {
-			//Summer11 MC
-			bool fired_START52_V5 = triggerFired("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFJet30",
-					hltConfig_, triggerResults_);
-			bool fired_START52_V9 = triggerFired("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFJet30",
-					hltConfig_, triggerResults_)
-					|| triggerFired("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFNoPUJet30", hltConfig_,
-							triggerResults_);
-			bool fired_START53_V7A = triggerFired("HLT_Ele25_CaloIdVT_CaloIsoVL_TrkIdVL_TrkIsoT_TriCentralPFNoPUJet30",
-					hltConfig_, triggerResults_)
-					|| triggerFired("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFNoPUJet30_30_20",
-							hltConfig_, triggerResults_);
-			return fired_START52_V5 || fired_START52_V9 || fired_START53_V7A;
+			//Summer12 MC
+			//do not use HLTs in Summer12 MC as they don't use JEC
+			//https://hypernews.cern.ch/HyperNews/CMS/get/top-trigger/66.html
+			return true;
+//			bool fired_START52_V5 = triggerFired("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFJet30",
+//					hltConfig_, triggerResults_);
+//			bool fired_START52_V9 = triggerFired("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFJet30",
+//					hltConfig_, triggerResults_)
+//					|| triggerFired("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFNoPUJet30", hltConfig_,
+//							triggerResults_);
+//			bool fired_START53_V7A = triggerFired("HLT_Ele25_CaloIdVT_CaloIsoVL_TrkIdVL_TrkIsoT_TriCentralPFNoPUJet30",
+//					hltConfig_, triggerResults_)
+//					|| triggerFired("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFNoPUJet30_30_20",
+//							hltConfig_, triggerResults_);
+//			return fired_START52_V5 || fired_START52_V9 || fired_START53_V7A;
 		}
 	}
 
