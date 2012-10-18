@@ -59,8 +59,9 @@ def setup_UnfoldingAnalysis(process, cms, options):
     
     if not options.printEventContent:
         process.unfoldingAnalysisSequence.remove(process.printEventContent)
+        
 
-    if options.useData:
+    if options.useData or not options.isTTbarMC:
         process.eventFiltersIntaggingMode.remove(process.MCFiltersInTaggingMode)
     #if not TTJet in options.dataType
     

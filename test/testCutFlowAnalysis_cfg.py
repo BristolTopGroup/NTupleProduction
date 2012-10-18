@@ -53,8 +53,10 @@ process.selectionAnalysis = cms.Path(
 
 if options.useData or not options.storePDFWeights:
     process.selectionAnalysis.remove(process.pdfWeights)
+
+if options.useData or not options.isTTbarMC:   
+    process.eventFiltersIntaggingMode.remove(process.MCFiltersInTaggingMode) 
     
 if options.useData:
-    process.eventFiltersIntaggingMode.remove(process.MCFiltersInTaggingMode)
     process.selectionAnalysis.remove(process.ttbarDecayAnalyser)
     

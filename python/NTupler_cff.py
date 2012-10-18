@@ -50,6 +50,7 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
     process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults', '', options.hltProcess)
     #GEN event
     process.rootTupleGenEventInfo.StorePDFWeights = cms.bool(options.storePDFWeights)
+    process.rootTupleGenEventInfo.isTTbarMC = cms.bool(options.isTTbarMC)
     
     process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         outputCommands=cms.untracked.vstring(
@@ -94,7 +95,6 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
             'keep *_rootTupleGenParticles_*_*',
             'keep *_rootTupleGenJets_*_*',
             'keep *_rootTupleGenMETTrue_*_*',
-            'kepp *_eventWeightPU_*_*'
         )
     )
     

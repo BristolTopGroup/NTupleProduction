@@ -5,10 +5,14 @@
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "boost/filesystem.hpp"
 
+#include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
+
 BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& iConfig) : //
 		genEvtInfoInputTag(iConfig.getParameter < edm::InputTag > ("GenEventInfoInputTag")), //
+		ttbarDecayFlags_(iConfig.getParameter < std::vector<edm::InputTag> > ("ttbarDecayFlags")), //
 		puWeightsInputTag_(iConfig.getParameter < edm::InputTag > ("PUWeightsInputTag")), //
 		storePDFWeights_(iConfig.getParameter<bool>("StorePDFWeights")), //
+		isTTbarMC_(iConfig.getParameter<bool>("isTTbarMC")), //
 		pdfWeightsInputTag_(iConfig.getParameter < edm::InputTag > ("PDFWeightsInputTag")), //
 		pileupInfoSrc_(iConfig.getParameter < edm::InputTag > ("pileupInfo")), //
 		prefix_(iConfig.getParameter < std::string > ("Prefix")), //
@@ -21,6 +25,7 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 	produces < std::vector<int> > (prefix_ + "NumberOfTrueInteractions" + suffix_);
 	produces < std::vector<int> > (prefix_ + "PileUpOriginBX" + suffix_);
 	produces<unsigned int>(prefix_ + "FlavourHistory" + suffix_);
+	produces<unsigned int>(prefix_ + "TtbarDecay" + suffix_);
 }
 
 void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -34,11 +39,13 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	std::auto_ptr < std::vector<int> > NumberOfTrueInteractions(new std::vector<int>());
 	std::auto_ptr < std::vector<int> > OriginBX(new std::vector<int>());
 	std::auto_ptr<unsigned int> flavourHistory(new unsigned int());
+	std::auto_ptr<unsigned int> ttbarDecay(new unsigned int());
 
 	*processID.get() = 0;
 	*ptHat.get() = 0.;
 	*PUWeight.get() = 0.;
 	*flavourHistory.get() = 0;
+	*ttbarDecay.get() = 0;
 
 	//-----------------------------------------------------------------
 	if (!iEvent.isRealData()) {
@@ -103,6 +110,27 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 		} else {
 			edm::LogError("BristolNTuple_PileUpError") << "Error! Can't get the product " << pileupInfoSrc_;
 		}
+
+		//identify ttbar decay mode
+		if (isTTbarMC_) {
+			if (ttbarDecayFlags_.size() != TTbarDecay::NumberOfDecayModes - 1) {
+				edm::LogError("BristolNTuple_GenEventError")
+						<< "Error! Not enough flags given to describe all decay modes." << "Expecting "
+						<< TTbarDecay::NumberOfDecayModes - 1 << " got " << ttbarDecayFlags_.size();
+			}
+			unsigned short numberOfIdentifiedModes(0);
+			for (unsigned short mode = 0; mode < ttbarDecayFlags_.size(); ++mode) {
+				bool result = passesFilter(iEvent, ttbarDecayFlags_.at(mode));
+				if (result) {
+					++numberOfIdentifiedModes;
+					*ttbarDecay.get() = mode + 1; //0 == not ttbar, first decay = 1, first filter = 0
+				}
+			}
+			if (numberOfIdentifiedModes > 1) {
+				edm::LogError("BristolNTuple_GenEventError") << "Error! Found more than one compatible decay mode:"
+						<< numberOfIdentifiedModes;
+			}
+		}
 	}
 
 	//-----------------------------------------------------------------
@@ -114,5 +142,6 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	iEvent.put(NumberOfTrueInteractions, prefix_ + "NumberOfTrueInteractions" + suffix_);
 	iEvent.put(OriginBX, prefix_ + "PileUpOriginBX" + suffix_);
 	iEvent.put(flavourHistory, prefix_ + "FlavourHistory" + suffix_);
+	iEvent.put(ttbarDecay, prefix_ + "TtbarDecay" + suffix_);
 
 }

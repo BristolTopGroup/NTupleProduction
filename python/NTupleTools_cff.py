@@ -105,6 +105,12 @@ options.register ('storePDFWeights',
                   VarParsing.varType.bool,
                   "Will store the PDF weights from cteq6.6")
 
+options.register ('isTTbarMC',
+                  False,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.bool,
+                  "Identify if samples contains ttbar events")
+
 options.parseArguments()
 
 if options.CMSSW == '44X':
