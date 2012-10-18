@@ -1,8 +1,8 @@
 #ifndef EventWeight_Producer_PU_h
 #define EventWeight_Producer_PU_h
 /**
-* Original from UserCode/Bromo/TopAnalysis/TopUtils
-**/
+ * Original from UserCode/Bromo/TopAnalysis/TopUtils
+ **/
 
 #include <memory>
 #include <string>
@@ -16,31 +16,31 @@
 
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 
-class EventWeight_Producer_PU : public edm::EDProducer {
+class EventWeight_Producer_PU: public edm::EDProducer {
 
-   public:
-      explicit EventWeight_Producer_PU(const edm::ParameterSet&);
-      ~EventWeight_Producer_PU();
+public:
+	explicit EventWeight_Producer_PU(const edm::ParameterSet&);
+	~EventWeight_Producer_PU();
 
-   private:
+private:
 
-      int error_code;
+	int error_code;
 
-      virtual void produce(edm::Event&, const edm::EventSetup&);
+	virtual void produce(edm::Event&, const edm::EventSetup&);
 
-      edm::InputTag   inTag_PUSource;
-      std::string     inTag_WeightName;
+	edm::InputTag inTag_PUSource;
+	std::string inTag_WeightName;
 
-      std::string     inTag_MCSampleTag;
+	std::string inTag_MCSampleTag;
 
-      edm::FileInPath inTag_MCSampleFile;
-      std::string     inTag_MCSampleHistoName;
-      edm::FileInPath inTag_DataFile;
-      std::string     inTag_DataHistoName;
-     
-      edm::LumiReWeighting   LumiWeights_;
+	edm::FileInPath inTag_MCSampleFile;
+	std::string inTag_MCSampleHistoName;
+	edm::FileInPath inTag_DataFile;
+	std::string inTag_DataHistoName;
 
-      double wght_;
+	edm::LumiReWeighting LumiWeights_;
+
+	double wght_;
 };
 
 #endif
