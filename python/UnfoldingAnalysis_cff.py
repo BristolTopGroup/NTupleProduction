@@ -8,7 +8,7 @@ def setup_UnfoldingAnalysis(process, cms, options):
     process.load('BristolAnalysis.NTupleTools.ttDecayChannelFilters_cff')
     process.load('BristolAnalysis.NTupleTools.TopPairElectronPlusJets2012SelectionFilter_cfi')
     process.load('BristolAnalysis.NTupleTools.BTagWeight_Producer_cfi')
-    process.load('BristolAnalysis.NTupleTools.EventWeight_Producer_PU_cfi')
+    
     process.load('BristolAnalysis.NTupleTools.UnfoldingAnalyser_cfi')
     
     #filters only in tagging mode
@@ -32,12 +32,14 @@ def setup_UnfoldingAnalysis(process, cms, options):
     
     #PU event weight
     if options.CMSSW == '44X':
-        process.eventWeightPU.MCSampleTag = cms.string("Fall11") # valid identifier: Fall11, Summer12
-        process.MCSampleTag = cms.string('Fall11')    
+#        process.eventWeightPU.MCSampleTag = cms.string("Fall11") # valid identifier: Fall11, Summer12
+        process.topPairEPlusJetsSelection.MCSampleTag = cms.string('Fall11')    
     else:
-        process.eventWeightPU.MCSampleTag = cms.string("Summer12")
+#        process.eventWeightPU.MCSampleTag = cms.string("Summer12")
+#        process.eventWeightPU.MCSampleFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Summer2012.root")
+        #need to figure that one out
+#        process.eventWeightPU.DataFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Summer2012.root")
         process.topPairEPlusJetsSelection.MCSampleTag = cms.string('Summer12')  
-    #process.eventWeightPU.MCSampleFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Summer2012.root")
     
     process.MCFiltersInTaggingMode = cms.Sequence(process.ttFullHadronicFilter * 
                                                    process.ttFullLeptonicFilter * 
@@ -45,12 +47,11 @@ def setup_UnfoldingAnalysis(process, cms, options):
                                                      process.ttSemiLeptonicMuonFilter * 
                                                      process.ttSemiLeptonicTauFilter)
     
-    process.eventFiltersIntaggingMode = cms.Sequence(MCFiltersInTaggingMode * 
+    process.eventFiltersIntaggingMode = cms.Sequence(process.MCFiltersInTaggingMode * 
                                                      process.topPairEPlusJetsSelection)
     
     process.unfoldingAnalysisSequence = cms.Sequence(process.eventFiltersIntaggingMode * 
                                                      process.eventWeightBtag * 
-                                                     process.eventWeightPU * 
 						                             process.printEventContent * 
                                                      process.unfoldingAnalyserElectronChannel * 
                                                      process.unfoldingAnalyserMuonChannel)

@@ -94,6 +94,7 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
             'keep *_rootTupleGenParticles_*_*',
             'keep *_rootTupleGenJets_*_*',
             'keep *_rootTupleGenMETTrue_*_*',
+            'kepp *_eventWeightPU_*_*'
         )
     )
     
@@ -173,6 +174,7 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
         process.rootTupleGenParticles + 
         process.rootTupleGenJetSequence + 
         process.rootTupleGenMETTrue) * 
+                                       
         process.rootTupleTree)
     
     
@@ -190,6 +192,7 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
         process.rootNTuples.remove(process.rootTupleType1CorrectedPFMetJetResDown)
         process.rootNTuples.remove(process.rootTupleType1p2CorrectedPFMetJetResUp)
         process.rootNTuples.remove(process.rootTupleType1p2CorrectedPFMetJetResDown)
+        process.rootNTuples.remove(process.eventWeightPU)
         
     if not options.writeFat:#write only PF particles
         process.rootNTuples.remove(process.rootTupleCaloJets)

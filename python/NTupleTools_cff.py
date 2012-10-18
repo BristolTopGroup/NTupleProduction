@@ -248,6 +248,14 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
                                          )
                                     )
 
+process.load('BristolAnalysis.NTupleTools.EventWeight_Producer_PU_cfi')
+if options.CMSSW == '44X':
+        process.eventWeightPU.MCSampleTag = cms.string("Fall11") # valid identifier: Fall11, Summer12
+else:
+        process.eventWeightPU.MCSampleTag = cms.string("Summer12")
+        process.eventWeightPU.MCSampleFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Summer2012.root")
+        process.eventWeightPU.MCSampleHistoName   = cms.string("puhisto")
+
 process.TFileService = cms.Service("TFileService",
                            fileName=cms.string('ntuple.root')
                            )
