@@ -19,12 +19,11 @@ selectionProducts = [cms.InputTag(selectionName, selectionPrefix + cut, 'PAT') f
 
 topPairEPlusJetsSelectionAnalyser = cms.EDAnalyzer("SelectionAnalyser",
     PUWeightInput=cms.InputTag('eventWeightPU'),
-#    BtagWeightInput = cms.InputTag( 'eventWeightBtag' ),
     selectionFlags=cms.VInputTag(selectionProducts),
     selectionNames=cms.vstring(selectionCuts),
 )
 
-muonselectionPrefix = 'TopPairMuonPlusJets2012Selection.'
+selectionPrefix = 'TopPairMuonPlusJets2012Selection.'
 selectionName = 'topPairMuPlusJetsSelection'
 selectionCuts = [
                 "AllEvents",
@@ -40,18 +39,16 @@ selectionCuts = [
                 "AtLeastOneBtag",
                 "AtLeastTwoBtags" 
                          ]
-electronSelectionProducts = [cms.InputTag(selectionName, selectionPrefix + cut, 'PAT') for cut in selectionCuts]
+selectionProducts = [cms.InputTag(selectionName, selectionPrefix + cut, 'PAT') for cut in selectionCuts]
 
 topPairMuPlusJetsSelectionAnalyser = cms.EDAnalyzer("SelectionAnalyser",
     PUWeightInput=cms.InputTag('eventWeightPU'),
-#    BtagWeightInput = cms.InputTag( 'eventWeightBtag' ),
     selectionFlags=cms.VInputTag(selectionProducts),
     selectionNames=cms.vstring(selectionCuts),
 )
 
 ttbarDecayAnalyser = cms.EDAnalyzer("SelectionAnalyser",
     PUWeightInput=cms.InputTag('eventWeightPU'),
-#    BtagWeightInput = cms.InputTag( 'eventWeightBtag' ),
     selectionFlags=cms.VInputTag(
                 cms.InputTag( 'ttFullHadronicFilter' ),
                 cms.InputTag( 'ttSemiLeptonicElectronFilter' ),
