@@ -296,7 +296,7 @@ if options.maxEvents:
 else:
     process.maxEvents.input = 100
     
-process.source.skipEvents = options.skipEvents
+process.source.skipEvents = cms.untracked.uint32(options.skipEvents)
     
 process.options.wantSummary = True
 process.out.dropMetaData = cms.untracked.string("DROPPED")
