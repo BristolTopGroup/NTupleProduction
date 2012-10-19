@@ -203,55 +203,6 @@ bool TopPairElectronPlusJets2012SelectionFilter::isLooseElectron(const pat::Elec
 	return passesPtAndEta && passesID && passesIso;
 }
 
-//double TopPairElectronPlusJets2012SelectionFilter::getRelativeIsolation(const pat::Electron& electron) const {
-//	//code from: https://twiki.cern.ch/twiki/bin/view/CMS/PfIsolation
-//	float AEff03 = 0.00;
-//
-//	if (isRealData_) {
-//		AEff03 = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
-//				electron.superCluster()->eta(), ElectronEffectiveArea::kEleEAData2011);
-//	} else {
-//		AEff03 = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
-//				electron.superCluster()->eta(), ElectronEffectiveArea::kEleEAFall11MC);
-//	}
-//
-//	AbsVetos vetos_ch;
-//	AbsVetos vetos_nh;
-//	AbsVetos vetos_ph;
-//
-//	Direction Dir = Direction(electron.superCluster()->eta(), electron.superCluster()->phi());
-//
-//	//threshold veto
-//	//vetos_nh.push_back(new ThresholdVeto( 0.5 ));
-//	//vetos_ph.push_back(new ThresholdVeto( 0.5 ));
-//	//rectangular veto
-//	//vetos_nh.push_back(new RectangularEtaPhiVeto( Dir, -0.1, 0.1, -0.2, 0.2));
-//	//vetos_ph.push_back(new RectangularEtaPhiVeto( Dir, -0.1, 0.1, -0.2, 0.2));
-//
-//	//pf isolation veto setup EGM recommendation
-//	if (abs(electron.superCluster()->eta()) > 1.479) {
-//		vetos_ch.push_back(new ConeVeto(Dir, 0.015));
-//		vetos_ph.push_back(new ConeVeto(Dir, 0.08));
-//	}
-//
-//	//cone size 0.3
-//	const double chIso03 = electron.isoDeposit(pat::PfChargedHadronIso)->depositAndCountWithin(0.3, vetos_ch).first;
-//	const double nhIso03 = electron.isoDeposit(pat::PfNeutralHadronIso)->depositAndCountWithin(0.3, vetos_nh).first;
-//	const double phIso03 = electron.isoDeposit(pat::PfGammaIso)->depositAndCountWithin(0.3, vetos_ph).first;
-//
-//	const double puChIso03 = electron.isoDeposit(pat::PfPUChargedHadronIso)->depositAndCountWithin(0.3, vetos_ch).first;
-//
-//	const double relIso = (chIso03 + nhIso03 + phIso03) / electron.pt();
-//	const double relIsodb = (chIso03 + max(0.0, nhIso03 + phIso03 - 0.5 * puChIso03)) / electron.pt();
-//	const double relIsorho = (chIso03 + max(0.0, nhIso03 + phIso03 - rho_ * AEff03)) / electron.pt();
-//
-//	if (useDeltaBetaCorrections_)
-//		return relIsodb;
-//	if (useRhoActiveAreaCorrections_)
-//		return relIsorho;
-//
-//	return relIso;
-//}
 
 void TopPairElectronPlusJets2012SelectionFilter::getLooseMuons() {
 	looseMuons_.clear();
@@ -269,23 +220,6 @@ bool TopPairElectronPlusJets2012SelectionFilter::isLooseMuon(const pat::Muon& mu
 	bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrections_) < looseMuonIso_;
 	return passesPtAndEta && passesID && passesIso;
 }
-
-//double TopPairElectronPlusJets2012SelectionFilter::getRelativeIsolation(const pat::Muon& muon) const {
-//	//cone size 0.4
-//	const double chIso04 = muon.isoDeposit(pat::PfChargedHadronIso)->depositAndCountWithin(0.4).first;
-//	const double nhIso04 = muon.isoDeposit(pat::PfNeutralHadronIso)->depositAndCountWithin(0.4).first;
-//	const double phIso04 = muon.isoDeposit(pat::PfGammaIso)->depositAndCountWithin(0.4).first;
-//
-//	const double puChIso04 = muon.isoDeposit(pat::PfPUChargedHadronIso)->depositAndCountWithin(0.4).first;
-//
-//	const double relIso = (chIso04 + nhIso04 + phIso04) / muon.pt();
-//	const double relIsodb = (chIso04 + max(0.0, nhIso04 + phIso04 - 0.5 * puChIso04)) / muon.pt();
-//
-//	if (useDeltaBetaCorrections_ || useRhoActiveAreaCorrections_) //atm leave active area
-//		return relIsodb;
-//
-//	return relIso;
-//}
 
 void TopPairElectronPlusJets2012SelectionFilter::goodIsolatedElectrons() {
 	goodIsolatedElectrons_.clear();
