@@ -26,17 +26,16 @@ topPairEPlusJetsSelectionAnalyser = cms.EDAnalyzer("SelectionAnalyser",
 selectionPrefix = 'TopPairMuonPlusJets2012Selection.'
 selectionName = 'topPairMuPlusJetsSelection'
 selectionCuts = [
-                "AllEvents",
-                "EventCleaningAndTrigger",
-                "OneIsolatedMuon",
-                "DiLeptonVeto",
-                "LooseElectronVeto",
-                "ConversionVeto",
-                "AtLeastOneGoodJet",
-                "AtLeastTwoGoodJets",
-                "AtLeastThreeGoodJets",
-                "AtLeastFourGoodJets",
-                "AtLeastOneBtag",
+               "AllEvents", 
+                "EventCleaningAndTrigger", 
+                "OneIsolatedMuon", 
+                "DiLeptonVeto", 
+                "LooseElectronVeto", 
+                "AtLeastOneGoodJet", 
+                "AtLeastTwoGoodJets", 
+                "AtLeastThreeGoodJets", 
+                "AtLeastFourGoodJets", 
+                "AtLeastOneBtag", 
                 "AtLeastTwoBtags" 
                          ]
 selectionProducts = [cms.InputTag(selectionName, selectionPrefix + cut, 'PAT') for cut in selectionCuts]
