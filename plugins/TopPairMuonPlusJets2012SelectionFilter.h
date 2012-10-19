@@ -66,8 +66,8 @@ public:
 	virtual bool isLooseElectron(const pat::Electron& electron) const;
 	virtual bool isLooseMuon(const pat::Muon& muon) const;
 	//isolation definitions
-	virtual double getRelativeIsolation(const pat::Electron& electron) const;
-	virtual double getRelativeIsolation(const pat::Muon& muon) const;
+//	virtual double getRelativeIsolation(const pat::Electron& electron) const;
+//	virtual double getRelativeIsolation(const pat::Muon& muon) const;
 	virtual void getLooseElectrons();
 	virtual void getLooseMuons();
 	virtual void goodIsolatedMuons();

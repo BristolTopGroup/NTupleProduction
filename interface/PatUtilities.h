@@ -4,6 +4,7 @@
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/GsfTrackReco/interface/GsfTrackFwd.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Utilities/interface/InputTag.h"
@@ -45,5 +46,9 @@ bool passesFilter(const edm::Event& event, const edm::InputTag filter);
 bool triggerFired(const std::string& triggerWildCard, const HLTConfigProvider& hltConfig,
 		const edm::TriggerResults& triggerResults);
 unsigned int findTrigger(const std::string& triggerWildCard, const HLTConfigProvider& hltConfig);
+
+double getRelativeIsolation(const pat::Electron& electron, double cone, double rho, bool isRealData,
+		bool useDeltaBetaCorrections, bool useRhoActiveAreaCorrections);
+double getRelativeIsolation(const pat::Muon& muon, double cone, bool useDeltaBetaCorrections);
 
 #endif 

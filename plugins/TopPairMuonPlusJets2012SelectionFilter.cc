@@ -177,18 +177,22 @@ void TopPairMuonPlusJets2012SelectionFilter::setupEventContent(edm::Event& iEven
 	if (debug_)
 		cout << "Getting loose electrons" << endl;
 	getLooseElectrons();
-	if (debug_)
-		cout << "Getting loose muons" << endl;
-	getLooseMuons();
-	//this is the correct order: goodIsolatedMuons, signalElectron, cleanedJets, cleanedBJets
-	if (debug_)
-		cout << "Getting isolated muons" << endl;
-	goodIsolatedMuons();
-	if (debug_)
-		cout << "Getting signal muon" << endl;
-	hasSignalMuon_ = goodIsolatedMuons_.size() > 0;
-	if (hasSignalMuon_)
-		signalMuon_ = goodIsolatedMuons_.front();
+	if (muons.isValid()) {
+		if (debug_)
+			cout << "Getting loose muons" << endl;
+		getLooseMuons();
+		//this is the correct order: goodIsolatedMuons, signalElectron, cleanedJets, cleanedBJets
+		if (debug_)
+			cout << "Getting isolated muons" << endl;
+		goodIsolatedMuons();
+		if (debug_)
+			cout << "Getting signal muon" << endl;
+		hasSignalMuon_ = goodIsolatedMuons_.size() > 0;
+		if (hasSignalMuon_)
+			signalMuon_ = goodIsolatedMuons_.front();
+	} else {
+		edm::LogError("TopPairMuonPlusJets2012SelectionFilterError") << "Error! Can't get the product " << muonInput_;
+	}
 	if (debug_)
 		cout << "Getting clean jets" << endl;
 	cleanedJets();
@@ -211,59 +215,60 @@ bool TopPairMuonPlusJets2012SelectionFilter::isLooseElectron(const pat::Electron
 	bool passesPtAndEta = electron.pt() > 20 && fabs(electron.eta()) < 2.5;
 	//		bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
 	bool passesID = electron.electronID("mvaTrigV0") > 0.0;
-	bool passesIso = getRelativeIsolation(electron) < looseElectronIso_;
+	bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrections_,
+			useRhoActiveAreaCorrections_) < looseElectronIso_;
 	return passesPtAndEta && passesID && passesIso;
 }
 
-double TopPairMuonPlusJets2012SelectionFilter::getRelativeIsolation(const pat::Electron& electron) const {
-	//code from: https://twiki.cern.ch/twiki/bin/view/CMS/PfIsolation
-	float AEff03 = 0.00;
-
-	if (isRealData_) {
-		AEff03 = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
-				electron.superCluster()->eta(), ElectronEffectiveArea::kEleEAData2011);
-	} else {
-		AEff03 = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
-				electron.superCluster()->eta(), ElectronEffectiveArea::kEleEAFall11MC);
-	}
-
-	AbsVetos vetos_ch;
-	AbsVetos vetos_nh;
-	AbsVetos vetos_ph;
-
-	Direction Dir = Direction(electron.superCluster()->eta(), electron.superCluster()->phi());
-
-	//threshold veto
-	//vetos_nh.push_back(new ThresholdVeto( 0.5 ));
-	//vetos_ph.push_back(new ThresholdVeto( 0.5 ));
-	//rectangular veto
-	//vetos_nh.push_back(new RectangularEtaPhiVeto( Dir, -0.1, 0.1, -0.2, 0.2));
-	//vetos_ph.push_back(new RectangularEtaPhiVeto( Dir, -0.1, 0.1, -0.2, 0.2));
-
-	//pf isolation veto setup EGM recommendation
-	if (abs(electron.superCluster()->eta()) > 1.479) {
-		vetos_ch.push_back(new ConeVeto(Dir, 0.015));
-		vetos_ph.push_back(new ConeVeto(Dir, 0.08));
-	}
-
-	//cone size 0.3
-	const double chIso03 = electron.isoDeposit(pat::PfChargedHadronIso)->depositAndCountWithin(0.3, vetos_ch).first;
-	const double nhIso03 = electron.isoDeposit(pat::PfNeutralHadronIso)->depositAndCountWithin(0.3, vetos_nh).first;
-	const double phIso03 = electron.isoDeposit(pat::PfGammaIso)->depositAndCountWithin(0.3, vetos_ph).first;
-
-	const double puChIso03 = electron.isoDeposit(pat::PfPUChargedHadronIso)->depositAndCountWithin(0.3, vetos_ch).first;
-
-	const double relIso = (chIso03 + nhIso03 + phIso03) / electron.pt();
-	const double relIsodb = (chIso03 + max(0.0, nhIso03 + phIso03 - 0.5 * puChIso03)) / electron.pt();
-	const double relIsorho = (chIso03 + max(0.0, nhIso03 + phIso03 - rho_ * AEff03)) / electron.pt();
-
-	if (useDeltaBetaCorrections_)
-		return relIsodb;
-	if (useRhoActiveAreaCorrections_)
-		return relIsorho;
-
-	return relIso;
-}
+//double TopPairMuonPlusJets2012SelectionFilter::getRelativeIsolation(const pat::Electron& electron) const {
+//	//code from: https://twiki.cern.ch/twiki/bin/view/CMS/PfIsolation
+//	float AEff03 = 0.00;
+//
+//	if (isRealData_) {
+//		AEff03 = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
+//				electron.superCluster()->eta(), ElectronEffectiveArea::kEleEAData2011);
+//	} else {
+//		AEff03 = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
+//				electron.superCluster()->eta(), ElectronEffectiveArea::kEleEAFall11MC);
+//	}
+//
+//	AbsVetos vetos_ch;
+//	AbsVetos vetos_nh;
+//	AbsVetos vetos_ph;
+//
+//	Direction Dir = Direction(electron.superCluster()->eta(), electron.superCluster()->phi());
+//
+//	//threshold veto
+//	//vetos_nh.push_back(new ThresholdVeto( 0.5 ));
+//	//vetos_ph.push_back(new ThresholdVeto( 0.5 ));
+//	//rectangular veto
+//	//vetos_nh.push_back(new RectangularEtaPhiVeto( Dir, -0.1, 0.1, -0.2, 0.2));
+//	//vetos_ph.push_back(new RectangularEtaPhiVeto( Dir, -0.1, 0.1, -0.2, 0.2));
+//
+//	//pf isolation veto setup EGM recommendation
+//	if (abs(electron.superCluster()->eta()) > 1.479) {
+//		vetos_ch.push_back(new ConeVeto(Dir, 0.015));
+//		vetos_ph.push_back(new ConeVeto(Dir, 0.08));
+//	}
+//
+//	//cone size 0.3
+//	const double chIso03 = electron.isoDeposit(pat::PfChargedHadronIso)->depositAndCountWithin(0.3, vetos_ch).first;
+//	const double nhIso03 = electron.isoDeposit(pat::PfNeutralHadronIso)->depositAndCountWithin(0.3, vetos_nh).first;
+//	const double phIso03 = electron.isoDeposit(pat::PfGammaIso)->depositAndCountWithin(0.3, vetos_ph).first;
+//
+//	const double puChIso03 = electron.isoDeposit(pat::PfPUChargedHadronIso)->depositAndCountWithin(0.3, vetos_ch).first;
+//
+//	const double relIso = (chIso03 + nhIso03 + phIso03) / electron.pt();
+//	const double relIsodb = (chIso03 + max(0.0, nhIso03 + phIso03 - 0.5 * puChIso03)) / electron.pt();
+//	const double relIsorho = (chIso03 + max(0.0, nhIso03 + phIso03 - rho_ * AEff03)) / electron.pt();
+//
+//	if (useDeltaBetaCorrections_)
+//		return relIsodb;
+//	if (useRhoActiveAreaCorrections_)
+//		return relIsorho;
+//
+//	return relIso;
+//}
 
 void TopPairMuonPlusJets2012SelectionFilter::getLooseMuons() {
 	looseMuons_.clear();
@@ -278,50 +283,67 @@ void TopPairMuonPlusJets2012SelectionFilter::getLooseMuons() {
 bool TopPairMuonPlusJets2012SelectionFilter::isLooseMuon(const pat::Muon& muon) const {
 	bool passesPtAndEta = muon.pt() > 10 && fabs(muon.eta()) < 2.5;
 	bool passesID = muon.isPFMuon() && (muon.isGlobalMuon() || muon.isTrackerMuon());
-	bool passesIso = getRelativeIsolation(muon) < looseMuonIso_;
+	bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrections_) < looseMuonIso_;
 	return passesPtAndEta && passesID && passesIso;
 }
 
-double TopPairMuonPlusJets2012SelectionFilter::getRelativeIsolation(const pat::Muon& muon) const {
-	//cone size 0.4
-	const double chIso04 = muon.isoDeposit(pat::PfChargedHadronIso)->depositAndCountWithin(0.4).first;
-	const double nhIso04 = muon.isoDeposit(pat::PfNeutralHadronIso)->depositAndCountWithin(0.4).first;
-	const double phIso04 = muon.isoDeposit(pat::PfGammaIso)->depositAndCountWithin(0.4).first;
-
-	const double puChIso04 = muon.isoDeposit(pat::PfPUChargedHadronIso)->depositAndCountWithin(0.4).first;
-
-	const double relIso = (chIso04 + nhIso04 + phIso04) / muon.pt();
-	const double relIsodb = (chIso04 + max(0.0, nhIso04 + phIso04 - 0.5 * puChIso04)) / muon.pt();
-
-	if (useDeltaBetaCorrections_ || useRhoActiveAreaCorrections_) //atm leave active area
-		return relIsodb;
-
-	return relIso;
-}
+//double TopPairMuonPlusJets2012SelectionFilter::getRelativeIsolation(const pat::Muon& muon) const {
+//	//cone size 0.4
+//	const double chIso04 = muon.isoDeposit(pat::PfChargedHadronIso)->depositAndCountWithin(0.4).first;
+//	const double nhIso04 = muon.isoDeposit(pat::PfNeutralHadronIso)->depositAndCountWithin(0.4).first;
+//	const double phIso04 = muon.isoDeposit(pat::PfGammaIso)->depositAndCountWithin(0.4).first;
+//
+//	const double puChIso04 = muon.isoDeposit(pat::PfPUChargedHadronIso)->depositAndCountWithin(0.4).first;
+//
+//	const double relIso = (chIso04 + nhIso04 + phIso04) / muon.pt();
+//	const double relIsodb = (chIso04 + max(0.0, nhIso04 + phIso04 - 0.5 * puChIso04)) / muon.pt();
+//
+//	if (useDeltaBetaCorrections_ || useRhoActiveAreaCorrections_) //atm leave active area
+//		return relIsodb;
+//
+//	return relIso;
+//}
 
 void TopPairMuonPlusJets2012SelectionFilter::goodIsolatedMuons() {
 	goodIsolatedMuons_.clear();
 	for (unsigned index = 0; index < muons_.size(); ++index) {
 		const pat::Muon muon = muons_.at(index);
-		if (debug_) {
-			cout << "Muon:" << endl;
-			cout << "pT: " << muon.pt() << " eta: " << muon.eta() << " phi: " << muon.phi() << endl;
-		}
 
-		bool passesIso = getRelativeIsolation(muon) < tightMuonIso_;
+		bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrections_) < tightMuonIso_;
 		if (isGoodMuon(muon) && passesIso)
 			goodIsolatedMuons_.push_back(muon);
 	}
 }
 
 bool TopPairMuonPlusJets2012SelectionFilter::isGoodMuon(const pat::Muon& muon) const {
+	if (debug_) {
+		cout << "isGoodMuon:" << "hasGoodPV: " << hasGoodPV_ << endl;
+		cout << "pT: " << muon.pt() << " eta: " << muon.eta() << " phi: " << muon.phi() << endl;
+		cout << "d0: " << muon.dB(pat::Muon::PV2D) << " z-dist: " << fabs(muon.vertex().z() - primaryVertex_.z());
+		cout << "isPFMuon: " << muon.isPFMuon() << " isGlobalMuon: " << muon.isGlobalMuon() << endl;
+//		normChi2 is causing this:
+//		Exception Message:
+//		BadRefCore RefCore: Request to resolve a null or invalid reference to a product of type 'std::vector<reco::Track>' has been detected.
+//		Please modify the calling code to test validity before dereferencing.
+
+//		cout << "normChi2: " << muon.normChi2() << endl;
+		if (muon.globalTrack().isNonnull()) {
+			cout << "normChi2: " << muon.globalTrack()->normalizedChi2() << endl;
+			cout << "numberOfValidMuonHits: " << muon.globalTrack()->hitPattern().numberOfValidMuonHits()
+					<< " isGlobalMuon: " << muon.innerTrack()->hitPattern().numberOfValidPixelHits() << endl;
+			cout << " trackerLayersWithMeasurement: " << muon.track()->hitPattern().trackerLayersWithMeasurement()
+					<< endl;
+		}
+		cout << "numberOfMatchedStations: " << muon.numberOfMatchedStations() << endl;
+	}
 	bool passesPtAndEta = muon.pt() > 26. && fabs(muon.eta()) < 2.1;
 	//2D impact w.r.t primary vertex
-	if (!hasGoodPV_)
+	if (!hasGoodPV_ or muon.globalTrack().isNull())
 		return false;
 	bool passesD0 = muon.dB(pat::Muon::PV2D) < 0.2 && fabs(muon.vertex().z() - primaryVertex_.z()) < 0.5; //cm
 	bool passesID = muon.isPFMuon() && muon.isGlobalMuon();
-	bool trackQuality = muon.normChi2() < 10 && muon.track()->hitPattern().trackerLayersWithMeasurement() > 5
+	bool trackQuality = muon.globalTrack()->normalizedChi2() < 10
+			&& muon.track()->hitPattern().trackerLayersWithMeasurement() > 5
 			&& muon.globalTrack()->hitPattern().numberOfValidMuonHits() > 0
 			&& muon.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 && muon.numberOfMatchedStations() > 1;
 	return passesPtAndEta && passesD0 && passesID && trackQuality;
