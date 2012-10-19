@@ -111,6 +111,11 @@ options.register ('isTTbarMC',
                   VarParsing.varType.bool,
                   "Identify if samples contains ttbar events")
 
+options.register ('skipEvents',
+                              0,
+                           VarParsing.multiplicity.singleton,
+                           VarParsing.varType.int,
+                               "Number of events to skip (0 for none)")
 options.parseArguments()
 
 if options.CMSSW == '44X':
@@ -290,6 +295,8 @@ if options.maxEvents:
     process.maxEvents.input = options.maxEvents
 else:
     process.maxEvents.input = 100
+    
+process.source.skipEvents = options.skipEvents
     
 process.options.wantSummary = True
 process.out.dropMetaData = cms.untracked.string("DROPPED")
