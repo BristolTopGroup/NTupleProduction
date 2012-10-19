@@ -11,6 +11,7 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
+#include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
 
 BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfig) :
 		trkInputTag(iConfig.getParameter < edm::InputTag > ("TracksInputTag")), //
@@ -34,6 +35,9 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 	produces < std::vector<double> > (prefix + "Energy" + suffix);
 	//extra properties
 	produces < std::vector<int> > (prefix + "Charge" + suffix);
+	produces < std::vector<double> > (prefix + "ecalDrivenMomentum.Px" + suffix);
+	produces < std::vector<double> > (prefix + "ecalDrivenMomentum.Py" + suffix);
+	produces < std::vector<double> > (prefix + "ecalDrivenMomentum.Pz" + suffix);
 
 	//electron ID variables
 	produces < std::vector<double> > (prefix + "HadronicOverEM" + suffix);
@@ -78,10 +82,14 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 		produces < std::vector<double> > (prefix + "PfNeutralHadronIso03" + suffix);
 		produces < std::vector<double> > (prefix + "PFGammaIso03" + suffix);
 		produces < std::vector<double> > (prefix + "PFRelIso03" + suffix);
+		produces < std::vector<double> > (prefix + "PFRelIso03DeltaBeta" + suffix);
+		produces < std::vector<double> > (prefix + "PFRelIso03RhoEA" + suffix);
+
 		produces < std::vector<double> > (prefix + "PfChargedHadronIso04" + suffix);
 		produces < std::vector<double> > (prefix + "PfNeutralHadronIso04" + suffix);
 		produces < std::vector<double> > (prefix + "PFGammaIso04" + suffix);
 		produces < std::vector<double> > (prefix + "PFRelIso04" + suffix);
+
 		produces < std::vector<double> > (prefix + "PfChargedHadronIso05" + suffix);
 		produces < std::vector<double> > (prefix + "PfNeutralHadronIso05" + suffix);
 		produces < std::vector<double> > (prefix + "PFGammaIso05" + suffix);
@@ -147,7 +155,9 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > energy(new std::vector<double>());
 	//extra properties
 	std::auto_ptr < std::vector<int> > charge(new std::vector<int>());
-
+	std::auto_ptr < std::vector<double> > ecalDrivenMomentumPx(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > ecalDrivenMomentumPy(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > ecalDrivenMomentumPz(new std::vector<double>());
 	//electron ID variables
 	std::auto_ptr < std::vector<double> > hadronicOverEM(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > EseedOverPout(new std::vector<double>());
@@ -189,6 +199,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > PfNeutralHadronIso03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PFGammaIso03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PFRelIso03(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > PFRelIso03DeltaBeta(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > PFRelIso03RhoEA(new std::vector<double>());
 
 	std::auto_ptr < std::vector<double> > PfChargedHadronIso04(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PfNeutralHadronIso04(new std::vector<double>());
@@ -252,6 +264,10 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > primaryVertexDXYCorr(new std::vector<double>());
 
 	//-----------------------------------------------------------------
+	edm::Handle<double> rhoH;
+	iEvent.getByLabel(edm::InputTag("kt6PFJets", "rho"), rhoH);
+	double rho(*rhoH);
+
 	edm::Handle < std::vector<pat::Electron> > electrons;
 	iEvent.getByLabel(inputTag, electrons);
 
@@ -441,7 +457,9 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			energy->push_back(it->energy());
 			//extra properties
 			charge->push_back(it->charge());
-
+			ecalDrivenMomentumPx->push_back(it->ecalDrivenMomentum().Px());
+			ecalDrivenMomentumPy->push_back(it->ecalDrivenMomentum().Py());
+			ecalDrivenMomentumPz->push_back(it->ecalDrivenMomentum().Pz());
 			// ID variables
 			hadronicOverEM->push_back(it->hadronicOverEm());
 			EseedOverPout->push_back(it->eSeedClusterOverPout());
@@ -535,6 +553,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 				PFRelIso03->push_back(pfRelIso03 / it->et());
 				PFRelIso04->push_back(pfRelIso04 / it->et());
 				PFRelIso05->push_back(pfRelIso05 / it->et());
+				PFRelIso03DeltaBeta->push_back(getRelativeIsolation(*it, 0.3, rho, iEvent.isRealData(), true, false));
+				PFRelIso03RhoEA->push_back(getRelativeIsolation(*it, 0.3, rho, iEvent.isRealData(), false, true));
 
 				if (PfPUChargedHadronIso) {
 					PfPUChargedHadronIso03->push_back(PfPUChargedHadronIso->depositWithin(0.3));
@@ -598,7 +618,9 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	iEvent.put(energy, prefix + "Energy" + suffix);
 	//extra properties
 	iEvent.put(charge, prefix + "Charge" + suffix);
-
+	iEvent.put(ecalDrivenMomentumPx, prefix + "ecalDrivenMomentum.Px" + suffix);
+	iEvent.put(ecalDrivenMomentumPy, prefix + "ecalDrivenMomentum.Py" + suffix);
+	iEvent.put(ecalDrivenMomentumPz, prefix + "ecalDrivenMomentum.Pz" + suffix);
 	//electron ID variables
 	iEvent.put(hadronicOverEM, prefix + "HadronicOverEM" + suffix);
 	iEvent.put(EseedOverPout, prefix + "eSeedClusterOverPout" + suffix);
@@ -643,6 +665,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 		iEvent.put(PfNeutralHadronIso03, prefix + "PfNeutralHadronIso03" + suffix);
 		iEvent.put(PFGammaIso03, prefix + "PFGammaIso03" + suffix);
 		iEvent.put(PFRelIso03, prefix + "PFRelIso03" + suffix);
+		iEvent.put(PFRelIso03DeltaBeta, prefix + "PFRelIso03DeltaBeta" + suffix);
+		iEvent.put(PFRelIso03RhoEA, prefix + "PFRelIso03RhoEA" + suffix);
 
 		iEvent.put(PfChargedHadronIso04, prefix + "PfChargedHadronIso04" + suffix);
 		iEvent.put(PfNeutralHadronIso04, prefix + "PfNeutralHadronIso04" + suffix);
