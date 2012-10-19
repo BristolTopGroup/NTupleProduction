@@ -15,6 +15,7 @@ unfoldingAnalyserElectronChannel = cms.EDAnalyzer("UnfoldingAnalyser",
 )
 
 unfoldingAnalyserMuonChannel = unfoldingAnalyserElectronChannel.clone(
-    doElectronChannel = cms.untracked.bool(False)
+    doElectronChannel = cms.untracked.bool(False),
+    selectionFlagInput = cms.InputTag("topPairMuPlusJetsSelection",  'TopPairMuonPlusJets2012Selection.FullSelection', 'PAT' ),
 )
 

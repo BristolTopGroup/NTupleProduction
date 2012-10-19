@@ -24,8 +24,8 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJets2012SelectionFilte
     tightMuonIsolation=cms.double(0.12),
     looseElectronIsolation=cms.double(0.15),
     looseMuonIsolation=cms.double(0.2),
-    useDeltaBetaCorrections = cms.bool(False),
-    useRhoActiveAreaCorrections = cms.bool(True),
+    useDeltaBetaCorrections = cms.bool(True),
+    useRhoActiveAreaCorrections = cms.bool(False),
     useMETFilters = cms.bool(True),
     useEEBadScFilter = cms.bool(False),
     

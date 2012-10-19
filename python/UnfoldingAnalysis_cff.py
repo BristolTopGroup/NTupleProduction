@@ -7,6 +7,7 @@ def setup_UnfoldingAnalysis(process, cms, options):
     ######################################################################################################
     process.load('BristolAnalysis.NTupleTools.ttDecayChannelFilters_cff')
     process.load('BristolAnalysis.NTupleTools.TopPairElectronPlusJets2012SelectionFilter_cfi')
+    process.load('BristolAnalysis.NTupleTools.TopPairMuonPlusJets2012SelectionFilter_cfi')
     process.load('BristolAnalysis.NTupleTools.BTagWeight_Producer_cfi')
     
     process.load('BristolAnalysis.NTupleTools.UnfoldingAnalyser_cfi')
@@ -18,17 +19,27 @@ def setup_UnfoldingAnalysis(process, cms, options):
     process.ttSemiLeptonicMuonFilter.taggingMode = cms.bool(True)
     process.ttSemiLeptonicTauFilter.taggingMode = cms.bool(True)
     process.topPairEPlusJetsSelection.taggingMode = cms.bool(True)
+    process.topPairMuPlusJetsSelection.taggingMode = cms.bool(True)
     
     electronselectionPrefix = 'TopPairElectronPlusJets2012Selection.'
+    muonselectionPrefix = 'TopPairMuonPlusJets2012Selection.'
     process.topPairEPlusJetsSelection.prefix = cms.untracked.string(electronselectionPrefix)
+    process.topPairMuPlusJetsSelection.prefix = cms.untracked.string(muonselectionPrefix)
     
-    process.eventWeightBtag.numberOfTagsInput = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'NumberOfBtags', 'PAT')
-    process.eventWeightBtag.jetInput = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'cleanedJets', 'PAT')
-    process.eventWeightBtag.targetBtagMultiplicity = cms.uint32(2) #will calculate the weight for b-tag multiplicity >=2
-    process.eventWeightBtag.BJetSystematic = cms.int32(0)
+    process.eventWeightBtagEPlusJets = process.eventWeightBtag.clone(
+            numberOfTagsInput = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'NumberOfBtags', 'PAT'),
+            jetInput = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'cleanedJets', 'PAT'),
+            targetBtagMultiplicity = cms.uint32(2), #will calculate the weight for b-tag multiplicity >=2
+            BJetSystematic = cms.int32(0)
+            )
+    process.eventWeightBtagMuPlusJets = process.eventWeightBtagEPlusJets.clone(
+            numberOfTagsInput = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'NumberOfBtags', 'PAT')  ,  
+            jetInput = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'cleanedJets', 'PAT'),       
+                                                              )
     process.unfoldingAnalyserElectronChannel.selectionFlagInput = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'FullSelection', 'PAT')
-#TODO: change to muon selection
-    process.unfoldingAnalyserMuonChannel.selectionFlagInput = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'FullSelection', 'PAT')
+    process.unfoldingAnalyserElectronChannel.BtagWeightInput = cms.InputTag( 'eventWeightBtagEPlusJets' )
+    process.unfoldingAnalyserMuonChannel.selectionFlagInput = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'FullSelection', 'PAT')
+    process.unfoldingAnalyserMuonChannel.BtagWeightInput = cms.InputTag( 'eventWeightBtagMuPlusJets' )
     
     #PU event weight
     if options.CMSSW == '44X':
@@ -48,10 +59,12 @@ def setup_UnfoldingAnalysis(process, cms, options):
                                                      process.ttSemiLeptonicTauFilter)
     
     process.eventFiltersIntaggingMode = cms.Sequence(process.MCFiltersInTaggingMode * 
-                                                     process.topPairEPlusJetsSelection)
+                                                     process.topPairEPlusJetsSelection *
+                                                     process.topPairMuPlusJetsSelection)
     
     process.unfoldingAnalysisSequence = cms.Sequence(process.eventFiltersIntaggingMode * 
-                                                     process.eventWeightBtag * 
+                                                     process.eventWeightBtagEPlusJets *
+                                                     process.eventWeightBtagMuPlusJets *  
 						                             process.printEventContent * 
                                                      process.unfoldingAnalyserElectronChannel * 
                                                      process.unfoldingAnalyserMuonChannel)
@@ -59,9 +72,3 @@ def setup_UnfoldingAnalysis(process, cms, options):
     
     if not options.printEventContent:
         process.unfoldingAnalysisSequence.remove(process.printEventContent)
-        
-
-    if options.useData or not options.isTTbarMC:
-        process.eventFiltersIntaggingMode.remove(process.MCFiltersInTaggingMode)
-    #if not TTJet in options.dataType
-    

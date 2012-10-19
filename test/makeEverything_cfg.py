@@ -33,22 +33,20 @@ process.out.SelectEvents.SelectEvents = cms.vstring('makingNTuples')
 #            Unfolding Config
 ##########################################################################################
 from BristolAnalysis.NTupleTools.UnfoldingAnalysis_cff import *
-setup_UnfoldingAnalysis(process, cms, options)
 
-process.unfoldingAnalysis = cms.Path(
-                      process.pdfWeights *
+if options.isTTbarMC:
+    setup_UnfoldingAnalysis(process, cms, options)
+    process.unfoldingAnalysis = cms.Path(
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
                       process.patseq * 
                       process.EventFilters * 
                       getattr(process, "producePatPFMETCorrections" + postfix) * 
                       getattr(process, "patMETs" + postfix)*
+                      process.eventWeightPU *
                       process.unfoldingAnalysisSequence 
                       )
 
-if options.useData or not options.storePDFWeights:
-    process.unfoldingAnalysis.remove(process.pdfWeights)
-    
 ##########################################################################################
 #            Selection Config
 ##########################################################################################
@@ -105,4 +103,5 @@ process.selectionAnalysis = cms.Path(
 
 if options.useData:
     process.eventFiltersIntaggingMode.remove(process.MCFiltersInTaggingMode)
+if options.useData or not options.isTTbarMC:
     process.selectionAnalysis.remove(process.ttbarDecayAnalyser)
