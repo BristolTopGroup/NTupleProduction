@@ -273,7 +273,7 @@ bool TopPairMuonPlusJets2012SelectionFilter::isGoodMuon(const pat::Muon& muon) c
 	//2D impact w.r.t primary vertex
 	if (!hasGoodPV_ or muon.globalTrack().isNull())
 		return false;
-	bool passesD0 = muon.dB(pat::Muon::PV2D) < 0.2 && fabs(muon.vertex().z() - primaryVertex_.z()) < 0.5; //cm
+	bool passesD0 = muon.dB(pat::Muon::PV2D) < 0.02 && fabs(muon.vertex().z() - primaryVertex_.z()) < 0.5; //cm
 	bool passesID = muon.isPFMuon() && muon.isGlobalMuon();
 	bool trackQuality = muon.globalTrack()->normalizedChi2() < 10
 			&& muon.track()->hitPattern().trackerLayersWithMeasurement() > 5
@@ -309,7 +309,7 @@ void TopPairMuonPlusJets2012SelectionFilter::cleanedBJets() {
 
 bool TopPairMuonPlusJets2012SelectionFilter::isGoodJet(const pat::Jet& jet) const {
 	//both cuts are done at PAT config level (selectedPATJets) this is just for safety
-	bool passesPtAndEta(jet.pt() > 20. && fabs(jet.eta() < 2.5));
+	bool passesPtAndEta(jet.pt() > 30. && fabs(jet.eta() < 2.4));
 	return passesPtAndEta;
 }
 
@@ -322,10 +322,10 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesSelectionStep(edm::Event& iEv
 		return passesEventCleaning(iEvent) && passesTriggerSelection();
 	case TTbarMuPlusJetsReferenceSelection::OneIsolatedMuon:
 		return hasExactlyOneIsolatedLepton();
+	case TTbarMuPlusJetsReferenceSelection::LooseMuonVeto:
+			return passesLooseMuonVeto();
 	case TTbarMuPlusJetsReferenceSelection::LooseElectronVeto:
-		return passesLooseLeptonVeto();
-	case TTbarMuPlusJetsReferenceSelection::DiLeptonVeto:
-		return passesDileptonVeto();
+		return passesLooseElectronVeto();
 	case TTbarMuPlusJetsReferenceSelection::AtLeastOneGoodJet:
 		return hasAtLeastOneGoodJet();
 	case TTbarMuPlusJetsReferenceSelection::AtLeastTwoGoodJets:
@@ -450,7 +450,7 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesTriggerSelection() const {
 			bool fired_START52_V5 = triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFJet30", hltConfig_, triggerResults_);
 			bool fired_START52_V9 = triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFJet30", hltConfig_, triggerResults_)
 					|| triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFNoPUJet30", hltConfig_, triggerResults_);
-			bool fired_START53_V7A = triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30_30_20", hltConfig_,
+			bool fired_START53_V7A = triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet50_40_30", hltConfig_,
 					triggerResults_);
 			return fired_START52_V5 || fired_START52_V9 || fired_START53_V7A;
 		}
@@ -463,12 +463,12 @@ bool TopPairMuonPlusJets2012SelectionFilter::hasExactlyOneIsolatedLepton() const
 	return goodIsolatedMuons_.size() == 1;
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::passesLooseLeptonVeto() const {
-	return looseElectrons_.size() < 2;
+bool TopPairMuonPlusJets2012SelectionFilter::passesLooseElectronVeto() const {
+	return looseElectrons_.size() == 0;
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::passesDileptonVeto() const {
-	return looseMuons_.size() == 0;
+bool TopPairMuonPlusJets2012SelectionFilter::passesLooseMuonVeto() const {
+	return looseMuons_.size() < 2;
 }
 
 bool TopPairMuonPlusJets2012SelectionFilter::hasAtLeastOneGoodJet() const {
