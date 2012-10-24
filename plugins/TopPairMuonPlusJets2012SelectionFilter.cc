@@ -431,7 +431,7 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesTriggerSelection() const {
 		else if (runNumber_ >= 190456 && runNumber_ <= 193805)
 			return triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFJet30", hltConfig_, triggerResults_)
 					|| triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFNoPUJet30", hltConfig_, triggerResults_);
-		else if (runNumber_ > 193806)
+		else if (runNumber_ >= 193806)
 			return triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30", hltConfig_, triggerResults_)
 					|| triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30_30_20", hltConfig_, triggerResults_)
 					|| triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet45_35_25", hltConfig_, triggerResults_);
