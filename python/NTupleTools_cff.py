@@ -57,6 +57,24 @@ options.register ('useGSFelectrons',
                   VarParsing.varType.bool,
                   "Use GSF instead of PF electrons in PAT")
 
+options.register ('setupMETmanually',
+                  False,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.bool,
+                  "Alternative way of setting up PFMET with PF2PAT (see python/MET_Setup_cff.py)")
+
+options.register ('applyType0METcorrection',
+                  False,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.bool,
+                  "Apply type0 MET correction")
+
+options.register ('applySysShiftCorrection',
+                  False,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.bool,
+                  "Apply x/y Shift Correction (for phi modulation)")
+
 options.register ('writeIsolatedPFLeptons',
                   True,
                   VarParsing.multiplicity.singleton,
@@ -116,6 +134,16 @@ options.register ('skipEvents',
                            VarParsing.multiplicity.singleton,
                            VarParsing.varType.int,
                                "Number of events to skip (0 for none)")
+#CMSSW 44X can't compile this file in the python directory correctly 
+#as it fails to identify the file ending. This hack helps.
+import sys
+hasCorrectEnding = False
+for arg in sys.argv:
+    if '.py' in arg:
+        hasCorrectEnding = True
+if not hasCorrectEnding:
+    sys.argv.append('something.py')
+
 options.parseArguments()
 
 if options.CMSSW == '44X':
@@ -195,15 +223,18 @@ setup_looseLeptons(process, cms, options, postfix=postfix, maxLooseLeptonRelIso=
 #Jets
 from BristolAnalysis.NTupleTools.Jets_Setup_cff import *
 setup_jets(process, cms, options, postfix=postfix)
+#MET
+from BristolAnalysis.NTupleTools.MET_Setup_cff import *
+if options.setupMETmanually:
+    setup_MET_manually(process, cms, options, postfix=postfix)
+else:
+    setup_MET(process, cms, options, postfix=postfix)
 #electron ID
 from BristolAnalysis.NTupleTools.ElectronID_cff import *
 setup_electronID(process, cms)
 #Object selection
 from BristolAnalysis.NTupleTools.ObjectSelection_cff import *
 selectObjects(process, cms)
-
-from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
-runMEtUncertainties(process, doSmearJets=not options.useData, jetCollection='goodPatJetsPFlow', addToPatDefaultSequence=False)
 
 #fix for loose pfIsolatedMuons for the newer tags
 process.patMuonsLoosePFlow.pfMuonSource = cms.InputTag("pfIsolatedMuonsLoose" + postfix)
@@ -261,11 +292,16 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
 
 process.load('BristolAnalysis.NTupleTools.EventWeight_Producer_PU_cfi')
 if options.CMSSW == '44X':
-        process.eventWeightPU.MCSampleTag = cms.string("Fall11") # valid identifier: Fall11, Summer12
+        process.eventWeightPU.MCSampleTag = cms.string("Fall11") # valid identifier: Fall11, Summer12    MCSampleFile        = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Default2011.root"),
+    	process.eventWeightPU.MCSampleFile        = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Default2011.root"),
+    	process.eventWeightPU.MCSampleHistoName   = cms.string("histo_Fall11_true"),
+    	process.eventWeightPU.DataFile            = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/Data_PUDist_2011Full.root"),
+    	process.eventWeightPU.DataHistoName       = cms.string("histoData_true"),
 else:
         process.eventWeightPU.MCSampleTag = cms.string("Summer12")
-        process.eventWeightPU.MCSampleFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Summer2012.root")
-        process.eventWeightPU.MCSampleHistoName   = cms.string("puhisto")
+        #process.eventWeightPU.MCSampleFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Summer2012.root")
+        process.eventWeightPU.MCSampleFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Default2012.root")
+	process.eventWeightPU.MCSampleHistoName   = cms.string("puhisto")
 
 process.TFileService = cms.Service("TFileService",
                            fileName=cms.string('ntuple.root')

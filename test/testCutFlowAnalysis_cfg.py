@@ -20,6 +20,13 @@ process.ttFullLeptonicMuTauFilter.taggingMode = cms.bool(True)
 process.topPairEPlusJetsSelection.taggingMode = cms.bool(True)
 process.topPairMuPlusJetsSelection.taggingMode = cms.bool(True)
 
+if options.CMSSW == '44X':
+    process.topPairEPlusJetsSelection.MCSampleTag = cms.string('Fall11')  
+    process.topPairMuPlusJetsSelection.MCSampleTag = cms.string('Fall11')  
+else:
+    process.topPairEPlusJetsSelection.MCSampleTag = cms.string('Summer12')  
+    process.topPairMuPlusJetsSelection.MCSampleTag = cms.string('Summer12')
+
 process.MCFiltersInTaggingMode = cms.Sequence(process.ttFullHadronicFilter * 
 #                                                     process.ttFullLeptonicFilter * 
                                                      process.ttSemiLeptonicElectronFilter * 
@@ -40,6 +47,7 @@ process.selectionAnalysis = cms.Path(
                       process.pdfWeights * 
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
+                      process.pfMEtSysShiftCorrSequence *
                       process.patseq * 
                       process.EventFilters * 
                       getattr(process, "producePatPFMETCorrections" + postfix) * 
@@ -50,6 +58,10 @@ process.selectionAnalysis = cms.Path(
                       process.topPairEPlusJetsSelectionAnalyser *
                       process.topPairMuPlusJetsSelectionAnalyser
                       )
+
+if not options.setupMETmanually:
+    process.selectionAnalysis.remove(getattr(process, "producePatPFMETCorrections" + postfix))
+    process.selectionAnalysis.remove(getattr(process, "patMETs" + postfix))
 
 if options.useData or not options.storePDFWeights:
     process.selectionAnalysis.remove(process.pdfWeights)

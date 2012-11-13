@@ -29,7 +29,7 @@ selectionCuts = [
                "AllEvents", 
                 "EventCleaningAndTrigger", 
                 "OneIsolatedMuon", 
-                "DiLeptonVeto", 
+                "LooseMuonVeto", 
                 "LooseElectronVeto", 
                 "AtLeastOneGoodJet", 
                 "AtLeastTwoGoodJets", 

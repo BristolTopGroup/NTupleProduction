@@ -1,26 +1,41 @@
 import FWCore.ParameterSet.Config as cms
 
+#Calo MET
 rootTupleCaloMET = cms.EDProducer("BristolNTuple_MET",
     InputTag=cms.InputTag('patMETs'),
     Prefix=cms.string('patMETs.'),
     Suffix=cms.string(''),
 )
 
+#Type1 (by default) corrected PFMET from PAT - default to use. Identical to patType1CorrectedPFMetPFlow
+#Jets collection used: pfJetsPFlow (anti-kt)
 rootTuplePFMET = cms.EDProducer("BristolNTuple_MET",
     InputTag=cms.InputTag('patMETsPFlow'),
     Prefix=cms.string('patMETsPFlow.'),
     Suffix=cms.string(''),
  )
 
+#Type1 corrected PFMET coming from PAT MET uncertainty sequence
+#Jets collection used: ak5PFJets
 rootTuplePFType1CorrectedMET = cms.EDProducer("BristolNTuple_MET",
     InputTag=cms.InputTag('patType1CorrectedPFMet'),
     Prefix=cms.string('patType1CorrectedPFMet.'),
     Suffix=cms.string(''),
  )
 
+#Type1p2 corrected PFMET coming from PAT MET uncertainty sequence
+#Jets collection used: ak5PFJets
 rootTuplePFType1p2CorrectedMET = cms.EDProducer("BristolNTuple_MET",
     InputTag=cms.InputTag('patType1p2CorrectedPFMet'),
     Prefix=cms.string('patType1p2CorrectedPFMet.'),
+    Suffix=cms.string(''),
+ )
+
+#Type1p2 corrected PFMET from PAT
+#Jets collection used: pfJetsPFlow (anti-kt)
+rootTuplePFType1p2CorrectedMetPFlow = cms.EDProducer("BristolNTuple_MET",
+    InputTag=cms.InputTag('patType1p2CorrectedPFMetPFlow'),
+    Prefix=cms.string('patType1p2CorrectedPFMetPFlow.'),
     Suffix=cms.string(''),
  )
 

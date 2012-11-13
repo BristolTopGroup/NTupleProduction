@@ -31,7 +31,7 @@ def setup_PF2PAT(process, cms, options, postfix="PFlow", removeTausFromJetCollec
         #process.patJetCorrFactorsPFlow.levels = inputJetCorrLabel[1]
         process.patJetCorrFactorsPFlow.rho = cms.InputTag("kt6PFJetsPFlow", "rho")
     else:
-        usePF2PAT(process, runPF2PAT=True, jetAlgo='AK5', runOnMC=not options.useData, postfix=postfix, typeIMetCorrections=False,
+        usePF2PAT(process, runPF2PAT=True, jetAlgo='AK5', runOnMC=not options.useData, postfix=postfix, typeIMetCorrections=not options.setupMETmanually,
                   jetCorrections=inputJetCorrLabel,
                   pvCollection=cms.InputTag('goodOfflinePrimaryVertices')
                   )
@@ -43,43 +43,6 @@ def setup_PF2PAT(process, cms, options, postfix="PFlow", removeTausFromJetCollec
     if not options.forceCheckClosestZVertex :
         process.pfPileUpPFlow.checkClosestZVertex = False
 
-    #PFMET setup: following by-hand recipe from https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMetAnalysis#Type_I_II_0_with_PF2PAT
-    process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
-    getattr(process,'patPF2PATSequence'+postfix).remove(getattr(process,'patMETs'+postfix))
-
-    from PhysicsTools.PatAlgos.tools.helpers import cloneProcessingSnippet
-    cloneProcessingSnippet(process, process.producePatPFMETCorrections, postfix)
-
-    getattr(process,'selectedPatJetsForMETtype1p2Corr'+postfix).src = cms.InputTag('selectedPatJets'+postfix)
-    getattr(process,'selectedPatJetsForMETtype2Corr'+postfix).src = cms.InputTag('selectedPatJets'+postfix)
-    getattr(process,'pfCandMETcorr'+postfix).src = cms.InputTag('pfNoJet'+postfix)
-    getattr(process,'patPFJetMETtype1p2Corr'+postfix).type1JetPtThreshold = cms.double(10.0)
-    getattr(process,'patType1CorrectedPFMet'+postfix).srcType1Corrections = cms.VInputTag(
-    cms.InputTag("patPFJetMETtype1p2Corr"+postfix,"type1"),
-    #cms.InputTag("patPFMETtype0Corr"+postfix) ###uncomment this line to include type-0 corrections
-    )
-    getattr(process,'patType1p2CorrectedPFMet'+postfix).srcType1Corrections = cms.VInputTag(
-        cms.InputTag("patPFJetMETtype1p2Corr"+postfix,"type1"),
-        #cms.InputTag("patPFMETtype0Corr"+postfix) ###uncomment this line to include type-0 corrections
-        )
-    getattr(process,'patPFJetMETtype1p2Corr'+postfix).skipEM = cms.bool(False)
-    getattr(process,'patPFJetMETtype1p2Corr'+postfix).skipMuons = cms.bool(False)
-    getattr(process,'patPFJetMETtype2Corr'+postfix).skipEM = cms.bool(False)
-    getattr(process,'patPFJetMETtype2Corr'+postfix).skipMuons = cms.bool(False)
-
-    ##for type I+II corrections, switch this to patType1p2CorrectedPFMet
-    getattr(process,'patMETs'+postfix).metSource = cms.InputTag('patType1CorrectedPFMet'+postfix)
-
-    getattr(process,'patDefaultSequence'+postfix).remove(getattr(process,'patMETs'+postfix))
-
-    if options.useData:
-        getattr(process,'patPFJetMETtype1p2Corr'+postfix).jetCorrLabel = 'L2L3Residual'
-        getattr(process,'patPFJetMETtype2Corr'+postfix).jetCorrLabel = 'L2L3Residual'
-
-    getattr(process,'patPFMet'+postfix).addGenMET = cms.bool(not options.useData)
-    process.patPFMet.addGenMET = cms.bool(not options.useData)
-
-    
     #False == taus also in jet collection
     process.pfNoTauPFlow.enable = removeTausFromJetCollection
 
