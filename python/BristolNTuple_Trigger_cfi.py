@@ -86,7 +86,6 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     'HLT_Ele25_CaloIdVL_CaloIsoT_TrkIdVL_TrkIsoT_TriCentralPFNoPUJet30_v',#anti-ID trigger DEV
     'HLT_Ele25_CaloIdVT_CaloIsoVL_TrkIdVL_TrkIsoT_TriCentralPFNoPUJet30_v',#stop signal trigger
     'HLT_Ele25_CaloIdVT_CaloIsoVL_TrkIdVL_TrkIsoT_TriCentralPFNoPUJet50_40_30_v',#stop signal trigger (backup)
-    'HLT_Ele25_CaloIdVT_CaloIsoVL_TrkIdVL_TrkIsoT_TriCentralPFNoPUJet45_35_25_v',
     #
     'HLT_Mu20_eta2p1_TriCentralPFNoPUJet30_v',
     'HLT_Mu20_eta2p1_TriCentralPFNoPUJet50_40_30_v',
@@ -101,7 +100,6 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     'HLT_IsoMu17_eta2p1_DiCentralPFNoPUJet30_v',
     'HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30_v',
     'HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet50_40_30_v',
-    'HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet45_35_25_v',
     #triggers with lower 3rd jet threshold to combat missing JEC
     'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFNoPUJet30_30_20_v',
     'HLT_Ele25_CaloIdVT_TrkIdT_TriCentralPFNoPUJet30_30_20_v',
@@ -112,6 +110,9 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     'HLT_IsoMu24_eta2p1_v',
     'HLT_IsoMu30_v',
     'HLT_IsoMu30_eta2p1_v',
+    #2012 triggers with online JEC
+    'HLT_Ele25_CaloIdVT_CaloIsoVL_TrkIdVL_TrkIsoT_TriCentralPFNoPUJet45_35_25_v',
+    'HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet45_35_25_v',
  ),                              
     HLTPathsOfInterest_Other = cms.vstring(
                                            #2010 data RunA + RunB
