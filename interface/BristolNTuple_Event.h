@@ -13,7 +13,7 @@ private:
 	bool passesFilter(edm::Event& event, edm::InputTag filter);
 	void produce(edm::Event &, const edm::EventSetup &);
 	const edm::InputTag dcsInputTag;
-	edm::InputTag hcalLaserFilterInput_, ecalDeadCellFilterInput_, trackingFailureFilter_, METInputForSumET_;
+	edm::InputTag hcalLaserFilterInput_, ecalDeadCellFilterInput_, ecalDeadCellTriggerPrimitiveFilterInput_, trackingFailureFilter_, METInputForSumET_;
 
 	const std::string prefix, suffix;
 

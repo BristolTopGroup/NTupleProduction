@@ -19,6 +19,7 @@ enum value {
 	passCSCBeamHaloFilter,
 	passHCALLaserFilter,
 	passECALDeadCellFilter,
+	passECALDeadCellTriggerPrimitiveFilter,
 	passTrackingFailureFilter,
 	passScrapingVeto,
 	passGoodPrimaryVertex,
@@ -33,6 +34,7 @@ const std::string names[NUMBER_OF_FILTERS] = { "All Events", //
 		"CSCBeamHaloFilter", //
 		"HCALLaserFilter", //
 		"ECALDeadCellFilter", //
+		"ECALDeadCellTriggerPrimitiveFilter", //
 		"TrackingFailureFilter", //
 		"ScrapingVeto", //
 		"GoodPrimaryVertex", //
@@ -67,7 +69,7 @@ private:
 	bool passesMuonCuts(edm::Event& event);
 	bool passesJetCuts(edm::Event& event);
 
-	edm::InputTag hcalNoiseInput_, hcalLaserFilterInput_, ecalDeadCellFilterInput_, //
+	edm::InputTag hcalNoiseInput_, hcalLaserFilterInput_, ecalDeadCellFilterInput_, ecalDeadCellTriggerPrimitiveFilterInput_,//
 			trackingFailureFilter_, //
 			trkInput_, vertexInput_, //
 			jetInput_, electronInput_, muonInput_;
