@@ -37,7 +37,6 @@ process.makingNTuples = cms.Path(
                       process.pdfWeights * 
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
-                      process.pfMEtSysShiftCorrSequence *
                       process.patseq * 
                       getattr(process, "producePatPFMETCorrections" + postfix) * 
                       getattr(process, "patMETs" + postfix) * 
@@ -47,7 +46,7 @@ process.makingNTuples = cms.Path(
                       process.rootNTuples
                       )
 
-if not options.setupMETmanually:
+if not options.CMSSW == '44X':
     process.makingNTuples.remove(getattr(process, "producePatPFMETCorrections" + postfix))
     process.makingNTuples.remove(getattr(process, "patMETs" + postfix))
 

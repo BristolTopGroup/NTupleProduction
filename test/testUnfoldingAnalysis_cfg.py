@@ -9,7 +9,6 @@ if options.isTTbarMC:
     process.unfoldingAnalysis = cms.Path(
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
-                      process.pfMEtSysShiftCorrSequence *
                       process.patseq * 
                       process.EventFilters * 
                       getattr(process, "producePatPFMETCorrections" + postfix) * 
@@ -17,7 +16,7 @@ if options.isTTbarMC:
                       process.eventWeightPU *
                       process.unfoldingAnalysisSequence 
                       )
-    if not options.setupMETmanually:
+    if not options.CMSSW == '44X':
         process.unfoldingAnalysis.remove(getattr(process, "producePatPFMETCorrections" + postfix))
         process.unfoldingAnalysis.remove(getattr(process, "patMETs" + postfix))
 else:

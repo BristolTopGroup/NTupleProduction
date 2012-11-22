@@ -85,7 +85,6 @@ if options.isTTbarMC:
     process.unfoldingAnalysis = cms.Path(
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
-                      process.pfMEtSysShiftCorrSequence *
                       process.patseq * 
                       process.EventFilters * 
                       getattr(process, "producePatPFMETCorrections" + postfix) * 
@@ -93,7 +92,7 @@ if options.isTTbarMC:
                       process.eventWeightPU *
                       process.unfoldingAnalysisSequence 
                       )
-    if not options.setupMETmanually:
+    if not options.CMSSW == '44X':
         process.unfoldingAnalysis.remove(getattr(process, "producePatPFMETCorrections" + postfix))
         process.unfoldingAnalysis.remove(getattr(process, "patMETs" + postfix))
 
@@ -105,7 +104,6 @@ process.load('BristolAnalysis.NTupleTools.SelectionAnalyser_cfi')
 process.selectionAnalysis = cms.Path(
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
-                      process.pfMEtSysShiftCorrSequence *
                       process.patseq * 
                       process.EventFilters * 
                       getattr(process, "producePatPFMETCorrections" + postfix) * 
@@ -121,6 +119,6 @@ if options.useData:
     process.eventFiltersIntaggingMode.remove(process.MCFiltersInTaggingMode)
 if options.useData or not options.isTTbarMC:
     process.selectionAnalysis.remove(process.ttbarDecayAnalyser)
-if not options.setupMETmanually:
+if not options.CMSSW == '44X':
     process.selectionAnalysis.remove(getattr(process, "producePatPFMETCorrections" + postfix))
     process.selectionAnalysis.remove(getattr(process, "patMETs" + postfix))

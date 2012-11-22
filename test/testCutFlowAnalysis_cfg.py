@@ -47,7 +47,6 @@ process.selectionAnalysis = cms.Path(
                       process.pdfWeights * 
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
-                      process.pfMEtSysShiftCorrSequence *
                       process.patseq * 
                       process.EventFilters * 
                       getattr(process, "producePatPFMETCorrections" + postfix) * 
@@ -59,7 +58,7 @@ process.selectionAnalysis = cms.Path(
                       process.topPairMuPlusJetsSelectionAnalyser
                       )
 
-if not options.setupMETmanually:
+if not options.CMSSW == '44X':
     process.selectionAnalysis.remove(getattr(process, "producePatPFMETCorrections" + postfix))
     process.selectionAnalysis.remove(getattr(process, "patMETs" + postfix))
 
