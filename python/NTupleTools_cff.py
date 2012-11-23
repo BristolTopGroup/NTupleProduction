@@ -293,10 +293,10 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
 process.load('BristolAnalysis.NTupleTools.EventWeight_Producer_PU_cfi')
 if options.CMSSW == '44X':
         process.eventWeightPU.MCSampleTag = cms.string("Fall11") # valid identifier: Fall11, Summer12    MCSampleFile        = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Default2011.root"),
-    	process.eventWeightPU.MCSampleFile        = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Default2011.root"),
-    	process.eventWeightPU.MCSampleHistoName   = cms.string("histo_Fall11_true"),
-    	process.eventWeightPU.DataFile            = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/Data_PUDist_2011Full.root"),
-    	process.eventWeightPU.DataHistoName       = cms.string("histoData_true"),
+    	process.eventWeightPU.MCSampleFile        = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Default2011.root")
+    	process.eventWeightPU.MCSampleHistoName   = cms.string("histo_Fall11_true")
+    	process.eventWeightPU.DataFile            = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/Data_PUDist_2011Full.root")
+    	process.eventWeightPU.DataHistoName       = cms.string("histoData_true")
 else:
         process.eventWeightPU.MCSampleTag = cms.string("Summer12")
         #process.eventWeightPU.MCSampleFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Summer2012.root")
