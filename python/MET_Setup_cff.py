@@ -97,8 +97,12 @@ def setup_MET_uncertainties(process, cms, options, postfix="PFlow"):
     #runMEtUncertainties(process, doSmearJets=not options.useData, jetCollection='goodPatJetsPFlow', addToPatDefaultSequence=False)                                                                                                             
     if options.useData:
         inputJetCorrLabelForMETuncertainties = 'L2L3Residual'
+        metSysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
     else:
         inputJetCorrLabelForMETuncertainties = 'L3Absolute'
+        metSysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
+        
+    process.pfMEtSysShiftCorr.parameter = metSysShiftCorrParameter
 
     runMEtUncertainties(process,
                     electronCollection = cms.InputTag('cleanPatElectrons'),
@@ -112,7 +116,7 @@ def setup_MET_uncertainties(process, cms, options, postfix="PFlow"):
                     makePFMEtByMVA = False,
                     makeNoPileUpPFMEt = False,
                     doApplyType0corr = options.applyType0METcorrection,
-                    sysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data,
+                    sysShiftCorrParameter = metSysShiftCorrParameter,
                     doApplySysShiftCorr = options.applySysShiftCorrection,
                     addToPatDefaultSequence=False
                     )
