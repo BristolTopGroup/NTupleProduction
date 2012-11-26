@@ -4,8 +4,14 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from PhysicsTools.PatAlgos.tools.coreTools import *
 #set up analysis
 #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions
-GLOBALTAG_DATA = 'FT_R_53_V6C::All' #2012 A and B: data re-reco with CMSSW_5_3_3_patch1
+
+#Data Global Tag
+GLOBALTAG_DATA = 'FT_53_V6_AN2::All' # Used for 2012 A and B: re-reconstructed data with CMSSW_5_3_2_patch4
+#GLOBALTAG_DATA = 'FT_53_V6C_AN2::All' # Used for 2012 A and B: re-reconstructed data with CMSSW_5_3_3_patch1              
+
 # GLOBALTAG_DATA = 'FT_R_53_V10:All' #2012 C v1: data re-reco with CMSSW_5_3_2_patch4
+
+#Monte Carlo Global Tag
 GLOBALTAG_MC = 'START53_V14::All'
 FILETAG = '53X'
 
