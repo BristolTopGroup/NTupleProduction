@@ -92,12 +92,19 @@ double getRelativeIsolation(const pat::Electron& electron, double cone, double r
 	//code from: https://twiki.cern.ch/twiki/bin/view/CMS/PfIsolation
 	float AEff = 0.00;
 	//so far this is only for 0.3. 0.4 is available but not 0.5
-	if (isRealData) {
+
+// 	  std::cout << "ElectronEffectiveArea::kEleEAData2011: " << ElectronEffectiveArea::kEleEAData2011 << std::endl;
+//        std::cout << "ElectronEffectiveArea::kEleEAData2012: " << ElectronEffectiveArea::kEleEAData2012<< std::endl;
+
+//        std::cout << "ElectronEffectiveArea::kEleEAFall1MC: " << ElectronEffectiveArea::kEleEAFall11MC << std::endl;
+//        std::cout << "ElectronEffectiveArea::kEleEASummer12MC: " << ElectronEffectiveArea::kEleEASummer12MC<< std::endl;
+
+        if (isRealData) {
 		AEff = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
-				electron.superCluster()->eta(), ElectronEffectiveArea::kEleEAData2011);
-	} else {
+				electron.superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
+        } else {
 		AEff = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
-				electron.superCluster()->eta(), ElectronEffectiveArea::kEleEAFall11MC);
+				electron.superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
 	}
 
 	AbsVetos vetos_ch;
