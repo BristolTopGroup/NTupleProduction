@@ -12,6 +12,7 @@ BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig) :
 		dcsInputTag(iConfig.getParameter < edm::InputTag > ("DCSInputTag")), //
 		hcalLaserFilterInput_(iConfig.getParameter < edm::InputTag > ("HCALLaserFilterInput")), //
 		ecalDeadCellFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellFilterInput")), //
+		ecalDeadCellTriggerPrimitiveFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellTriggerPrimitiveFilterInput")), //
 		trackingFailureFilter_(iConfig.getParameter < edm::InputTag > ("TrackingFailureFilterInput")), //
 		METInputForSumET_(iConfig.getParameter < edm::InputTag > ("METInputForSumET")), //
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //
@@ -30,6 +31,7 @@ BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig) :
 	//optinal MET filter decisions
 	produces<bool>(prefix + "HCALLaserFilter" + suffix);
 	produces<bool>(prefix + "ECALDeadCellFilter" + suffix);
+	produces<bool>(prefix + "ECALDeadCellTriggerPrimitiveFilter" + suffix);
 	produces<bool>(prefix + "TrackingFailureFilter" + suffix);
 	produces<bool>(prefix + "CSCTightHaloId" + suffix);
 }
@@ -91,6 +93,7 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
 	std::auto_ptr<bool> HCALLaserFilter(new bool(passesFilter(iEvent, hcalLaserFilterInput_)));
 	std::auto_ptr<bool> ECALDeadCellFilter(new bool(passesFilter(iEvent, ecalDeadCellFilterInput_)));
+	std::auto_ptr<bool> ECALDeadCellTriggerPrimitiveFilter(new bool(passesFilter(iEvent, ecalDeadCellTriggerPrimitiveFilterInput_)));
 	std::auto_ptr<bool> TrackingFailureFilter(new bool(passesFilter(iEvent, trackingFailureFilter_)));
 
 	bool cscTightID(false);
@@ -119,6 +122,7 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
 	iEvent.put(HCALLaserFilter, prefix + "HCALLaserFilter" + suffix);
 	iEvent.put(ECALDeadCellFilter, prefix + "ECALDeadCellFilter" + suffix);
+	iEvent.put(ECALDeadCellTriggerPrimitiveFilter, prefix + "ECALDeadCellTriggerPrimitiveFilter" + suffix);
 	iEvent.put(TrackingFailureFilter, prefix + "TrackingFailureFilter" + suffix);
 	iEvent.put(CSCTightHaloId, prefix + "CSCTightHaloId" + suffix);
 }

@@ -110,6 +110,9 @@ rootTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     'HLT_IsoMu24_eta2p1_v',
     'HLT_IsoMu30_v',
     'HLT_IsoMu30_eta2p1_v',
+    #2012 triggers with online JEC
+    'HLT_Ele25_CaloIdVT_CaloIsoVL_TrkIdVL_TrkIsoT_TriCentralPFNoPUJet45_35_25_v',
+    'HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet45_35_25_v',
  ),                              
     HLTPathsOfInterest_Other = cms.vstring(
                                            #2010 data RunA + RunB

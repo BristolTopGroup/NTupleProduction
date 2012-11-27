@@ -6,21 +6,23 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include <boost/array.hpp>
 
+namespace TTbarDecay {
+enum value {
+	NotTtbar,
+	FullHadronic,
+	SemiLeptonicElectron,
+	SemiLeptonicMuon,
+	SemiLeptonicTau,
+	FullLeptonicEE,
+	FullLeptonicMuMu,
+	FullLeptonicTauTau,
+	FullLeptonicETau,
+	FullLeptonicEMu,
+	FullLeptonicMuTau,
+	NumberOfDecayModes
+};
+}
 class BristolNTuple_GenEventInfo: public edm::EDProducer {
-	enum TTbarDecay{
-		NotTtbar,
-		FullHadronic,
-		SemiLeptonicElectron,
-		SemiLeptonicMuon,
-		SemiLeptonicTau,
-		FullLeptonicEE,
-		FullLeptonicMuMu,
-		FullLeptonicTauTau,
-		FullLeptonicETau,
-		FullLeptonicEMu,
-		FullLeptonicMuTau,
-		NumberOfDecayModes
-	};
 
 public:
 	explicit BristolNTuple_GenEventInfo(const edm::ParameterSet&);

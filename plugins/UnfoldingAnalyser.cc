@@ -29,12 +29,14 @@ UnfoldingAnalyser::UnfoldingAnalyser(const edm::ParameterSet& iConfig) :
 		contamination_inGenMET_(), //
 		contamination_inRecoMET_(), //
 		response_(), //
+		response_withoutFakes_(),//
 		truth_AsymBins_(), //
 		measured_AsymBins_(), //
 		fake_AsymBins_(), //
 		contamination_AsymBins_inGenMET_(), //
 		contamination_AsymBins_inRecoMET_(), //
-		response_AsymBins_() {
+		response_AsymBins_(),//
+		response_withoutFakes_AsymBins_(){
 
 }
 
@@ -70,27 +72,34 @@ void UnfoldingAnalyser::beginJob() {
 			> ("contamination_inRecoMET", "background distribution;RECO(MET);# Events", 2000, 0., 2000.);
 
 	response_ = fs->make < TH2F > ("response", "response;RECO(MET);GEN(MET)", 2000, 0., 2000., 2000, 0., 2000.);
-	
+	response_withoutFakes_ = fs->make < TH2F
+			> ("response_withoutFakes", "response;RECO(MET);GEN(MET)", 2000, 0., 2000., 2000, 0., 2000.);
+
 //histograms with asymmetric bins (final measurement)
 	cout << "But what other options do I have?" << endl;
-float METBinEdges[6] = { 0, 25, 45, 70, 100, 2000 };
+	float METBinEdges[6] = { 0, 25, 45, 70, 100, 2000 };
 
 	truth_AsymBins_ = fs->make < TH1F > ("truth_AsymBins", "True distribution;GEN(MET);# Events", 5, METBinEdges);
-	measured_AsymBins_ = fs->make < TH1F > ("measured_AsymBins", "Measured distribution;RECO(MET);# Events", 5, METBinEdges);
+	measured_AsymBins_ = fs->make < TH1F
+			> ("measured_AsymBins", "Measured distribution;RECO(MET);# Events", 5, METBinEdges);
 	fake_AsymBins_ = fs->make < TH1F > ("fake_AsymBins", "background distribution;RECO(MET);# Events", 5, METBinEdges);
 	contamination_AsymBins_inGenMET_ = fs->make < TH1F
 			> ("contamination_AsymBins_inGenMET", "background distribution;GEN(MET);# Events", 5, METBinEdges);
 	contamination_AsymBins_inRecoMET_ = fs->make < TH1F
 			> ("contamination_AsymBins_inRecoMET", "background distribution;RECO(MET);# Events", 5, METBinEdges);
-	response_AsymBins_ = fs->make < TH2F > ("response_AsymBins", "response;RECO(MET);GEN(MET)", 5, METBinEdges, 5, METBinEdges);
+	response_AsymBins_ = fs->make < TH2F
+			> ("response_AsymBins", "response;RECO(MET);GEN(MET)", 5, METBinEdges, 5, METBinEdges);
+	response_withoutFakes_AsymBins_ = fs->make < TH2F
+			> ("response_withoutFakes_AsymBins", "response;RECO(MET);GEN(MET)", 5, METBinEdges, 5, METBinEdges);
 
-cout << "Well, you could use 'scram b' as a compiler on your machine within an IDE" << endl;
+	cout << "Well, you could use 'scram b' as a compiler on your machine within an IDE" << endl;
 	truth_->Sumw2();
 	measured_->Sumw2();
 	fake_->Sumw2();
 	contamination_inGenMET_->Sumw2();
 	contamination_inRecoMET_->Sumw2();
 	response_->Sumw2();
+	response_withoutFakes_->Sumw2();
 
 	truth_AsymBins_->Sumw2();
 	measured_AsymBins_->Sumw2();
@@ -98,7 +107,9 @@ cout << "Well, you could use 'scram b' as a compiler on your machine within an I
 	contamination_AsymBins_inGenMET_->Sumw2();
 	contamination_AsymBins_inRecoMET_->Sumw2();
 	response_AsymBins_->Sumw2();
-cout << "However, you need to be able to install CMSSW on your machine." << endl;
+	response_withoutFakes_AsymBins_->Sumw2();
+
+	cout << "However, you need to be able to install CMSSW on your machine." << endl;
 }
 
 void UnfoldingAnalyser::endJob() {
@@ -151,7 +162,10 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 			response_->Fill(recoMET, genMET, weight);
 			response_AsymBins_->Fill(recoMET, genMET, weight);
 
-			if (!isSemiLeptonicElectron) {
+			if (isSemiLeptonicElectron) {
+				response_withoutFakes_->Fill(recoMET, genMET, weight);
+				response_withoutFakes_AsymBins_->Fill(recoMET, genMET, weight);
+			} else {
 				fake_->Fill(recoMET, weight);
 				fake_AsymBins_->Fill(recoMET, weight);
 				//contamination from other ttbar processes
@@ -177,7 +191,10 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 			response_->Fill(recoMET, genMET, weight);
 			response_AsymBins_->Fill(recoMET, genMET, weight);
 
-			if (!isSemiLeptonicMuon) {
+			if (isSemiLeptonicMuon) {
+				response_withoutFakes_->Fill(recoMET, genMET, weight);
+				response_withoutFakes_AsymBins_->Fill(recoMET, genMET, weight);
+			} else {
 				fake_->Fill(recoMET, weight);
 				fake_AsymBins_->Fill(recoMET, weight);
 				if (isFullyHadronicTtbar || isDiLeptonicTtbar || isSemiLeptonicTau || isSemiLeptonicElectron) {

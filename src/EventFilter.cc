@@ -17,6 +17,7 @@ EventFilter::EventFilter(const edm::ParameterSet& iConfig) :
 		hcalNoiseInput_(iConfig.getParameter < edm::InputTag > ("HCALNoiseFilterInput")), //
 		hcalLaserFilterInput_(iConfig.getParameter < edm::InputTag > ("HCALLaserFilterInput")), //
 		ecalDeadCellFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellFilterInput")), //
+		ecalDeadCellTriggerPrimitiveFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellTriggerPrimitiveFilterInput")), //
 		trackingFailureFilter_(iConfig.getParameter < edm::InputTag > ("TrackingFailureFilterInput")), //
 		trkInput_(iConfig.getParameter < edm::InputTag > ("TracksInput")), //
 		vertexInput_(iConfig.getParameter < edm::InputTag > ("VertexInput")), //
@@ -97,6 +98,8 @@ bool EventFilter::passesSelectionStep(edm::Event& event, Filters::value filter) 
 		return passesFilter(event, hcalLaserFilterInput_);
 	case Filters::passECALDeadCellFilter:
 		return passesFilter(event, ecalDeadCellFilterInput_);
+	case Filters::passECALDeadCellTriggerPrimitiveFilter:
+		return passesFilter(event, ecalDeadCellTriggerPrimitiveFilterInput_);	
 	case Filters::passTrackingFailureFilter:
 		if (useTrackingFailureFilter_)
 			return passesFilter(event, trackingFailureFilter_);
@@ -332,6 +335,7 @@ void EventFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
 			> ("HCALNoiseFilterInput", edm::InputTag("HBHENoiseFilterResultProducer", "HBHENoiseFilterResult"));
 	desc.add < edm::InputTag > ("HCALLaserFilterInput", edm::InputTag("HcalLaserEventFilter"));
 	desc.add < edm::InputTag > ("ECALDeadCellFilterInput", edm::InputTag("EcalDeadCellBoundaryEnergyFilter"));
+	desc.add < edm::InputTag > ("ECALDeadCellTriggerPrimitiveFilterInput", edm::InputTag("EcalDeadCellTriggerPrimitiveFilter"));
 	desc.add < edm::InputTag > ("TrackingFailureFilterInput", edm::InputTag("trackingFailureFilter"));
 	desc.add < edm::InputTag > ("TracksInput", edm::InputTag("generalTracks"));
 

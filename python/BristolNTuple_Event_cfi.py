@@ -4,6 +4,7 @@ rootTupleEvent = cms.EDProducer(
         DCSInputTag=cms.InputTag('scalersRawToDigi'),
         HCALLaserFilterInput=cms.InputTag('HcalLaserEventFilter'),
         ECALDeadCellFilterInput=cms.InputTag('EcalDeadCellBoundaryEnergyFilter'),
+	ECALDeadCellTriggerPrimitiveFilterInput=cms.InputTag('EcalDeadCellTriggerPrimitiveFilter'),
         TrackingFailureFilterInput=cms.InputTag('trackingFailureFilter'),
         METInputForSumET=cms.InputTag('patMETsPFlow'),
         Prefix=cms.string('Event.'),

@@ -56,6 +56,7 @@ process.makingNTuples = cms.Path(
                       process.pdfWeights * 
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
+                      process.pfMEtSysShiftCorrSequence *
                       process.patseq * 
                       getattr(process, "producePatPFMETCorrections" + postfix) * 
                       getattr(process, "patMETs" + postfix) * 
@@ -64,6 +65,10 @@ process.makingNTuples = cms.Path(
                       process.MCFiltersInTaggingMode *
                       process.rootNTuples
                       )
+
+if not options.setupMETmanually:
+    process.makingNTuples.remove(getattr(process, "producePatPFMETCorrections" + postfix))
+    process.makingNTuples.remove(getattr(process, "patMETs" + postfix))
 
 if not options.printEventContent:
     process.makingNTuples.remove(process.printEventContent)
@@ -112,6 +117,7 @@ if options.isTTbarMC:
     process.unfoldingAnalysis = cms.Path(
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
+                      process.pfMEtSysShiftCorrSequence *
                       process.patseq * 
                       process.EventFilters * 
                       getattr(process, "producePatPFMETCorrections" + postfix) * 
@@ -119,6 +125,9 @@ if options.isTTbarMC:
                       process.eventWeightPU *
                       process.unfoldingAnalysisSequence 
                       )
+    if not options.setupMETmanually:
+        process.unfoldingAnalysis.remove(getattr(process, "producePatPFMETCorrections" + postfix))
+        process.unfoldingAnalysis.remove(getattr(process, "patMETs" + postfix))
 
 ##########################################################################################
 #            Selection Config
@@ -128,7 +137,8 @@ process.load('BristolAnalysis.NTupleTools.SelectionAnalyser_cfi')
 process.selectionAnalysis = cms.Path(
                       process.pdfWeights * 
                       process.hlTrigReport * 
-                      process.egammaIDLikelihood * 
+                      process.egammaIDLikelihood *
+                      process.pfMEtSysShiftCorrSequence *
                       process.patseq * 
                       process.EventFilters * 
                       getattr(process, "producePatPFMETCorrections" + postfix) * 
@@ -144,3 +154,6 @@ if options.useData:
     process.eventFiltersIntaggingMode.remove(process.MCFiltersInTaggingMode)
 if options.useData or not options.isTTbarMC:
     process.selectionAnalysis.remove(process.ttbarDecayAnalyser)
+if not options.setupMETmanually:
+    process.selectionAnalysis.remove(getattr(process, "producePatPFMETCorrections" + postfix))
+    process.selectionAnalysis.remove(getattr(process, "patMETs" + postfix))

@@ -69,6 +69,7 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
             'keep *_rootTuplePFElectrons_*_*',
             'keep *_rootTuplePFLooseElectrons_*_*',
             #MET
+            'keep *_rootTupleRecoPFMET_*_*',
             'keep *_rootTupleCaloMET_*_*',
             'keep *_rootTuplePFMET_*_*',
             'keep *_rootTuplePFType1CorrectedMET_*_*',
@@ -76,6 +77,10 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
             'keep *_rootTuplePFMet*_*_*',
             'keep *_rootTupleType1CorrectedPFMet*_*_*',
             'keep *_rootTupleType1p2CorrectedPFMet*_*_*',
+            #MET corrections                                                                                                                                                                                                          
+            'keep *_rootTupleSysShiftMetCorrections*_*_*',
+            'keep *_rootTupleType0MetCorrections*_*_*',
+            'keep *_rootTupleType1MetCorrections*_*_*',
             #muons
             'keep *_nTupleMuons_*_*',
             'keep *_nTuplePFMuons_*_*',
@@ -122,10 +127,16 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
         #photons
         process.rootTuplePhotons + 
         #MET
+        process.rootTupleRecoPFMET + 
         process.rootTupleCaloMET + 
         process.rootTuplePFMET + 
         process.rootTuplePFType1CorrectedMET +
         process.rootTuplePFType1p2CorrectedMET +
+        process.rootTuplePFType1p2CorrectedMetPFlow +
+        #MET corrections
+        process.rootTupleSysShiftMetCorrections +
+        process.rootTupleType0MetCorrections +
+        process.rootTupleType1MetCorrections +
         #MET uncertainties
         process.rootTuplePFMetElectronEnUp +
         process.rootTuplePFMetElectronEnDown +

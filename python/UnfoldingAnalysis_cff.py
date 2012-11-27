@@ -44,14 +44,15 @@ def setup_UnfoldingAnalysis(process, cms, options):
     #PU event weight
     if options.CMSSW == '44X':
 #        process.eventWeightPU.MCSampleTag = cms.string("Fall11") # valid identifier: Fall11, Summer12
-        process.topPairEPlusJetsSelection.MCSampleTag = cms.string('Fall11')    
+        process.topPairEPlusJetsSelection.MCSampleTag = cms.string('Fall11')  
+        process.topPairMuPlusJetsSelection.MCSampleTag = cms.string('Fall11')  
     else:
 #        process.eventWeightPU.MCSampleTag = cms.string("Summer12")
 #        process.eventWeightPU.MCSampleFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Summer2012.root")
         #need to figure that one out
 #        process.eventWeightPU.DataFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Summer2012.root")
         process.topPairEPlusJetsSelection.MCSampleTag = cms.string('Summer12')  
-    
+        process.topPairMuPlusJetsSelection.MCSampleTag = cms.string('Summer12') 
     process.MCFiltersInTaggingMode = cms.Sequence(process.ttFullHadronicFilter * 
                                                    process.ttFullLeptonicFilter * 
                                                      process.ttSemiLeptonicElectronFilter * 
@@ -65,7 +66,7 @@ def setup_UnfoldingAnalysis(process, cms, options):
     process.unfoldingAnalysisSequence = cms.Sequence(process.eventFiltersIntaggingMode * 
                                                      process.eventWeightBtagEPlusJets *
                                                      process.eventWeightBtagMuPlusJets *  
-						                             process.printEventContent * 
+                                                     process.printEventContent * 
                                                      process.unfoldingAnalyserElectronChannel * 
                                                      process.unfoldingAnalyserMuonChannel)
     

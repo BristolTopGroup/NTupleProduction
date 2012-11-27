@@ -8,12 +8,14 @@ def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
     process.HBHENoiseFilterResultProducer = setup_HBHENoiseFilter(process, cms)
     process.HcalLaserEventFilter = setup_HcalLaserFilter(process, cms)
     process.EcalDeadCellBoundaryEnergyFilter = setup_ECALDeadCellFilter(process, cms)
+    process.EcalDeadCellTriggerPrimitiveFilter = setup_ECALDeadCellTriggerPrimitiveFilter(process, cms)
     process.trackingFailureFilter = setup_trackingFailureFilter(process, cms)
     process.EventFilter = setup_skim(process, cms, options)
     
     process.EventFilter.HCALNoiseFilterInput = cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult')
     process.EventFilter.HCALLaserFilterInput = cms.InputTag('HcalLaserEventFilter')
     process.EventFilter.ECALDeadCellFilterInput = cms.InputTag('EcalDeadCellBoundaryEnergyFilter')
+    process.EventFilter.ECALDeadCellTriggerPrimitiveFilterInput = cms.InputTag('EcalDeadCellTriggerPrimitiveFilter')
     process.EventFilter.TrackingFailureFilterInput = cms.InputTag('trackingFailureFilter')
     process.EventFilter.useTrackingFailureFilter = cms.bool(True)
     #disable optional MET filters for now
@@ -25,7 +27,8 @@ def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
                 process.HBHENoiseFilterResultProducer * 
                                 process.scrapingVeto * 
                                 process.HcalLaserEventFilter * 
-                                process.EcalDeadCellBoundaryEnergyFilter * 
+                                process.EcalDeadCellBoundaryEnergyFilter *
+				process.EcalDeadCellTriggerPrimitiveFilter *
                                 process.EventFilter
                                 )
     return EventFilters
@@ -99,6 +102,16 @@ def setup_ECALDeadCellFilter(process, cms):
     EcalDeadCellBoundaryEnergyFilter.limitDeadCellToChannelStatusEE = cms.vint32(12, 14)
 
     return EcalDeadCellBoundaryEnergyFilter
+
+def setup_ECALDeadCellTriggerPrimitiveFilter(process, cms):
+    print '=' * 60
+    print "Setting up ECALDeadCell TriggerPrimitive Filter"
+    print '=' * 60    
+    #https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFilters#ECAL_dead_cell_filter
+    from RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi import EcalDeadCellTriggerPrimitiveFilter     
+    EcalDeadCellTriggerPrimitiveFilter.tpDigiCollection = cms.InputTag("ecalTPSkimNA")
+    return EcalDeadCellTriggerPrimitiveFilter   
+
 
 def setup_trackingFailureFilter(process, cms):
     from RecoMET.METFilters.trackingFailureFilter_cfi import trackingFailureFilter

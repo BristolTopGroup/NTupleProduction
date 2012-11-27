@@ -22,7 +22,7 @@ enum Step {
 	AllEvents,
 	EventCleaningAndTrigger,
 	OneIsolatedMuon,
-	DiLeptonVeto,
+	LooseMuonVeto,
 	LooseElectronVeto,
 	AtLeastOneGoodJet,
 	AtLeastTwoGoodJets,
@@ -37,7 +37,7 @@ const std::string StringSteps[NUMBER_OF_SELECTION_STEPS] = { //
 		"AllEvents", //
 				"EventCleaningAndTrigger", //
 				"OneIsolatedMuon", //
-				"DiLeptonVeto", //
+				"LooseMuonVeto", //
 				"LooseElectronVeto", //
 				"AtLeastOneGoodJet", //
 				"AtLeastTwoGoodJets", //
@@ -80,8 +80,8 @@ public:
 	virtual bool passesScrapingVeto(edm::Event& event) const;
 	virtual bool passesTriggerSelection() const;
 	virtual bool hasExactlyOneIsolatedLepton() const;
-	virtual bool passesLooseLeptonVeto() const;
-	virtual bool passesDileptonVeto() const;
+	virtual bool passesLooseMuonVeto() const;
+	virtual bool passesLooseElectronVeto() const;
 	virtual bool hasAtLeastOneGoodJet() const;
 	virtual bool hasAtLeastTwoGoodJets() const;
 	virtual bool hasAtLeastThreeGoodJets() const;
