@@ -137,6 +137,11 @@ options.register ('isTTbarMC',
                   VarParsing.varType.bool,
                   "Identify if samples contains ttbar events")
 
+options.register ('isMCatNLO',
+                  False,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.bool,
+
 options.register ('skipEvents',
                               0,
                            VarParsing.multiplicity.singleton,
