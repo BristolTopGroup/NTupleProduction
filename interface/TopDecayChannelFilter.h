@@ -30,6 +30,7 @@ private:
 	edm::InputTag src_;
 	S sel_;
 	bool useTtGenEvent_;
+	bool useMCATNLO_;
 	const bool taggingMode_;
 };
 
@@ -38,8 +39,8 @@ TopDecayChannelFilter<S>::TopDecayChannelFilter(const edm::ParameterSet& cfg) :
 		src_(cfg.template getParameter < edm::InputTag > ("src")), //
 		sel_(cfg), //
 		useTtGenEvent_(cfg.getParameter<bool>("useTtGenEvent")), //
-		taggingMode_(cfg.getParameter<bool>("taggingMode")) {
-	 produces<bool>();
+		useMCATNLO_(cfg.getParameter<bool>("useMCATNLO")), taggingMode_(cfg.getParameter<bool>("taggingMode")) {
+	produces<bool>();
 }
 
 template<typename S>
@@ -55,6 +56,9 @@ bool TopDecayChannelFilter<S>::filter(edm::Event& iEvent, const edm::EventSetup&
 	if (useTtGenEvent_) {
 		iEvent.getByLabel(src_, ttbarGenEvent);
 		filterDecision = sel_(ttbarGenEvent->particles(), src_.label());
+	} else if (useMCATNLO_) {
+		iEvent.getByLabel(src_, genParticles);
+		filterDecision = sel_(*genParticles, "MC@NLO");
 	} else {
 		iEvent.getByLabel(src_, genParticles);
 		filterDecision = sel_(*genParticles, src_.label());
