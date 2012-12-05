@@ -1,6 +1,15 @@
 #import default nTuple stub
 from BristolAnalysis.NTupleTools.NTupleTools_cff import *
 ##########################################################################################
+#            Test files
+##########################################################################################
+#TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TTJets_TuneZ2_7TeV_Fall11_44X_AODSIM.root'
+#TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TT_TuneZ2_7TeV_POWHEG_44X.root'
+TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TT_TuneZ2_7TeV_MCatNLO_44X.root'
+process.source.fileNames = [
+            TEST_MC_FILE
+            ]
+##########################################################################################
 #            General
 ##########################################################################################
 process.load('BristolAnalysis.NTupleTools.ttDecayChannelFilters_cff')
@@ -21,6 +30,19 @@ process.ttFullLeptonicTauTauFilter.taggingMode = cms.bool(True)
 process.ttFullLeptonicETauFilter.taggingMode = cms.bool(True)
 process.ttFullLeptonicEMuFilter.taggingMode = cms.bool(True)
 process.ttFullLeptonicMuTauFilter.taggingMode = cms.bool(True)
+
+if options.isMCatNLO:
+    process.ttFullHadronicFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicFilter.useMCATNLO = cms.bool(True)
+    process.ttSemiLeptonicElectronFilter.useMCATNLO = cms.bool(True)
+    process.ttSemiLeptonicMuonFilter.useMCATNLO = cms.bool(True)
+    process.ttSemiLeptonicTauFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicEEFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicMuMuFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicTauTauFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicETauFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicEMuFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicMuTauFilter.useMCATNLO = cms.bool(True)
 
 if options.CMSSW == '44X':
     process.topPairEPlusJetsSelection.MCSampleTag = cms.string('Fall11')  
