@@ -289,7 +289,10 @@ if options.useData:
     process.patseq.remove(process.genJetParticles)    
     process.patseq.remove(process.ca8GenJetsNoNu)
     process.patseq.remove(process.flavorHistorySeq)
-    
+
+if options.isMCatNLO:
+    process.patseq.remove(process.flavorHistorySeq)
+
 # HLT Trigger Report
 process.hlTrigReport = cms.EDAnalyzer("HLTrigReport",
     HLTriggerResults=cms.InputTag("TriggerResults", "", options.hltProcess)
