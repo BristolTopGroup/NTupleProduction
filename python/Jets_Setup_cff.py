@@ -34,15 +34,6 @@ def setup_jets(process, cms, options, postfix="PFlow"):
     #lots of stuff down here is obsolete for 52x - need to clean up
     
     ###############################
-    ########## Gen Setup ##########
-    ###############################
-
-    process.load("RecoJets.Configuration.GenJetParticles_cff")
-    from RecoJets.JetProducers.ca4GenJets_cfi import ca4GenJets
-    process.ca8GenJetsNoNu = ca4GenJets.clone(rParam=cms.double(0.8),
-                                           src=cms.InputTag("genParticlesForJetsNoNu"))
-        
-    ###############################
     #### Jet RECO includes ########
     ###############################
 
@@ -87,45 +78,12 @@ def setup_jets(process, cms, options, postfix="PFlow"):
                                              doRhoFastjet=cms.bool(True)
     )
 
-
-    ###############################
-    ###### Bare CA 0.8 jets #######
-    ###############################
-    from RecoJets.JetProducers.ca4PFJets_cfi import ca4PFJets
-    process.ca8PFJetsPFlow = ca4PFJets.clone(
-                                             rParam=cms.double(0.8),
-                                             src=cms.InputTag('pfNoElectron' + postfix),
-                                             doAreaFastjet=cms.bool(True),
-                                             doRhoFastjet=cms.bool(True),
-                                             Rho_EtaMax=cms.double(6.0),
-                                             Ghost_EtaMax=cms.double(7.0)
-    )
-    
-    addJetCollection(process,
-                 cms.InputTag('ca8PFJetsPFlow'), # Jet collection; must be already in the event when patLayer0 sequence is executed
-                 'CA8', 'PF',
-                 doJTA=True, # Run Jet-Track association & JetCharge
-                 doBTagging=True, # Run b-tagging
-                 jetCorrLabel=inputJetCorrLabel,
-                 doType1MET=False,
-                 doL1Cleaning=False,
-                 doL1Counters=False,
-                 genJetCollection=cms.InputTag("ca8GenJetsNoNu"),
-                 doJetID=False
-                 )
-
-
-    if options.CMSSW == '44X':
-        process.patJetCorrFactorsCA8PF.rho = cms.InputTag("kt6PFJetsPFlow", "rho")
-    
     ###############################
     ### TagInfo and Matching Setup#
     ###############################
     
     # Do some configuration of the jet substructure things
-    for jetcoll in (process.patJetsPFlow,
-                    process.patJetsCA8PF
-                    ) :
+    for jetcoll in [process.patJetsPFlow] :
         if options.useData == False :
             jetcoll.embedGenJetMatch = True
             jetcoll.getJetMCFlavour = True
@@ -137,8 +95,7 @@ def setup_jets(process, cms, options, postfix="PFlow"):
         
     additionalJets = [getattr(process, "kt6PFJets"),
                       getattr(process, "kt6PFJets" + postfix),
-                      getattr(process, "kt4PFJets" + postfix),
-                      getattr(process, "ca8PFJets" + postfix)]
+                      getattr(process, "kt4PFJets" + postfix)]
     pfNoElectron = getattr(process, "pfNoElectron" + postfix)
     for module in additionalJets :
         getattr(process, "patPF2PATSequence" + postfix).replace(pfNoElectron, pfNoElectron * module)

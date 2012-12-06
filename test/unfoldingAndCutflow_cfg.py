@@ -6,6 +6,7 @@ from BristolAnalysis.NTupleTools.NTupleTools_cff import *
 #TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TTJets_TuneZ2_7TeV_Fall11_44X_AODSIM.root'
 #TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TT_TuneZ2_7TeV_POWHEG_44X.root'
 TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TT_TuneZ2_7TeV_MCatNLO_44X.root'
+TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TT_TuneZ2_7TeV_MCatNLO_44X_D058CA1C-9A36-E111-A1A5-0026189438E9.root'
 process.source.fileNames = [
             TEST_MC_FILE
             ]
