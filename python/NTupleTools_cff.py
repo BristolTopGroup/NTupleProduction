@@ -29,8 +29,6 @@ USE_JEC_FROM_DB = False
 removeTausFromJetCollection = False
 #maximal relative isolation for loose leptons
 maxLooseLeptonRelIso = 999.0
-#include Cambridge-Aachen jet with cone of DR=0.8
-includeCA08Jets = False
 
 makePATTuple = False
 
@@ -264,7 +262,6 @@ process.patseq = cms.Sequence(
     process.HBHENoiseFilterResultProducer * 
     process.goodOfflinePrimaryVertices * 
     process.genParticlesForJetsNoNu * 
-    process.ca8GenJetsNoNu * 
     getattr(process, "patPF2PATSequence" + postfix) * 
     process.looseLeptonSequence * 
     process.patDefaultSequence * 
@@ -272,24 +269,19 @@ process.patseq = cms.Sequence(
     process.goodPatJetsPFlow * 
     process.metUncertaintySequence * 
     process.EventFilters * 
-    process.goodPatJetsCA8PF * 
-    process.flavorHistorySeq# * 
+    process.flavorHistorySeq 
     )
 
 process.patseq.replace(process.goodOfflinePrimaryVertices,
                             process.goodOfflinePrimaryVertices * 
                             process.eidCiCSequence)
 
-
-if not includeCA08Jets:
-    process.patseq.remove(process.goodPatJetsCA8PF)
-    
 if options.useData:
     process.patseq.remove(process.genParticlesForJetsNoNu)
     process.patseq.remove(process.genJetParticles)    
-    process.patseq.remove(process.ca8GenJetsNoNu)
     process.patseq.remove(process.flavorHistorySeq)
 
+# remove flavour history as it has problems with the MC@NLO genparticles
 if options.isMCatNLO:
     process.patseq.remove(process.flavorHistorySeq)
 
