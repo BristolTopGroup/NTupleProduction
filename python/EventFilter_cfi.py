@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 EventFilter = cms.EDFilter(
     'EventFilter',
     #event filters
-    HCALNoiseFilterInput=cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult'),
+    HBHENoiseFilterInput=cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult'),
     #optional MET filters
     HCALLaserFilterInput=cms.InputTag('HcalLaserEventFilter'),
     ECALDeadCellFilterInput=cms.InputTag('EcalDeadCellBoundaryEnergyFilter'),

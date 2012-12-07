@@ -14,7 +14,7 @@ using namespace edm;
 using namespace std;
 
 EventFilter::EventFilter(const edm::ParameterSet& iConfig) :
-		hcalNoiseInput_(iConfig.getParameter < edm::InputTag > ("HCALNoiseFilterInput")), //
+		hcalNoiseInput_(iConfig.getParameter < edm::InputTag > ("HBHENoiseFilterInput")), //
 		hcalLaserFilterInput_(iConfig.getParameter < edm::InputTag > ("HCALLaserFilterInput")), //
 		ecalDeadCellFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellFilterInput")), //
 		ecalDeadCellTriggerPrimitiveFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellTriggerPrimitiveFilterInput")), //
@@ -331,8 +331,7 @@ void EventFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
 	//The following says we do not know what parameters are allowed so do no validation
 	// Please change this to state exactly what you do use, even if it is no parameters
 	edm::ParameterSetDescription desc;
-	desc.add < edm::InputTag
-			> ("HCALNoiseFilterInput", edm::InputTag("HBHENoiseFilterResultProducer", "HBHENoiseFilterResult"));
+	desc.add < edm::InputTag > ("HBHENoiseFilterInput", edm::InputTag("HBHENoiseFilterResultProducer", "HBHENoiseFilterResult"));
 	desc.add < edm::InputTag > ("HCALLaserFilterInput", edm::InputTag("HcalLaserEventFilter"));
 	desc.add < edm::InputTag > ("ECALDeadCellFilterInput", edm::InputTag("EcalDeadCellBoundaryEnergyFilter"));
 	desc.add < edm::InputTag > ("ECALDeadCellTriggerPrimitiveFilterInput", edm::InputTag("EcalDeadCellTriggerPrimitiveFilter"));

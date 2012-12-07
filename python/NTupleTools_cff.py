@@ -259,7 +259,7 @@ if options.useData :
     process.looseLeptonSequence.remove(process.muonMatchLoosePFlow)
 
 process.patseq = cms.Sequence(
-    process.HBHENoiseFilterResultProducer * 
+    process.HBHENoiseFilter * 
     process.goodOfflinePrimaryVertices * 
     process.genParticlesForJetsNoNu * 
     getattr(process, "patPF2PATSequence" + postfix) * 
