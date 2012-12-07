@@ -181,8 +181,9 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
 	} else { //muon channel
 		if (isSemiLeptonicMuon) {
-			truth_->Fill(genMET, weight);
-			truth_AsymBins_->Fill(genMET, weight);
+			//PU weight only (no btag-weight) as no b-tagging is applied
+                        truth_->Fill(genMET, puWeight);
+                        truth_AsymBins_->Fill(genMET, puWeight);
 		}
 
 		if (passesSelection) {
