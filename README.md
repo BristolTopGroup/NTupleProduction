@@ -42,15 +42,10 @@ addpkg ElectroWeakAnalysis/Utilities V00-04-00
 
 #Bristol tools & RootTupleMaker
 git clone git@github.com:BristolTopGroup/NTupleProduction.git -b 44X BristolAnalysis/NTupleTools
+#TopSkimming
+git clone git@github.com:BristolTopGroup/TopSkimming.git TopQuarkAnalysis/TopSkimming
 
-cvs co -r HEAD TopQuarkAnalysis/TopSkimming
-#hopefully this will not be necessary soon
-cp BristolAnalysis/NTupleTools/interface/TopDecayChannelFilter.h TopQuarkAnalysis/TopSkimming/interface/TopDecayChannelFilter.h
-cp BristolAnalysis/NTupleTools/python/TtDecayChannelFilter_cfi.py TopQuarkAnalysis/TopSkimming/python/TtDecayChannelFilter_cfi.py
-cp BristolAnalysis/NTupleTools/interface/TtDecayChannelSelector.h TopQuarkAnalysis/TopSkimming/interface/TtDecayChannelSelector.h
-cp BristolAnalysis/NTupleTools/src/TtDecayChannelSelector.cc TopQuarkAnalysis/TopSkimming/src/TtDecayChannelSelector.cc
-
-#setup full version of LHAPDF (faster)
+#setup full version of LHAPDF (faster AND prevents crashes!)
 scram setup lhapdffull
 scram b -j8
 
