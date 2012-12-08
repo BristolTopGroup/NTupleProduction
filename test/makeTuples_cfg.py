@@ -8,7 +8,10 @@ if not makePATTuple:
 else:
     from BristolAnalysis.NTupleTools.PatTuple_cff import *
     setup_pattuple(process, cms, options)
-process.load('BristolAnalysis.NTupleTools.ttDecayChannelFilters_cff')
+process.load('TopQuarkAnalysis.TopSkimming.TtFullyHadronicFilter_cfi')
+process.load('TopQuarkAnalysis.TopSkimming.TtFullyLeptonicFilter_cfi')
+process.load('TopQuarkAnalysis.TopSkimming.TtSemiLeptonicFilter_cfi')
+
 process.ttFullHadronicFilter.taggingMode = cms.bool(True)
 process.ttFullLeptonicFilter.taggingMode = cms.bool(True)
 process.ttSemiLeptonicElectronFilter.taggingMode = cms.bool(True)
@@ -20,6 +23,19 @@ process.ttFullLeptonicTauTauFilter.taggingMode = cms.bool(True)
 process.ttFullLeptonicETauFilter.taggingMode = cms.bool(True)
 process.ttFullLeptonicEMuFilter.taggingMode = cms.bool(True)
 process.ttFullLeptonicMuTauFilter.taggingMode = cms.bool(True)
+
+if options.isMCatNLO:
+    process.ttFullHadronicFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicFilter.useMCATNLO = cms.bool(True)
+    process.ttSemiLeptonicElectronFilter.useMCATNLO = cms.bool(True)
+    process.ttSemiLeptonicMuonFilter.useMCATNLO = cms.bool(True)
+    process.ttSemiLeptonicTauFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicEEFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicMuMuFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicTauTauFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicETauFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicEMuFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicMuTauFilter.useMCATNLO = cms.bool(True)
 
 process.MCFiltersInTaggingMode = cms.Sequence(process.ttFullHadronicFilter * 
 #                                                     process.ttFullLeptonicFilter * 
