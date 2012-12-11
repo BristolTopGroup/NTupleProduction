@@ -261,6 +261,7 @@ if options.useData :
 process.patseq = cms.Sequence(
     process.HBHENoiseFilter * 
     process.goodOfflinePrimaryVertices * 
+    process.eidMVASequence *
     process.genParticlesForJetsNoNu * 
     getattr(process, "patPF2PATSequence" + postfix) * 
     process.looseLeptonSequence * 
@@ -271,10 +272,6 @@ process.patseq = cms.Sequence(
     process.EventFilters * 
     process.flavorHistorySeq 
     )
-
-process.patseq.replace(process.goodOfflinePrimaryVertices,
-                            process.goodOfflinePrimaryVertices * 
-                            process.eidCiCSequence)
 
 if options.useData:
     process.patseq.remove(process.genParticlesForJetsNoNu)

@@ -48,19 +48,6 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 	produces < std::vector<double> > (prefix + "SigmaIEtaIEta" + suffix);
 	produces < std::vector<double> > (prefix + "DeltaPhiTrkSC" + suffix);
 	produces < std::vector<double> > (prefix + "DeltaEtaTrkSC" + suffix);
-	produces < std::vector<unsigned int> > (prefix + "PassID" + suffix);
-	produces < std::vector<unsigned int> > (prefix + "PassIDMC" + suffix);
-	if (debugRelease_) { // explicit storage of ID variables which are usually stored in a single integer
-		produces < std::vector<bool> > (prefix + "eidVeryLooseMC" + suffix);
-		produces < std::vector<bool> > (prefix + "eidLooseMC" + suffix);
-		produces < std::vector<bool> > (prefix + "eidMediumMC" + suffix);
-		produces < std::vector<bool> > (prefix + "eidTightMC" + suffix);
-		produces < std::vector<bool> > (prefix + "eidSuperTightMC" + suffix);
-		produces < std::vector<bool> > (prefix + "eidHyperTight1MC" + suffix);
-		produces < std::vector<bool> > (prefix + "eidHyperTight2MC" + suffix);
-		produces < std::vector<bool> > (prefix + "eidHyperTight3MC" + suffix);
-		produces < std::vector<bool> > (prefix + "eidHyperTight4MC" + suffix);
-	}
 	produces < std::vector<double> > (prefix + "Likelihood" + suffix);
 	produces < std::vector<int> > (prefix + "NumberOfBrems" + suffix);
 	produces < std::vector<double> > (prefix + "mvaTrigV0" + suffix);
@@ -127,7 +114,7 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 	produces < std::vector<double> > (prefix + "shFracInnerHits" + suffix);
 	produces < std::vector<bool> > (prefix + "passConversionVeto" + suffix);
 
-//calorimeter variables
+	//calorimeter variables
 	produces < std::vector<double> > (prefix + "SCEta" + suffix);
 	produces < std::vector<double> > (prefix + "SCPhi" + suffix);
 	produces < std::vector<double> > (prefix + "SCPt" + suffix);
@@ -167,17 +154,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > sigmaIEtaIEta(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > deltaPhiTrkSC(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > deltaEtaTrkSC(new std::vector<double>());
-	std::auto_ptr < std::vector<unsigned int> > passID(new std::vector<unsigned int>());
-	std::auto_ptr < std::vector<unsigned int> > passIDMC(new std::vector<unsigned int>());
-	std::auto_ptr < std::vector<bool> > eidVeryLooseMC(new std::vector<bool>());
-	std::auto_ptr < std::vector<bool> > eidLooseMC(new std::vector<bool>());
-	std::auto_ptr < std::vector<bool> > eidMediumMC(new std::vector<bool>());
-	std::auto_ptr < std::vector<bool> > eidTightMC(new std::vector<bool>());
-	std::auto_ptr < std::vector<bool> > eidSuperTightMC(new std::vector<bool>());
-	std::auto_ptr < std::vector<bool> > eidHyperTight1MC(new std::vector<bool>());
-	std::auto_ptr < std::vector<bool> > eidHyperTight2MC(new std::vector<bool>());
-	std::auto_ptr < std::vector<bool> > eidHyperTight3MC(new std::vector<bool>());
-	std::auto_ptr < std::vector<bool> > eidHyperTight4MC(new std::vector<bool>());
 	std::auto_ptr < std::vector<double> > likelihood(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > numberOfBrems(new std::vector<int>());
 	std::auto_ptr < std::vector<double> > mvaTrigV0(new std::vector<double>());
@@ -225,7 +201,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 //    std::auto_ptr < std::vector<double> > dB(new std::vector<double>());
 
-//high energy electron isolation variables
+	//high energy electron isolation variables
 	std::auto_ptr < std::vector<double> > ecalIsoHeep03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > hcalIsoD1Heep03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > hcalIsoD2Heep03(new std::vector<double>());
@@ -245,7 +221,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > shFracInnerHits(new std::vector<double>());
 	std::auto_ptr < std::vector<bool> > passConversionVeto(new std::vector<bool>());
 
-//calorimeter variables
+	//calorimeter variables
 	std::auto_ptr < std::vector<double> > scEta(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > scPhi(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > scPt(new std::vector<double>());
@@ -299,98 +275,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			// exit from loop when you reach the required number of electrons
 			if (px->size() >= maxSize)
 				break;
-
-			unsigned int passId = 0;
-
-			/* passID for different electron IDs is assigned bitwise
-			 * https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideCategoryBasedElectronID
-			 * bit 0: eidVeryLoose
-			 * bit 1: eidLoose
-			 * bit 2: eidMedium
-			 * bit 3: eidTight
-			 * bit 4: eidSuperTight
-			 * bit 5: eidHyperTight1
-			 * bit 6: eidHyperTight2
-			 * bit 7: eidHyperTight3
-			 * bit 8: eidHyperTight4
-			 */
-			if (it->electronID("eidVeryLoose") > 0)
-				passId = passId | 1 << 0;
-			if (it->electronID("eidLoose") > 0)
-				passId = passId | 1 << 1;
-			if (it->electronID("eidMedium") > 0)
-				passId = passId | 1 << 2;
-			if (it->electronID("eidTight") > 0)
-				passId = passId | 1 << 3;
-			if (it->electronID("eidSuperTight") > 0)
-				passId = passId | 1 << 4;
-			if (it->electronID("eidHyperTight1") > 0)
-				passId = passId | 1 << 5;
-			if (it->electronID("eidHyperTight2") > 0)
-				passId = passId | 1 << 6;
-			if (it->electronID("eidHyperTight3") > 0)
-				passId = passId | 1 << 7;
-			if (it->electronID("eidHyperTight4") > 0)
-				passId = passId | 1 << 8;
-
-			unsigned int passIdMC = 0;
-			/* passID for different electron IDs is assigned bitwise
-			 * https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideCategoryBasedElectronID
-			 * bit 0: eidVeryLooseMC
-			 * bit 1: eidLooseMC
-			 * bit 2: eidMediumMC
-			 * bit 3: eidTightMC
-			 * bit 4: eidSuperTightMC
-			 * bit 5: eidHyperTight1MC
-			 * bit 6: eidHyperTight2MC
-			 * bit 7: eidHyperTight3MC
-			 * bit 8: eidHyperTight4MC
-			 */
-			if (it->electronID("eidVeryLooseMC") > 0) {
-				passIdMC = passIdMC | 1 << 0;
-				eidVeryLooseMC->push_back(true);
-			} else
-				eidVeryLooseMC->push_back(false);
-			if (it->electronID("eidLooseMC") > 0) {
-				passIdMC = passIdMC | 1 << 1;
-				eidLooseMC->push_back(true);
-			} else
-				eidLooseMC->push_back(false);
-			if (it->electronID("eidMediumMC") > 0) {
-				passIdMC = passIdMC | 1 << 2;
-				eidMediumMC->push_back(true);
-			} else
-				eidMediumMC->push_back(false);
-			if (it->electronID("eidTightMC") > 0) {
-				passIdMC = passIdMC | 1 << 3;
-				eidTightMC->push_back(true);
-			} else
-				eidTightMC->push_back(false);
-			if (it->electronID("eidSuperTightMC") > 0) {
-				passIdMC = passIdMC | 1 << 4;
-				eidSuperTightMC->push_back(true);
-			} else
-				eidSuperTightMC->push_back(false);
-			if (it->electronID("eidHyperTight1MC") > 0) {
-				passIdMC = passIdMC | 1 << 5;
-				eidHyperTight1MC->push_back(true);
-			} else
-				eidHyperTight1MC->push_back(false);
-			if (it->electronID("eidHyperTight2MC") > 0) {
-				passIdMC = passIdMC | 1 << 6;
-				eidHyperTight2MC->push_back(true);
-			} else
-				eidHyperTight2MC->push_back(false);
-			if (it->electronID("eidHyperTight3MC") > 0) {
-				passIdMC = passIdMC | 1 << 7;
-				eidHyperTight3MC->push_back(true);
-			} else
-				eidHyperTight3MC->push_back(false);
-			if (it->electronID("eidHyperTight4MC") > 0) {
-				passIdMC = passIdMC | 1 << 8;
-				eidHyperTight4MC->push_back(true);
-			} else
-				eidHyperTight4MC->push_back(false);
 
 			/* Conversion (fit)
 			 * See https://indico.cern.ch/getFile.py/access?contribId=12&sessionId=0&resId=0&materialId=slides&confId=133587
@@ -469,8 +353,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			sigmaIEtaIEta->push_back(it->sigmaIetaIeta());
 			deltaPhiTrkSC->push_back(it->deltaPhiSuperClusterTrackAtVtx());
 			deltaEtaTrkSC->push_back(it->deltaEtaSuperClusterTrackAtVtx());
-			passID->push_back(passId);
-			passIDMC->push_back(passIdMC);
 			likelihood->push_back(likelihood_);
 			numberOfBrems->push_back(it->numberOfBrems());
 			mvaTrigV0->push_back(it->electronID("mvaTrigV0"));
@@ -630,19 +512,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	iEvent.put(sigmaIEtaIEta, prefix + "SigmaIEtaIEta" + suffix);
 	iEvent.put(deltaPhiTrkSC, prefix + "DeltaPhiTrkSC" + suffix);
 	iEvent.put(deltaEtaTrkSC, prefix + "DeltaEtaTrkSC" + suffix);
-	iEvent.put(passID, prefix + "PassID" + suffix);
-	iEvent.put(passIDMC, prefix + "PassIDMC" + suffix);
-	if (debugRelease_) {
-		iEvent.put(eidVeryLooseMC, prefix + "eidVeryLooseMC" + suffix);
-		iEvent.put(eidLooseMC, prefix + "eidLooseMC" + suffix);
-		iEvent.put(eidMediumMC, prefix + "eidMediumMC" + suffix);
-		iEvent.put(eidTightMC, prefix + "eidTightMC" + suffix);
-		iEvent.put(eidSuperTightMC, prefix + "eidSuperTightMC" + suffix);
-		iEvent.put(eidHyperTight1MC, prefix + "eidHyperTight1MC" + suffix);
-		iEvent.put(eidHyperTight2MC, prefix + "eidHyperTight2MC" + suffix);
-		iEvent.put(eidHyperTight3MC, prefix + "eidHyperTight3MC" + suffix);
-		iEvent.put(eidHyperTight4MC, prefix + "eidHyperTight4MC" + suffix);
-	}
 	iEvent.put(likelihood, prefix + "Likelihood" + suffix);
 	iEvent.put(numberOfBrems, prefix + "NumberOfBrems" + suffix);
 	iEvent.put(mvaTrigV0, prefix + "mvaTrigV0" + suffix);
