@@ -114,7 +114,8 @@ def setup_ECALDeadCellTriggerPrimitiveFilter(process, cms):
     print "Setting up ECALDeadCell TriggerPrimitive Filter"
     print '=' * 60    
     #https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFilters#ECAL_dead_cell_filter
-    from RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi import EcalDeadCellTriggerPrimitiveFilter     
+    from RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi import EcalDeadCellTriggerPrimitiveFilter
+    EcalDeadCellTriggerPrimitiveFilter.taggingMode = cms.bool(True)
     EcalDeadCellTriggerPrimitiveFilter.tpDigiCollection = cms.InputTag("ecalTPSkimNA")
     return EcalDeadCellTriggerPrimitiveFilter   
 
