@@ -18,9 +18,9 @@ EventFilter::EventFilter(const edm::ParameterSet& iConfig) :
 		hcalLaserFilterInput_(iConfig.getParameter < edm::InputTag > ("HCALLaserFilterInput")), //
 		ecalDeadCellFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellFilterInput")), //
 		ecalDeadCellTriggerPrimitiveFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellTriggerPrimitiveFilterInput")), //
-		trackingFailureFilter_(iConfig.getParameter < edm::InputTag > ("TrackingFailureFilterInput")), //
-		eeBadSCFilter_(iConfig.getParameter < edm::InputTag > ("EEBadSCFilterInput")), //
-		ecalLaserCorrFilter_(iConfig.getParameter < edm::InputTag > ("ECALLaserCorrFilter")), //
+		trackingFailureFilterInput_(iConfig.getParameter < edm::InputTag > ("TrackingFailureFilterInput")), //
+		eeBadSCFilterInput_(iConfig.getParameter < edm::InputTag > ("EEBadSCFilterInput")), //
+		ecalLaserCorrFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALLaserCorrFilterInput")), //
 		trkInput_(iConfig.getParameter < edm::InputTag > ("TracksInput")), //
 		vertexInput_(iConfig.getParameter < edm::InputTag > ("VertexInput")), //
 		jetInput_(iConfig.getParameter < edm::InputTag > ("jetInput")), //
@@ -100,13 +100,13 @@ bool EventFilter::passesSelectionStep(edm::Event& event, Filters::value filter) 
 		return passesFilter(event, ecalDeadCellTriggerPrimitiveFilterInput_);	
 	case Filters::passTrackingFailureFilter:
 		if (useTrackingFailureFilter_)
-			return passesFilter(event, trackingFailureFilter_);
+			return passesFilter(event, trackingFailureFilterInput_);
 		else
 			return true;
 	case Filters::passEEBadSCFilter:
-		return passesFilter(event, eeBadSCFilter_);
+		return passesFilter(event, eeBadSCFilterInput_);
 	case Filters::passECALLaserCorrFilter:
-		return passesFilter(event, ecalLaserCorrFilter_);
+		return passesFilter(event, ecalLaserCorrFilterInput_);
 	case Filters::passScrapingVeto:
 		return passesScrapingVeto(event);
 	case Filters::passGoodPrimaryVertex:
@@ -339,7 +339,7 @@ void EventFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
 	desc.add < edm::InputTag > ("ECALDeadCellTriggerPrimitiveFilterInput", edm::InputTag("EcalDeadCellTriggerPrimitiveFilter"));
 	desc.add < edm::InputTag > ("TrackingFailureFilterInput", edm::InputTag("trackingFailureFilter"));
 	desc.add < edm::InputTag > ("EEBadSCFilterInput", edm::InputTag("eeBadScFilter"));
-	desc.add < edm::InputTag > ("ECALLaserCorrFilter", edm::InputTag("ecalLaserCorrFilter"));
+	desc.add < edm::InputTag > ("ECALLaserCorrFilterInput", edm::InputTag("ecalLaserCorrFilter"));
 	desc.add < edm::InputTag > ("TracksInput", edm::InputTag("generalTracks"));
 
 	desc.add < edm::InputTag > ("VertexInput", edm::InputTag("goodOfflinePrimaryVertices"));

@@ -21,7 +21,7 @@ def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
     process.EventFilter.ECALDeadCellTriggerPrimitiveFilterInput = cms.InputTag('EcalDeadCellTriggerPrimitiveFilter')
     process.EventFilter.TrackingFailureFilterInput = cms.InputTag('trackingFailureFilter')
     process.EventFilter.EEBadSCFilterInput = cms.InputTag('eeBadScFilter')
-    process.EventFilter.ECALLaserCorrFilter = cms.InputTag('ecalLaserCorrFilter')
+    process.EventFilter.ECALLaserCorrFilterInput = cms.InputTag('ecalLaserCorrFilter')
     process.EventFilter.useTrackingFailureFilter = cms.bool(True)
     #disable optional MET filters for now
     process.EventFilter.useOptionalMETFilters = cms.bool(False)

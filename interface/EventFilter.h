@@ -74,9 +74,9 @@ private:
 	bool passesJetCuts(edm::Event& event);
 
 	edm::InputTag hcalNoiseInput_, hcalLaserFilterInput_, ecalDeadCellFilterInput_, ecalDeadCellTriggerPrimitiveFilterInput_,//
-			trackingFailureFilter_, //
-			eeBadSCFilter_, //
-			ecalLaserCorrFilter_, //
+			trackingFailureFilterInput_, //
+			eeBadSCFilterInput_, //
+			ecalLaserCorrFilterInput_, //
 			trkInput_, vertexInput_, //
 			jetInput_, electronInput_, muonInput_;
 
