@@ -5,18 +5,18 @@ from PhysicsTools.PatAlgos.tools.coreTools import *
 #set up analysis
 #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions
 
+#Globals tags have been updated with the new JEC from https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECDataMC
 #Data Global Tag
-GLOBALTAG_DATA = 'FT_53_V6_AN2::All' # Used for 2012 A and B: re-reconstructed data with CMSSW_5_3_2_patch4
-#GLOBALTAG_DATA = 'FT_53_V6C_AN2::All' # Used for 2012 A and B: re-reconstructed data with CMSSW_5_3_3_patch1              
-
-# GLOBALTAG_DATA = 'FT_R_53_V10:All' #2012 C v1: data re-reco with CMSSW_5_3_2_patch4
+GLOBALTAG_DATA = 'FT_53_V6_AN3::All' # Used for 2012 A and B: re-reconstructed data with CMSSW_5_3_2_patch4
+#GLOBALTAG_DATA = 'FT_53_V6C_AN3::All' # Used for 2012 A and B: re-reconstructed data with CMSSW_5_3_3_patch1              
+#GLOBALTAG_DATA = 'FT_53_V10_AN3::All' # Used for 2012 C: re-reconstructed data with CMSSW_5_3_2_patch4
 
 #Monte Carlo Global Tag
-GLOBALTAG_MC = 'START53_V14::All'
+GLOBALTAG_MC = 'START53_V15::All'
 FILETAG = '53X'
 
 TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/SingleElectron_Run2012B_196531_524_PromptReco-v1_AOD.root'
-TEST_MC_FILE = 'file:///storage/phjaj/datasets/mc/8TeV/E2CDA378-0126-E211-9C94-003048F0E1AE.root'
+TEST_MC_FILE = 'file:///storage/TopQuarkGroup/mc/8TeV/SynchEx/Summer12_DR53X_TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_AODSIM_PU_S10_START53_V7A-v1.root'
 
 #CERN
 #TEST_DATA_FILE = '/store/data/Run2012A/ElectronHad/AOD/PromptReco-v1/000/193/336/C47F154E-A697-E111-83F5-001D09F24D8A.root'
