@@ -331,6 +331,21 @@ else :
 # reduce verbosity
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(100)
 
+#----------------------------------------------------------------------------------------------------
+# The ECAL laser correction filter (ecalLaserCorrFilter) occasionally 
+# interpolates laser correction values of < 1 and issues a LogError message
+# 
+# This does not affect the laser correction that is applied: only the interpolated estimate 
+# that the filter uses.  The filter runs in "Tagging Mode", so no events can be removed.
+# 
+# Error message comes from line 173 of:
+# CalibCalorimetry/EcalLaserCorrection/src/EcalLaserDbService.cc
+# function = EcalLaserDbService::getLaserCorrection
+# Message = "The interpolated laser correction is <= zero!"
+#
+# We suppress these messages.  Suppression can be removed by commenting the following line.
+#----------------------------------------------------------------------------------------------------
+process.MessageLogger.suppressError = cms.untracked.vstring ('ecalLaserCorrFilter') 
 
 # process all the events
 if options.maxEvents:
