@@ -13,6 +13,8 @@ def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
     process.trackingFailureFilter = setup_trackingFailureFilter(process, cms)
     process.eeBadScFilter = setup_eeBadScFilter(process, cms)
     process.ecalLaserCorrFilter = setup_ecalLaserCorrFilter(process, cms)
+    #setting up tracking POG filters                                                                                                                                                                                                      
+    setup_trackingPOGfilters(process, cms)
     
     process.EventFilter = setup_skim(process, cms, options)
     process.EventFilter.HBHENoiseFilterInput = cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult')
@@ -22,6 +24,11 @@ def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
     process.EventFilter.TrackingFailureFilterInput = cms.InputTag('trackingFailureFilter')
     process.EventFilter.EEBadSCFilterInput = cms.InputTag('eeBadScFilter')
     process.EventFilter.ECALLaserCorrFilterInput = cms.InputTag('ecalLaserCorrFilter')
+    #tracking POG filters
+    process.EventFilter.manystripclus53XInput = cms.InputTag('manystripclus53X')
+    process.EventFilter.toomanystripclus53XInput = cms.InputTag('toomanystripclus53X')
+    process.EventFilter.logErrorTooManyClustersInput = cms.InputTag('logErrorTooManyClusters')
+    process.EventFilter.useTrackingPOGFilters = cms.bool(True)
     process.EventFilter.useTrackingFailureFilter = cms.bool(True)
     #disable optional MET filters for now
     process.EventFilter.useOptionalMETFilters = cms.bool(False)
@@ -36,6 +43,9 @@ def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
                 process.EcalDeadCellTriggerPrimitiveFilter *
                 process.eeBadScFilter *
                 process.ecalLaserCorrFilter *
+                ~process.manystripclus53X *
+                ~process.toomanystripclus53X *
+                ~process.logErrorTooManyClusters *
                 process.EventFilter
                 )
     return EventFilters
@@ -129,8 +139,8 @@ def setup_ECALDeadCellTriggerPrimitiveFilter(process, cms):
 def setup_trackingFailureFilter(process, cms):
     from RecoMET.METFilters.trackingFailureFilter_cfi import trackingFailureFilter
     trackingFailureFilter.JetSource = cms.InputTag('ak5PFJets')
-    trackingFailureFilter.TrackSource           = cms.InputTag('generalTracks')
-    trackingFailureFilter.VertexSource          = cms.InputTag('goodOfflinePrimaryVertices')
+    trackingFailureFilter.TrackSource = cms.InputTag('generalTracks')
+    trackingFailureFilter.VertexSource = cms.InputTag('goodOfflinePrimaryVertices')
     trackingFailureFilter.taggingMode = cms.bool(True)
     return trackingFailureFilter
 
@@ -144,6 +154,20 @@ def setup_ecalLaserCorrFilter(process, cms):
     ecalLaserCorrFilter.taggingMode = cms.bool (True)
     ecalLaserCorrFilter.Debug = cms.bool (False)
     return ecalLaserCorrFilter
+
+def setup_trackingPOGfilters(process, cms):
+    from RecoMET.METFilters.trackingPOGFilters_cfi import manystripclus53X
+    from RecoMET.METFilters.trackingPOGFilters_cfi import toomanystripclus53X
+    from RecoMET.METFilters.trackingPOGFilters_cfi import logErrorTooManyClusters
+    manystripclus53X.taggedMode = cms.untracked.bool(True)
+    manystripclus53X.forcedValue = cms.untracked.bool(False)
+    toomanystripclus53X.taggedMode = cms.untracked.bool(True)
+    toomanystripclus53X.forcedValue = cms.untracked.bool(False)
+    logErrorTooManyClusters.taggedMode = cms.untracked.bool(True)
+    logErrorTooManyClusters.forcedValue = cms.untracked.bool(False)
+    process.manystripclus53X = manystripclus53X
+    process.toomanystripclus53X = toomanystripclus53X
+    process.logErrorTooManyClusters = logErrorTooManyClusters
 
     
 def setup_skim(process, cms, options):

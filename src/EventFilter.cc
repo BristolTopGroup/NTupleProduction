@@ -21,6 +21,9 @@ EventFilter::EventFilter(const edm::ParameterSet& iConfig) :
 		trackingFailureFilterInput_(iConfig.getParameter < edm::InputTag > ("TrackingFailureFilterInput")), //
 		eeBadSCFilterInput_(iConfig.getParameter < edm::InputTag > ("EEBadSCFilterInput")), //
 		ecalLaserCorrFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALLaserCorrFilterInput")), //
+		manystripclus53XInput_(iConfig.getParameter < edm::InputTag > ("manystripclus53XInput")), //
+		toomanystripclus53XInput_(iConfig.getParameter < edm::InputTag > ("toomanystripclus53XInput")), //
+		logErrorTooManyClustersInput_(iConfig.getParameter < edm::InputTag > ("logErrorTooManyClustersInput")), //
 		trkInput_(iConfig.getParameter < edm::InputTag > ("TracksInput")), //
 		vertexInput_(iConfig.getParameter < edm::InputTag > ("VertexInput")), //
 		jetInput_(iConfig.getParameter < edm::InputTag > ("jetInput")), //
@@ -43,6 +46,7 @@ EventFilter::EventFilter(const edm::ParameterSet& iConfig) :
 		debug_(iConfig.getParameter<bool>("debug")), //
 		counteitherleptontype_(iConfig.getParameter<bool>("counteitherleptontype")), //
 		useTrackingFailureFilter_(iConfig.getParameter<bool>("useTrackingFailureFilter")), //
+		useTrackingPOGFilters_(iConfig.getParameter<bool>("useTrackingPOGFilters")), //
 		useOptionalMETFilters_(iConfig.getParameter<bool>("useOptionalMETFilters")),//
 		eventCount_(), //
 		hCount() {
@@ -72,7 +76,7 @@ bool EventFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 			++eventCount_.at(index);
 		else {
 			//will not use the filter decision but will still save the outcome
-			if(useOptionalMETFilters_ == false && (index >= Filters::passCSCBeamHaloFilter && index <= Filters::passECALLaserCorrFilter))
+			if(useOptionalMETFilters_ == false && (index >= Filters::passCSCBeamHaloFilter && index <= Filters::passTrackingPOGFilters))
 				continue;
 
 			return false;
@@ -107,6 +111,11 @@ bool EventFilter::passesSelectionStep(edm::Event& event, Filters::value filter) 
 		return passesFilter(event, eeBadSCFilterInput_);
 	case Filters::passECALLaserCorrFilter:
 		return passesFilter(event, ecalLaserCorrFilterInput_);
+	case Filters::passTrackingPOGFilters:
+		if (useTrackingPOGFilters_)
+			return !passesFilter(event, manystripclus53XInput_) && !passesFilter(event, toomanystripclus53XInput_) && !passesFilter(event, logErrorTooManyClustersInput_);
+		else
+			return true;
 	case Filters::passScrapingVeto:
 		return passesScrapingVeto(event);
 	case Filters::passGoodPrimaryVertex:
@@ -340,6 +349,9 @@ void EventFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
 	desc.add < edm::InputTag > ("TrackingFailureFilterInput", edm::InputTag("trackingFailureFilter"));
 	desc.add < edm::InputTag > ("EEBadSCFilterInput", edm::InputTag("eeBadScFilter"));
 	desc.add < edm::InputTag > ("ECALLaserCorrFilterInput", edm::InputTag("ecalLaserCorrFilter"));
+	desc.add < edm::InputTag > ("manystripclus53XInput", edm::InputTag("manystripclus53X"));
+	desc.add < edm::InputTag > ("toomanystripclus53XInput", edm::InputTag("toomanystripclus53X"));
+	desc.add < edm::InputTag > ("logErrorTooManyClustersInput", edm::InputTag("logErrorTooManyClusters"));
 	desc.add < edm::InputTag > ("TracksInput", edm::InputTag("generalTracks"));
 
 	desc.add < edm::InputTag > ("VertexInput", edm::InputTag("goodOfflinePrimaryVertices"));
@@ -370,7 +382,8 @@ void EventFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
 
 	desc.add<bool>("debug", false);
 	desc.add<bool>("counteitherleptontype", true);
-	desc.add<bool>("useTrackingFailureFilter", false);
+	desc.add<bool>("useTrackingFailureFilter", true);
+	desc.add<bool>("useTrackingPOGFilters", true);
 	desc.add<bool>("useOptionalMETFilters", false);
 	descriptions.addDefault(desc);
 }
