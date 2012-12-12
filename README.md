@@ -10,13 +10,13 @@ To setup the code:
 
 ```
 export SCRAM_ARCH=slc5_amd64_gcc462
-scram p -n CMSSW_5_3_7_nTuple_v9a CMSSW_5_3_7
+scram p -n CMSSW_5_3_7_nTuple_v9b CMSSW_5_3_7
 cd CMSSW_5_3_7_nTuple_v9b/src
 cmsenv
 
-#PAT recipe (V08-09-48)
+#PAT recipe (V08-09-50)
 addpkg DataFormats/PatCandidates V06-05-06-03
-addpkg PhysicsTools/PatAlgos     V08-09-48
+addpkg PhysicsTools/PatAlgos     V08-09-50
 addpkg DataFormats/StdDictionaries V00-02-14
 addpkg FWCore/GuiBrowsers V00-00-70
 
