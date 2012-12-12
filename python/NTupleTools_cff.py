@@ -15,7 +15,7 @@ GLOBALTAG_DATA = 'FT_53_V6_AN3::All' # Used for 2012 A and B: re-reconstructed d
 GLOBALTAG_MC = 'START53_V15::All'
 FILETAG = '53X'
 
-TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/SingleElectron_Run2012B_196531_524_PromptReco-v1_AOD.root'
+TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/SingleElectron_Run2012B_13Jul2012_ReReco_AOD.root'
 TEST_MC_FILE = 'file:///storage/TopQuarkGroup/mc/8TeV/SynchEx/Summer12_DR53X_TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_AODSIM_PU_S10_START53_V7A-v1.root'
 
 #CERN

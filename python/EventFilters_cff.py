@@ -141,7 +141,7 @@ def setup_eeBadScFilter(process, cms):
 
 def setup_ecalLaserCorrFilter(process, cms):
     from RecoMET.METFilters.ecalLaserCorrFilter_cfi import ecalLaserCorrFilter
-    ecalLaserCorrFilter.TaggingMode = cms.bool (True)
+    ecalLaserCorrFilter.taggingMode = cms.bool (True)
     ecalLaserCorrFilter.Debug = cms.bool (False)
     return ecalLaserCorrFilter
 
