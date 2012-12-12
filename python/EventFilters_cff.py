@@ -11,6 +11,7 @@ def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
     process.EcalDeadCellBoundaryEnergyFilter = setup_ECALDeadCellFilter(process, cms)
     process.EcalDeadCellTriggerPrimitiveFilter = setup_ECALDeadCellTriggerPrimitiveFilter(process, cms)
     process.trackingFailureFilter = setup_trackingFailureFilter(process, cms)
+    process.eeBadScFilter = setup_eeBadScFilter(process, cms)
     process.EventFilter = setup_skim(process, cms, options)
     
     process.EventFilter.HBHENoiseFilterInput = cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult')
@@ -18,6 +19,7 @@ def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
     process.EventFilter.ECALDeadCellFilterInput = cms.InputTag('EcalDeadCellBoundaryEnergyFilter')
     process.EventFilter.ECALDeadCellTriggerPrimitiveFilterInput = cms.InputTag('EcalDeadCellTriggerPrimitiveFilter')
     process.EventFilter.TrackingFailureFilterInput = cms.InputTag('trackingFailureFilter')
+    process.EventFilter.EEBadSCFilterInput = cms.InputTag('eeBadScFilter')
     process.EventFilter.useTrackingFailureFilter = cms.bool(True)
     #disable optional MET filters for now
     process.EventFilter.useOptionalMETFilters = cms.bool(False)
@@ -30,6 +32,7 @@ def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
                 process.HcalLaserEventFilter * 
                 process.EcalDeadCellBoundaryEnergyFilter *
                 process.EcalDeadCellTriggerPrimitiveFilter *
+                process.eeBadScFilter *
                 process.EventFilter
                 )
     return EventFilters

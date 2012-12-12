@@ -9,6 +9,7 @@ EventFilter = cms.EDFilter(
     ECALDeadCellFilterInput=cms.InputTag('EcalDeadCellBoundaryEnergyFilter'),
     ECALDeadCellTriggerPrimitiveFilterInput = cms.InputTag('EcalDeadCellTriggerPrimitiveFilter'),
     TrackingFailureFilterInput=cms.InputTag('trackingFailureFilter'),
+    EEBadSCFilterInput = cms.InputTag('eeBadScFilter'),
     useOptionalMETFilters=cms.bool(False),
     useTrackingFailureFilter=cms.bool(False),
 
