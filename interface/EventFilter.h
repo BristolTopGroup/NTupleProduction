@@ -22,6 +22,7 @@ enum value {
 	passECALDeadCellTriggerPrimitiveFilter,
 	passTrackingFailureFilter,
 	passEEBadSCFilter,
+	passECALLaserCorrFilter,
 	passScrapingVeto,
 	passGoodPrimaryVertex,
 	passElectronCuts,
@@ -38,6 +39,7 @@ const std::string names[NUMBER_OF_FILTERS] = { "All Events", //
 		"ECALDeadCellTriggerPrimitiveFilter", //
 		"TrackingFailureFilter", //
 		"EEBadSupercrystalFilter", //
+		"ECALLaserCorrFilter", //
 		"ScrapingVeto", //
 		"GoodPrimaryVertex", //
 		"ElectronCuts", //
@@ -74,6 +76,7 @@ private:
 	edm::InputTag hcalNoiseInput_, hcalLaserFilterInput_, ecalDeadCellFilterInput_, ecalDeadCellTriggerPrimitiveFilterInput_,//
 			trackingFailureFilter_, //
 			eeBadSCFilter_, //
+			ecalLaserCorrFilter_, //
 			trkInput_, vertexInput_, //
 			jetInput_, electronInput_, muonInput_;
 

@@ -10,6 +10,7 @@ EventFilter = cms.EDFilter(
     ECALDeadCellTriggerPrimitiveFilterInput = cms.InputTag('EcalDeadCellTriggerPrimitiveFilter'),
     TrackingFailureFilterInput=cms.InputTag('trackingFailureFilter'),
     EEBadSCFilterInput = cms.InputTag('eeBadScFilter'),
+    ECALLaserCorrFilter = cms.InputTag('ecalLaserCorrFilter'),
     useOptionalMETFilters=cms.bool(False),
     useTrackingFailureFilter=cms.bool(False),
 

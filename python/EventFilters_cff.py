@@ -12,14 +12,16 @@ def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
     process.EcalDeadCellTriggerPrimitiveFilter = setup_ECALDeadCellTriggerPrimitiveFilter(process, cms)
     process.trackingFailureFilter = setup_trackingFailureFilter(process, cms)
     process.eeBadScFilter = setup_eeBadScFilter(process, cms)
-    process.EventFilter = setup_skim(process, cms, options)
+    process.ecalLaserCorrFilter = setup_ecalLaserCorrFilter(process, cms)
     
+    process.EventFilter = setup_skim(process, cms, options)
     process.EventFilter.HBHENoiseFilterInput = cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult')
     process.EventFilter.HCALLaserFilterInput = cms.InputTag('HcalLaserEventFilter')
     process.EventFilter.ECALDeadCellFilterInput = cms.InputTag('EcalDeadCellBoundaryEnergyFilter')
     process.EventFilter.ECALDeadCellTriggerPrimitiveFilterInput = cms.InputTag('EcalDeadCellTriggerPrimitiveFilter')
     process.EventFilter.TrackingFailureFilterInput = cms.InputTag('trackingFailureFilter')
     process.EventFilter.EEBadSCFilterInput = cms.InputTag('eeBadScFilter')
+    process.EventFilter.ECALLaserCorrFilter = cms.InputTag('ecalLaserCorrFilter')
     process.EventFilter.useTrackingFailureFilter = cms.bool(True)
     #disable optional MET filters for now
     process.EventFilter.useOptionalMETFilters = cms.bool(False)
@@ -33,6 +35,7 @@ def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
                 process.EcalDeadCellBoundaryEnergyFilter *
                 process.EcalDeadCellTriggerPrimitiveFilter *
                 process.eeBadScFilter *
+                process.ecalLaserCorrFilter *
                 process.EventFilter
                 )
     return EventFilters
@@ -137,7 +140,7 @@ def setup_eeBadScFilter(process, cms):
     return eeBadScFilter
 
 def setup_ecalLaserCorrFilter(process, cms):
-    from SandBox.Skims.ecalLaserCorrFilter_cfi import ecalLaserCorrFilter
+    from RecoMET.METFilters.ecalLaserCorrFilter_cfi import ecalLaserCorrFilter
     ecalLaserCorrFilter.TaggingMode = cms.bool (True)
     ecalLaserCorrFilter.Debug = cms.bool (False)
     return ecalLaserCorrFilter
