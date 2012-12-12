@@ -1,6 +1,9 @@
 #import default nTuple stub
 from BristolAnalysis.NTupleTools.NTupleTools_cff import *
-process.load('BristolAnalysis.NTupleTools.ttDecayChannelFilters_cff')
+process.load('TopQuarkAnalysis.TopSkimming.TtFullyHadronicFilter_cfi')
+process.load('TopQuarkAnalysis.TopSkimming.TtFullyLeptonicFilter_cfi')
+process.load('TopQuarkAnalysis.TopSkimming.TtSemiLeptonicFilter_cfi')
+
 process.load('BristolAnalysis.NTupleTools.TopPairElectronPlusJets2012SelectionFilter_cfi')
 process.load('BristolAnalysis.NTupleTools.TopPairMuonPlusJets2012SelectionFilter_cfi')
 process.load('BristolAnalysis.NTupleTools.EventWeight_Producer_PU_cfi')
@@ -20,6 +23,19 @@ process.ttFullLeptonicMuTauFilter.taggingMode = cms.bool(True)
 process.topPairEPlusJetsSelection.taggingMode = cms.bool(True)
 process.topPairMuPlusJetsSelection.taggingMode = cms.bool(True)
 
+if options.isMCatNLO:
+    process.ttFullHadronicFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicFilter.useMCATNLO = cms.bool(True)
+    process.ttSemiLeptonicElectronFilter.useMCATNLO = cms.bool(True)
+    process.ttSemiLeptonicMuonFilter.useMCATNLO = cms.bool(True)
+    process.ttSemiLeptonicTauFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicEEFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicMuMuFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicTauTauFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicETauFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicEMuFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicMuTauFilter.useMCATNLO = cms.bool(True)
+    
 if options.CMSSW == '44X':
     process.topPairEPlusJetsSelection.MCSampleTag = cms.string('Fall11')  
     process.topPairMuPlusJetsSelection.MCSampleTag = cms.string('Fall11')  
