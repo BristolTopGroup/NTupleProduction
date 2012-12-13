@@ -45,7 +45,7 @@ def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
                 process.ecalLaserCorrFilter *
                 ~process.manystripclus53X *
                 ~process.toomanystripclus53X *
-                ~process.logErrorTooManyClusters *
+                #~process.logErrorTooManyClusters *
                 process.EventFilter
                 )
     return EventFilters

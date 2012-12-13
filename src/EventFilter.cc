@@ -113,7 +113,8 @@ bool EventFilter::passesSelectionStep(edm::Event& event, Filters::value filter) 
 		return passesFilter(event, ecalLaserCorrFilterInput_);
 	case Filters::passTrackingPOGFilters:
 		if (useTrackingPOGFilters_)
-			return !passesFilter(event, manystripclus53XInput_) && !passesFilter(event, toomanystripclus53XInput_) && !passesFilter(event, logErrorTooManyClustersInput_);
+			return !passesFilter(event, manystripclus53XInput_) && !passesFilter(event, toomanystripclus53XInput_);
+					//&& !passesFilter(event, logErrorTooManyClustersInput_);
 		else
 			return true;
 	case Filters::passScrapingVeto:
