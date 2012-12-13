@@ -12,7 +12,10 @@ process.source.fileNames = [
 ##########################################################################################
 #            General
 ##########################################################################################
-process.load('BristolAnalysis.NTupleTools.ttDecayChannelFilters_cff')
+process.load('TopQuarkAnalysis.TopSkimming.TtFullyHadronicFilter_cfi')
+process.load('TopQuarkAnalysis.TopSkimming.TtFullyLeptonicFilter_cfi')
+process.load('TopQuarkAnalysis.TopSkimming.TtSemiLeptonicFilter_cfi')
+
 process.load('BristolAnalysis.NTupleTools.TopPairElectronPlusJets2012SelectionFilter_cfi')
 process.load('BristolAnalysis.NTupleTools.TopPairMuonPlusJets2012SelectionFilter_cfi')
  #filters only in tagging mode
