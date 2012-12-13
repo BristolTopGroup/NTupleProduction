@@ -36,16 +36,10 @@ cvs co -r V00-00-31 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysis
 
 #Bristol Tools
 git clone git@github.com:BristolTopGroup/NTupleProduction.git BristolAnalysis/NTupleTools
+#TopSkimming
+git clone git@github.com:BristolTopGroup/TopSkimming.git TopQuarkAnalysis/TopSkimming
 
-#Top skimming
-cvs co -r HEAD TopQuarkAnalysis/TopSkimming
-
-#customise the ttbar event selectors
-cp BristolAnalysis/NTupleTools/interface/TopDecayChannelFilter.h TopQuarkAnalysis/TopSkimming/interface/TopDecayChannelFilter.h
-cp BristolAnalysis/NTupleTools/python/TtDecayChannelFilter_cfi.py TopQuarkAnalysis/TopSkimming/python/TtDecayChannelFilter_cfi.py
-cp BristolAnalysis/NTupleTools/interface/TtDecayChannelSelector.h TopQuarkAnalysis/TopSkimming/interface/TtDecayChannelSelector.h
-cp BristolAnalysis/NTupleTools/src/TtDecayChannelSelector.cc TopQuarkAnalysis/TopSkimming/src/TtDecayChannelSelector.cc
-
+#setup full version of LHAPDF (faster AND prevents crashes!)
 scram setup lhapdffull
 scram b -j8
 
