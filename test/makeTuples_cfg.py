@@ -4,7 +4,7 @@ from BristolAnalysis.NTupleTools.NTupleTools_cff import *
 if not makePATTuple:
     #NTuple content
     from BristolAnalysis.NTupleTools.NTupler_cff import *
-    setup_ntupler(process, cms, options, includeCA08Jets)
+    setup_ntupler(process, cms, options)
 else:
     from BristolAnalysis.NTupleTools.PatTuple_cff import *
     setup_pattuple(process, cms, options)

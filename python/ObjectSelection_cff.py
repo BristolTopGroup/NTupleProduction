@@ -19,9 +19,6 @@ def selectObjects(process, cms):
                                                           "tagInfoSecondaryVertex('secondaryVertex').secondaryVertex(0).p4().mass() : 0")
     process.patJetsPFlow.userData.userFunctionLabels = cms.vstring('secvtxMass')
     
-    # CA8 jets
-    process.selectedPatJetsCA8PF.cut = cms.string("pt > 20 & abs(rapidity) < 2.5")
-    
     # electrons
     process.selectedPatElectrons.cut = cms.string('pt > 10.0 & abs(eta) < 2.5')
     process.patElectrons.embedTrack = cms.bool(True)
@@ -61,10 +58,6 @@ def selectObjects(process, cms):
     process.goodPatJetsPFlow = cms.EDFilter("PFJetIDSelectionFunctorFilter",
                                             filterParams=pfJetIDSelector.clone(),
                                             src=cms.InputTag("selectedPatJetsPFlow")
-                                            )
-    process.goodPatJetsCA8PF = cms.EDFilter("PFJetIDSelectionFunctorFilter",
-                                            filterParams=pfJetIDSelector.clone(),
-                                            src=cms.InputTag("selectedPatJetsCA8PF")
                                             )
     process.selectedPatJetsForMETtype1p2Corr.src = cms.InputTag('selectedPatJetsPFlow')
     process.selectedPatJetsForMETtype2Corr.src = cms.InputTag('selectedPatJetsPFlow')

@@ -5,32 +5,49 @@ def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
     print "Setting up Event Filters"
     print '=' * 60
     process.scrapingVeto = setup_scrapingveto(process, cms)
-    process.HBHENoiseFilterResultProducer = setup_HBHENoiseFilter(process, cms)
+    process.HBHENoiseFilter = setup_HBHENoiseFilter(process, cms)
+    process.HBHENoiseFilterResultProducer = setup_HBHENoiseFilterResultProducer(process, cms)
     process.HcalLaserEventFilter = setup_HcalLaserFilter(process, cms)
     process.EcalDeadCellBoundaryEnergyFilter = setup_ECALDeadCellFilter(process, cms)
     process.EcalDeadCellTriggerPrimitiveFilter = setup_ECALDeadCellTriggerPrimitiveFilter(process, cms)
     process.trackingFailureFilter = setup_trackingFailureFilter(process, cms)
-    process.EventFilter = setup_skim(process, cms, options)
+    process.eeBadScFilter = setup_eeBadScFilter(process, cms)
+    process.ecalLaserCorrFilter = setup_ecalLaserCorrFilter(process, cms)
+    #setting up tracking POG filters                                                                                                                                                                                                      
+    setup_trackingPOGfilters(process, cms)
     
-    process.EventFilter.HCALNoiseFilterInput = cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult')
+    process.EventFilter = setup_skim(process, cms, options)
+    process.EventFilter.HBHENoiseFilterInput = cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult')
     process.EventFilter.HCALLaserFilterInput = cms.InputTag('HcalLaserEventFilter')
     process.EventFilter.ECALDeadCellFilterInput = cms.InputTag('EcalDeadCellBoundaryEnergyFilter')
     process.EventFilter.ECALDeadCellTriggerPrimitiveFilterInput = cms.InputTag('EcalDeadCellTriggerPrimitiveFilter')
     process.EventFilter.TrackingFailureFilterInput = cms.InputTag('trackingFailureFilter')
+    process.EventFilter.EEBadSCFilterInput = cms.InputTag('eeBadScFilter')
+    process.EventFilter.ECALLaserCorrFilterInput = cms.InputTag('ecalLaserCorrFilter')
+    #tracking POG filters
+    process.EventFilter.manystripclus53XInput = cms.InputTag('manystripclus53X')
+    process.EventFilter.toomanystripclus53XInput = cms.InputTag('toomanystripclus53X')
+    process.EventFilter.logErrorTooManyClustersInput = cms.InputTag('logErrorTooManyClusters')
+    process.EventFilter.useTrackingPOGFilters = cms.bool(True)
     process.EventFilter.useTrackingFailureFilter = cms.bool(True)
     #disable optional MET filters for now
     process.EventFilter.useOptionalMETFilters = cms.bool(False)
     
     print "Creating event filter sequence (merging all previous)."
     EventFilters = cms.Sequence(
+                process.HBHENoiseFilterResultProducer *
                 process.trackingFailureFilter * 
-                process.HBHENoiseFilterResultProducer * 
-                                process.scrapingVeto * 
-                                process.HcalLaserEventFilter * 
-                                process.EcalDeadCellBoundaryEnergyFilter *
-				process.EcalDeadCellTriggerPrimitiveFilter *
-                                process.EventFilter
-                                )
+                process.scrapingVeto * 
+                process.HcalLaserEventFilter * 
+                process.EcalDeadCellBoundaryEnergyFilter *
+                process.EcalDeadCellTriggerPrimitiveFilter *
+                process.eeBadScFilter *
+                process.ecalLaserCorrFilter *
+                ~process.manystripclus53X *
+                ~process.toomanystripclus53X *
+                #~process.logErrorTooManyClusters *
+                process.EventFilter
+                )
     return EventFilters
     
 def setup_HBHENoiseFilter(process, cms):
@@ -38,11 +55,17 @@ def setup_HBHENoiseFilter(process, cms):
     print "Setting up HBHE Noise Filter"
     print '=' * 60
     # HB + HE noise filtering
-    #values taken from
-    #https://twiki.cern.ch/twiki/bin/view/CMS/HBHEAnomalousSignals2011
+    #following https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFilters prescription
+    #this filter is applied before the PAT sequence
+    from CommonTools.RecoAlgos.HBHENoiseFilter_cfi import HBHENoiseFilter
+    return HBHENoiseFilter
+
+def setup_HBHENoiseFilterResultProducer(process, cms):
+    #EDProducer to keep track of in the AnalysisTools
+    #values kept identical to the ones from HBHENoiseFilter
     HBHENoiseFilterResultProducer = cms.EDProducer(
         'HBHENoiseFilterResultProducer',
-        noiselabel=cms.InputTag('hcalnoise', '', 'RECO'),
+        noiselabel=cms.InputTag('hcalnoise'),
         minRatio=cms.double(-999),
         maxRatio=cms.double(999),
         minHPDHits=cms.int32(17),
@@ -52,11 +75,10 @@ def setup_HBHENoiseFilter(process, cms):
         minHighEHitTime=cms.double(-9999.0),
         maxHighEHitTime=cms.double(9999.0),
         maxRBXEMF=cms.double(-999.0),
-        minNumIsolatedNoiseChannels=cms.int32(9999),
-        minIsolatedNoiseSumE=cms.double(9999),
-        minIsolatedNoiseSumEt=cms.double(9999),
+        minNumIsolatedNoiseChannels = cms.int32(10),
+        minIsolatedNoiseSumE = cms.double(50.0),
+        minIsolatedNoiseSumEt = cms.double(25.0),
         useTS4TS5=cms.bool(True),
-        #these additional parameters were introduced for 53X configuration - should technically be still alright for older CMSSW versions
         IgnoreTS4TS5ifJetInLowBVRegion=cms.bool(False),
         jetlabel = cms.InputTag('ak5PFJets'),
         maxjetindex = cms.int32(0), # maximum jet index that will be checked for 'IgnoreTS4TS5ifJetInLowBVRegion'
@@ -108,7 +130,8 @@ def setup_ECALDeadCellTriggerPrimitiveFilter(process, cms):
     print "Setting up ECALDeadCell TriggerPrimitive Filter"
     print '=' * 60    
     #https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFilters#ECAL_dead_cell_filter
-    from RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi import EcalDeadCellTriggerPrimitiveFilter     
+    from RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi import EcalDeadCellTriggerPrimitiveFilter
+    EcalDeadCellTriggerPrimitiveFilter.taggingMode = cms.bool(True)
     EcalDeadCellTriggerPrimitiveFilter.tpDigiCollection = cms.InputTag("ecalTPSkimNA")
     return EcalDeadCellTriggerPrimitiveFilter   
 
@@ -116,8 +139,8 @@ def setup_ECALDeadCellTriggerPrimitiveFilter(process, cms):
 def setup_trackingFailureFilter(process, cms):
     from RecoMET.METFilters.trackingFailureFilter_cfi import trackingFailureFilter
     trackingFailureFilter.JetSource = cms.InputTag('ak5PFJets')
-    trackingFailureFilter.TrackSource           = cms.InputTag('generalTracks')
-    trackingFailureFilter.VertexSource          = cms.InputTag('goodOfflinePrimaryVertices')
+    trackingFailureFilter.TrackSource = cms.InputTag('generalTracks')
+    trackingFailureFilter.VertexSource = cms.InputTag('goodOfflinePrimaryVertices')
     trackingFailureFilter.taggingMode = cms.bool(True)
     return trackingFailureFilter
 
@@ -127,10 +150,24 @@ def setup_eeBadScFilter(process, cms):
     return eeBadScFilter
 
 def setup_ecalLaserCorrFilter(process, cms):
-    from SandBox.Skims.ecalLaserCorrFilter_cfi import ecalLaserCorrFilter
-    ecalLaserCorrFilter.TaggingMode = cms.bool (True)
+    from RecoMET.METFilters.ecalLaserCorrFilter_cfi import ecalLaserCorrFilter
+    ecalLaserCorrFilter.taggingMode = cms.bool (True)
     ecalLaserCorrFilter.Debug = cms.bool (False)
     return ecalLaserCorrFilter
+
+def setup_trackingPOGfilters(process, cms):
+    from RecoMET.METFilters.trackingPOGFilters_cfi import manystripclus53X
+    from RecoMET.METFilters.trackingPOGFilters_cfi import toomanystripclus53X
+    from RecoMET.METFilters.trackingPOGFilters_cfi import logErrorTooManyClusters
+    manystripclus53X.taggedMode = cms.untracked.bool(True)
+    manystripclus53X.forcedValue = cms.untracked.bool(False)
+    toomanystripclus53X.taggedMode = cms.untracked.bool(True)
+    toomanystripclus53X.forcedValue = cms.untracked.bool(False)
+    logErrorTooManyClusters.taggedMode = cms.untracked.bool(True)
+    logErrorTooManyClusters.forcedValue = cms.untracked.bool(False)
+    process.manystripclus53X = manystripclus53X
+    process.toomanystripclus53X = toomanystripclus53X
+    process.logErrorTooManyClusters = logErrorTooManyClusters
 
     
 def setup_skim(process, cms, options):
