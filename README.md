@@ -2,7 +2,7 @@ NTupleProduction
 ================
 
 ## Brief Description
-Software for nTuples production (v9b) from AOD files for ttbar+MET differential cross section analysis
+Software for nTuples production (v10) from AOD files for ttbar+MET differential cross section analysis
 
 ## General Recipe
 
@@ -10,8 +10,8 @@ To setup the code:
 
 ```
 export SCRAM_ARCH=slc5_amd64_gcc462
-scram p -n CMSSW_5_3_7_nTuple_v9b CMSSW_5_3_7
-cd CMSSW_5_3_7_nTuple_v9b/src
+scram p -n CMSSW_5_3_7_nTuple_v10 CMSSW_5_3_7
+cd CMSSW_5_3_7_nTuple_v10/src
 cmsenv
 
 #PAT recipe (V08-09-50)
