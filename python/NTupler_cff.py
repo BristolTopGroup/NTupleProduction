@@ -1,4 +1,4 @@
-def setup_ntupler(process, cms, options, includeCA08Jets = False):
+def setup_ntupler(process, cms, options):
     print '=' * 60
     print "Setting up NTupler"
     print '=' * 60
@@ -15,10 +15,6 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
     #PF2PAT jets
     process.rootTuplePF2PATJets.InputTag = cms.InputTag('goodPatJetsPFlow')
     process.rootTuplePF2PATJets.Prefix = cms.string('goodPatJetsPFlow.')
-    #Cambridge-Aachen cone 0.8 jets
-    process.rootTupleCA8PFJets = process.rootTuplePF2PATJets.clone()
-    process.rootTupleCA8PFJets.InputTag = cms.InputTag('goodPatJetsCA8PF')
-    process.rootTupleCA8PFJets.Prefix = cms.string('goodPatJetsCA8PF.')
     #selection on GenParticles
     process.rootTupleGenParticles.minPt = cms.double(-1)
     process.rootTupleGenParticles.maxAbsoluteEta = cms.double(100)
@@ -63,7 +59,6 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
             'keep *_rootTupleCaloJets_*_*',
             #PF jets
             'keep *_rootTuplePF2PATJets_*_*',
-            'keep *_rootTupleCA8PFJets_*_*',
             #electrons
             'keep *_rootTupleElectrons_*_*',
             'keep *_rootTuplePFElectrons_*_*',
@@ -111,9 +106,6 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
         #jets
         process.rootTupleCaloJets + 
         process.rootTuplePF2PATJets + 
-        process.rootTupleCA8PFJets + 
-    #    process.rootTupleCA8PFJetsPruned +
-    #    process.rootTupleCA8PFJetsTopTag +
         #electrons
         process.rootTupleElectrons + 
         process.rootTuplePFElectrons + 
@@ -189,9 +181,6 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
         process.rootTupleTree)
     
     
-    if not includeCA08Jets:
-        process.rootNTuples.remove(process.rootTupleCA8PFJets)
-        
     if options.useData:
         process.rootNTuples.remove(process.rootTupleGenEventInfo)
         process.rootNTuples.remove(process.rootTupleGenParticles)
