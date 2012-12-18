@@ -138,12 +138,25 @@ double getRelativeIsolation(const pat::Electron& electron, double cone, double r
 }
 
 double getRelativeIsolation(const pat::Muon& muon, double cone, bool useDeltaBetaCorrections) {
-	const double chIso = muon.isoDeposit(pat::PfChargedHadronIso)->depositAndCountWithin(cone).first;
-	const double nhIso = muon.isoDeposit(pat::PfNeutralHadronIso)->depositAndCountWithin(cone).first;
-	const double phIso = muon.isoDeposit(pat::PfGammaIso)->depositAndCountWithin(cone).first;
-
-	const double puChIso = muon.isoDeposit(pat::PfPUChargedHadronIso)->depositAndCountWithin(0.4).first;
-
+	double chIso = 0;
+	double nhIso = 0; 
+	double phIso = 0;
+	double puChIso = 0;
+	
+	if(cone==0.3){
+ 	chIso = muon.pfIsolationR03().sumChargedHadronPt;
+ 	nhIso = muon.pfIsolationR03().sumNeutralHadronEt;
+ 	phIso = muon.pfIsolationR03().sumPhotonEt;
+	puChIso = muon.pfIsolationR03().sumPUPt;
+	}else{
+	chIso = muon.pfIsolationR04().sumChargedHadronPt;
+ 	nhIso = muon.pfIsolationR04().sumNeutralHadronEt;
+ 	phIso = muon.pfIsolationR04().sumPhotonEt;
+	puChIso = muon.pfIsolationR04().sumPUPt;
+	
+	}
+	
+	
 	const double relIso = (chIso + nhIso + phIso) / muon.pt();
 	const double relIsodb = (chIso + max(0.0, nhIso + phIso - 0.5 * puChIso)) / muon.pt();
 
