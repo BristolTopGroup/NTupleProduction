@@ -5,9 +5,15 @@
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
 
 #include "TH1F.h"
 #include "TH2F.h"
+
+#include <vector>
+#include <string>
 
 class UnfoldingAnalyser: public edm::EDAnalyzer {
 public:
@@ -23,10 +29,19 @@ private:
 	edm::InputTag PUWeightInput_, BtagWeightInput_;
 	//distributions
 	edm::InputTag genMetInput_, recoMetInput_;
+	edm::InputTag gen_jet_input_, jet_input_;
+	edm::InputTag electron_input_, muon_input_;
+	edm::InputTag vertex_input_, gen_event_input_;
 	edm::InputTag selectionFlagInput_;
 	edm::InputTag isFullyHadronicTtbarFlag_, isDiLeptonicTtbarFlag_;
 	edm::InputTag isSemiLeptonicTauFlag_, isSemiLeptonicElectronFlag_, isSemiLeptonicMuonFlag_;
 	bool doElectronChannel_; //if false do muon channel
+	std::string variable_under_analysis_;
+	double variable_min_;
+	double variable_max_;
+	unsigned int variable_n_bins_;
+	std::vector<double> bin_edges_;
+	bool isSemiLeptonic_;
 	//in order to be able to create a RooResponse object one needs
 	//Does not pass selection
 	// - fill truth distribution (1D)
@@ -38,12 +53,31 @@ private:
 	// - fill measured (1D)
 	// - fill fake (1D)
 	//histograms with 1 GeV binning
-	TH1F* truth_, *measured_, *fake_, *contamination_inGenMET_, *contamination_inRecoMET_;
-	TH2F* response_, *response_withoutFakes_;
+	TH1F* truth_, *measured_, *fake_, *contamination_in_gen_variable_, *contamination_in_reco_variable_;
+	TH2F* response_, *response_without_fakes_;
 	//histograms with analysis binning: [0,25,45,70,100, inf]
-	TH1F* truth_AsymBins_, *measured_AsymBins_, *fake_AsymBins_, *contamination_AsymBins_inGenMET_,
-			*contamination_AsymBins_inRecoMET_;
-	TH2F* response_AsymBins_, *response_withoutFakes_AsymBins_;
+	TH1F* truth_asym_bins_, *measured_asym_bins_, *fake_asym_bins_, *contamination_asym_bins_in_gen_variable_,
+			*contamination_asym_bins_in_reco_variable_;
+	TH2F* response_asym_bins_, *response_without_fakes_asym_bins_;
+
+	//functions
+	float get_gen_variable(const edm::Event& iEvent) const;
+	float get_reco_variable(const edm::Event& iEvent) const;
+
+	float get_gen_met(const edm::Event& iEvent) const;
+	float get_reco_met(const edm::Event& iEvent) const;
+
+	float get_gen_ht(const edm::Event& iEvent) const;
+	float get_reco_ht(const edm::Event& iEvent) const;
+
+	float get_gen_st(const edm::Event& iEvent) const;
+	float get_reco_st(const edm::Event& iEvent) const;
+
+	float get_gen_mt(const edm::Event& iEvent) const;
+	float get_reco_mt(const edm::Event& iEvent) const;
+
+	const reco::GenParticle* get_gen_lepton(const edm::Event& iEvent) const;
+	const reco::Candidate* get_reco_lepton(const edm::Event& iEvent) const;
 
 };
 #endif
