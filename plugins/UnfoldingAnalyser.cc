@@ -19,23 +19,23 @@ using namespace std;
 #include "TString.h"
 
 UnfoldingAnalyser::UnfoldingAnalyser(const edm::ParameterSet& iConfig) :
-		pu_weight_input_(iConfig.getParameter < edm::InputTag > ("PUWeightInput")), //
-		b_tag_weight_input(iConfig.getParameter < edm::InputTag > ("BtagWeightInput")), //
-		gen_MET_input_(iConfig.getParameter < edm::InputTag > ("genMetInput")), //
-		reco_MET_input_(iConfig.getParameter < edm::InputTag > ("recoMetInput")), //
+		pu_weight_input_(iConfig.getParameter < edm::InputTag > ("pu_weight_input")), //
+		b_tag_weight_input(iConfig.getParameter < edm::InputTag > ("b_tag_weight_input")), //
+		gen_MET_input_(iConfig.getParameter < edm::InputTag > ("gen_MET_input")), //
+		reco_MET_input_(iConfig.getParameter < edm::InputTag > ("reco_MET_Input")), //
 		gen_jet_input_(iConfig.getParameter < edm::InputTag > ("gen_jet_input")), //
-		jet_input_(iConfig.getParameter < edm::InputTag > ("jet_input")), //
+		reco_jet_input_(iConfig.getParameter < edm::InputTag > ("reco_jet_input")), //
 		electron_input_(iConfig.getParameter < edm::InputTag > ("electron_input")), //
 		muon_input_(iConfig.getParameter < edm::InputTag > ("muon_input")), //
 		vertex_input_(iConfig.getParameter < edm::InputTag > ("vertex_input")), //
 		gen_event_input_(iConfig.getParameter < edm::InputTag > ("gen_event_input")), //
-		selection_flag_input_(iConfig.getParameter < edm::InputTag > ("selectionFlagInput")), //
-		is_fully_hadronic_ttbar_flag_(iConfig.getParameter < edm::InputTag > ("is_fully_hadronicFlag")), //
-		is_dileptonic_ttbar_flag_(iConfig.getParameter < edm::InputTag > ("is_dileptonicFlag")), //
-		is_semileptonic_tau_flag_(iConfig.getParameter < edm::InputTag > ("is_semileptonic_tauFlag")), //
-		is_semileptonic_electron_flag_(iConfig.getParameter < edm::InputTag > ("is_semileptonic_electronFlag")), //
-		is_semileptonic_muon_flag_(iConfig.getParameter < edm::InputTag > ("is_semileptonic_muonFlag")), //
-		do_electron_channel_(iConfig.getUntrackedParameter<bool>("doElectronChannel")), //
+		selection_flag_input_(iConfig.getParameter < edm::InputTag > ("selection_flag_input")), //
+		is_fully_hadronic_ttbar_flag_(iConfig.getParameter < edm::InputTag > ("is_fully_hadronic_flag")), //
+		is_dileptonic_ttbar_flag_(iConfig.getParameter < edm::InputTag > ("is_dileptonic_flag")), //
+		is_semileptonic_tau_flag_(iConfig.getParameter < edm::InputTag > ("is_semileptonic_tau_flag")), //
+		is_semileptonic_electron_flag_(iConfig.getParameter < edm::InputTag > ("is_semileptonic_electron_flag")), //
+		is_semileptonic_muon_flag_(iConfig.getParameter < edm::InputTag > ("is_semileptonic_muon_flag")), //
+		do_electron_channel_(iConfig.getUntrackedParameter<bool>("do_electron_channel")), //
 		variable_under_analysis_(iConfig.getParameter < string > ("variable_under_analysis")), //
 		variable_min_(iConfig.getParameter<double>("variable_min")), //
 		variable_max_(iConfig.getParameter<double>("variable_max")), //
@@ -62,28 +62,28 @@ UnfoldingAnalyser::UnfoldingAnalyser(const edm::ParameterSet& iConfig) :
 
 void UnfoldingAnalyser::fillDescriptions(edm::ConfigurationDescriptions & descriptions) {
 	edm::ParameterSetDescription desc;
-	desc.add < InputTag > ("PUWeightInput");
-	desc.add < InputTag > ("BtagWeightInput");
-	desc.add < InputTag > ("genMetInput");
-	desc.add < InputTag > ("recoMetInput");
+	desc.add < InputTag > ("pu_weight_input");
+	desc.add < InputTag > ("b_tag_weight_input");
+	desc.add < InputTag > ("gen_MET_input");
+	desc.add < InputTag > ("reco_MET_Input");
 	desc.add < InputTag > ("gen_jet_input");
-	desc.add < InputTag > ("jet_input");
+	desc.add < InputTag > ("reco_jet_input");
 	desc.add < InputTag > ("electron_input");
 	desc.add < InputTag > ("muon_input");
 	desc.add < InputTag > ("vertex_input");
 	desc.add < InputTag > ("gen_event_input");
-	desc.add < InputTag > ("selectionFlagInput");
-	desc.add < InputTag > ("is_fully_hadronicFlag");
-	desc.add < InputTag > ("is_dileptonicFlag");
-	desc.add < InputTag > ("is_semileptonic_tauFlag");
-	desc.add < InputTag > ("is_semileptonic_electronFlag");
-	desc.add < InputTag > ("is_semileptonic_muonFlag");
+	desc.add < InputTag > ("selection_flag_input");
+	desc.add < InputTag > ("is_fully_hadronic_flag");
+	desc.add < InputTag > ("is_dileptonic_flag");
+	desc.add < InputTag > ("is_semileptonic_tau_flag");
+	desc.add < InputTag > ("is_semileptonic_electron_flag");
+	desc.add < InputTag > ("is_semileptonic_muon_flag");
 	desc.add < string > ("variable_under_analysis");
 	desc.add<double>("variable_min");
 	desc.add<double>("variable_max");
 	desc.add<unsigned int>("variable_n_bins");
 	desc.add < vector<double> > ("bin_edges");
-	desc.addUntracked<bool>("doElectronChannel", false);
+	desc.addUntracked<bool>("do_electron_channel", false);
 
 	descriptions.add("UnfoldingAnalyser", desc);
 }
@@ -201,7 +201,6 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	is_semileptonic_ = is_semileptonic_tau || is_semileptonic_electron || is_semileptonic_muon;
 
 	float gen_variable(get_gen_variable(iEvent));
-	float reco_variable(get_gen_variable(iEvent));
 
 	if (do_electron_channel_) {
 		if (is_semileptonic_electron) {
@@ -211,6 +210,8 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 		}
 
 		if (passes_selection) {
+			float reco_variable(get_reco_variable(iEvent));
+
 			measured_->Fill(reco_variable, weight);
 			measured_asym_bins_->Fill(reco_variable, weight);
 			response_->Fill(reco_variable, gen_variable, weight);
@@ -241,6 +242,8 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 		}
 
 		if (passes_selection) {
+			float reco_variable(get_reco_variable(iEvent));
+
 			measured_->Fill(reco_variable, weight);
 			measured_asym_bins_->Fill(reco_variable, weight);
 			response_->Fill(reco_variable, gen_variable, weight);
@@ -354,7 +357,7 @@ float UnfoldingAnalyser::get_reco_met(const edm::Event& iEvent) const {
 
 float UnfoldingAnalyser::get_reco_ht(const edm::Event& iEvent) const {
 	edm::Handle < pat::JetCollection > jets;
-	iEvent.getByLabel(jet_input_, jets);
+	iEvent.getByLabel(reco_jet_input_, jets);
 	float ht(0.);
 
 	//HT = first 5 jets == 5 most energetic jets
