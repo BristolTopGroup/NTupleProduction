@@ -26,22 +26,22 @@ public:
 
 private:
 	//non-global event weights (global = i.e. lumi-weight)
-	edm::InputTag PUWeightInput_, BtagWeightInput_;
+	edm::InputTag pu_weight_input_, b_tag_weight_input;
 	//distributions
-	edm::InputTag genMetInput_, recoMetInput_;
+	edm::InputTag gen_MET_input_, reco_MET_input_;
 	edm::InputTag gen_jet_input_, jet_input_;
 	edm::InputTag electron_input_, muon_input_;
 	edm::InputTag vertex_input_, gen_event_input_;
-	edm::InputTag selectionFlagInput_;
-	edm::InputTag isFullyHadronicTtbarFlag_, isDiLeptonicTtbarFlag_;
-	edm::InputTag isSemiLeptonicTauFlag_, isSemiLeptonicElectronFlag_, isSemiLeptonicMuonFlag_;
-	bool doElectronChannel_; //if false do muon channel
+	edm::InputTag selection_flag_input_;
+	edm::InputTag is_fully_hadronic_ttbar_flag_, is_dileptonic_ttbar_flag_;
+	edm::InputTag is_semileptonic_tau_flag_, is_semileptonic_electron_flag_, is_semileptonic_muon_flag_;
+	bool do_electron_channel_; //if false do muon channel
 	std::string variable_under_analysis_;
 	double variable_min_;
 	double variable_max_;
 	unsigned int variable_n_bins_;
 	std::vector<double> bin_edges_;
-	bool isSemiLeptonic_;
+	bool is_semileptonic_;
 	//in order to be able to create a RooResponse object one needs
 	//Does not pass selection
 	// - fill truth distribution (1D)
