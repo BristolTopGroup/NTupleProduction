@@ -94,10 +94,6 @@ process.eventWeightBtagMuPlusJets = process.eventWeightBtagEPlusJets.clone(
             numberOfTagsInput = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'NumberOfBtags', 'PAT')  ,  
             jetInput = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'cleanedJets', 'PAT'),       
                                                               )
-process.unfoldingAnalyserElectronChannel.selectionFlagInput = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'FullSelection', 'PAT')
-process.unfoldingAnalyserElectronChannel.BtagWeightInput = cms.InputTag( 'eventWeightBtagEPlusJets' )
-process.unfoldingAnalyserMuonChannel.selectionFlagInput = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'FullSelection', 'PAT')
-process.unfoldingAnalyserMuonChannel.BtagWeightInput = cms.InputTag( 'eventWeightBtagMuPlusJets' )
 electron_unfolding_analysers = [
     process.unfolding_MET_analyser_electron_channel,
     process.unfolding_HT_analyser_electron_channel,
@@ -106,8 +102,9 @@ electron_unfolding_analysers = [
 ]
 
 for analyser in electron_unfolding_analysers:
-    analyser.selectionFlagInput = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'FullSelection', 'PAT')
-    analyser.BtagWeightInput = cms.InputTag( 'eventWeightBtagEPlusJets' )
+    analyser.selection_flag_input = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'FullSelection', 'PAT')
+    analyser.b_tag_weight_input = cms.InputTag( 'eventWeightBtagEPlusJets' )
+    analyser.reco_jet_input = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'cleanedJets', 'PAT')
 
 muon_unfolding_analysers = [
     process.unfolding_MET_analyser_muon_channel,
@@ -117,9 +114,9 @@ muon_unfolding_analysers = [
 ]
 
 for analyser in muon_unfolding_analysers:
-    analyser.selectionFlagInput = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'FullSelection', 'PAT')
-    analyser.BtagWeightInput = cms.InputTag( 'eventWeightBtagMuPlusJets' )
-
+    analyser.selection_flag_input = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'FullSelection', 'PAT')
+    analyser.b_tag_weight_input = cms.InputTag( 'eventWeightBtagMuPlusJets' )
+    analyser.reco_jet_input = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'cleanedJets', 'PAT')
 
 process.unfoldingAnalysisSequence = cms.Sequence(process.eventFiltersIntaggingMode *
                                                  process.eventWeightBtagEPlusJets *

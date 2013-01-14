@@ -29,7 +29,7 @@ private:
 	edm::InputTag pu_weight_input_, b_tag_weight_input;
 	//distributions
 	edm::InputTag gen_MET_input_, reco_MET_input_;
-	edm::InputTag gen_jet_input_, jet_input_;
+	edm::InputTag gen_jet_input_, reco_jet_input_;
 	edm::InputTag electron_input_, muon_input_;
 	edm::InputTag vertex_input_, gen_event_input_;
 	edm::InputTag selection_flag_input_;
