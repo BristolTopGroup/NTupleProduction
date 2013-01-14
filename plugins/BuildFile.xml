@@ -1,4 +1,5 @@
 <use name="CondCore/PluginSystem"/>
+<use name="AnalysisDataFormats/TopObjects"/>
 <use name="DataFormats/PatCandidates"/>
 <use name="FWCore/ServiceRegistry"/>
 <use name="FWCore/MessageLogger"/>
