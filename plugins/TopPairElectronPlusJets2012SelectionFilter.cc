@@ -401,7 +401,7 @@ bool TopPairElectronPlusJets2012SelectionFilter::passesTriggerSelection() const 
 			return triggerFired("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFJet30", hltConfig_,
 					triggerResults_);
 		else //2012 data
-			return triggerFired("HLT_Ele27_WP80_v", hltConfig_, triggerResults_)
+			return triggerFired("HLT_Ele27_WP80_v", hltConfig_, triggerResults_);
 
 	} else {
 		if (MCSampleTag_ == "Fall11") {

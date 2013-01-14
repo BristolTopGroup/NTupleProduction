@@ -429,15 +429,13 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesTriggerSelection() const {
 		else if (runNumber_ >= 173236 && runNumber_ < 190456) //other triggers available (mainly sTop
 			return triggerFired("HLT_IsoMu24_eta2p1", hltConfig_, triggerResults_);
 		else //2012 Data
-			return triggerFired("HLT_IsoMu24_eta2p1", hltConfig_, triggerResults_);
-		else
-			return false;
+			return triggerFired("HLT_IsoMu24_eta2p1_v", hltConfig_, triggerResults_);
 	} else {
 		if (MCSampleTag_ == "Fall11") {
 			//Fall11 MC
 			return triggerFired("HLT_IsoMu24", hltConfig_, triggerResults_);
 		} else {//Summer12 MC
-			return triggerFired("HLT_IsoMu24_eta2p1", hltConfig_, triggerResults_);
+			return triggerFired("HLT_IsoMu24_eta2p1_v", hltConfig_, triggerResults_);
 		}
 	}
 	return false;
