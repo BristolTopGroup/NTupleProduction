@@ -16,10 +16,10 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJets2012SelectionFilte
     BadEESupercrystalFilterInput=cms.InputTag('BadEESupercrystalFilter'),
 
 #jet cuts
-    min1JetPt=cms.double(45.),
-    min2JetPt=cms.double(45.),
-    min3JetPt=cms.double(45.),
-    min4JetPt=cms.double(20.),
+    min1JetPt=cms.double(30.),
+    min2JetPt=cms.double(30.),
+    min3JetPt=cms.double(30.),
+    min4JetPt=cms.double(30.),
 #lepton isolation
     tightMuonIsolation=cms.double(0.12),
     looseElectronIsolation=cms.double(0.15),
