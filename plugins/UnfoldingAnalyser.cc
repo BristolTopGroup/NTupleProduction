@@ -406,53 +406,13 @@ const reco::GenParticle* UnfoldingAnalyser::get_gen_lepton(const edm::Event& iEv
 
 const reco::Candidate* UnfoldingAnalyser::get_reco_lepton(const edm::Event& iEvent) const {
 	if (do_electron_channel_) {
-		edm::Handle < pat::ElectronCollection > electrons;
-		iEvent.getByLabel(electron_input_, electrons);
-		for (unsigned index = 0; index < electrons->size(); ++index) {
-			const pat::Electron electron = electrons->at(index);
-			bool passes_pt_and_eta = electron.pt() > 30. && fabs(electron.eta()) < 2.5;
-			bool not_in_crack = fabs(electron.superCluster()->eta()) < 1.4442
-					|| fabs(electron.superCluster()->eta()) > 1.5660;
-			//2D impact w.r.t primary vertex
-			bool passes_d0 = electron.dB(pat::Electron::PV2D) < 0.02; //cm
-			bool passes_id = electron.electronID("mvaTrigV0") > 0.0;
-			bool is_good_electron = passes_pt_and_eta && not_in_crack && passes_d0 && passes_id;
-
-			edm::Handle<double> rhoH;
-			iEvent.getByLabel(edm::InputTag("kt6PFJets", "rho"), rhoH);
-			double rho = *rhoH.product();
-
-			bool passes_iso = getRelativeIsolation(electron, 0.3, rho, iEvent.isRealData(), false, true) < 0.1;
-
-			if (is_good_electron && passes_iso) { //since we check for signal selection, there should be really just one electron
-				return electron.clone();
-			}
-		}
+		edm::Handle < pat::ElectronCollection > signalElectron;
+		iEvent.getByLabel(electron_input_, signalElectron);
+		return signalElectron->at(0).clone();
 	} else {
-		edm::Handle < pat::MuonCollection > muons;
-		iEvent.getByLabel(muon_input_, muons);
-		edm::Handle < reco::VertexCollection > primary_vertices;
-		iEvent.getByLabel(vertex_input_, primary_vertices);
-		reco::Vertex primary_vertex = primary_vertices->at(0);
-
-		for (unsigned index = 0; index < muons->size(); ++index) {
-			const pat::Muon muon = muons->at(index);
-			bool passes_pt_and_eta = muon.pt() > 26. && fabs(muon.eta()) < 2.1;
-			//2D impact w.r.t primary vertex
-			bool passes_d0 = muon.dB(pat::Muon::PV2D) < 0.02 && fabs(muon.vertex().z() - primary_vertex.z()) < 0.5; //cm
-			bool passes_id = muon.isPFMuon() && muon.isGlobalMuon();
-			bool track_quality = muon.globalTrack()->normalizedChi2() < 10
-					&& muon.track()->hitPattern().trackerLayersWithMeasurement() > 5
-					&& muon.globalTrack()->hitPattern().numberOfValidMuonHits() > 0
-					&& muon.innerTrack()->hitPattern().numberOfValidPixelHits() > 0
-					&& muon.numberOfMatchedStations() > 1;
-			bool is_good_muon = passes_pt_and_eta && passes_d0 && passes_id && track_quality;
-
-			bool passes_iso = getRelativeIsolation(muon, 0.4, true) < 0.12;
-			if (is_good_muon && passes_iso) {
-				return muon.clone();
-			}
-		}
+		edm::Handle < pat::MuonCollection > signalMuon;
+		iEvent.getByLabel(muon_input_, signalMuon);
+		return signalMuon->at(0).clone();
 	}
 	return 0;
 }
