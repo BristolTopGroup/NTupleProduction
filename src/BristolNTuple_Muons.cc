@@ -63,7 +63,6 @@ BristolNTuple_Muons::BristolNTuple_Muons(const edm::ParameterSet& iConfig) :
 		produces < std::vector<double> > (prefix + "PfNeutralHadronIso04" + suffix);
 		produces < std::vector<double> > (prefix + "PFGammaIso04" + suffix);
 		produces < std::vector<double> > (prefix + "PFRelIso04" + suffix);
-		produces < std::vector<double> > (prefix + "PFRelIso04DeltaBeta" + suffix);
 
 		produces < std::vector<double> > (prefix + "PfChargedHadronIso05" + suffix);
 		produces < std::vector<double> > (prefix + "PfNeutralHadronIso05" + suffix);
@@ -81,6 +80,20 @@ BristolNTuple_Muons::BristolNTuple_Muons(const edm::ParameterSet& iConfig) :
 		produces < std::vector<double> > (prefix + "PfPUChargedHadronIso03" + suffix);
 		produces < std::vector<double> > (prefix + "PfPUChargedHadronIso04" + suffix);
 		produces < std::vector<double> > (prefix + "PfPUChargedHadronIso05" + suffix);
+		
+		//new variable for pf delta beta corrected reliso
+		produces < std::vector<double> > (prefix + "sumChargedHadronPt03" + suffix);
+		produces < std::vector<double> > (prefix + "sumChargedHadronPt04" + suffix);
+		produces < std::vector<double> > (prefix + "sumNeutralHadronPt03" + suffix);
+		produces < std::vector<double> > (prefix + "sumNeutralHadronPt04" + suffix);
+		produces < std::vector<double> > (prefix + "sumPhotonPt03" + suffix);
+		produces < std::vector<double> > (prefix + "sumPhotonPt04" + suffix);
+		produces < std::vector<double> > (prefix + "sumPUPt03" + suffix);
+		produces < std::vector<double> > (prefix + "sumPUPt04" + suffix);
+		
+		produces < std::vector<double> > (prefix + "PFRelIso03DeltaBeta" + suffix);
+		produces < std::vector<double> > (prefix + "PFRelIso04DeltaBeta" + suffix);
+		
 	}
 
 	//associated track
@@ -167,7 +180,7 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	std::auto_ptr < std::vector<double> > PfNeutralHadronIso04(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PFGammaIso04(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PFRelIso04(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > PFRelIso04DeltaBeta(new std::vector<double>());
+
 
 	std::auto_ptr < std::vector<double> > PfChargedHadronIso05(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PfNeutralHadronIso05(new std::vector<double>());
@@ -185,7 +198,20 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	std::auto_ptr < std::vector<double> > PfPUChargedHadronIso03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PfPUChargedHadronIso04(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PfPUChargedHadronIso05(new std::vector<double>());
-
+	
+	//new iso vars
+	std::auto_ptr < std::vector<double> > sumChargedHadronPt03(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > sumChargedHadronPt04(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > sumNeutralHadronPt03(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > sumNeutralHadronPt04(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > sumPhotonPt03(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > sumPhotonPt04(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > sumPUPt03(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > sumPUPt04(new std::vector<double>());
+	
+	std::auto_ptr < std::vector<double> > PFRelIso03DeltaBeta(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > PFRelIso04DeltaBeta(new std::vector<double>());
+	
 	//associated track
 	std::auto_ptr < std::vector<double> > trkD0(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > trkD0Error(new std::vector<double>());
@@ -352,6 +378,9 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 					pfRelIso03 += PfChargedHadronIsolation->depositWithin(0.3);
 					pfRelIso04 += PfChargedHadronIsolation->depositWithin(0.4);
 					pfRelIso05 += PfChargedHadronIsolation->depositWithin(0.5);
+					
+					sumChargedHadronPt03->push_back(it->pfIsolationR03().sumChargedHadronPt);
+					sumChargedHadronPt04->push_back(it->pfIsolationR04().sumChargedHadronPt);
 				} else
 					edm::LogError("BristolNTuple_MuonsExtraError") << "Error! Can't get the isolation deposit "
 							<< "PfChargedHadronIsolation";
@@ -362,6 +391,10 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 					pfRelIso03 += PfNeutralHadronIsolation->depositWithin(0.3);
 					pfRelIso04 += PfNeutralHadronIsolation->depositWithin(0.4);
 					pfRelIso05 += PfNeutralHadronIsolation->depositWithin(0.5);
+					
+					sumNeutralHadronPt03->push_back(it->pfIsolationR03().sumNeutralHadronEt);
+					sumNeutralHadronPt04->push_back(it->pfIsolationR04().sumNeutralHadronEt);
+					
 				} else
 					edm::LogError("BristolNTuple_MuonsExtraError") << "Error! Can't get the isolation deposit "
 							<< "PfNeutralHadronIsolation";
@@ -372,13 +405,21 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 					pfRelIso03 += PFGammaIsolation->depositWithin(0.3);
 					pfRelIso04 += PFGammaIsolation->depositWithin(0.4);
 					pfRelIso05 += PFGammaIsolation->depositWithin(0.5);
+					
+					sumPhotonPt03->push_back(it->pfIsolationR03().sumPhotonEt);
+					sumPhotonPt04->push_back(it->pfIsolationR04().sumPhotonEt);
 				} else
 					edm::LogError("BristolNTuple_MuonsExtraError") << "Error! Can't get the isolation deposit "
 							<< "PFGammaIsolation";
-
+				
+				sumPUPt03->push_back(it->pfIsolationR03().sumPUPt);
+				sumPUPt04->push_back(it->pfIsolationR04().sumPUPt);
+				
+				
 				PFRelIso03->push_back(pfRelIso03 / it->pt());
 				PFRelIso04->push_back(pfRelIso04 / it->pt());
 				PFRelIso05->push_back(pfRelIso05 / it->pt());
+				PFRelIso03DeltaBeta->push_back(getRelativeIsolation(*it, 0.3, true));
 				PFRelIso04DeltaBeta->push_back(getRelativeIsolation(*it, 0.4, true));
 
 				if (PfPUChargedHadronIso) {
@@ -486,7 +527,7 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 		iEvent.put(PfNeutralHadronIso04, prefix + "PfNeutralHadronIso04" + suffix);
 		iEvent.put(PFGammaIso04, prefix + "PFGammaIso04" + suffix);
 		iEvent.put(PFRelIso04, prefix + "PFRelIso04" + suffix);
-		iEvent.put(PFRelIso04DeltaBeta, prefix + "PFRelIso04DeltaBeta" + suffix);
+		
 
 		iEvent.put(PfChargedHadronIso05, prefix + "PfChargedHadronIso05" + suffix);
 		iEvent.put(PfNeutralHadronIso05, prefix + "PfNeutralHadronIso05" + suffix);
@@ -503,6 +544,19 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 		iEvent.put(PfPUChargedHadronIso03, prefix + "PfPUChargedHadronIso03" + suffix);
 		iEvent.put(PfPUChargedHadronIso04, prefix + "PfPUChargedHadronIso04" + suffix);
 		iEvent.put(PfPUChargedHadronIso05, prefix + "PfPUChargedHadronIso05" + suffix);
+		
+		//new iso vars
+		iEvent.put(sumChargedHadronPt03, prefix + "sumChargedHadronPt03" + suffix);
+		iEvent.put(sumChargedHadronPt04, prefix + "sumChargedHadronPt04" + suffix);
+		iEvent.put(sumNeutralHadronPt03, prefix + "sumNeutralHadronPt03" + suffix);
+		iEvent.put(sumNeutralHadronPt04, prefix + "sumNeutralHadronPt04" + suffix);
+		iEvent.put(sumPhotonPt03, prefix + "sumPhotonPt03" + suffix);
+		iEvent.put(sumPhotonPt04, prefix + "sumPhotonPt04" + suffix);
+		iEvent.put(sumPUPt03, prefix + "sumPUPt03" + suffix);
+		iEvent.put(sumPUPt04, prefix + "sumPUPt04" + suffix);
+		
+		iEvent.put(PFRelIso03DeltaBeta, prefix + "PFRelIso03DeltaBeta" + suffix);
+		iEvent.put(PFRelIso04DeltaBeta, prefix + "PFRelIso04DeltaBeta" + suffix);
 	}
 
 	//associated track

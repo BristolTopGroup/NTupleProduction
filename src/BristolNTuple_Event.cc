@@ -14,6 +14,11 @@ BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig) :
 		ecalDeadCellFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellFilterInput")), //
 		ecalDeadCellTriggerPrimitiveFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellTriggerPrimitiveFilterInput")), //
 		trackingFailureFilter_(iConfig.getParameter < edm::InputTag > ("TrackingFailureFilterInput")), //
+		eeBadSCFilterInput_(iConfig.getParameter < edm::InputTag > ("EEBadSCFilterInput")), //
+		ecalLaserCorrFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALLaserCorrFilterInput")), //
+		manystripclus53XInput_(iConfig.getParameter < edm::InputTag > ("manystripclus53XInput")), //
+		toomanystripclus53XInput_(iConfig.getParameter < edm::InputTag > ("toomanystripclus53XInput")), //
+		logErrorTooManyClustersInput_(iConfig.getParameter < edm::InputTag > ("logErrorTooManyClustersInput")), //
 		METInputForSumET_(iConfig.getParameter < edm::InputTag > ("METInputForSumET")), //
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //
 		suffix(iConfig.getParameter < std::string > ("Suffix")) {
@@ -28,12 +33,15 @@ BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig) :
 	produces<double>(prefix + "rho" + suffix);
 	produces<double>(prefix + "SumET" + suffix);
 
-	//optinal MET filter decisions
+	//optional MET filter decisions
 	produces<bool>(prefix + "HCALLaserFilter" + suffix);
 	produces<bool>(prefix + "ECALDeadCellFilter" + suffix);
 	produces<bool>(prefix + "ECALDeadCellTriggerPrimitiveFilter" + suffix);
 	produces<bool>(prefix + "TrackingFailureFilter" + suffix);
 	produces<bool>(prefix + "CSCTightHaloId" + suffix);
+	produces<bool>(prefix + "EEBadSCFilter" + suffix);
+	produces<bool>(prefix + "ECALLaserCorrFilter" + suffix);
+	produces<bool>(prefix + "TrackingPOGFilters" + suffix);
 }
 
 void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -95,6 +103,9 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	std::auto_ptr<bool> ECALDeadCellFilter(new bool(passesFilter(iEvent, ecalDeadCellFilterInput_)));
 	std::auto_ptr<bool> ECALDeadCellTriggerPrimitiveFilter(new bool(passesFilter(iEvent, ecalDeadCellTriggerPrimitiveFilterInput_)));
 	std::auto_ptr<bool> TrackingFailureFilter(new bool(passesFilter(iEvent, trackingFailureFilter_)));
+	std::auto_ptr<bool> EEBadSCFilter(new bool(passesFilter(iEvent, eeBadSCFilterInput_)));
+	std::auto_ptr<bool> ECALLaserCorrFilter(new bool(passesFilter(iEvent, ecalLaserCorrFilterInput_)));
+	std::auto_ptr<bool> TrackingPOGFilters(new bool(!passesFilter(iEvent, manystripclus53XInput_) && !passesFilter(iEvent, toomanystripclus53XInput_)));
 
 	bool cscTightID(false);
 	edm::Handle < reco::BeamHaloSummary > TheBeamHaloSummary;
@@ -125,6 +136,9 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	iEvent.put(ECALDeadCellTriggerPrimitiveFilter, prefix + "ECALDeadCellTriggerPrimitiveFilter" + suffix);
 	iEvent.put(TrackingFailureFilter, prefix + "TrackingFailureFilter" + suffix);
 	iEvent.put(CSCTightHaloId, prefix + "CSCTightHaloId" + suffix);
+	iEvent.put(EEBadSCFilter, prefix + "EEBadSCFilter" + suffix);
+	iEvent.put(ECALLaserCorrFilter, prefix + "ECALLaserCorrFilter" + suffix);
+	iEvent.put(TrackingPOGFilters, prefix + "TrackingPOGFilters" + suffix);
 }
 
 bool BristolNTuple_Event::passesFilter(edm::Event& event, edm::InputTag filter) {

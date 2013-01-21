@@ -428,34 +428,16 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesTriggerSelection() const {
 			return triggerFired("HLT_IsoMu24", hltConfig_, triggerResults_);
 		else if (runNumber_ >= 173236 && runNumber_ < 190456) //other triggers available (mainly sTop
 			return triggerFired("HLT_IsoMu24_eta2p1", hltConfig_, triggerResults_);
-		else if (runNumber_ >= 190456 && runNumber_ <= 193805)
-			return triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFJet30", hltConfig_, triggerResults_)
-					|| triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFNoPUJet30", hltConfig_, triggerResults_);
-		else if (runNumber_ >= 193806)
-			return triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30", hltConfig_, triggerResults_)
-					|| triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30_30_20", hltConfig_, triggerResults_)
-					|| triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet45_35_25", hltConfig_, triggerResults_);
-		else
-			return false;
+		else //2012 Data
+			return triggerFired("HLT_IsoMu24_eta2p1_v", hltConfig_, triggerResults_);
 	} else {
 		if (MCSampleTag_ == "Fall11") {
 			//Fall11 MC
 			return triggerFired("HLT_IsoMu24", hltConfig_, triggerResults_);
-		} else {
-			//do not use HLTs in Summer12 MC as they don't use JEC
-			//https://hypernews.cern.ch/HyperNews/CMS/get/top-trigger/66.html
-//			return true;
-			//let's put it back - discussion inconclusive but it is better to have a scale factor than efficiency corrections
-			//Summer12 MC
-			bool fired_START52_V5 = triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFJet30", hltConfig_, triggerResults_);
-			bool fired_START52_V9 = triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFJet30", hltConfig_, triggerResults_)
-					|| triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFNoPUJet30", hltConfig_, triggerResults_);
-			bool fired_START53_V7A = triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet50_40_30", hltConfig_,
-					triggerResults_);
-			return fired_START52_V5 || fired_START52_V9 || fired_START53_V7A;
+		} else {//Summer12 MC
+			return triggerFired("HLT_IsoMu24_eta2p1_v", hltConfig_, triggerResults_);
 		}
 	}
-
 	return false;
 }
 

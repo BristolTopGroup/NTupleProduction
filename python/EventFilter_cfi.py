@@ -3,14 +3,22 @@ import FWCore.ParameterSet.Config as cms
 EventFilter = cms.EDFilter(
     'EventFilter',
     #event filters
-    HCALNoiseFilterInput=cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult'),
+    HBHENoiseFilterInput=cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult'),
     #optional MET filters
     HCALLaserFilterInput=cms.InputTag('HcalLaserEventFilter'),
     ECALDeadCellFilterInput=cms.InputTag('EcalDeadCellBoundaryEnergyFilter'),
     ECALDeadCellTriggerPrimitiveFilterInput = cms.InputTag('EcalDeadCellTriggerPrimitiveFilter'),
     TrackingFailureFilterInput=cms.InputTag('trackingFailureFilter'),
+    EEBadSCFilterInput = cms.InputTag('eeBadScFilter'),
+    ECALLaserCorrFilterInput = cms.InputTag('ecalLaserCorrFilter'),
+    #tracking POG filters
+    manystripclus53XInput = cms.InputTag('manystripclus53X'),
+    toomanystripclus53XInput = cms.InputTag('toomanystripclus53X'),
+    logErrorTooManyClustersInput = cms.InputTag('logErrorTooManyClusters'),
+    
     useOptionalMETFilters=cms.bool(False),
-    useTrackingFailureFilter=cms.bool(False),
+    useTrackingFailureFilter=cms.bool(True),
+    useTrackingPOGFilters=cms.bool(True),
 
     #track input for scraping filter
     TracksInput=cms.InputTag('generalTracks'),

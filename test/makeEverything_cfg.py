@@ -3,7 +3,10 @@ from BristolAnalysis.NTupleTools.NTupleTools_cff import *
 ##########################################################################################
 #            General
 ##########################################################################################
-process.load('BristolAnalysis.NTupleTools.ttDecayChannelFilters_cff')
+process.load('TopQuarkAnalysis.TopSkimming.TtFullyHadronicFilter_cfi')
+process.load('TopQuarkAnalysis.TopSkimming.TtFullyLeptonicFilter_cfi')
+process.load('TopQuarkAnalysis.TopSkimming.TtSemiLeptonicFilter_cfi')
+
 process.load('BristolAnalysis.NTupleTools.TopPairElectronPlusJets2012SelectionFilter_cfi')
 process.load('BristolAnalysis.NTupleTools.TopPairMuonPlusJets2012SelectionFilter_cfi')
  #filters only in tagging mode
@@ -21,6 +24,20 @@ process.ttFullLeptonicTauTauFilter.taggingMode = cms.bool(True)
 process.ttFullLeptonicETauFilter.taggingMode = cms.bool(True)
 process.ttFullLeptonicEMuFilter.taggingMode = cms.bool(True)
 process.ttFullLeptonicMuTauFilter.taggingMode = cms.bool(True)
+
+
+if options.isMCatNLO:
+    process.ttFullHadronicFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicFilter.useMCATNLO = cms.bool(True)
+    process.ttSemiLeptonicElectronFilter.useMCATNLO = cms.bool(True)
+    process.ttSemiLeptonicMuonFilter.useMCATNLO = cms.bool(True)
+    process.ttSemiLeptonicTauFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicEEFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicMuMuFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicTauTauFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicETauFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicEMuFilter.useMCATNLO = cms.bool(True)
+    process.ttFullLeptonicMuTauFilter.useMCATNLO = cms.bool(True)
 
 electronselectionPrefix = 'TopPairElectronPlusJets2012Selection.'
 muonselectionPrefix = 'TopPairMuonPlusJets2012Selection.'
@@ -48,7 +65,7 @@ process.eventFiltersIntaggingMode = cms.Sequence(process.MCFiltersInTaggingMode 
 if not makePATTuple:
     #NTuple content
     from BristolAnalysis.NTupleTools.NTupler_cff import *
-    setup_ntupler(process, cms, options, includeCA08Jets)
+    setup_ntupler(process, cms, options)
 else:
     from BristolAnalysis.NTupleTools.PatTuple_cff import *
     setup_pattuple(process, cms, options)

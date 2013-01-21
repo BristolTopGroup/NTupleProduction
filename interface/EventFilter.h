@@ -21,6 +21,9 @@ enum value {
 	passECALDeadCellFilter,
 	passECALDeadCellTriggerPrimitiveFilter,
 	passTrackingFailureFilter,
+	passEEBadSCFilter,
+	passECALLaserCorrFilter,
+	passTrackingPOGFilters,
 	passScrapingVeto,
 	passGoodPrimaryVertex,
 	passElectronCuts,
@@ -36,6 +39,9 @@ const std::string names[NUMBER_OF_FILTERS] = { "All Events", //
 		"ECALDeadCellFilter", //
 		"ECALDeadCellTriggerPrimitiveFilter", //
 		"TrackingFailureFilter", //
+		"EEBadSupercrystalFilter", //
+		"ECALLaserCorrFilter", //
+		"TrackingPOGFilters", //
 		"ScrapingVeto", //
 		"GoodPrimaryVertex", //
 		"ElectronCuts", //
@@ -70,7 +76,12 @@ private:
 	bool passesJetCuts(edm::Event& event);
 
 	edm::InputTag hcalNoiseInput_, hcalLaserFilterInput_, ecalDeadCellFilterInput_, ecalDeadCellTriggerPrimitiveFilterInput_,//
-			trackingFailureFilter_, //
+			trackingFailureFilterInput_, //
+			eeBadSCFilterInput_, //
+			ecalLaserCorrFilterInput_, //
+			manystripclus53XInput_, //
+			toomanystripclus53XInput_, //
+			logErrorTooManyClustersInput_, //
 			trkInput_, vertexInput_, //
 			jetInput_, electronInput_, muonInput_;
 
@@ -78,7 +89,7 @@ private:
 
 	double minJetPt_, maxAbsJetEta_, minElectronPt_, maxAbsElectronEta_, minMuonPt_, maxAbsMuonEta_;
 
-	bool debug_, counteitherleptontype_, useTrackingFailureFilter_, useOptionalMETFilters_;
+	bool debug_, counteitherleptontype_, useTrackingFailureFilter_, useTrackingPOGFilters_, useOptionalMETFilters_;
 	std::vector<int> eventCount_;
 
 	TH1I* hCount;
