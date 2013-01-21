@@ -70,6 +70,7 @@ TopPairMuonPlusJets2012SelectionFilter::TopPairMuonPlusJets2012SelectionFilter(c
 	produces<bool>(prefix_ + "FullSelection");
 	produces<unsigned int>(prefix_ + "NumberOfBtags");
 	produces < pat::JetCollection > (prefix_ + "cleanedJets");
+	produces < pat::MuonCollection > (prefix_ + "signalMuon");
 }
 
 void TopPairMuonPlusJets2012SelectionFilter::fillDescriptions(edm::ConfigurationDescriptions & descriptions) {
@@ -135,6 +136,10 @@ bool TopPairMuonPlusJets2012SelectionFilter::filter(edm::Event& iEvent, const ed
 	for (unsigned int index = 0; index < cleanedJets_.size(); ++index)
 		jetoutput->push_back(cleanedJets_.at(index));
 	iEvent.put(jetoutput, prefix_ + "cleanedJets");
+
+	std::auto_ptr < pat::MuonCollection > signalMuon(new pat::MuonCollection());
+	signalMuon->push_back(signalMuon_);
+	iEvent.put(signalMuon, prefix_ + "signalMuon");
 
 	return taggingMode_ || passesSelection;
 }
@@ -323,7 +328,7 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesSelectionStep(edm::Event& iEv
 	case TTbarMuPlusJetsReferenceSelection::OneIsolatedMuon:
 		return hasExactlyOneIsolatedLepton();
 	case TTbarMuPlusJetsReferenceSelection::LooseMuonVeto:
-			return passesLooseMuonVeto();
+		return passesLooseMuonVeto();
 	case TTbarMuPlusJetsReferenceSelection::LooseElectronVeto:
 		return passesLooseElectronVeto();
 	case TTbarMuPlusJetsReferenceSelection::AtLeastOneGoodJet:

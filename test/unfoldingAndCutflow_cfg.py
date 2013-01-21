@@ -105,6 +105,7 @@ for analyser in electron_unfolding_analysers:
     analyser.selection_flag_input = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'FullSelection', 'PAT')
     analyser.b_tag_weight_input = cms.InputTag( 'eventWeightBtagEPlusJets' )
     analyser.reco_jet_input = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'cleanedJets', 'PAT')
+    analyser.electron_input = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'signalElectron', 'PAT')
 
 muon_unfolding_analysers = [
     process.unfolding_MET_analyser_muon_channel,
@@ -117,6 +118,7 @@ for analyser in muon_unfolding_analysers:
     analyser.selection_flag_input = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'FullSelection', 'PAT')
     analyser.b_tag_weight_input = cms.InputTag( 'eventWeightBtagMuPlusJets' )
     analyser.reco_jet_input = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'cleanedJets', 'PAT')
+    analyser.muon_input = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'signalMuon', 'PAT')
 
 process.unfoldingAnalysisSequence = cms.Sequence(process.eventFiltersIntaggingMode *
                                                  process.eventWeightBtagEPlusJets *
