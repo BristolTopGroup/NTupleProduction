@@ -68,6 +68,7 @@ TopPairElectronPlusJets2012SelectionFilter::TopPairElectronPlusJets2012Selection
 	produces<bool>(prefix_ + "FullSelection");
 	produces<unsigned int>(prefix_ + "NumberOfBtags");
 	produces < pat::JetCollection > (prefix_ + "cleanedJets");
+	produces < pat::ElectronCollection > (prefix_ + "signalElectron");
 }
 
 void TopPairElectronPlusJets2012SelectionFilter::fillDescriptions(edm::ConfigurationDescriptions & descriptions) {
@@ -130,9 +131,14 @@ bool TopPairElectronPlusJets2012SelectionFilter::filter(edm::Event& iEvent, cons
 		iEvent.put(passesStep, prefix_ + TTbarEPlusJetsReferenceSelection::StringSteps[step]);
 	}
 	iEvent.put(std::auto_ptr<bool>(new bool(passesSelection)), prefix_ + "FullSelection");
+
 	for (unsigned int index = 0; index < cleanedJets_.size(); ++index)
 		jetoutput->push_back(cleanedJets_.at(index));
 	iEvent.put(jetoutput, prefix_ + "cleanedJets");
+
+	std::auto_ptr < pat::ElectronCollection > signalElectron(new pat::ElectronCollection());
+	signalElectron->push_back(signalElectron_);
+	iEvent.put(signalElectron, prefix_ + "signalElectron");
 
 	return taggingMode_ || passesSelection;
 }
@@ -202,7 +208,6 @@ bool TopPairElectronPlusJets2012SelectionFilter::isLooseElectron(const pat::Elec
 			useRhoActiveAreaCorrections_) < looseElectronIso_;
 	return passesPtAndEta && passesID && passesIso;
 }
-
 
 void TopPairElectronPlusJets2012SelectionFilter::getLooseMuons() {
 	looseMuons_.clear();
