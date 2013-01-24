@@ -293,8 +293,8 @@ float UnfoldingAnalyser::get_gen_ht(const edm::Event& iEvent) const {
 	iEvent.getByLabel(gen_jet_input_, jets);
 	float ht(0.);
 
-	//HT = first 5 jets == 5 most energetic jets
-	for (unsigned int index = 0; index < jets->size() && index < 6; ++index) {
+	//Take ALL the jets!
+	for (unsigned int index = 0; index < jets->size(); ++index) {
 		ht += jets->at(index).pt();
 	}
 	return ht;
@@ -360,8 +360,8 @@ float UnfoldingAnalyser::get_reco_ht(const edm::Event& iEvent) const {
 	iEvent.getByLabel(reco_jet_input_, jets);
 	float ht(0.);
 
-	//HT = first 5 jets == 5 most energetic jets
-	for (unsigned int index = 0; index < jets->size() && index < 6; ++index) {
+	//Take ALL the jets!
+	for (unsigned int index = 0; index < jets->size(); ++index) {
 		const pat::Jet jet = jets->at(index);
 		ht += jets->at(index).pt();
 	}
