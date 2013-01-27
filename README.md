@@ -30,7 +30,7 @@ addpkg PhysicsTools/PatUtils V03-09-26
 #addpkg RecoTauTag/RecoTau V01-04-20
 #addpkg RecoTauTag/Configuration V01-04-08
 
-#MET Analysis
+#MET analysis
 addpkg JetMETCorrections/Type1MET V04-06-09
 
 #MET Filters
@@ -42,6 +42,7 @@ cvs co -r V00-00-31 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysis
 
 #Bristol Tools
 git clone git@github.com:BristolTopGroup/NTupleProduction.git BristolAnalysis/NTupleTools
+
 #TopSkimming
 git clone git@github.com:BristolTopGroup/TopSkimming.git TopQuarkAnalysis/TopSkimming
 
@@ -68,3 +69,4 @@ More information can be found at [Bristol Ntuple Recipes twiki page](https://twi
 
 ## Bugs
 Please report any problems on our [issues page](https://github.com/BristolTopGroup/NTupleProduction/issues).
+

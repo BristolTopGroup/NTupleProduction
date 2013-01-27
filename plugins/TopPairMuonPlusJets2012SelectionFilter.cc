@@ -86,15 +86,15 @@ void TopPairMuonPlusJets2012SelectionFilter::fillDescriptions(edm::Configuration
 	desc.add < InputTag > ("ECALDeadCellFilterInput");
 	desc.add < InputTag > ("TrackingFailureFilterInput");
 	desc.add < InputTag > ("BadEESupercrystalFilterInput");
-	desc.add<double>("min1JetPt", 45.0);
-	desc.add<double>("min2JetPt", 45.0);
-	desc.add<double>("min3JetPt", 45.0);
-	desc.add<double>("min4JetPt", 20.0);
+	desc.add<double>("min1JetPt", 30.0);
+	desc.add<double>("min2JetPt", 30.0);
+	desc.add<double>("min3JetPt", 30.0);
+	desc.add<double>("min4JetPt", 30.0);
 	desc.add<double>("tightMuonIsolation", 0.12);
 	desc.add<double>("looseElectronIsolation", 0.15);
 	desc.add<double>("looseMuonIsolation", 0.2);
 
-	desc.add<bool>("useDeltaBetaCorrections", false);
+	desc.add<bool>("useDeltaBetaCorrections", true);
 	desc.add<bool>("useRhoActiveAreaCorrections", true);
 	desc.add<bool>("useMETFilters", false);
 	desc.add<bool>("useEEBadScFilter", false);
@@ -220,8 +220,11 @@ bool TopPairMuonPlusJets2012SelectionFilter::isLooseElectron(const pat::Electron
 	bool passesPtAndEta = electron.pt() > 20 && fabs(electron.eta()) < 2.5;
 	//		bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
 	bool passesID = electron.electronID("mvaTrigV0") > 0.0;
-	bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrections_,
-			useRhoActiveAreaCorrections_) < looseElectronIso_;
+	bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, false,
+			true) < looseElectronIso_;
+//			cout << "ele pt:  " << electron.pt() << endl;
+//			cout << "ele isolation:  " << getRelativeIsolation(electron, 0.3, rho_, isRealData_, false, true) << endl;
+			
 	return passesPtAndEta && passesID && passesIso;
 }
 
@@ -248,6 +251,10 @@ void TopPairMuonPlusJets2012SelectionFilter::goodIsolatedMuons() {
 		const pat::Muon muon = muons_.at(index);
 
 		bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrections_) < tightMuonIso_;
+		
+//		cout << "mu pt:  " <<  muon.pt() << endl;
+//		cout << "mu isolation:  " << getRelativeIsolation(muon, 0.4, useDeltaBetaCorrections_) << endl;
+		
 		if (isGoodMuon(muon) && passesIso)
 			goodIsolatedMuons_.push_back(muon);
 	}
@@ -278,7 +285,7 @@ bool TopPairMuonPlusJets2012SelectionFilter::isGoodMuon(const pat::Muon& muon) c
 	//2D impact w.r.t primary vertex
 	if (!hasGoodPV_ or muon.globalTrack().isNull())
 		return false;
-	bool passesD0 = muon.dB(pat::Muon::PV2D) < 0.02 && fabs(muon.vertex().z() - primaryVertex_.z()) < 0.5; //cm
+	bool passesD0 = muon.dB(pat::Muon::PV2D) < 0.2 && fabs(muon.vertex().z() - primaryVertex_.z()) < 0.5; //cm
 	bool passesID = muon.isPFMuon() && muon.isGlobalMuon();
 	bool trackQuality = muon.globalTrack()->normalizedChi2() < 10
 			&& muon.track()->hitPattern().trackerLayersWithMeasurement() > 5
@@ -314,8 +321,22 @@ void TopPairMuonPlusJets2012SelectionFilter::cleanedBJets() {
 
 bool TopPairMuonPlusJets2012SelectionFilter::isGoodJet(const pat::Jet& jet) const {
 	//both cuts are done at PAT config level (selectedPATJets) this is just for safety
-	bool passesPtAndEta(jet.pt() > 30. && fabs(jet.eta() < 2.4));
-	return passesPtAndEta;
+	bool passesPtAndEta(jet.pt() > 30. && fabs(jet.eta() < 2.5));
+	bool passNOD = jet.numberOfDaughters() > 1;
+	bool passNHF = jet.neutralHadronEnergyFraction() < 0.99;
+	bool passNEF = jet.neutralEmEnergyFraction() < 0.99;
+	bool passCHF = true;
+	bool passNCH = true;
+	bool passCEF = true; 
+	if (fabs(jet.eta()) < 2.4) {
+		passCEF = jet.chargedEmEnergyFraction() < 0.99;
+		passCHF = jet.chargedHadronEnergyFraction() > 0;
+		passNCH = jet.chargedMultiplicity() > 0;
+	}
+	
+	bool passesJetID = passNOD && passCEF && passNHF && passNEF && passCHF && passNCH;
+	
+	return passesPtAndEta && passesJetID;
 }
 
 bool TopPairMuonPlusJets2012SelectionFilter::passesSelectionStep(edm::Event& iEvent, unsigned int selectionStep) const {
