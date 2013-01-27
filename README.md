@@ -30,7 +30,7 @@ addpkg PhysicsTools/PatUtils V03-09-26
 #addpkg RecoTauTag/RecoTau V01-04-20
 #addpkg RecoTauTag/Configuration V01-04-08
 
-met analysis
+#MET analysis
 addpkg JetMETCorrections/Type1MET V04-06-09
 
 #MET Filters
