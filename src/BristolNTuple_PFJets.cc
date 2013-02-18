@@ -34,6 +34,13 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "Charge" + suffix);
 	produces < std::vector<double> > (prefix + "Mass" + suffix);
 	produces < std::vector<int> > (prefix + "PartonFlavour" + suffix);
+	//generated jet properties
+	produces < std::vector<double> > (prefix + "GenJet.Pt" + suffix);
+	produces < std::vector<double> > (prefix + "GenJet.Px" + suffix);
+	produces < std::vector<double> > (prefix + "GenJet.Py" + suffix);
+	produces < std::vector<double> > (prefix + "GenJet.Pz" + suffix);
+	produces < std::vector<double> > (prefix + "GenJet.Eta" + suffix);
+	produces < std::vector<double> > (prefix + "GenJet.Phi" + suffix);
 	//jet energy correction and uncertainties
 	produces < std::vector<double> > (prefix + "JECUnc" + suffix);
 	produces < std::vector<double> > (prefix + "L2L3ResJEC" + suffix);
@@ -106,6 +113,13 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<double> > charge(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > mass(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > partonFlavour(new std::vector<int>());
+	//generated jet properties
+	std::auto_ptr < std::vector<double> > genJet_pt(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > genJet_px(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > genJet_py(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > genJet_pz(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > genJet_eta(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > genJet_phi(new std::vector<double>());
 	//jet energy correction and uncertainties
 	std::auto_ptr < std::vector<double> > jecUnc_vec(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > l2l3resJEC_vec(new std::vector<double>());
@@ -206,6 +220,27 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			if (readJECuncertainty) {
 				jecUnc->setJetEta(it->eta());
 				jecUnc->setJetPt(it->pt()); // the uncertainty is a function of the corrected pt
+			}
+
+			// Store generated jet resolutions for monte carlo
+			double genjet_pt;
+			double genjet_px;
+			double genjet_py;
+			double genjet_pz;
+			double genjet_eta;
+			double genjet_phi;
+			if (!iEvent.isRealData()) {
+				// take only jets with corrected pt>10 according to: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiTopRefSyst#Jet_energy_resolution
+				if (it->pt() > 10) {
+					if (it->genJet()) { //matching (stop segmentation fault due to jet having no associated generator jet)
+						genjet_pt = it->genJet()->pt();
+						genjet_px = it->genJet()->px();
+						genjet_py = it->genJet()->py();
+						genjet_pz = it->genJet()->pz();
+						genjet_eta = it->genJet()->eta();
+						genjet_phi = it->genJet()->phi();						
+					}
+				}
 			}
 
 			// Vertex association
@@ -323,6 +358,14 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			mass->push_back(it->mass());
 			partonFlavour->push_back(it->partonFlavour());
 
+			//generated jet properties
+			genJet_pt->push_back(genjet_pt);
+			genJet_px->push_back(genjet_px);
+			genJet_py->push_back(genjet_py);
+			genJet_pz->push_back(genjet_pz);
+			genJet_eta->push_back(genjet_eta);
+			genJet_phi->push_back(genjet_phi);
+
 			//jet energy correction and uncertainties
 			if (readJECuncertainty)
 				jecUnc_vec->push_back(jecUnc->getUncertainty(true));
@@ -420,6 +463,13 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(charge, prefix + "Charge" + suffix);
 	iEvent.put(mass, prefix + "Mass" + suffix);
 	iEvent.put(partonFlavour, prefix + "PartonFlavour" + suffix);
+	//generated jet properties
+	iEvent.put(genJet_pt, prefix + "GenJet.Pt" + suffix);
+	iEvent.put(genJet_px, prefix + "GenJet.Px" + suffix);
+	iEvent.put(genJet_py, prefix + "GenJet.Py" + suffix);
+	iEvent.put(genJet_pz, prefix + "GenJet.Pz" + suffix);
+	iEvent.put(genJet_eta, prefix + "GenJet.Eta" + suffix);
+	iEvent.put(genJet_phi, prefix + "GenJet.Phi" + suffix);
 	//jet energy correction and uncertainties
 	iEvent.put(jecUnc_vec, prefix + "JECUnc" + suffix);
 	iEvent.put(l2l3resJEC_vec, prefix + "L2L3ResJEC" + suffix);
