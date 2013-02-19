@@ -203,7 +203,7 @@ void TopPairElectronPlusJets2012SelectionFilter::getLooseElectrons() {
 bool TopPairElectronPlusJets2012SelectionFilter::isLooseElectron(const pat::Electron& electron) const {
 	bool passesPtAndEta = electron.pt() > 20 && fabs(electron.eta()) < 2.5;
 	//		bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
-	bool passesID = electron.electronID("mvaTrigV0") > 0.0;
+	bool passesID = electron.electronID("mvaTrigV0") > 0.5;
 	bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrections_,
 			useRhoActiveAreaCorrections_) < looseElectronIso_;
 	return passesPtAndEta && passesID && passesIso;
@@ -247,7 +247,7 @@ bool TopPairElectronPlusJets2012SelectionFilter::isGoodElectron(const pat::Elect
 	bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
 	//2D impact w.r.t primary vertex
 	bool passesD0 = electron.dB(pat::Electron::PV2D) < 0.02; //cm
-	bool passesID = electron.electronID("mvaTrigV0") > 0.0;
+	bool passesID = electron.electronID("mvaTrigV0") > 0.5;
 	return passesPtAndEta && notInCrack && passesD0 && passesID;
 }
 
