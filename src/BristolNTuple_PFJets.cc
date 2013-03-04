@@ -35,6 +35,7 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "Mass" + suffix);
 	produces < std::vector<int> > (prefix + "PartonFlavour" + suffix);
 	//generated jet properties
+	produces < std::vector<double> > (prefix + "GenJet.Energy" + suffix);
 	produces < std::vector<double> > (prefix + "GenJet.Pt" + suffix);
 	produces < std::vector<double> > (prefix + "GenJet.Px" + suffix);
 	produces < std::vector<double> > (prefix + "GenJet.Py" + suffix);
@@ -114,6 +115,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<double> > mass(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > partonFlavour(new std::vector<int>());
 	//generated jet properties
+	std::auto_ptr < std::vector<double> > genJet_energy(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > genJet_pt(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > genJet_px(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > genJet_py(new std::vector<double>());
@@ -223,6 +225,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			}
 
 			// Store generated jet resolutions for monte carlo
+			double genjet_energy;
 			double genjet_pt;
 			double genjet_px;
 			double genjet_py;
@@ -233,6 +236,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				// take only jets with corrected pt>10 according to: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiTopRefSyst#Jet_energy_resolution
 				if (it->pt() > 10) {
 					if (it->genJet()) { //matching (stop segmentation fault due to jet having no associated generator jet)
+						genjet_energy = it->genJet()->energy();
 						genjet_pt = it->genJet()->pt();
 						genjet_px = it->genJet()->px();
 						genjet_py = it->genJet()->py();
@@ -359,6 +363,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			partonFlavour->push_back(it->partonFlavour());
 
 			//generated jet properties
+			genJet_energy->push_back(genjet_energy);
 			genJet_pt->push_back(genjet_pt);
 			genJet_px->push_back(genjet_px);
 			genJet_py->push_back(genjet_py);
@@ -464,6 +469,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(mass, prefix + "Mass" + suffix);
 	iEvent.put(partonFlavour, prefix + "PartonFlavour" + suffix);
 	//generated jet properties
+	iEvent.put(genJet_pt, prefix + "GenJet.Energy" + suffix);
 	iEvent.put(genJet_pt, prefix + "GenJet.Pt" + suffix);
 	iEvent.put(genJet_px, prefix + "GenJet.Px" + suffix);
 	iEvent.put(genJet_py, prefix + "GenJet.Py" + suffix);
