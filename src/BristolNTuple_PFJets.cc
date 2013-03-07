@@ -225,13 +225,13 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			}
 
 			// Store generated jet resolutions for monte carlo
-			double genjet_energy;
-			double genjet_pt;
-			double genjet_px;
-			double genjet_py;
-			double genjet_pz;
-			double genjet_eta;
-			double genjet_phi;
+			double genjet_energy(0);
+			double genjet_pt(0);
+			double genjet_px(0);
+			double genjet_py(0);
+			double genjet_pz(0);
+			double genjet_eta(0);
+			double genjet_phi(0);
 			if (!iEvent.isRealData()) {
 				// take only jets with corrected pt>10 according to: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiTopRefSyst#Jet_energy_resolution
 				if (it->pt() > 10) {
