@@ -469,7 +469,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(mass, prefix + "Mass" + suffix);
 	iEvent.put(partonFlavour, prefix + "PartonFlavour" + suffix);
 	//generated jet properties
-	iEvent.put(genJet_pt, prefix + "GenJet.Energy" + suffix);
+	iEvent.put(genJet_energy, prefix + "GenJet.Energy" + suffix);
 	iEvent.put(genJet_pt, prefix + "GenJet.Pt" + suffix);
 	iEvent.put(genJet_px, prefix + "GenJet.Px" + suffix);
 	iEvent.put(genJet_py, prefix + "GenJet.Py" + suffix);
