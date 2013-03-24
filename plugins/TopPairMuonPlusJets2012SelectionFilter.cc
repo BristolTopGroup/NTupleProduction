@@ -219,7 +219,7 @@ void TopPairMuonPlusJets2012SelectionFilter::getLooseElectrons() {
 bool TopPairMuonPlusJets2012SelectionFilter::isLooseElectron(const pat::Electron& electron) const {
 	bool passesPtAndEta = electron.pt() > 20 && fabs(electron.eta()) < 2.5;
 	//		bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
-	bool passesID = electron.electronID("mvaTrigV0") > 0.0;
+	bool passesID = electron.electronID("mvaTrigV0") > 0.5;
 	bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrections_,
 			useRhoActiveAreaCorrections_) < looseElectronIso_;
 	return passesPtAndEta && passesID && passesIso;
