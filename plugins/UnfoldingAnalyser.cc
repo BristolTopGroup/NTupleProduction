@@ -9,6 +9,7 @@
 #include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "AnalysisDataFormats/TopObjects/interface/TtGenEvent.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 #include <iostream>
 using namespace edm;
@@ -18,7 +19,7 @@ using namespace std;
 // one has to use this thing.
 #include "TString.h"
 
-UnfoldingAnalyser::UnfoldingAnalyser(const edm::ParameterSet& iConfig) :
+UnfoldingAnalyser::UnfoldingAnalyser(const edm::ParameterSet& iConfig) :		
 		pu_weight_input_(iConfig.getParameter < edm::InputTag > ("pu_weight_input")), //
 		b_tag_weight_input(iConfig.getParameter < edm::InputTag > ("b_tag_weight_input")), //
 		gen_MET_input_(iConfig.getParameter < edm::InputTag > ("gen_MET_input")), //
@@ -93,7 +94,7 @@ void UnfoldingAnalyser::beginJob() {
 	if (!fs) {
 		throw edm::Exception(edm::errors::Configuration, "TFile Service is not registered in cfg file");
 	}
-	cout << "This is not how you debug" << endl;
+	//cout << "This is not how you debug" << endl;
 	truth_ =
 			fs->make < TH1F
 					> ("truth", TString("True distribution;GEN(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
@@ -122,7 +123,7 @@ void UnfoldingAnalyser::beginJob() {
 							"response;RECO(" + variable_under_analysis_ + ");GEN(" + variable_under_analysis_ + ")"), variable_n_bins_, variable_min_, variable_max_, variable_n_bins_, variable_min_, variable_max_);
 
 //histograms with asymmetric bins (final measurement)
-	cout << "But what other options do I have?" << endl;
+	//cout << "But what other options do I have?" << endl;
 	double* METBinEdges = &bin_edges_[0];
 	unsigned int n_asym_bins = bin_edges_.size() - 1;
 	truth_asym_bins_ =
@@ -153,7 +154,7 @@ void UnfoldingAnalyser::beginJob() {
 					> ("response_without_fakes_AsymBins", TString(
 							"response;RECO(" + variable_under_analysis_ + ");GEN(" + variable_under_analysis_ + ")"), n_asym_bins, METBinEdges, n_asym_bins, METBinEdges);
 
-	cout << "Well, you could use 'scram b' as a compiler on your machine within an IDE" << endl;
+	//cout << "Well, you could use 'scram b' as a compiler on your machine within an IDE" << endl;
 	truth_->Sumw2();
 	measured_->Sumw2();
 	fake_->Sumw2();
@@ -170,7 +171,7 @@ void UnfoldingAnalyser::beginJob() {
 	response_asym_bins_->Sumw2();
 	response_without_fakes_asym_bins_->Sumw2();
 
-	cout << "However, you need to be able to install CMSSW on your machine." << endl;
+	//cout << "However, you need to be able to install CMSSW on your machine." << endl;
 }
 
 void UnfoldingAnalyser::endJob() {
@@ -312,19 +313,37 @@ float UnfoldingAnalyser::get_gen_st(const edm::Event& iEvent) const {
 }
 
 float UnfoldingAnalyser::get_gen_mt(const edm::Event& iEvent) const {
+
+
 	if (!is_semileptonic_)
 		return -1.;
 	//get electron/muon
 	const reco::GenParticle* lepton = get_gen_lepton(iEvent);
-	//get MET
+	//get Gen MET
 	edm::Handle < reco::GenMETCollection > genMETs;
 	iEvent.getByLabel(gen_MET_input_, genMETs);
 	reco::GenMET met(genMETs->at(0));
-
+	
+	//get MET
+	edm::Handle < std::vector<pat::MET> > recoMETs;
+	iEvent.getByLabel(reco_MET_input_, recoMETs);
+	pat::MET recoMETObject(recoMETs->at(0));
+        
+	double En = met.energy();
+	double mom = sqrt(pow(met.px(),2)+pow(met.py(),2)+pow(met.pz(),2));
+	
+// 	cout << "GEN lep px,y: " <<  lepton->px() << ", " <<   lepton->py() << ") , met px,y,z: " << met.px() << ", " << met.py() << ", "<< met.pz()<<")" << endl;
+// 	cout << "missing mass is either: " << pow(En,2)-pow(mom,2) << endl;
+// 	//cout << "or: " << 
+// 	
+// 	cout << "Gen lepE: " <<  lepton->et() << " , metE: " <<  met.et() << endl;
+// 	cout << "MET pt: " <<  met.pt() << " , mass: " << met.mass() << endl;
+	
 	//combine their x & y momenta to get the transverse W boson mass
-	double energy_squared = pow(lepton->et() + met.et(), 2);
+	double energy_squared = pow(lepton->et() + met.pt(), 2);
 	double momentum_squared = pow(lepton->px() + met.px(), 2) + pow(lepton->py() + met.py(), 2);
 	double MT_squared = energy_squared - momentum_squared;
+//	cout << "MTgen: " << sqrt(MT_squared) << endl;
 
 	if (MT_squared > 0)
 		return sqrt(MT_squared);
@@ -385,7 +404,10 @@ float UnfoldingAnalyser::get_reco_mt(const edm::Event& iEvent) const {
 	iEvent.getByLabel(reco_MET_input_, recoMETs);
 
 	pat::MET met(recoMETs->at(0));
-
+	
+        //cout << "RECO lep py: " <<  lepton->py() << " , met px: " << met.px() << endl;
+	
+	
 	//combine their x & y momenta to get the transverse W boson mass
 	double energy_squared = pow(lepton->et() + met.et(), 2);
 	double momentum_squared = pow(lepton->px() + met.px(), 2) + pow(lepton->py() + met.py(), 2);

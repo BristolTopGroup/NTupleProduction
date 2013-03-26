@@ -8,6 +8,7 @@
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "FWCore/Utilities/interface/InputTag.h"
 
 #include "TH1F.h"
 #include "TH2F.h"

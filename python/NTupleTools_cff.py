@@ -27,6 +27,9 @@ TEST_MC_FILE = 'file:///storage/TopQuarkGroup/mc/8TeV/SynchEx/Summer12_DR53X_TTJ
 USE_JEC_FROM_DB = False
 #if 'False' taus are included in the jet collections
 removeTausFromJetCollection = False
+#if remove eles from gen jets
+excludeElectronsFromWsFromGenJets = True	
+
 #maximal relative isolation for loose leptons
 maxLooseLeptonRelIso = 999.0
 
@@ -146,6 +149,9 @@ options.register ('skipEvents',
                            VarParsing.multiplicity.singleton,
                            VarParsing.varType.int,
                                "Number of events to skip (0 for none)")
+
+			       
+			       
 #CMSSW 44X can't compile this file in the python directory correctly 
 #as it fails to identify the file ending. This hack helps.
 import sys
@@ -257,12 +263,20 @@ process.patElectronsLoosePFlow.pfElectronSource = cms.InputTag("pfIsolatedElectr
 if options.useData :
     removeMCMatching(process, ['All'])
     process.looseLeptonSequence.remove(process.muonMatchLoosePFlow)
+    
+if not options.useData :
+    ## needed for redoing the ak5GenJets
+    process.load("BristolAnalysis.NTupleTools.GenJetParticles_cfi")
+    process.load("RecoJets.Configuration.RecoGenJets_cff")
+
+    if excludeElectronsFromWsFromGenJets :
+        process.genParticlesForJetsNoNu.excludeFromResonancePids = [11, 12, 13, 14, 16]
 
 process.patseq = cms.Sequence(
     process.HBHENoiseFilter * 
     process.goodOfflinePrimaryVertices * 
     process.eidMVASequence *
-    process.genParticlesForJetsNoNu * 
+    process.genParticlesForJetsNoNu *
     getattr(process, "patPF2PATSequence" + postfix) * 
     process.looseLeptonSequence * 
     process.patDefaultSequence * 
@@ -274,10 +288,11 @@ process.patseq = cms.Sequence(
     )
 
 if options.useData:
-    process.patseq.remove(process.genParticlesForJetsNoNu)
+    process.patseq.remove(process.genParticlesForJetsNoNuNoLep)
     process.patseq.remove(process.genJetParticles)    
     process.patseq.remove(process.flavorHistorySeq)
-
+    process.patseq.remove(process.genParticlesForJets)
+        
 # remove flavour history as it has problems with the MC@NLO genparticles
 if options.isMCatNLO:
     process.patseq.remove(process.flavorHistorySeq)

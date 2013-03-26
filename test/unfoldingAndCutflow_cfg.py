@@ -3,8 +3,9 @@ from BristolAnalysis.NTupleTools.NTupleTools_cff import *
 ##########################################################################################
 #            Test files
 ##########################################################################################
-TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TTJets_TuneZ2_7TeV_Fall11_44X_AODSIM.root'
+#TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TTJets_TuneZ2_7TeV_Fall11_44X_AODSIM.root'
 #TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TT_TuneZ2_7TeV_POWHEG_44X.root'
+TEST_MC_FILE = 'file:///storage/TopQuarkGroup/mc/8TeV/SynchEx/Summer12_DR53X_TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_AODSIM_PU_S10_START53_V7A-v1.root'
 if options.isMCatNLO:
     TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TT_TuneZ2_7TeV_MCatNLO_44X.root'
 process.source.fileNames = [
@@ -148,21 +149,21 @@ process.unfoldingAnalysisSequence = cms.Sequence(process.eventFiltersIntaggingMo
 if not options.printEventContent:
     process.unfoldingAnalysisSequence.remove(process.printEventContent)
 
-if options.isTTbarMC:
-    process.unfoldingAnalysis = cms.Path(
-                      process.hlTrigReport * 
-                      process.egammaIDLikelihood * 
-                      process.pfMEtSysShiftCorrSequence *
-                      process.patseq * 
-                      process.EventFilters * 
-                      getattr(process, "producePatPFMETCorrections" + postfix) * 
-                      getattr(process, "patMETs" + postfix)*
-                      process.eventWeightPU *
-                      process.unfoldingAnalysisSequence 
-                      )
-    if not options.setupMETmanually:
-        process.unfoldingAnalysis.remove(getattr(process, "producePatPFMETCorrections" + postfix))
-        process.unfoldingAnalysis.remove(getattr(process, "patMETs" + postfix))
+#if options.isTTbarMC:
+process.unfoldingAnalysis = cms.Path(
+		  process.hlTrigReport * 
+		  process.egammaIDLikelihood * 
+		  process.pfMEtSysShiftCorrSequence *
+		  process.patseq * 
+		  process.EventFilters * 
+		  getattr(process, "producePatPFMETCorrections" + postfix) * 
+		  getattr(process, "patMETs" + postfix)*
+		  process.eventWeightPU *
+		  process.unfoldingAnalysisSequence 
+		  )
+if not options.setupMETmanually:
+    process.unfoldingAnalysis.remove(getattr(process, "producePatPFMETCorrections" + postfix))
+    process.unfoldingAnalysis.remove(getattr(process, "patMETs" + postfix))
 
 ##########################################################################################
 #            Selection Config
