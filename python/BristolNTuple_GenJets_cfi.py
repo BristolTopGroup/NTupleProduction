@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 rootTupleGenJets = cms.EDProducer("BristolNTuple_GenJets",
-    InputTag = cms.InputTag('ak5GenJets'),
+    InputTag = cms.InputTag('ak5GenJetsNoNu'),
     Prefix = cms.string('GenJet.'),
     Suffix = cms.string(''),
     minPt = cms.double(15.),
