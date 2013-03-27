@@ -22,8 +22,9 @@ using namespace std;
 UnfoldingAnalyser::UnfoldingAnalyser(const edm::ParameterSet& iConfig) :		
 		pu_weight_input_(iConfig.getParameter < edm::InputTag > ("pu_weight_input")), //
 		b_tag_weight_input(iConfig.getParameter < edm::InputTag > ("b_tag_weight_input")), //
+		gen_part_input_(iConfig.getParameter < edm::InputTag > ("gen_part_input")), //
 		gen_MET_input_(iConfig.getParameter < edm::InputTag > ("gen_MET_input")), //
-		reco_MET_input_(iConfig.getParameter < edm::InputTag > ("reco_MET_Input")), //
+		reco_MET_input_(iConfig.getParameter < edm::InputTag > ("reco_MET_Input")), //	
 		gen_jet_input_(iConfig.getParameter < edm::InputTag > ("gen_jet_input")), //
 		reco_jet_input_(iConfig.getParameter < edm::InputTag > ("reco_jet_input")), //
 		electron_input_(iConfig.getParameter < edm::InputTag > ("electron_input")), //
@@ -65,6 +66,7 @@ void UnfoldingAnalyser::fillDescriptions(edm::ConfigurationDescriptions & descri
 	edm::ParameterSetDescription desc;
 	desc.add < InputTag > ("pu_weight_input");
 	desc.add < InputTag > ("b_tag_weight_input");
+	desc.add < InputTag > ("gen_part_input");
 	desc.add < InputTag > ("gen_MET_input");
 	desc.add < InputTag > ("reco_MET_Input");
 	desc.add < InputTag > ("gen_jet_input");
@@ -276,6 +278,8 @@ float UnfoldingAnalyser::get_gen_variable(const edm::Event& iEvent) const {
 		return get_gen_st(iEvent);
 	else if (variable_under_analysis_ == "MT")
 		return get_gen_mt(iEvent);
+	else if (variable_under_analysis_ == "WPT")
+		return get_gen_wpt(iEvent);
 	else {
 		throw "Unknown variable type '" + variable_under_analysis_ + "'!";
 	}
@@ -307,6 +311,7 @@ float UnfoldingAnalyser::get_gen_st(const edm::Event& iEvent) const {
 	// ST = HT + MET + lepton pt
 	float ht = get_gen_ht(iEvent);
 	float met = get_gen_met(iEvent);
+	
 	//get lepton
 	const reco::GenParticle* lepton = get_gen_lepton(iEvent);
 	return ht + met + lepton->pt();
@@ -323,14 +328,9 @@ float UnfoldingAnalyser::get_gen_mt(const edm::Event& iEvent) const {
 	edm::Handle < reco::GenMETCollection > genMETs;
 	iEvent.getByLabel(gen_MET_input_, genMETs);
 	reco::GenMET met(genMETs->at(0));
-	
-	//get MET
-	edm::Handle < std::vector<pat::MET> > recoMETs;
-	iEvent.getByLabel(reco_MET_input_, recoMETs);
-	pat::MET recoMETObject(recoMETs->at(0));
-        
-	double En = met.energy();
-	double mom = sqrt(pow(met.px(),2)+pow(met.py(),2)+pow(met.pz(),2));
+
+//	double En = met.energy();
+//	double mom = sqrt(pow(met.px(),2)+pow(met.py(),2)+pow(met.pz(),2));
 	
 // 	cout << "GEN lep px,y: " <<  lepton->px() << ", " <<   lepton->py() << ") , met px,y,z: " << met.px() << ", " << met.py() << ", "<< met.pz()<<")" << endl;
 // 	cout << "missing mass is either: " << pow(En,2)-pow(mom,2) << endl;
@@ -351,6 +351,77 @@ float UnfoldingAnalyser::get_gen_mt(const edm::Event& iEvent) const {
 		return -1;
 }
 
+float UnfoldingAnalyser::get_gen_wpt(const edm::Event& iEvent) const {
+
+
+	if (!is_semileptonic_)
+		return -1.;
+	//get electron/muon
+	//const reco::GenParticle* lepton = get_gen_lepton(iEvent);
+	
+	//get Gen MET
+	edm::Handle < reco::GenMETCollection > genMETs;
+	iEvent.getByLabel(gen_MET_input_, genMETs);
+	reco::GenMET met(genMETs->at(0));
+	
+	
+	edm::Handle < reco::GenParticleCollection > genParticles;
+	iEvent.getByLabel(gen_part_input_, genParticles);
+	
+	int num = 0;
+        std::auto_ptr < std::vector<double> > pt(new std::vector<double>());
+	std::auto_ptr < std::vector<int> > pdgId(new std::vector<int>());
+	double W_genpt = 0;
+	
+	
+		if (genParticles.isValid()) {
+			edm::LogInfo("BristolNTuple_GenParticlesInfo") << "Total # GenParticles: " << genParticles->size();
+
+			for (reco::GenParticleCollection::const_iterator it = genParticles->begin(); it != genParticles->end();
+					++it) {
+				// exit from loop when you reach the required number of GenParticles
+				if (pt->size() >= 24)
+					break;
+				
+					
+				num++;
+				
+
+				
+				
+				int idx = -1;
+				for (reco::GenParticleCollection::const_iterator mit = genParticles->begin();
+						mit != genParticles->end(); ++mit) {
+					if (it->mother() == &(*mit)) {
+						idx = std::distance(genParticles->begin(), mit);
+						break;
+					}
+				}
+				
+				
+				//cout  << num <<  " ,part: " <<it->pdgId() << " ,px read: " << it->px()  << " ,mother: " << idx << endl;
+
+				// fill in all the vectors
+				pt->push_back(it->pt());
+ 				pdgId->push_back(it->pdgId());
+				
+				if((fabs(it->pdgId()) == 11 || fabs(it->pdgId()) == 13) && fabs(pdgId->at(idx)) == 24){
+				W_genpt = pt->at(idx);
+				}
+				
+	
+				}
+			} else {
+			edm::LogError("BristolNTuple_GenParticlesError") << "Error! Can't get the product " << gen_part_input_;
+			}
+
+//	cout << "or from gen met and lepton: " << sqrt(pow(lepton->px()+met.px(),2)+pow(lepton->py()+met.py(),2)) << endl;
+//     	return sqrt(pow(lepton->px()+met.px(),2)+pow(lepton->py()+met.py(),2)); 
+
+	return W_genpt;
+
+}
+
 float UnfoldingAnalyser::get_reco_variable(const edm::Event& iEvent) const {
 	if (variable_under_analysis_ == "MET")
 		return get_reco_met(iEvent);
@@ -360,6 +431,8 @@ float UnfoldingAnalyser::get_reco_variable(const edm::Event& iEvent) const {
 		return get_reco_st(iEvent);
 	else if (variable_under_analysis_ == "MT")
 		return get_reco_mt(iEvent);
+	else if (variable_under_analysis_ == "WPT")
+		return get_reco_wpt(iEvent);
 	else {
 		throw "Unknown variable type '" + variable_under_analysis_ + "'!";
 	}
@@ -417,6 +490,18 @@ float UnfoldingAnalyser::get_reco_mt(const edm::Event& iEvent) const {
 		return sqrt(MT_squared);
 	else
 		return -1;
+}
+
+float UnfoldingAnalyser::get_reco_wpt(const edm::Event& iEvent) const {
+	//get electron/muon
+	const reco::Candidate* lepton = get_reco_lepton(iEvent);
+	//get MET
+	edm::Handle < std::vector<pat::MET> > recoMETs;
+	iEvent.getByLabel(reco_MET_input_, recoMETs);
+
+	pat::MET met(recoMETs->at(0));
+	
+	return sqrt(pow(lepton->px()+met.px(),2)+pow(lepton->py()+met.py(),2)); 
 }
 
 const reco::GenParticle* UnfoldingAnalyser::get_gen_lepton(const edm::Event& iEvent) const {

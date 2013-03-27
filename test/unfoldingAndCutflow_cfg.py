@@ -99,10 +99,13 @@ electron_unfolding_analysers = [
     process.unfolding_MET_analyser_electron_channel_patMETsPFlow,
     process.unfolding_ST_analyser_electron_channel_patMETsPFlow,
     process.unfolding_MT_analyser_electron_channel_patMETsPFlow,
+    process.unfolding_WPT_analyser_electron_channel_patMETsPFlow,
     process.unfolding_MET_analyser_electron_channel_patType1CorrectedPFMet,
     process.unfolding_ST_analyser_electron_channel_patType1CorrectedPFMet,
-    process.unfolding_MT_analyser_electron_channel_patType1CorrectedPFMet,
+    process.unfolding_MT_analyser_electron_channel_patType1CorrectedPFMet,    
+    process.unfolding_WPT_analyser_electron_channel_patType1CorrectedPFMet,
     process.unfolding_HT_analyser_electron_channel
+
 ]
 
 for analyser in electron_unfolding_analysers:
@@ -115,9 +118,11 @@ muon_unfolding_analysers = [
     process.unfolding_MET_analyser_muon_channel_patMETsPFlow,
     process.unfolding_ST_analyser_muon_channel_patMETsPFlow,
     process.unfolding_MT_analyser_muon_channel_patMETsPFlow,
+    process.unfolding_WPT_analyser_muon_channel_patMETsPFlow,
     process.unfolding_MET_analyser_muon_channel_patType1CorrectedPFMet,
     process.unfolding_ST_analyser_muon_channel_patType1CorrectedPFMet,
     process.unfolding_MT_analyser_muon_channel_patType1CorrectedPFMet,
+    process.unfolding_WPT_analyser_muon_channel_patType1CorrectedPFMet,
     process.unfolding_HT_analyser_muon_channel
 ]
 
@@ -137,12 +142,16 @@ process.unfoldingAnalysisSequence = cms.Sequence(process.eventFiltersIntaggingMo
                                                  process.unfolding_ST_analyser_muon_channel_patMETsPFlow*
                                                  process.unfolding_MT_analyser_electron_channel_patMETsPFlow*
                                                  process.unfolding_MT_analyser_muon_channel_patMETsPFlow*
+						 process.unfolding_WPT_analyser_electron_channel_patMETsPFlow*
+                                                 process.unfolding_WPT_analyser_muon_channel_patMETsPFlow*
                                                  process.unfolding_MET_analyser_electron_channel_patType1CorrectedPFMet*
                                                  process.unfolding_MET_analyser_muon_channel_patType1CorrectedPFMet*
                                                  process.unfolding_ST_analyser_electron_channel_patType1CorrectedPFMet*
                                                  process.unfolding_ST_analyser_muon_channel_patType1CorrectedPFMet*
                                                  process.unfolding_MT_analyser_electron_channel_patType1CorrectedPFMet*
                                                  process.unfolding_MT_analyser_muon_channel_patType1CorrectedPFMet*
+						 process.unfolding_WPT_analyser_electron_channel_patType1CorrectedPFMet*
+                                                 process.unfolding_WPT_analyser_muon_channel_patType1CorrectedPFMet*
                                                  process.unfolding_HT_analyser_electron_channel*
                                                  process.unfolding_HT_analyser_muon_channel)
     

@@ -28,7 +28,8 @@ public:
 private:
 	//non-global event weights (global = i.e. lumi-weight)
 	edm::InputTag pu_weight_input_, b_tag_weight_input;
-	//distributions
+	//distributions	
+	edm::InputTag gen_part_input_;
 	edm::InputTag gen_MET_input_, reco_MET_input_;
 	edm::InputTag gen_jet_input_, reco_jet_input_;
 	edm::InputTag electron_input_, muon_input_;
@@ -76,7 +77,10 @@ private:
 
 	float get_gen_mt(const edm::Event& iEvent) const;
 	float get_reco_mt(const edm::Event& iEvent) const;
-
+	
+	float get_gen_wpt(const edm::Event& iEvent) const;
+	float get_reco_wpt(const edm::Event& iEvent) const;
+	
 	const reco::GenParticle* get_gen_lepton(const edm::Event& iEvent) const;
 	const reco::Candidate* get_reco_lepton(const edm::Event& iEvent) const;
 

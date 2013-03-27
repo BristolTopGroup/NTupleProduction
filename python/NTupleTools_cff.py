@@ -268,7 +268,7 @@ if not options.useData :
     ## needed for redoing the ak5GenJets
     process.load("BristolAnalysis.NTupleTools.GenJetParticles_cfi")
     process.load("RecoJets.Configuration.RecoGenJets_cff")
-
+    #exclude the following particles with ids below from the gen jets electron had to be added, the rest are default
     if excludeElectronsFromWsFromGenJets :
         process.genParticlesForJetsNoNu.excludeFromResonancePids = [11, 12, 13, 14, 16]
 
