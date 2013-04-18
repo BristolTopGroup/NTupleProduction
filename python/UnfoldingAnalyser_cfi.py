@@ -75,7 +75,7 @@ unfolding_WPT_analyser_electron_channel_patMETsPFlow = unfolding_MET_analyser_el
     bin_edges=cms.vdouble([0, 40, 70, 100, 130, 170, 1000])
 )
 
-unfolding_WPT_analyser_muon_channel_patMETsPFlow = unfolding_MT_analyser_electron_channel_patMETsPFlow.clone(
+unfolding_WPT_analyser_muon_channel_patMETsPFlow = unfolding_WPT_analyser_electron_channel_patMETsPFlow.clone(
     do_electron_channel=cms.untracked.bool(False),
 )
 

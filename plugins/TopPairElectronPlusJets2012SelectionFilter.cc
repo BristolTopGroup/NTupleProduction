@@ -84,12 +84,12 @@ void TopPairElectronPlusJets2012SelectionFilter::fillDescriptions(edm::Configura
 	desc.add < InputTag > ("ECALDeadCellFilterInput");
 	desc.add < InputTag > ("TrackingFailureFilterInput");
 	desc.add < InputTag > ("BadEESupercrystalFilterInput");
-	desc.add<double>("min1JetPt", 45.0);
-	desc.add<double>("min2JetPt", 45.0);
-	desc.add<double>("min3JetPt", 45.0);
-	desc.add<double>("min4JetPt", 20.0);
+	desc.add<double>("min1JetPt", 30.0);
+	desc.add<double>("min2JetPt", 30.0);
+	desc.add<double>("min3JetPt", 30.0);
+	desc.add<double>("min4JetPt", 30.0);
 	desc.add<double>("tightElectronIsolation", 0.1);
-	desc.add<double>("looseElectronIsolation", 0.15);
+	desc.add<double>("looseElectronIsolation", 0.2);
 	desc.add<double>("looseMuonIsolation", 0.2);
 
 	desc.add<bool>("useDeltaBetaCorrections", false);

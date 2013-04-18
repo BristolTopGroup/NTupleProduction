@@ -86,16 +86,16 @@ void TopPairMuonPlusJets2012SelectionFilter::fillDescriptions(edm::Configuration
 	desc.add < InputTag > ("ECALDeadCellFilterInput");
 	desc.add < InputTag > ("TrackingFailureFilterInput");
 	desc.add < InputTag > ("BadEESupercrystalFilterInput");
-	desc.add<double>("min1JetPt", 45.0);
-	desc.add<double>("min2JetPt", 45.0);
-	desc.add<double>("min3JetPt", 45.0);
-	desc.add<double>("min4JetPt", 20.0);
+	desc.add<double>("min1JetPt", 30.0);
+	desc.add<double>("min2JetPt", 30.0);
+	desc.add<double>("min3JetPt", 30.0);
+	desc.add<double>("min4JetPt", 30.0);
 	desc.add<double>("tightMuonIsolation", 0.12);
 	desc.add<double>("looseElectronIsolation", 0.15);
 	desc.add<double>("looseMuonIsolation", 0.2);
 
-	desc.add<bool>("useDeltaBetaCorrections", false);
-	desc.add<bool>("useRhoActiveAreaCorrections", true);
+	desc.add<bool>("useDeltaBetaCorrections", true);
+	desc.add<bool>("useRhoActiveAreaCorrections", false);
 	desc.add<bool>("useMETFilters", false);
 	desc.add<bool>("useEEBadScFilter", false);
 
@@ -314,7 +314,7 @@ void TopPairMuonPlusJets2012SelectionFilter::cleanedBJets() {
 
 bool TopPairMuonPlusJets2012SelectionFilter::isGoodJet(const pat::Jet& jet) const {
 	//both cuts are done at PAT config level (selectedPATJets) this is just for safety
-	bool passesPtAndEta(jet.pt() > 30. && fabs(jet.eta() < 2.4));
+	bool passesPtAndEta(jet.pt() > 20. && fabs(jet.eta() < 2.5));
 	return passesPtAndEta;
 }
 
