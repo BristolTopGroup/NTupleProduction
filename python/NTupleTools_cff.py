@@ -288,7 +288,7 @@ process.patseq = cms.Sequence(
     )
 
 if options.useData:
-    process.patseq.remove(process.genParticlesForJetsNoNuNoLep)
+    process.patseq.remove(process.genParticlesForJetsNoNu)
     process.patseq.remove(process.genJetParticles)    
     process.patseq.remove(process.flavorHistorySeq)
     process.patseq.remove(process.genParticlesForJets)
