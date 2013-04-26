@@ -15,10 +15,17 @@ def setup_PF2PAT(process, cms, options, postfix="PFlow", removeTausFromJetCollec
     if options.useData :#data set up
         inputJetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual'])
 
+    # manually adding type0 corrections in the sequence: has to be done before setting up PF2PAT
+    process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
+    process.producePatPFMETCorrections.replace(process.pfCandMETcorr,
+                                               process.type0PFMEtCorrection *
+                                               process.patPFMETtype0Corr *
+                                               process.pfCandMETcorr
+                                               )
+    
     # Default PF2PAT with AK5 jets. Make sure to turn ON the L1fastjet stuff.
     # Separate configs for 44X and 52X (as per different JEC prescriptions)
     # see https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections
-    process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
     if options.CMSSW == '44X':
         usePF2PAT(process, runPF2PAT=True, jetAlgo='AK5', runOnMC=not options.useData, postfix=postfix, typeIMetCorrections=False)
         process.pfPileUpPFlow.Enable = True
