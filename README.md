@@ -2,7 +2,7 @@ NTupleProduction
 ================
 
 ## Brief Description
-Software for nTuples production (v10) from AOD files for ttbar+MET differential cross section analysis
+Software for nTuples production (v10) from AOD files for ttbar+X differential cross section analysis
 
 ## General Recipe
 
