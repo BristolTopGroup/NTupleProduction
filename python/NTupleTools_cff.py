@@ -13,7 +13,7 @@ GLOBALTAG_DATA = 'FT_53_V21_AN3::All' # Used for 2012 A and B: 22Jan2013 re-reco
 #GLOBALTAG_DATA = 'FT_P_V42C_AN4::All' # Used for 2012 C run 201191: ecal recovery of run 201191 (11Dec2012 re-reco)
 
 #Monte Carlo Global Tag
-GLOBALTAG_MC = 'START53_V20::All'
+GLOBALTAG_MC = 'START53_V21::All'
 FILETAG = '53X'
 
 TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/SingleElectron_Run2012B_13Jul2012_ReReco_AOD.root'
@@ -146,10 +146,10 @@ options.register ('isMCatNLO',
 		 "Identify if samples contains ttbar MC@NLO events (different genParticle structure)")
 
 options.register ('skipEvents',
-                              0,
-                           VarParsing.multiplicity.singleton,
-                           VarParsing.varType.int,
-                               "Number of events to skip (0 for none)")
+                  0,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.int,
+                  "Number of events to skip (0 for none)")
 
 			       
 			       
