@@ -48,6 +48,9 @@ cvs co -r V00-00-08 RecoMET/METAnalyzers
 #Egamma tools (https://twiki.cern.ch/twiki/bin/view/CMS/TWikiTopRefEventSel#Electrons)
 cvs co -r V00-00-30-01 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
 
+# ElectroWeakAnalysis needed for full LHAPDF libraries to work
+addpkg ElectroWeakAnalysis/Utilities
+
 #Bristol Tools
 git clone git@github.com:BristolTopGroup/NTupleProduction.git BristolAnalysis/NTupleTools
 #TopSkimming
@@ -55,6 +58,7 @@ git clone git@github.com:BristolTopGroup/TopSkimming.git TopQuarkAnalysis/TopSki
 
 #setup full version of LHAPDF (faster AND prevents crashes!)
 scram setup lhapdffull
+touch $CMSSW_BASE/src/ElectroWeakAnalysis/Utilities/BuildFile.xml
 scram b -j8
 
 #copy pile up histograms into working directory
