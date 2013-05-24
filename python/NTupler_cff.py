@@ -15,6 +15,7 @@ def setup_ntupler(process, cms, options):
     #PF2PAT jets
     process.rootTuplePF2PATJets.InputTag = cms.InputTag('goodPatJetsPFlow')
     process.rootTuplePF2PATJets.Prefix = cms.string('goodPatJetsPFlow.')
+    process.rootTuplePF2PATJets.isRealData = cms.bool(options.useData)
     #selection on GenParticles
     process.rootTupleGenParticles.minPt = cms.double(-1)
     process.rootTupleGenParticles.maxAbsoluteEta = cms.double(100)
