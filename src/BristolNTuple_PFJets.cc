@@ -19,7 +19,8 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		jecUncPath(iConfig.getParameter < std::string > ("JECUncertainty")), //
 		readJECuncertainty(iConfig.getParameter<bool>("ReadJECuncertainty")), //
 		doVertexAssociation(iConfig.getParameter<bool>("DoVertexAssociation")), //
-		vtxInputTag(iConfig.getParameter < edm::InputTag > ("VertexInputTag")) {
+		vtxInputTag(iConfig.getParameter < edm::InputTag > ("VertexInputTag")), // 
+		isRealData(iConfig.getParameter<bool>("isRealData")) {
 	//kinematic variables
 	produces < std::vector<double> > (prefix + "Px" + suffix);
 	produces < std::vector<double> > (prefix + "Py" + suffix);
@@ -35,13 +36,15 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "Mass" + suffix);
 	produces < std::vector<int> > (prefix + "PartonFlavour" + suffix);
 	//generated jet properties
-	produces < std::vector<double> > (prefix + "GenJet.Energy" + suffix);
-	produces < std::vector<double> > (prefix + "GenJet.Pt" + suffix);
-	produces < std::vector<double> > (prefix + "GenJet.Px" + suffix);
-	produces < std::vector<double> > (prefix + "GenJet.Py" + suffix);
-	produces < std::vector<double> > (prefix + "GenJet.Pz" + suffix);
-	produces < std::vector<double> > (prefix + "GenJet.Eta" + suffix);
-	produces < std::vector<double> > (prefix + "GenJet.Phi" + suffix);
+        if (!isRealData) {
+            produces < std::vector<double> > (prefix + "GenJet.Energy" + suffix);
+	    produces < std::vector<double> > (prefix + "GenJet.Pt" + suffix);
+	    produces < std::vector<double> > (prefix + "GenJet.Px" + suffix);
+	    produces < std::vector<double> > (prefix + "GenJet.Py" + suffix);
+	    produces < std::vector<double> > (prefix + "GenJet.Pz" + suffix);
+	    produces < std::vector<double> > (prefix + "GenJet.Eta" + suffix);
+	    produces < std::vector<double> > (prefix + "GenJet.Phi" + suffix);
+        }
 	//jet energy correction and uncertainties
 	produces < std::vector<double> > (prefix + "JECUnc" + suffix);
 	produces < std::vector<double> > (prefix + "L2L3ResJEC" + suffix);
@@ -469,13 +472,15 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(mass, prefix + "Mass" + suffix);
 	iEvent.put(partonFlavour, prefix + "PartonFlavour" + suffix);
 	//generated jet properties
-	iEvent.put(genJet_energy, prefix + "GenJet.Energy" + suffix);
-	iEvent.put(genJet_pt, prefix + "GenJet.Pt" + suffix);
-	iEvent.put(genJet_px, prefix + "GenJet.Px" + suffix);
-	iEvent.put(genJet_py, prefix + "GenJet.Py" + suffix);
-	iEvent.put(genJet_pz, prefix + "GenJet.Pz" + suffix);
-	iEvent.put(genJet_eta, prefix + "GenJet.Eta" + suffix);
-	iEvent.put(genJet_phi, prefix + "GenJet.Phi" + suffix);
+        if (!iEvent.isRealData()) {
+		iEvent.put(genJet_energy, prefix + "GenJet.Energy" + suffix);
+		iEvent.put(genJet_pt, prefix + "GenJet.Pt" + suffix);
+		iEvent.put(genJet_px, prefix + "GenJet.Px" + suffix);
+		iEvent.put(genJet_py, prefix + "GenJet.Py" + suffix);
+		iEvent.put(genJet_pz, prefix + "GenJet.Pz" + suffix);
+		iEvent.put(genJet_eta, prefix + "GenJet.Eta" + suffix);
+		iEvent.put(genJet_phi, prefix + "GenJet.Phi" + suffix);
+        }
 	//jet energy correction and uncertainties
 	iEvent.put(jecUnc_vec, prefix + "JECUnc" + suffix);
 	iEvent.put(l2l3resJEC_vec, prefix + "L2L3ResJEC" + suffix);
