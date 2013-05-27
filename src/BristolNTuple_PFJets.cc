@@ -227,15 +227,15 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				jecUnc->setJetPt(it->pt()); // the uncertainty is a function of the corrected pt
 			}
 
-			// Store generated jet resolutions for monte carlo
-			double genjet_energy(0);
-			double genjet_pt(0);
-			double genjet_px(0);
-			double genjet_py(0);
-			double genjet_pz(0);
-			double genjet_eta(0);
-			double genjet_phi(0);
 			if (!iEvent.isRealData()) {
+				// Store generated jet resolutions for monte carlo
+				double genjet_energy(0);
+				double genjet_pt(0);
+				double genjet_px(0);
+				double genjet_py(0);
+				double genjet_pz(0);
+				double genjet_eta(0);
+				double genjet_phi(0);
 				// take only jets with corrected pt>10 according to: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiTopRefSyst#Jet_energy_resolution
 				if (it->pt() > 10) {
 					if (it->genJet()) { //matching (stop segmentation fault due to jet having no associated generator jet)
@@ -248,6 +248,14 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 						genjet_phi = it->genJet()->phi();						
 					}
 				}
+				//generated jet properties
+				genJet_energy->push_back(genjet_energy);
+				genJet_pt->push_back(genjet_pt);
+				genJet_px->push_back(genjet_px);
+				genJet_py->push_back(genjet_py);
+				genJet_pz->push_back(genjet_pz);
+				genJet_eta->push_back(genjet_eta);
+				genJet_phi->push_back(genjet_phi);
 			}
 
 			// Vertex association
@@ -364,15 +372,6 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			charge->push_back(it->jetCharge());
 			mass->push_back(it->mass());
 			partonFlavour->push_back(it->partonFlavour());
-
-			//generated jet properties
-			genJet_energy->push_back(genjet_energy);
-			genJet_pt->push_back(genjet_pt);
-			genJet_px->push_back(genjet_px);
-			genJet_py->push_back(genjet_py);
-			genJet_pz->push_back(genjet_pz);
-			genJet_eta->push_back(genjet_eta);
-			genJet_phi->push_back(genjet_phi);
 
 			//jet energy correction and uncertainties
 			if (readJECuncertainty)
