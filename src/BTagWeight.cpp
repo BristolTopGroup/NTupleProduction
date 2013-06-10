@@ -1,4 +1,5 @@
 #include "BristolAnalysis/NTupleTools/interface/BTagWeight.h"
+#include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
 
 #include <functional>
 #include <numeric>
@@ -272,27 +273,41 @@ double BTagWeight::getAverageBScaleFactor(const JetCollection& jets, double unce
 }
 
 double BTagWeight::getBScaleFactor(const Jet& jet, double uncertaintyFactor) const {
-	const boost::array<double, 14> SFb_error = { { 0.0295675, 0.0295095, 0.0210867, 0.0219349, 0.0227033, 0.0204062,
-			0.0185857, 0.0256242, 0.0383341, 0.0409675, 0.0420284, 0.0541299, 0.0578761, 0.0655432 } };
+	const boost::array<double, 16> SFb_error = { {0.0554504,
+			 0.0209663,
+			 0.0207019,
+			 0.0230073,
+			 0.0208719,
+			 0.0200453,
+			 0.0264232,
+			 0.0240102,
+			 0.0229375,
+			 0.0184615,
+			 0.0216242,
+			 0.0248119,
+			 0.0465748,
+			 0.0474666,
+			 0.0718173,
+			 0.0717567 } };
 
-	const boost::array<double, 14> ptbins = { { 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500 } };
+	const boost::array<double, 16> ptbins = { {20, 30, 40, 50, 60, 70, 80,100, 120, 160, 210, 260, 320, 400, 500, 600 } };
 
 	double SFb(0);
 	double sf_error(0);
 	//these numbers are for CSVM only
-	double pt = jet.pt();
-	if (pt < 30) {
-		SFb = 0.6981 * (1. + 0.414063 * 30) / (1. + 0.300155 * 30);
+	double pt = getSmearedJetPtScale(jet, 0)*jet.pt();
+	if (pt < 20) {
+		SFb = 0.726981*((1.+(0.253238*20))/(1.+(0.188389*20)));
 		sf_error = 0.12;
-	} else if (pt > 670) {
-		SFb = 0.6981 * (1. + 0.414063 * 670) / (1. + 0.300155 * 670);
+	} else if (pt > 800) {
+		SFb = 0.726981*((1.+(0.253238*800))/(1.+(0.188389*800)));
 		//use twice the uncertainty
 		sf_error = 2 * SFb_error[SFb_error.size() - 1];
 	} else {
-		SFb = 0.6981 * (1. + 0.414063 * pt) / (1. + 0.300155 * pt);
+		SFb = 0.726981*((1.+(0.253238*pt))/(1.+(0.188389*pt)));
 		unsigned int ptbin(0);
 		for (unsigned int bin = 0; bin < ptbins.size() + 1; ++bin) {
-			double upperCut = bin + 1 < ptbins.size() ? ptbins.at(bin + 1) : 670.;
+			double upperCut = bin + 1 < ptbins.size() ? ptbins.at(bin + 1) : 800.;
 			double lowerCut = ptbins.at(bin);
 
 			if (pt > lowerCut && pt <= upperCut) {
@@ -329,22 +344,23 @@ double BTagWeight::getAverageUDSGScaleFactor(const JetCollection& jets) const {
 }
 
 double BTagWeight::getUDSGScaleFactor(const Jet& jet) const {
-	double pt = jet.pt();
+	double pt = getSmearedJetPtScale(jet, 0)*jet.pt();
+	double eta = jet.eta();
 	double SF_udsg_mean(0), SF_udsg_min(0), SF_udsg_max(0);
 
 	if (pt < 20) {
 		return 0;
-	} else if (pt > 670) {
-		SF_udsg_mean = getMeanUDSGScaleFactor(670.);
-		SF_udsg_min = getMinUDSGScaleFactor(670);
-		SF_udsg_max = getMaxUDSGScaleFactor(670);
+	} else if (pt > 800) {
+		SF_udsg_mean = getMeanUDSGScaleFactor(800., eta);
+		SF_udsg_min = getMinUDSGScaleFactor(800, eta);
+		SF_udsg_max = getMaxUDSGScaleFactor(800, eta);
 		//use twice the uncertainty
 		SF_udsg_min -= (SF_udsg_mean - SF_udsg_min);
 		SF_udsg_max += (SF_udsg_max - SF_udsg_mean);
 	} else {
-		SF_udsg_mean = getMeanUDSGScaleFactor(pt);
-		SF_udsg_min = getMinUDSGScaleFactor(pt);
-		SF_udsg_max = getMaxUDSGScaleFactor(pt);
+		SF_udsg_mean = getMeanUDSGScaleFactor(pt, eta);
+		SF_udsg_min = getMinUDSGScaleFactor(pt, eta);
+		SF_udsg_max = getMaxUDSGScaleFactor(pt, eta);
 	}
 	if (LightJetSystematic_ == -1)
 		return SF_udsg_min;
@@ -354,16 +370,31 @@ double BTagWeight::getUDSGScaleFactor(const Jet& jet) const {
 	return SF_udsg_mean;
 }
 
-double BTagWeight::getMeanUDSGScaleFactor(double jetPT) const {
-	return 1.04318 + 0.000848162 * jetPT - 2.5795e-06 * pow(jetPT, 2) + 1.64156e-09 * pow(jetPT, 3);
+double BTagWeight::getMeanUDSGScaleFactor(double jetPT, double jetEta) const {
+	if(jetEta < 0.8)
+		return ((1.06238+(0.00198635*jetPT))+(-4.89082e-06*(jetPT*jetPT)))+(3.29312e-09*(jetPT*(jetPT*jetPT)));
+	else if(jetEta >= 0.8 && jetEta < 1.6)
+		return ((1.08048+(0.00110831*jetPT))+(-2.96189e-06*(jetPT*jetPT)))+(2.16266e-09*(jetPT*(jetPT*jetPT)));
+	else
+		return ((1.09145+(0.000687171*jetPT))+(-2.45054e-06*(jetPT*jetPT)))+(1.7844e-09*(jetPT*(jetPT*jetPT)));
 }
 
-double BTagWeight::getMinUDSGScaleFactor(double jetPT) const {
-	return 0.962627 + 0.000448344 * jetPT - 1.25579e-06 * pow(jetPT, 2) + 4.82283e-10 * pow(jetPT, 3);
+double BTagWeight::getMinUDSGScaleFactor(double jetPT, double jetEta) const {
+	if(jetEta < 0.8)
+		return ((0.972746+(0.00104424*jetPT))+(-2.36081e-06*(jetPT*jetPT)))+(1.53438e-09*(jetPT*(jetPT*jetPT)));
+	else if(jetEta >= 0.8 && jetEta < 1.6)
+		return ((0.9836+(0.000649761*jetPT))+(-1.59773e-06*(jetPT*jetPT)))+(1.14324e-09*(jetPT*(jetPT*jetPT)));
+	else
+		return ((1.00616+(0.000358884*jetPT))+(-1.23768e-06*(jetPT*jetPT)))+(6.86678e-10*(jetPT*(jetPT*jetPT)));
 }
 
-double BTagWeight::getMaxUDSGScaleFactor(double jetPT) const {
-	return 1.12368 + 0.00124806 * jetPT - 3.9032e-06 * pow(jetPT, 2) + 2.80083e-09 * pow(jetPT, 3);
+double BTagWeight::getMaxUDSGScaleFactor(double jetPT, double jetEta) const {
+	if(jetEta < 0.8)
+		return ((1.15201+(0.00292575*jetPT))+(-7.41497e-06*(jetPT*jetPT)))+(5.0512e-09*(jetPT*(jetPT*jetPT)));
+	else if(jetEta >= 0.8 && jetEta < 1.6)
+		return ((1.17735+(0.00156533*jetPT))+(-4.32257e-06*(jetPT*jetPT)))+(3.18197e-09*(jetPT*(jetPT*jetPT)));
+	else
+		return ((1.17671+(0.0010147*jetPT))+(-3.66269e-06*(jetPT*jetPT)))+(2.88425e-09*(jetPT*(jetPT*jetPT)));
 }
 
 double BTagWeight::getAverageBEfficiency() const {
@@ -387,11 +418,11 @@ double BTagWeight::getAverageUDSGEfficiency(const JetCollection& jets) const {
 		const Jet jet(jets.at(index));
 		double efficiency(0);
 		//these numbers are for CSVM only
-		double pt = jet.pt();
+		double pt = getSmearedJetPtScale(jet, 0)*jet.pt();
 		if (pt < 20) {
 			continue;
-		} else if (pt > 670) {
-			efficiency = getMeanUDSGEfficiency(670.);
+		} else if (pt > 800) {
+			efficiency = getMeanUDSGEfficiency(800.);
 		} else {
 			efficiency = getMeanUDSGEfficiency(pt);
 		}

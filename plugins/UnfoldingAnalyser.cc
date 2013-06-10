@@ -195,6 +195,8 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	double btagWeight(*btagWeightHandle);
 	double weight(puWeight * btagWeight);
 
+	
+
 	bool passes_selection(passesFilter(iEvent, selection_flag_input_));
 	bool is_fully_hadronic(passesFilter(iEvent, is_fully_hadronic_ttbar_flag_));
 	bool is_dileptonic(passesFilter(iEvent, is_dileptonic_ttbar_flag_));
@@ -244,9 +246,13 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 			truth_asym_bins_->Fill(gen_variable, puWeight);
 		}
 
+		double muonCorrection = get_muon_correction(iEvent);
+
 		if (passes_selection) {
 			float reco_variable(get_reco_variable(iEvent));
 
+			weight *= muonCorrection;
+			
 			measured_->Fill(reco_variable, weight);
 			measured_asym_bins_->Fill(reco_variable, weight);
 			response_->Fill(reco_variable, gen_variable, weight);
@@ -443,7 +449,9 @@ float UnfoldingAnalyser::get_reco_met(const edm::Event& iEvent) const {
 	edm::Handle < std::vector<pat::MET> > recoMETs;
 	iEvent.getByLabel(reco_MET_input_, recoMETs);
 
+
 	pat::MET recoMETObject(recoMETs->at(0));
+	
 	return recoMETObject.pt();
 }
 
@@ -451,11 +459,11 @@ float UnfoldingAnalyser::get_reco_ht(const edm::Event& iEvent) const {
 	edm::Handle < pat::JetCollection > jets;
 	iEvent.getByLabel(reco_jet_input_, jets);
 	float ht(0.);
-
+	
 	//Take ALL the jets!
 	for (unsigned int index = 0; index < jets->size(); ++index) {
 		const pat::Jet jet = jets->at(index);
-		ht += jets->at(index).pt();
+		ht += getSmearedJetPtScale(jets->at(index), 0)*jets->at(index).pt();
 	}
 	return ht;
 }
@@ -522,6 +530,26 @@ const reco::Candidate* UnfoldingAnalyser::get_reco_lepton(const edm::Event& iEve
 		return signalMuon->at(0).clone();
 	}
 	return 0;
+}
+
+float UnfoldingAnalyser::get_muon_correction(const edm::Event& iEvent) const {
+	//ID, iso and trigger correction respectively from:  https://indico.cern.ch/getFile.py/access?contribId=3&resId=0&materialId=slides&confId=214870
+	
+	double correction(1.);
+	
+	edm::Handle < pat::MuonCollection > signalMuon;
+	iEvent.getByLabel(muon_input_, signalMuon);
+	
+	double muEta = signalMuon->at(0).eta();
+
+	if(abs(muEta)<0.9)
+		correction = 0.9941*0.9923*0.9560;
+	else if(abs(muEta)>=0.9 && abs(muEta)<1.2)
+		correction = 0.9917*0.9979*0.9528;
+	else if(abs(muEta)>=1.2)
+		correction = 0.9982*1.0019*0.9809;
+	
+	return correction; 
 }
 
 DEFINE_FWK_MODULE (UnfoldingAnalyser);

@@ -6,6 +6,7 @@
 #include "DataFormats/GsfTrackReco/interface/GsfTrackFwd.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
@@ -50,5 +51,7 @@ unsigned int findTrigger(const std::string& triggerWildCard, const HLTConfigProv
 double getRelativeIsolation(const pat::Electron& electron, double cone, double rho, bool isRealData,
 		bool useDeltaBetaCorrections, bool useRhoActiveAreaCorrections);
 double getRelativeIsolation(const pat::Muon& muon, double cone, bool useDeltaBetaCorrections);
+
+double getSmearedJetPtScale(const pat::Jet& jet, int jet_smearing_systematic);
 
 #endif 
