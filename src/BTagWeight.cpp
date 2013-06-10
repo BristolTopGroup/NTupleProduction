@@ -8,6 +8,9 @@
 
 using namespace pat;
 
+//Btag weights using this method: https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagWeight
+//And SFs taken from here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagPOG#2012_Data_and_MC_Moriond13_presc
+
 std::vector<double> BjetWeights(const JetCollection& jets, unsigned int numberOfBtags) {
 	boost::scoped_ptr < BTagWeight > btagWeight(new BTagWeight());
 	//get b-jets
