@@ -11,7 +11,7 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJets2012SelectionFilte
     trkInput=cms.InputTag('generalTracks'),#track input for scraping filter
     HcalNoiseInput=cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult'),
     HCALLaserFilterInput=cms.InputTag('HcalLaserEventFilter'),
-    ECALDeadCellFilterInput=cms.InputTag('EcalDeadCellBoundaryEnergyFilter'),
+    ECALDeadCellFilterInput=cms.InputTag('EcalDeadCellTriggerPrimitiveFilter'),
     TrackingFailureFilterInput=cms.InputTag('trackingFailureFilter'),
     BadEESupercrystalFilterInput=cms.InputTag('BadEESupercrystalFilter'),
 
@@ -25,7 +25,7 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJets2012SelectionFilte
     looseElectronIsolation=cms.double(0.15),
     looseMuonIsolation=cms.double(0.2),
     useDeltaBetaCorrections = cms.bool(True),
-    useRhoActiveAreaCorrections = cms.bool(False),
+    useRhoActiveAreaCorrections = cms.bool(True),
     useMETFilters = cms.bool(True),
     useEEBadScFilter = cms.bool(False),
     

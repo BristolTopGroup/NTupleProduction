@@ -84,6 +84,7 @@ private:
 	const reco::GenParticle* get_gen_lepton(const edm::Event& iEvent) const;
 	const reco::Candidate* get_reco_lepton(const edm::Event& iEvent) const;
 
+	float get_muon_correction(const edm::Event& iEvent) const;
 };
 #endif
 

@@ -206,6 +206,7 @@ else:
     process.source.fileNames = [
             TEST_DATA_FILE
             ]
+
     
 # add the flavor history
 process.load("PhysicsTools.HepMCCandAlgos.flavorHistoryPaths_cfi")

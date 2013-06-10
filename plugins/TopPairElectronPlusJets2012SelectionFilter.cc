@@ -278,8 +278,25 @@ void TopPairElectronPlusJets2012SelectionFilter::cleanedBJets() {
 
 bool TopPairElectronPlusJets2012SelectionFilter::isGoodJet(const pat::Jet& jet) const {
 	//both cuts are done at PAT config level (selectedPATJets) this is just for safety
-	bool passesPtAndEta(jet.pt() > 20. && fabs(jet.eta() < 2.5));
-	return passesPtAndEta;
+	double smearFactor = getSmearedJetPtScale(jet, 0);
+	bool passesPtAndEta(smearFactor*jet.pt() > 20. && fabs(jet.eta() < 2.5));
+	bool passesJetID(false);
+	
+	bool passNOD = jet.numberOfDaughters() > 1;
+ 	//bool passNHF = (jet.neutralHadronEnergy() + jet.HFHadronEnergy()) / jet.energy() < 0.99;
+	bool passNHF = jet.neutralHadronEnergyFraction() < 0.99;
+ 	bool passNEF = jet.neutralEmEnergyFraction() < 0.99;
+ 	bool passCHF = true;
+ 	bool passNCH = true;
+ 	bool passCEF = true;
+ 	if (fabs(jet.eta()) < 2.4) {
+ 	        passCEF = jet.chargedEmEnergyFraction() < 0.99;
+ 	        passCHF = jet.chargedHadronEnergyFraction() > 0;
+ 	        passNCH = jet.chargedMultiplicity() > 0;
+ 	}
+ 	passesJetID = passNOD && passCEF && passNHF && passNEF && passCHF && passNCH;
+
+	return passesPtAndEta && passesJetID;
 }
 
 bool TopPairElectronPlusJets2012SelectionFilter::passesSelectionStep(edm::Event& iEvent,
@@ -442,7 +459,7 @@ bool TopPairElectronPlusJets2012SelectionFilter::passesConversionVeto() const {
 
 bool TopPairElectronPlusJets2012SelectionFilter::hasAtLeastOneGoodJet() const {
 	if (cleanedJets_.size() > 0)
-		return cleanedJets_.at(0).pt() > min1JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(0), 0)*cleanedJets_.at(0).pt() > min1JetPt_;
 
 	return false;
 
@@ -450,19 +467,19 @@ bool TopPairElectronPlusJets2012SelectionFilter::hasAtLeastOneGoodJet() const {
 
 bool TopPairElectronPlusJets2012SelectionFilter::hasAtLeastTwoGoodJets() const {
 	if (cleanedJets_.size() > 1)
-		return cleanedJets_.at(1).pt() > min2JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(1), 0)*cleanedJets_.at(1).pt() > min2JetPt_;
 	return false;
 }
 
 bool TopPairElectronPlusJets2012SelectionFilter::hasAtLeastThreeGoodJets() const {
 	if (cleanedJets_.size() > 2)
-		return cleanedJets_.at(2).pt() > min3JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(2), 0)*cleanedJets_.at(2).pt() > min3JetPt_;
 	return false;
 }
 
 bool TopPairElectronPlusJets2012SelectionFilter::hasAtLeastFourGoodJets() const {
 	if (cleanedJets_.size() > 3)
-		return cleanedJets_.at(3).pt() > min4JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(3), 0)*cleanedJets_.at(3).pt() > min4JetPt_;
 	return false;
 }
 
