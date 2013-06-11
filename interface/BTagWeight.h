@@ -42,9 +42,9 @@ public:
 	double getUDSGScaleFactor(const pat::Jet&) const;
 	double getAverageUDSGEfficiency(const pat::JetCollection&) const;
 
-	double getMeanUDSGScaleFactor(double jetPT) const;
-	double getMinUDSGScaleFactor(double jetPT) const;
-	double getMaxUDSGScaleFactor(double jetPT) const;
+	double getMeanUDSGScaleFactor(double jetPT, double jetEta) const;
+	double getMinUDSGScaleFactor(double jetPT, double jetEta) const;
+	double getMaxUDSGScaleFactor(double jetPT, double jetEta) const;
 
 	double getMeanUDSGEfficiency(double jetPT) const;
 private:
