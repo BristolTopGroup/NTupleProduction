@@ -98,7 +98,7 @@ private:
 
 	//config
 	edm::InputTag jetInput_, electronInput_, muonInput_, hltInputTag_, VertexInput_, trkInput_, hcalNoiseInput_;
-	edm::InputTag hcalLaserFilterInput_, ecalDeadCellFilterInput_, trackingFailureFilter_, eeBadScFilter_;
+	edm::InputTag hcalLaserFilterInput_, ecalDeadCellFilterInput_, ecalLaserCorrFilterInput_, manystripclus53X_, toomanystripclus53X_, logErrorTooManyClusters_, trackingFailureFilter_, eeBadScFilter_;
 
 	double min1JetPt_, min2JetPt_, min3JetPt_, min4JetPt_;
 

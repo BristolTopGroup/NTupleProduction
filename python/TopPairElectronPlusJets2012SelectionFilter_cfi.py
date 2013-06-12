@@ -12,9 +12,13 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJets2012SelectionFi
     HcalNoiseInput=cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult'),
     HCALLaserFilterInput=cms.InputTag('HcalLaserEventFilter'),
     ECALDeadCellFilterInput=cms.InputTag('EcalDeadCellTriggerPrimitiveFilter'),
- #   ECALDeadCellFilterInput=cms.InputTag('EcalDeadCellBoundaryEnergyFilter'),
     TrackingFailureFilterInput=cms.InputTag('trackingFailureFilter'),
     BadEESupercrystalFilterInput=cms.InputTag('BadEESupercrystalFilter'),
+    ECALLaserCorrFilterInput=cms.InputTag('ecalLaserCorrFilter'),
+    #trackingPOGfilters
+    ManyStripClus53XInput=cms.InputTag('manystripclus53X'),
+    TooManyStripClus53XInput=cms.InputTag('toomanystripclus53X'),
+    #LogErrorTooManyClusters=cms.InputTag('logErrorTooManyClusters'),
 
 #jet cuts
     min1JetPt=cms.double(30.),
