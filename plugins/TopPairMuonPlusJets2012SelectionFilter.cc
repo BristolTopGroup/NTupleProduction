@@ -28,6 +28,10 @@ TopPairMuonPlusJets2012SelectionFilter::TopPairMuonPlusJets2012SelectionFilter(c
 		hcalNoiseInput_(iConfig.getParameter < edm::InputTag > ("HcalNoiseInput")), //
 		hcalLaserFilterInput_(iConfig.getParameter < edm::InputTag > ("HCALLaserFilterInput")), //
 		ecalDeadCellFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellFilterInput")), //
+		ecalLaserCorrFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALLaserCorrFilterInput")), //
+		manystripclus53X_(iConfig.getParameter < edm::InputTag > ("ManyStripClus53XInput")), //
+		toomanystripclus53X_(iConfig.getParameter < edm::InputTag > ("TooManyStripClus53XInput")), //
+//		logErrorTooManyClusters_(iConfig.getParameter < edm::InputTag > ("LogErrorTooManyClusters")), //
 		trackingFailureFilter_(iConfig.getParameter < edm::InputTag > ("TrackingFailureFilterInput")), //
 		eeBadScFilter_(iConfig.getParameter < edm::InputTag > ("BadEESupercrystalFilterInput")), //
 		min1JetPt_(iConfig.getParameter<double>("min1JetPt")), //
@@ -84,6 +88,10 @@ void TopPairMuonPlusJets2012SelectionFilter::fillDescriptions(edm::Configuration
 	desc.add < InputTag > ("HcalNoiseInput");
 	desc.add < InputTag > ("HCALLaserFilterInput");
 	desc.add < InputTag > ("ECALDeadCellFilterInput");
+	desc.add < InputTag > ("ECALLaserCorrFilterInput");
+	desc.add < InputTag > ("ManyStripClus53XInput");
+	desc.add < InputTag > ("TooManyStripClus53XInput");
+//	desc.add < InputTag > ("LogErrorTooManyClusters");
 	desc.add < InputTag > ("TrackingFailureFilterInput");
 	desc.add < InputTag > ("BadEESupercrystalFilterInput");
 	desc.add<double>("min1JetPt", 30.0);
@@ -282,7 +290,7 @@ bool TopPairMuonPlusJets2012SelectionFilter::isGoodMuon(const pat::Muon& muon) c
 	//2D impact w.r.t primary vertex
 	if (!hasGoodPV_ or muon.globalTrack().isNull())
 		return false;
-	bool passesD0 = muon.dB(pat::Muon::PV2D) < 0.2 && fabs(muon.vertex().z() - primaryVertex_.z()) < 0.5; //cm
+	bool passesD0 = fabs(muon.dB(pat::Muon::PV2D)) < 0.2 && fabs(muon.vertex().z() - primaryVertex_.z()) < 0.5; //cm
 	bool passesID = muon.isPFMuon() && muon.isGlobalMuon();
 	bool trackQuality = muon.globalTrack()->normalizedChi2() < 10
 			&& muon.track()->hitPattern().trackerLayersWithMeasurement() > 5
@@ -396,6 +404,10 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesEventCleaning(edm::Event& iEv
 		passesMETFilters = passesMETFilters && passesFilter(iEvent, hcalLaserFilterInput_);
 		passesMETFilters = passesMETFilters && passesFilter(iEvent, ecalDeadCellFilterInput_);
 		passesMETFilters = passesMETFilters && passesFilter(iEvent, trackingFailureFilter_);
+		passesMETFilters = passesMETFilters && passesFilter(iEvent, ecalLaserCorrFilterInput_);
+		passesMETFilters = passesMETFilters && !passesFilter(iEvent, manystripclus53X_);
+		passesMETFilters = passesMETFilters && !passesFilter(iEvent, toomanystripclus53X_);
+//		passesMETFilters = passesMETFilters && !passesFilter(iEvent, logErrorTooManyClusters_);
 		if (useEEBadScFilter_)
 			passesMETFilters = passesMETFilters && passesFilter(iEvent, eeBadScFilter_);
 
