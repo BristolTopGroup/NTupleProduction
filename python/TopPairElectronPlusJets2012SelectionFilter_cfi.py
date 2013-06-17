@@ -11,9 +11,14 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJets2012SelectionFi
     trkInput=cms.InputTag('generalTracks'),#track input for scraping filter
     HcalNoiseInput=cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult'),
     HCALLaserFilterInput=cms.InputTag('HcalLaserEventFilter'),
-    ECALDeadCellFilterInput=cms.InputTag('EcalDeadCellBoundaryEnergyFilter'),
+    ECALDeadCellFilterInput=cms.InputTag('EcalDeadCellTriggerPrimitiveFilter'),
     TrackingFailureFilterInput=cms.InputTag('trackingFailureFilter'),
     BadEESupercrystalFilterInput=cms.InputTag('BadEESupercrystalFilter'),
+    ECALLaserCorrFilterInput=cms.InputTag('ecalLaserCorrFilter'),
+    #trackingPOGfilters
+    ManyStripClus53XInput=cms.InputTag('manystripclus53X'),
+    TooManyStripClus53XInput=cms.InputTag('toomanystripclus53X'),
+    #LogErrorTooManyClusters=cms.InputTag('logErrorTooManyClusters'),
 
 #jet cuts
     min1JetPt=cms.double(30.),
@@ -24,7 +29,8 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJets2012SelectionFi
     tightElectronIsolation=cms.double(0.1),
     looseElectronIsolation=cms.double(0.15),
     looseMuonIsolation=cms.double(0.2),
-    useDeltaBetaCorrections = cms.bool(False),
+    useDeltaBetaCorrectionsForMuons = cms.bool(True),
+    useDeltaBetaCorrectionsForElectrons = cms.bool(False),
     useRhoActiveAreaCorrections = cms.bool(True),
     useMETFilters = cms.bool(True),
     useEEBadScFilter = cms.bool(False),
