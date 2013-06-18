@@ -47,7 +47,7 @@ unfolding_ST_analyser_electron_channel_patMETsPFlow = unfolding_MET_analyser_ele
     variable_min=cms.double(0.),
     variable_max=cms.double(2000.),
     variable_n_bins=cms.uint32(2000),
-    bin_edges=cms.vdouble([0, 350 , 400 , 450 , 500 , 570 , 650 , 2000])
+    bin_edges=cms.vdouble([0, 350 , 400 , 450 , 500 , 580 , 700 , 2000])
 )
 
 unfolding_ST_analyser_muon_channel_patMETsPFlow = unfolding_ST_analyser_electron_channel_patMETsPFlow.clone(
