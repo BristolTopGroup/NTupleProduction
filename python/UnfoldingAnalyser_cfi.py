@@ -30,6 +30,14 @@ unfolding_MET_analyser_muon_channel_patMETsPFlow = unfolding_MET_analyser_electr
     do_electron_channel=cms.untracked.bool(False),
 )
 
+unfolding_MET_nu_analyser_electron_channel_patMETsPFlow = unfolding_MET_analyser_electron_channel_patMETsPFlow.clone(
+    variable_under_analysis=cms.string('MET_nu'),
+)
+
+unfolding_MET_nu_analyser_muon_channel_patMETsPFlow = unfolding_MET_nu_analyser_electron_channel_patMETsPFlow.clone(
+    do_electron_channel=cms.untracked.bool(False),
+)
+
 unfolding_HT_analyser_electron_channel = unfolding_MET_analyser_electron_channel_patMETsPFlow.clone(
     variable_under_analysis=cms.string('HT'),
     variable_min=cms.double(0.),
@@ -39,6 +47,22 @@ unfolding_HT_analyser_electron_channel = unfolding_MET_analyser_electron_channel
 )
 
 unfolding_HT_analyser_muon_channel = unfolding_HT_analyser_electron_channel.clone(
+    do_electron_channel=cms.untracked.bool(False),
+)
+
+unfolding_HT_nocuts_analyser_electron_channel = unfolding_HT_analyser_electron_channel.clone(
+    variable_under_analysis=cms.string('HT_nocuts'),
+)
+
+unfolding_HT_nocuts_analyser_muon_channel = unfolding_HT_nocuts_analyser_electron_channel.clone(
+    do_electron_channel=cms.untracked.bool(False),
+)
+
+unfolding_HT_parton_analyser_electron_channel = unfolding_HT_analyser_electron_channel.clone(
+    variable_under_analysis=cms.string('HT_parton'),
+)
+
+unfolding_HT_parton_analyser_muon_channel = unfolding_HT_parton_analyser_electron_channel.clone(
     do_electron_channel=cms.untracked.bool(False),
 )
 
@@ -54,6 +78,22 @@ unfolding_ST_analyser_muon_channel_patMETsPFlow = unfolding_ST_analyser_electron
     do_electron_channel=cms.untracked.bool(False),
 )
 
+unfolding_ST_nocuts_analyser_electron_channel_patMETsPFlow = unfolding_ST_analyser_electron_channel_patMETsPFlow.clone(
+    variable_under_analysis=cms.string('ST_nocuts'),
+)
+
+unfolding_ST_nocuts_analyser_muon_channel_patMETsPFlow = unfolding_ST_nocuts_analyser_electron_channel_patMETsPFlow.clone(
+    do_electron_channel=cms.untracked.bool(False),
+)
+
+unfolding_ST_parton_analyser_electron_channel_patMETsPFlow = unfolding_ST_analyser_electron_channel_patMETsPFlow.clone(
+    variable_under_analysis=cms.string('ST_parton'),
+)
+
+unfolding_ST_parton_analyser_muon_channel_patMETsPFlow = unfolding_ST_parton_analyser_electron_channel_patMETsPFlow.clone(
+    do_electron_channel=cms.untracked.bool(False),
+)
+
 unfolding_MT_analyser_electron_channel_patMETsPFlow = unfolding_MET_analyser_electron_channel_patMETsPFlow.clone(
     variable_under_analysis=cms.string('MT'),
     variable_min=cms.double(0),
@@ -62,8 +102,15 @@ unfolding_MT_analyser_electron_channel_patMETsPFlow = unfolding_MET_analyser_ele
     bin_edges=cms.vdouble([0, 30, 50, 80, 100, 1000])
 )
 
-
 unfolding_MT_analyser_muon_channel_patMETsPFlow = unfolding_MT_analyser_electron_channel_patMETsPFlow.clone(
+    do_electron_channel=cms.untracked.bool(False),
+)
+
+unfolding_MT_nu_analyser_electron_channel_patMETsPFlow = unfolding_MT_analyser_electron_channel_patMETsPFlow.clone(
+    variable_under_analysis=cms.string('MT_nu'),
+)
+
+unfolding_MT_nu_analyser_muon_channel_patMETsPFlow = unfolding_MT_nu_analyser_electron_channel_patMETsPFlow.clone(
     do_electron_channel=cms.untracked.bool(False),
 )
 
@@ -79,11 +126,27 @@ unfolding_WPT_analyser_muon_channel_patMETsPFlow = unfolding_WPT_analyser_electr
     do_electron_channel=cms.untracked.bool(False),
 )
 
+unfolding_WPT_nu_analyser_electron_channel_patMETsPFlow = unfolding_WPT_analyser_electron_channel_patMETsPFlow.clone(
+    variable_under_analysis=cms.string('WPT_nu'),
+)
+
+unfolding_WPT_nu_analyser_muon_channel_patMETsPFlow = unfolding_WPT_nu_analyser_electron_channel_patMETsPFlow.clone(
+    do_electron_channel=cms.untracked.bool(False),
+)
+
 unfolding_MET_analyser_electron_channel_patType1CorrectedPFMet = unfolding_MET_analyser_electron_channel_patMETsPFlow.clone(
     reco_MET_Input=cms.InputTag('patType1CorrectedPFMet'),
 )
 
 unfolding_MET_analyser_muon_channel_patType1CorrectedPFMet = unfolding_MET_analyser_muon_channel_patMETsPFlow.clone(
+    reco_MET_Input=cms.InputTag('patType1CorrectedPFMet'),
+)
+
+unfolding_MET_nu_analyser_electron_channel_patType1CorrectedPFMet = unfolding_MET_nu_analyser_electron_channel_patMETsPFlow.clone(
+    reco_MET_Input=cms.InputTag('patType1CorrectedPFMet'),
+)
+
+unfolding_MET_nu_analyser_muon_channel_patType1CorrectedPFMet = unfolding_MET_nu_analyser_muon_channel_patMETsPFlow.clone(
     reco_MET_Input=cms.InputTag('patType1CorrectedPFMet'),
 )
 
@@ -95,6 +158,22 @@ unfolding_ST_analyser_muon_channel_patType1CorrectedPFMet = unfolding_ST_analyse
     reco_MET_Input=cms.InputTag('patType1CorrectedPFMet'),
 )
 
+unfolding_ST_nocuts_analyser_electron_channel_patType1CorrectedPFMet = unfolding_ST_nocuts_analyser_electron_channel_patMETsPFlow.clone(
+    reco_MET_Input=cms.InputTag('patType1CorrectedPFMet'),
+)
+
+unfolding_ST_nocuts_analyser_muon_channel_patType1CorrectedPFMet = unfolding_ST_nocuts_analyser_muon_channel_patMETsPFlow.clone(
+    reco_MET_Input=cms.InputTag('patType1CorrectedPFMet'),
+)
+
+unfolding_ST_parton_analyser_electron_channel_patType1CorrectedPFMet = unfolding_ST_parton_analyser_electron_channel_patMETsPFlow.clone(
+    reco_MET_Input=cms.InputTag('patType1CorrectedPFMet'),
+)
+
+unfolding_ST_parton_analyser_muon_channel_patType1CorrectedPFMet = unfolding_ST_parton_analyser_muon_channel_patMETsPFlow.clone(
+    reco_MET_Input=cms.InputTag('patType1CorrectedPFMet'),
+)
+
 unfolding_MT_analyser_electron_channel_patType1CorrectedPFMet = unfolding_MT_analyser_electron_channel_patMETsPFlow.clone(
     reco_MET_Input=cms.InputTag('patType1CorrectedPFMet'),
 )
@@ -103,10 +182,26 @@ unfolding_MT_analyser_muon_channel_patType1CorrectedPFMet = unfolding_MT_analyse
     reco_MET_Input=cms.InputTag('patType1CorrectedPFMet'),
 )
 
+unfolding_MT_nu_analyser_electron_channel_patType1CorrectedPFMet = unfolding_MT_nu_analyser_electron_channel_patMETsPFlow.clone(
+    reco_MET_Input=cms.InputTag('patType1CorrectedPFMet'),
+)
+
+unfolding_MT_nu_analyser_muon_channel_patType1CorrectedPFMet = unfolding_MT_nu_analyser_muon_channel_patMETsPFlow.clone(
+    reco_MET_Input=cms.InputTag('patType1CorrectedPFMet'),
+)
+
 unfolding_WPT_analyser_electron_channel_patType1CorrectedPFMet = unfolding_WPT_analyser_electron_channel_patMETsPFlow.clone(
     reco_MET_Input=cms.InputTag('patType1CorrectedPFMet'),
 )
 
 unfolding_WPT_analyser_muon_channel_patType1CorrectedPFMet = unfolding_WPT_analyser_muon_channel_patMETsPFlow.clone(
+    reco_MET_Input=cms.InputTag('patType1CorrectedPFMet'),
+)
+
+unfolding_WPT_nu_analyser_electron_channel_patType1CorrectedPFMet = unfolding_WPT_nu_analyser_electron_channel_patMETsPFlow.clone(
+    reco_MET_Input=cms.InputTag('patType1CorrectedPFMet'),
+)
+
+unfolding_WPT_nu_analyser_muon_channel_patType1CorrectedPFMet = unfolding_WPT_nu_analyser_muon_channel_patMETsPFlow.clone(
     reco_MET_Input=cms.InputTag('patType1CorrectedPFMet'),
 )

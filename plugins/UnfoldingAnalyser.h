@@ -68,18 +68,30 @@ private:
 
 	float get_gen_met(const edm::Event& iEvent) const;
 	float get_reco_met(const edm::Event& iEvent) const;
+	
+	float get_gen_met_nu(const edm::Event& iEvent) const;
 
 	float get_gen_ht(const edm::Event& iEvent) const;
 	float get_reco_ht(const edm::Event& iEvent) const;
 
+	float get_gen_ht_nocuts(const edm::Event& iEvent) const;
+	float get_gen_ht_parton(const edm::Event& iEvent) const;
+	
 	float get_gen_st(const edm::Event& iEvent) const;
 	float get_reco_st(const edm::Event& iEvent) const;
 
+	float get_gen_st_nocuts(const edm::Event& iEvent) const;
+	float get_gen_st_parton(const edm::Event& iEvent) const;
+	
 	float get_gen_mt(const edm::Event& iEvent) const;
 	float get_reco_mt(const edm::Event& iEvent) const;
 	
+	float get_gen_mt_nu(const edm::Event& iEvent) const;
+	
 	float get_gen_wpt(const edm::Event& iEvent) const;
 	float get_reco_wpt(const edm::Event& iEvent) const;
+	
+	float get_gen_wpt_nu(const edm::Event& iEvent) const;
 	
 	const reco::GenParticle* get_gen_lepton(const edm::Event& iEvent) const;
 	const reco::Candidate* get_reco_lepton(const edm::Event& iEvent) const;

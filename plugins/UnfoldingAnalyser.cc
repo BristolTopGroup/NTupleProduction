@@ -97,32 +97,32 @@ void UnfoldingAnalyser::beginJob() {
 		throw edm::Exception(edm::errors::Configuration, "TFile Service is not registered in cfg file");
 	}
 	//cout << "This is not how you debug" << endl;
-	truth_ =
-			fs->make < TH1F
-					> ("truth", TString("True distribution;GEN(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
-	measured_ =
-			fs->make < TH1F
-					> ("measured", TString("Measured distribution;RECO(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
-	fake_ =
-			fs->make < TH1F
-					> ("fake", TString("background distribution;RECO(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
-	contamination_in_gen_variable_ =
-			fs->make < TH1F
-					> ("contamination_inGenMET", TString(
-							"background distribution;GEN(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
-	contamination_in_reco_variable_ =
-			fs->make < TH1F
-					> ("contamination_inRecoMET", TString(
-							"background distribution;RECO(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
-
-	response_ =
-			fs->make < TH2F
-					> ("response", TString(
-							"response;RECO(" + variable_under_analysis_ + ");GEN(" + variable_under_analysis_ + ")"), variable_n_bins_, variable_min_, variable_max_, variable_n_bins_, variable_min_, variable_max_);
-	response_without_fakes_ =
-			fs->make < TH2F
-					> ("response_withoutFakes", TString(
-							"response;RECO(" + variable_under_analysis_ + ");GEN(" + variable_under_analysis_ + ")"), variable_n_bins_, variable_min_, variable_max_, variable_n_bins_, variable_min_, variable_max_);
+// 	truth_ =
+// 			fs->make < TH1F
+// 					> ("truth", TString("True distribution;GEN(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
+// 	measured_ =
+// 			fs->make < TH1F
+// 					> ("measured", TString("Measured distribution;RECO(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
+// 	fake_ =
+// 			fs->make < TH1F
+// 					> ("fake", TString("background distribution;RECO(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
+// 	contamination_in_gen_variable_ =
+// 			fs->make < TH1F
+// 					> ("contamination_inGenMET", TString(
+// 							"background distribution;GEN(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
+// 	contamination_in_reco_variable_ =
+// 			fs->make < TH1F
+// 					> ("contamination_inRecoMET", TString(
+// 							"background distribution;RECO(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
+// 
+// 	response_ =
+// 			fs->make < TH2F
+// 					> ("response", TString(
+// 							"response;RECO(" + variable_under_analysis_ + ");GEN(" + variable_under_analysis_ + ")"), variable_n_bins_, variable_min_, variable_max_, variable_n_bins_, variable_min_, variable_max_);
+// 	response_without_fakes_ =
+// 			fs->make < TH2F
+// 					> ("response_withoutFakes", TString(
+// 							"response;RECO(" + variable_under_analysis_ + ");GEN(" + variable_under_analysis_ + ")"), variable_n_bins_, variable_min_, variable_max_, variable_n_bins_, variable_min_, variable_max_);
 
 //histograms with asymmetric bins (final measurement)
 	//cout << "But what other options do I have?" << endl;
@@ -157,13 +157,13 @@ void UnfoldingAnalyser::beginJob() {
 							"response;RECO(" + variable_under_analysis_ + ");GEN(" + variable_under_analysis_ + ")"), n_asym_bins, METBinEdges, n_asym_bins, METBinEdges);
 
 	//cout << "Well, you could use 'scram b' as a compiler on your machine within an IDE" << endl;
-	truth_->Sumw2();
-	measured_->Sumw2();
-	fake_->Sumw2();
-	contamination_in_gen_variable_->Sumw2();
-	contamination_in_reco_variable_->Sumw2();
-	response_->Sumw2();
-	response_without_fakes_->Sumw2();
+// 	truth_->Sumw2();
+// 	measured_->Sumw2();
+// 	fake_->Sumw2();
+// 	contamination_in_gen_variable_->Sumw2();
+// 	contamination_in_reco_variable_->Sumw2();
+// 	response_->Sumw2();
+// 	response_without_fakes_->Sumw2();
 
 	truth_asym_bins_->Sumw2();
 	measured_asym_bins_->Sumw2();
@@ -204,35 +204,36 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	bool is_semileptonic_electron(passesFilter(iEvent, is_semileptonic_electron_flag_));
 	bool is_semileptonic_muon(passesFilter(iEvent, is_semileptonic_muon_flag_));
 	is_semileptonic_ = is_semileptonic_tau || is_semileptonic_electron || is_semileptonic_muon;
-
+	
+		
 	float gen_variable(get_gen_variable(iEvent));
-
+		
 	if (do_electron_channel_) {
 		if (is_semileptonic_electron) {
 			//PU weight only (no btag-weight) as no b-tagging is applied
-			truth_->Fill(gen_variable, puWeight);
+			//truth_->Fill(gen_variable, puWeight);
 			truth_asym_bins_->Fill(gen_variable, puWeight);
 		}
 
 		if (passes_selection) {
 			float reco_variable(get_reco_variable(iEvent));
 
-			measured_->Fill(reco_variable, weight);
+			//measured_->Fill(reco_variable, weight);
 			measured_asym_bins_->Fill(reco_variable, weight);
-			response_->Fill(reco_variable, gen_variable, weight);
+			//response_->Fill(reco_variable, gen_variable, weight);
 			response_asym_bins_->Fill(reco_variable, gen_variable, weight);
 
 			if (is_semileptonic_electron) {
-				response_without_fakes_->Fill(reco_variable, gen_variable, weight);
+				//response_without_fakes_->Fill(reco_variable, gen_variable, weight);
 				response_without_fakes_asym_bins_->Fill(reco_variable, gen_variable, weight);
 			} else {
-				fake_->Fill(reco_variable, weight);
+				//fake_->Fill(reco_variable, weight);
 				fake_asym_bins_->Fill(reco_variable, weight);
 				//contamination from other ttbar processes
 				if (is_fully_hadronic || is_dileptonic || is_semileptonic_tau || is_semileptonic_muon) {
-					contamination_in_reco_variable_->Fill(reco_variable, weight);
+					//contamination_in_reco_variable_->Fill(reco_variable, weight);
 					contamination_asym_bins_in_reco_variable_->Fill(reco_variable, weight);
-					contamination_in_gen_variable_->Fill(gen_variable, weight);
+					//contamination_in_gen_variable_->Fill(gen_variable, weight);
 					contamination_asym_bins_in_gen_variable_->Fill(gen_variable, weight);
 				}
 			}
@@ -242,7 +243,7 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	} else { //muon channel
 		if (is_semileptonic_muon) {
 			//PU weight only (no btag-weight) as no b-tagging is applied
-			truth_->Fill(gen_variable, puWeight);
+			//truth_->Fill(gen_variable, puWeight);
 			truth_asym_bins_->Fill(gen_variable, puWeight);
 		}
 
@@ -253,21 +254,21 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
 			weight *= muonCorrection;
 			
-			measured_->Fill(reco_variable, weight);
+			//measured_->Fill(reco_variable, weight);
 			measured_asym_bins_->Fill(reco_variable, weight);
-			response_->Fill(reco_variable, gen_variable, weight);
+			//response_->Fill(reco_variable, gen_variable, weight);
 			response_asym_bins_->Fill(reco_variable, gen_variable, weight);
 
 			if (is_semileptonic_muon) {
-				response_without_fakes_->Fill(reco_variable, gen_variable, weight);
+				//response_without_fakes_->Fill(reco_variable, gen_variable, weight);
 				response_without_fakes_asym_bins_->Fill(reco_variable, gen_variable, weight);
 			} else {
-				fake_->Fill(reco_variable, weight);
+				//fake_->Fill(reco_variable, weight);
 				fake_asym_bins_->Fill(reco_variable, weight);
 				if (is_fully_hadronic || is_dileptonic || is_semileptonic_tau || is_semileptonic_electron) {
-					contamination_in_reco_variable_->Fill(reco_variable, weight);
+					//contamination_in_reco_variable_->Fill(reco_variable, weight);
 					contamination_asym_bins_in_reco_variable_->Fill(reco_variable, weight);
-					contamination_in_gen_variable_->Fill(gen_variable, weight);
+					//contamination_in_gen_variable_->Fill(gen_variable, weight);
 					contamination_asym_bins_in_gen_variable_->Fill(gen_variable, weight);
 				}
 			}
@@ -278,14 +279,28 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 float UnfoldingAnalyser::get_gen_variable(const edm::Event& iEvent) const {
 	if (variable_under_analysis_ == "MET")
 		return get_gen_met(iEvent);
+	else if (variable_under_analysis_ == "MET_nu")
+		return get_gen_met_nu(iEvent);
 	else if (variable_under_analysis_ == "HT")
 		return get_gen_ht(iEvent);
+	else if (variable_under_analysis_ == "HT_nocuts")
+		return get_gen_ht_nocuts(iEvent);
+	else if (variable_under_analysis_ == "HT_parton")
+		return get_gen_ht_parton(iEvent);
 	else if (variable_under_analysis_ == "ST")
 		return get_gen_st(iEvent);
+	else if (variable_under_analysis_ == "ST_nocuts")
+		return get_gen_st_nocuts(iEvent);
+	else if (variable_under_analysis_ == "ST_parton")
+		return get_gen_st_parton(iEvent);
 	else if (variable_under_analysis_ == "MT")
 		return get_gen_mt(iEvent);
+	else if (variable_under_analysis_ == "MT_nu")
+		return get_gen_mt_nu(iEvent);	
 	else if (variable_under_analysis_ == "WPT")
 		return get_gen_wpt(iEvent);
+	else if (variable_under_analysis_ == "WPT_nu")
+		return get_gen_wpt_nu(iEvent);
 	else {
 		throw "Unknown variable type '" + variable_under_analysis_ + "'!";
 	}
@@ -293,10 +308,23 @@ float UnfoldingAnalyser::get_gen_variable(const edm::Event& iEvent) const {
 }
 
 float UnfoldingAnalyser::get_gen_met(const edm::Event& iEvent) const {
+	
 	edm::Handle < reco::GenMETCollection > genMETs;
 	iEvent.getByLabel(gen_MET_input_, genMETs);
 	reco::GenMET genMETObject(genMETs->at(0));
+	
 	return genMETObject.pt();
+}
+
+float UnfoldingAnalyser::get_gen_met_nu(const edm::Event& iEvent) const {
+	
+	if (!is_semileptonic_)
+		return -1.;
+	
+	edm::Handle < TtGenEvent > genEvt;
+        iEvent.getByLabel(gen_event_input_, genEvt);
+	
+	return genEvt->singleNeutrino()->et();
 }
 
 float UnfoldingAnalyser::get_gen_ht(const edm::Event& iEvent) const {
@@ -306,6 +334,7 @@ float UnfoldingAnalyser::get_gen_ht(const edm::Event& iEvent) const {
 
 	//Take ALL the jets!
 	for (unsigned int index = 0; index < jets->size(); ++index) {
+	if(jets->at(index).pt() > 20)
 		ht += jets->at(index).pt();
 	}
 	return ht;
@@ -323,6 +352,68 @@ float UnfoldingAnalyser::get_gen_st(const edm::Event& iEvent) const {
 	return ht + met + lepton->pt();
 }
 
+float UnfoldingAnalyser::get_gen_ht_nocuts(const edm::Event& iEvent) const {
+	edm::Handle < reco::GenJetCollection > jets;
+	iEvent.getByLabel(gen_jet_input_, jets);
+	float ht(0.);
+
+	//Take ALL the jets!
+	for (unsigned int index = 0; index < jets->size(); ++index) {
+			ht += jets->at(index).pt();
+	}
+	return ht;
+}
+
+float UnfoldingAnalyser::get_gen_ht_parton(const edm::Event& iEvent) const {
+	if (!is_semileptonic_)
+		return -1.;
+
+	edm::Handle < TtGenEvent > genEvt;
+    	iEvent.getByLabel(gen_event_input_, genEvt);
+	
+	//radiation from leptonic top
+	double leptTopRad = 0;
+	for(unsigned int i = 0; i < genEvt->leptonicDecayTopRadiation().size(); i++){
+	leptTopRad += genEvt->leptonicDecayTopRadiation().at(i)->pt();	
+	}
+	
+	//radiation from hadronic top
+	double hadTopRad = 0;
+	for(unsigned int i = 0; i < genEvt->hadronicDecayTopRadiation().size(); i++){
+	hadTopRad += genEvt->hadronicDecayTopRadiation().at(i)->pt();	
+	}
+	
+	double HT_parton=genEvt->hadronicDecayQuark()->pt()+genEvt->hadronicDecayQuarkBar()->pt()+genEvt->leptonicDecayB()->pt()+genEvt->hadronicDecayB()->pt()+leptTopRad+hadTopRad;
+
+	return HT_parton;
+}
+
+float UnfoldingAnalyser::get_gen_st_nocuts(const edm::Event& iEvent) const {
+	if (!is_semileptonic_)
+		return -1.;
+	// ST = HT + MET + lepton pt
+	float ht = get_gen_ht_nocuts(iEvent);
+	float met = get_gen_met(iEvent);
+	
+	//get lepton
+	const reco::GenParticle* lepton = get_gen_lepton(iEvent);
+	return ht + met + lepton->pt();
+}
+
+float UnfoldingAnalyser::get_gen_st_parton(const edm::Event& iEvent) const {
+	if (!is_semileptonic_)
+		return -1.;
+
+	edm::Handle < TtGenEvent > genEvt;
+    	iEvent.getByLabel(gen_event_input_, genEvt);
+
+	float ht = get_gen_ht_parton(iEvent);
+	
+	double ST_parton=genEvt->singleLepton()->pt()+genEvt->singleNeutrino()->pt()+ht;
+
+	return ST_parton;
+}
+
 float UnfoldingAnalyser::get_gen_mt(const edm::Event& iEvent) const {
 
 
@@ -335,109 +426,80 @@ float UnfoldingAnalyser::get_gen_mt(const edm::Event& iEvent) const {
 	iEvent.getByLabel(gen_MET_input_, genMETs);
 	reco::GenMET met(genMETs->at(0));
 
-//	double En = met.energy();
-//	double mom = sqrt(pow(met.px(),2)+pow(met.py(),2)+pow(met.pz(),2));
-	
-// 	cout << "GEN lep px,y: " <<  lepton->px() << ", " <<   lepton->py() << ") , met px,y,z: " << met.px() << ", " << met.py() << ", "<< met.pz()<<")" << endl;
-// 	cout << "missing mass is either: " << pow(En,2)-pow(mom,2) << endl;
-// 	//cout << "or: " << 
-// 	
-// 	cout << "Gen lepE: " <<  lepton->et() << " , metE: " <<  met.et() << endl;
-// 	cout << "MET pt: " <<  met.pt() << " , mass: " << met.mass() << endl;
-	
 	//combine their x & y momenta to get the transverse W boson mass
 	double energy_squared = pow(lepton->et() + met.pt(), 2);
 	double momentum_squared = pow(lepton->px() + met.px(), 2) + pow(lepton->py() + met.py(), 2);
 	double MT_squared = energy_squared - momentum_squared;
 //	cout << "MTgen: " << sqrt(MT_squared) << endl;
-
+	
 	if (MT_squared > 0)
 		return sqrt(MT_squared);
 	else
 		return -1;
 }
 
+float UnfoldingAnalyser::get_gen_mt_nu(const edm::Event& iEvent) const {
+    
+    if (!is_semileptonic_)
+	return -1.;
+    
+    edm::Handle < TtGenEvent > genEvt;
+    iEvent.getByLabel(gen_event_input_, genEvt);
+
+//need to use lepton and neutrino for this!
+	
+	double energy_squared = pow(genEvt->singleLepton()->et() + genEvt->singleNeutrino()->et(), 2);
+	double momentum_squared = pow(genEvt->singleLepton()->px() + genEvt->singleNeutrino()->px(), 2) + pow(genEvt->singleLepton()->py() + genEvt->singleNeutrino()->py(), 2);
+	double MT_squared = energy_squared - momentum_squared;
+	
+	if (MT_squared > 0)
+		return sqrt(MT_squared);
+	else
+		return -1;
+    
+
+}
+
+
 float UnfoldingAnalyser::get_gen_wpt(const edm::Event& iEvent) const {
 
 
 	if (!is_semileptonic_)
 		return -1.;
+
 	//get electron/muon
-	//const reco::GenParticle* lepton = get_gen_lepton(iEvent);
-	
+	const reco::GenParticle* lepton = get_gen_lepton(iEvent);
+
 	//get Gen MET
 	edm::Handle < reco::GenMETCollection > genMETs;
 	iEvent.getByLabel(gen_MET_input_, genMETs);
 	reco::GenMET met(genMETs->at(0));
-	
-	
-	edm::Handle < reco::GenParticleCollection > genParticles;
-	iEvent.getByLabel(gen_part_input_, genParticles);
-	
-	int num = 0;
-        std::auto_ptr < std::vector<double> > pt(new std::vector<double>());
-	std::auto_ptr < std::vector<int> > pdgId(new std::vector<int>());
-	double W_genpt = 0;
-	
-	
-		if (genParticles.isValid()) {
-			edm::LogInfo("BristolNTuple_GenParticlesInfo") << "Total # GenParticles: " << genParticles->size();
 
-			for (reco::GenParticleCollection::const_iterator it = genParticles->begin(); it != genParticles->end();
-					++it) {
-				// exit from loop when you reach the required number of GenParticles
-				if (pt->size() >= 24)
-					break;
-				
-					
-				num++;
-				
+	return sqrt(pow(lepton->px()+met.px(),2)+pow(lepton->py()+met.py(),2));
+}
 
-				
-				
-				int idx = -1;
-				for (reco::GenParticleCollection::const_iterator mit = genParticles->begin();
-						mit != genParticles->end(); ++mit) {
-					if (it->mother() == &(*mit)) {
-						idx = std::distance(genParticles->begin(), mit);
-						break;
-					}
-				}
-				
-				
-				//cout  << num <<  " ,part: " <<it->pdgId() << " ,px read: " << it->px()  << " ,mother: " << idx << endl;
+float UnfoldingAnalyser::get_gen_wpt_nu(const edm::Event& iEvent) const {
 
-				// fill in all the vectors
-				pt->push_back(it->pt());
- 				pdgId->push_back(it->pdgId());
-				
-				if((fabs(it->pdgId()) == 11 || fabs(it->pdgId()) == 13) && fabs(pdgId->at(idx)) == 24){
-				W_genpt = pt->at(idx);
-				}
-				
-	
-				}
-			} else {
-			edm::LogError("BristolNTuple_GenParticlesError") << "Error! Can't get the product " << gen_part_input_;
-			}
 
-//	cout << "or from gen met and lepton: " << sqrt(pow(lepton->px()+met.px(),2)+pow(lepton->py()+met.py(),2)) << endl;
-//     	return sqrt(pow(lepton->px()+met.px(),2)+pow(lepton->py()+met.py(),2)); 
+	if (!is_semileptonic_)
+		return -1.;
+		
+        edm::Handle < TtGenEvent > genEvt;
+    	iEvent.getByLabel(gen_event_input_, genEvt);
 
-	return W_genpt;
-
+	return genEvt->leptonicDecayW()->pt();
 }
 
 float UnfoldingAnalyser::get_reco_variable(const edm::Event& iEvent) const {
-	if (variable_under_analysis_ == "MET")
+	if (variable_under_analysis_ == "MET" || variable_under_analysis_ == "MET_nu")
 		return get_reco_met(iEvent);
-	else if (variable_under_analysis_ == "HT")
+	else if (variable_under_analysis_ == "HT" || variable_under_analysis_ == "HT_nocuts" || variable_under_analysis_ == "HT_parton")
 		return get_reco_ht(iEvent);
-	else if (variable_under_analysis_ == "ST")
+	else if (variable_under_analysis_ == "ST" || variable_under_analysis_ == "ST_nocuts" || variable_under_analysis_== "ST_parton")
 		return get_reco_st(iEvent);
-	else if (variable_under_analysis_ == "MT")
+	else if (variable_under_analysis_ == "MT" || variable_under_analysis_ == "MT_nu")
 		return get_reco_mt(iEvent);
-	else if (variable_under_analysis_ == "WPT")
+	else if (variable_under_analysis_ == "WPT" || variable_under_analysis_ == "WPT_nu")
 		return get_reco_wpt(iEvent);
 	else {
 		throw "Unknown variable type '" + variable_under_analysis_ + "'!";
