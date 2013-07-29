@@ -1,13 +1,16 @@
 # Starting with a skeleton process which gets imported with the following line
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
+# Import LumiList for running on specific JSON files or excluding/including specific events when running locally.
+import FWCore.PythonUtilities.LumiList as LumiList
+
 from PhysicsTools.PatAlgos.tools.coreTools import *
 #set up analysis
 #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions
 
 #Globals tags have been updated with the new JEC from https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECDataMC
 #Data Global Tag
-GLOBALTAG_DATA = 'FT_53_V21_AN3::All' # Used for 2012 A and B: 22Jan2013 re-reco
+GLOBALTAG_DATA = 'FT_53_V21_AN3::All' # Used for 2012 A, B, C and D: 22Jan2013 re-reco
 #GLOBALTAG_DATA = 'FT53_V10A_AN4::All' # Used for 2012 C: 24Aug2012 re-reco (v1)
 #GLOBALTAG_DATA = 'GR_P_V42_AN4::All' # Used for 2012 C prompt reco (v2) and Run 2012 D prompt reco (v1)
 #GLOBALTAG_DATA = 'FT_P_V42C_AN4::All' # Used for 2012 C run 201191: ecal recovery of run 201191 (11Dec2012 re-reco)
@@ -207,6 +210,10 @@ else:
             TEST_DATA_FILE
             ]
 
+# Use lumisToProcess to specify a JSON file to use when running locally.
+#process.source.lumisToProcess = LumiList.LumiList(filename = 'BristolAnalysis/NTupleTools/data/CertifiedJSONs/Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt').getVLuminosityBlockRange()
+# Use eventsToSkip to specify events which you do not want to process when running locally.
+#process.source.eventsToSkip = cms.untracked.VEventRange('193336:280110630')
     
 # add the flavor history
 process.load("PhysicsTools.HepMCCandAlgos.flavorHistoryPaths_cfi")
