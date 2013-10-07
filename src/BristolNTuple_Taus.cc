@@ -110,8 +110,24 @@ void BristolNTuple_Taus::produce(edm::Event& iEvent, const edm::EventSetup& iSet
 			 *   'byTightCombinedIsolationDeltaBetaCorr' 'byTightIsolation' 'byTightIsolationDeltaBetaCorr'
 			 *   'byVLooseCombinedIsolationDeltaBetaCorr' 'byVLooseIsolation' 'byVLooseIsolationDeltaBetaCorr'
 			 *   'decayModeFinding'
+			 *
+			 *   IDs in 53X git version
+			 *   'againstElectronDeadECAL' 'againstElectronLoose' 'againstElectronLooseMVA3'
+			 *   'againstElectronMVA3category' 'againstElectronMVA3raw' 'againstElectronMedium'
+			 *   'againstElectronMediumMVA3' 'againstElectronTight' 'againstElectronTightMVA3'
+			 *   'againstElectronVTightMVA3' 'againstMuonLoose' 'againstMuonLoose2' 'againstMuonLoose3'
+			 *   'againstMuonMedium' 'againstMuonMedium2' 'againstMuonTight' 'againstMuonTight2'
+			 *   'againstMuonTight3' 'byCombinedIsolationDeltaBetaCorrRaw' 'byCombinedIsolationDeltaBetaCorrRaw3Hits'
+			 *   'byIsolationMVA2raw' 'byIsolationMVAraw' 'byLooseCombinedIsolationDeltaBetaCorr'
+			 *   'byLooseCombinedIsolationDeltaBetaCorr3Hits' 'byLooseIsolation' 'byLooseIsolationDeltaBetaCorr'
+			 *   'byLooseIsolationMVA' 'byLooseIsolationMVA2' 'byMediumCombinedIsolationDeltaBetaCorr'
+			 *   'byMediumCombinedIsolationDeltaBetaCorr3Hits' 'byMediumIsolation' 'byMediumIsolationDeltaBetaCorr'
+			 *   'byMediumIsolationMVA' 'byMediumIsolationMVA2' 'byTightCombinedIsolationDeltaBetaCorr'
+			 *   'byTightCombinedIsolationDeltaBetaCorr3Hits' 'byTightIsolation' 'byTightIsolationDeltaBetaCorr'
+			 *    'byTightIsolationMVA' 'byTightIsolationMVA2' 'byVLooseCombinedIsolationDeltaBetaCorr'
+			 *    'byVLooseIsolation' 'byVLooseIsolationDeltaBetaCorr' 'decayModeFinding'
 			 */
-			againstElectronMVADiscr->push_back(it->tauID("againstElectronMVA") > 0.5 ? 1 : 0);
+			againstElectronMVADiscr->push_back(it->tauID("againstElectronMVA3raw") > 0.5 ? 1 : 0);
 			againstMuonMediumDiscr->push_back(it->tauID("againstMuonMedium") > 0.5 ? 1 : 0);
 			byMediumIsolationDiscr->push_back(it->tauID("byMediumIsolation") > 0.5 ? 1 : 0);
 
@@ -191,6 +207,5 @@ void BristolNTuple_Taus::produce(edm::Event& iEvent, const edm::EventSetup& iSet
 //	iEvent.put(trackisolationusingleadingpiondiscr, prefix + "TrackIsolationUsingLeadingPionDiscr" + suffix);
 //	iEvent.put(ecalisolationdiscr, prefix + "EcalIsolationDiscr" + suffix);
 //	iEvent.put(ecalisolationusingleadingpiondiscr, prefix + "EcalIsolationUsingLeadingPionDiscr" + suffix);
-
 
 }
