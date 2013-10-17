@@ -27,7 +27,7 @@ public:
 
 private:
 	//non-global event weights (global = i.e. lumi-weight)
-	edm::InputTag pu_weight_input_, b_tag_weight_input;
+	edm::InputTag pu_weight_input_, b_tag_weight_input, top_pt_reweight_input_;
 	//distributions	
 	edm::InputTag gen_part_input_;
 	edm::InputTag gen_MET_input_, reco_MET_input_;

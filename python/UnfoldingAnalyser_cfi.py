@@ -3,6 +3,7 @@ import FWCore.ParameterSet.Config as cms
 unfolding_MET_analyser_electron_channel_patMETsPFlow = cms.EDAnalyzer("UnfoldingAnalyser",
     pu_weight_input=cms.InputTag('eventWeightPU'),
     b_tag_weight_input=cms.InputTag('eventWeightBtag'),
+    top_pt_reweight_input=cms.InputTag('eventWeightTopPt'),
     gen_part_input=cms.InputTag('genParticles'), 
     gen_MET_input=cms.InputTag('genMetTrue'),
     reco_MET_Input=cms.InputTag('patMETsPFlow'),

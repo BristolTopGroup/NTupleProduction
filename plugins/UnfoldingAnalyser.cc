@@ -22,6 +22,7 @@ using namespace std;
 UnfoldingAnalyser::UnfoldingAnalyser(const edm::ParameterSet& iConfig) :		
 		pu_weight_input_(iConfig.getParameter < edm::InputTag > ("pu_weight_input")), //
 		b_tag_weight_input(iConfig.getParameter < edm::InputTag > ("b_tag_weight_input")), //
+		top_pt_reweight_input_(iConfig.getParameter < edm::InputTag > ("top_pt_reweight_input")), //
 		gen_part_input_(iConfig.getParameter < edm::InputTag > ("gen_part_input")), //
 		gen_MET_input_(iConfig.getParameter < edm::InputTag > ("gen_MET_input")), //
 		reco_MET_input_(iConfig.getParameter < edm::InputTag > ("reco_MET_Input")), //	
@@ -66,6 +67,7 @@ void UnfoldingAnalyser::fillDescriptions(edm::ConfigurationDescriptions & descri
 	edm::ParameterSetDescription desc;
 	desc.add < InputTag > ("pu_weight_input");
 	desc.add < InputTag > ("b_tag_weight_input");
+	desc.add < InputTag > ("top_pt_reweight_input");
 	desc.add < InputTag > ("gen_part_input");
 	desc.add < InputTag > ("gen_MET_input");
 	desc.add < InputTag > ("reco_MET_Input");
@@ -191,12 +193,16 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	edm::Handle<double> btagWeightHandle;
 	iEvent.getByLabel(b_tag_weight_input, btagWeightHandle);
 
+	edm::Handle<double> topPtReweightHandle;
+	iEvent.getByLabel(top_pt_reweight_input_, topPtReweightHandle);
+
 	double puWeight(*puWeightHandle);
 	double btagWeight(*btagWeightHandle);
-	double weight(puWeight * btagWeight);
+	double topPtReweight(*topPtReweightHandle);
 
+	double truthWeight(puWeight * topPtReweight);
+	double recoWeight(puWeight * btagWeight * topPtReweight);
 	
-
 	bool passes_selection(passesFilter(iEvent, selection_flag_input_));
 	bool is_fully_hadronic(passesFilter(iEvent, is_fully_hadronic_ttbar_flag_));
 	bool is_dileptonic(passesFilter(iEvent, is_dileptonic_ttbar_flag_));
@@ -212,29 +218,29 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 		if (is_semileptonic_electron) {
 			//PU weight only (no btag-weight) as no b-tagging is applied
 			//truth_->Fill(gen_variable, puWeight);
-			truth_asym_bins_->Fill(gen_variable, puWeight);
+			truth_asym_bins_->Fill(gen_variable, truthWeight);
 		}
 
 		if (passes_selection) {
 			float reco_variable(get_reco_variable(iEvent));
 
 			//measured_->Fill(reco_variable, weight);
-			measured_asym_bins_->Fill(reco_variable, weight);
+			measured_asym_bins_->Fill(reco_variable, recoWeight);
 			//response_->Fill(reco_variable, gen_variable, weight);
-			response_asym_bins_->Fill(reco_variable, gen_variable, weight);
+			response_asym_bins_->Fill(reco_variable, gen_variable, recoWeight);
 
 			if (is_semileptonic_electron) {
 				//response_without_fakes_->Fill(reco_variable, gen_variable, weight);
-				response_without_fakes_asym_bins_->Fill(reco_variable, gen_variable, weight);
+				response_without_fakes_asym_bins_->Fill(reco_variable, gen_variable, recoWeight);
 			} else {
 				//fake_->Fill(reco_variable, weight);
-				fake_asym_bins_->Fill(reco_variable, weight);
+				fake_asym_bins_->Fill(reco_variable, recoWeight);
 				//contamination from other ttbar processes
 				if (is_fully_hadronic || is_dileptonic || is_semileptonic_tau || is_semileptonic_muon) {
 					//contamination_in_reco_variable_->Fill(reco_variable, weight);
-					contamination_asym_bins_in_reco_variable_->Fill(reco_variable, weight);
+					contamination_asym_bins_in_reco_variable_->Fill(reco_variable, recoWeight);
 					//contamination_in_gen_variable_->Fill(gen_variable, weight);
-					contamination_asym_bins_in_gen_variable_->Fill(gen_variable, weight);
+					contamination_asym_bins_in_gen_variable_->Fill(gen_variable, recoWeight);
 				}
 			}
 
@@ -244,7 +250,7 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 		if (is_semileptonic_muon) {
 			//PU weight only (no btag-weight) as no b-tagging is applied
 			//truth_->Fill(gen_variable, puWeight);
-			truth_asym_bins_->Fill(gen_variable, puWeight);
+			truth_asym_bins_->Fill(gen_variable, truthWeight);
 		}
 
 		double muonCorrection = get_muon_correction(iEvent);
@@ -252,24 +258,24 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 		if (passes_selection) {
 			float reco_variable(get_reco_variable(iEvent));
 
-			weight *= muonCorrection;
+			recoWeight *= muonCorrection;
 			
 			//measured_->Fill(reco_variable, weight);
-			measured_asym_bins_->Fill(reco_variable, weight);
+			measured_asym_bins_->Fill(reco_variable, recoWeight);
 			//response_->Fill(reco_variable, gen_variable, weight);
-			response_asym_bins_->Fill(reco_variable, gen_variable, weight);
+			response_asym_bins_->Fill(reco_variable, gen_variable, recoWeight);
 
 			if (is_semileptonic_muon) {
 				//response_without_fakes_->Fill(reco_variable, gen_variable, weight);
-				response_without_fakes_asym_bins_->Fill(reco_variable, gen_variable, weight);
+				response_without_fakes_asym_bins_->Fill(reco_variable, gen_variable, recoWeight);
 			} else {
 				//fake_->Fill(reco_variable, weight);
-				fake_asym_bins_->Fill(reco_variable, weight);
+				fake_asym_bins_->Fill(reco_variable, recoWeight);
 				if (is_fully_hadronic || is_dileptonic || is_semileptonic_tau || is_semileptonic_electron) {
 					//contamination_in_reco_variable_->Fill(reco_variable, weight);
-					contamination_asym_bins_in_reco_variable_->Fill(reco_variable, weight);
+					contamination_asym_bins_in_reco_variable_->Fill(reco_variable, recoWeight);
 					//contamination_in_gen_variable_->Fill(gen_variable, weight);
-					contamination_asym_bins_in_gen_variable_->Fill(gen_variable, weight);
+					contamination_asym_bins_in_gen_variable_->Fill(gen_variable, recoWeight);
 				}
 			}
 		}

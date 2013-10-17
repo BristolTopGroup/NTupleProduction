@@ -88,6 +88,7 @@ process.eventFiltersIntaggingMode = cms.Sequence(process.MCFiltersInTaggingMode 
 #            Unfolding Config
 ##########################################################################################
 process.load('BristolAnalysis.NTupleTools.BTagWeight_Producer_cfi')
+process.load('BristolAnalysis.NTupleTools.TopPtReweight_Producer_cfi')
 process.load('BristolAnalysis.NTupleTools.UnfoldingAnalyser_cfi')
 process.eventWeightBtagEPlusJets = process.eventWeightBtag.clone(
             numberOfTagsInput = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'NumberOfBtags', 'PAT'),
@@ -95,10 +96,19 @@ process.eventWeightBtagEPlusJets = process.eventWeightBtag.clone(
             targetBtagMultiplicity = cms.uint32(2), #will calculate the weight for b-tag multiplicity >=2
             BJetSystematic = cms.int32(0)
             )
+
 process.eventWeightBtagMuPlusJets = process.eventWeightBtagEPlusJets.clone(
             numberOfTagsInput = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'NumberOfBtags', 'PAT')  ,  
             jetInput = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'cleanedJets', 'PAT'),       
                                                               )
+
+process.eventWeightTopPt = process.eventWeightTopPt.clone(
+            gen_event_input = cms.InputTag( 'genEvt'),
+            genParticles = cms.InputTag( 'genParticles'),
+            prefix = cms.string( 'TopPtReweights.')
+#            TopPtSystematic = cms.int32(0)
+            )
+
 electron_unfolding_analysers = [
     process.unfolding_MET_analyser_electron_channel_patMETsPFlow,
     process.unfolding_MET_nu_analyser_electron_channel_patMETsPFlow,
@@ -163,6 +173,7 @@ for analyser in muon_unfolding_analysers:
 process.unfoldingAnalysisSequence = cms.Sequence(process.eventFiltersIntaggingMode *
                                                  process.eventWeightBtagEPlusJets *
                                                  process.eventWeightBtagMuPlusJets *
+                                                 process.eventWeightTopPt *
                                                  process.printEventContent * 
                                                  process.unfolding_MET_analyser_electron_channel_patMETsPFlow*
                                                  process.unfolding_MET_analyser_muon_channel_patMETsPFlow*
