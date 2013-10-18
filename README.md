@@ -27,14 +27,20 @@ git cms-addpkg PhysicsTools/PatAlgos
 git cms-merge-topic cms-analysis-tools:5_3_12_patch2-metUncertainties
 git cms-merge-topic cms-analysis-tools:5_3_12_patch2-newJECs
 git cms-merge-topic cms-analysis-tools:5_3_12_patch2-mvaElIdPatFunction
+
+# ElectroWeakAnalysis needed for full LHAPDF libraries to work
+git cms-addpkg ElectroWeakAnalysis/Utilities
+
 #Bristol Tools
 git clone git@github.com:BristolTopGroup/NTupleProduction.git BristolAnalysis/NTupleTools
 #TopSkimming
 git clone git@github.com:BristolTopGroup/TopSkimming.git TopQuarkAnalysis/TopSkimming
 
 #setup full version of LHAPDF (faster AND prevents crashes!)
+#https://github.com/cms-sw/cmssw/tree/CMSSW_7_0_X/ElectroWeakAnalysis/Utilities
 scram setup lhapdffull
-scram b -j 8
+touch $CMSSW_BASE/src/ElectroWeakAnalysis/Utilities/BuildFile.xml
+scram b -j8
 
 #get XML files for electron MVA
 cd EgammaAnalysis/ElectronTools/data/
