@@ -49,8 +49,8 @@ UnfoldingAnalyser::UnfoldingAnalyser(const edm::ParameterSet& iConfig) :
 		fake_(), //
 		contamination_in_gen_variable_(), //
 		contamination_in_reco_variable_(), //
-		response_(), //
-		response_without_fakes_(), //
+//		response_(), //
+//		response_without_fakes_(), //
 		//
 		truth_asym_bins_(), //
 		measured_asym_bins_(), //
@@ -97,24 +97,25 @@ void UnfoldingAnalyser::beginJob() {
 		throw edm::Exception(edm::errors::Configuration, "TFile Service is not registered in cfg file");
 	}
 	//cout << "This is not how you debug" << endl;
-// 	truth_ =
-// 			fs->make < TH1F
-// 					> ("truth", TString("True distribution;GEN(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
-// 	measured_ =
-// 			fs->make < TH1F
-// 					> ("measured", TString("Measured distribution;RECO(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
-// 	fake_ =
-// 			fs->make < TH1F
-// 					> ("fake", TString("background distribution;RECO(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
-// 	contamination_in_gen_variable_ =
-// 			fs->make < TH1F
-// 					> ("contamination_inGenMET", TString(
-// 							"background distribution;GEN(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
-// 	contamination_in_reco_variable_ =
-// 			fs->make < TH1F
-// 					> ("contamination_inRecoMET", TString(
-// 							"background distribution;RECO(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
-// 
+//histograms with 1 GeV binning
+ 	truth_ =
+ 			fs->make < TH1F
+ 					> ("truth", TString("True distribution;GEN(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
+ 	measured_ =
+ 			fs->make < TH1F
+ 					> ("measured", TString("Measured distribution;RECO(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
+ 	fake_ =
+ 			fs->make < TH1F
+ 					> ("fake", TString("background distribution;RECO(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
+ 	contamination_in_gen_variable_ =
+ 			fs->make < TH1F
+ 					> ("contamination_inGenMET", TString(
+ 							"background distribution;GEN(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
+ 	contamination_in_reco_variable_ =
+ 			fs->make < TH1F
+ 					> ("contamination_inRecoMET", TString(
+ 							"background distribution;RECO(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
+
 // 	response_ =
 // 			fs->make < TH2F
 // 					> ("response", TString(
@@ -157,11 +158,11 @@ void UnfoldingAnalyser::beginJob() {
 							"response;RECO(" + variable_under_analysis_ + ");GEN(" + variable_under_analysis_ + ")"), n_asym_bins, METBinEdges, n_asym_bins, METBinEdges);
 
 	//cout << "Well, you could use 'scram b' as a compiler on your machine within an IDE" << endl;
-// 	truth_->Sumw2();
-// 	measured_->Sumw2();
-// 	fake_->Sumw2();
-// 	contamination_in_gen_variable_->Sumw2();
-// 	contamination_in_reco_variable_->Sumw2();
+ 	truth_->Sumw2();
+ 	measured_->Sumw2();
+ 	fake_->Sumw2();
+ 	contamination_in_gen_variable_->Sumw2();
+ 	contamination_in_reco_variable_->Sumw2();
 // 	response_->Sumw2();
 // 	response_without_fakes_->Sumw2();
 
@@ -211,14 +212,14 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	if (do_electron_channel_) {
 		if (is_semileptonic_electron) {
 			//PU weight only (no btag-weight) as no b-tagging is applied
-			//truth_->Fill(gen_variable, puWeight);
+			truth_->Fill(gen_variable, puWeight);
 			truth_asym_bins_->Fill(gen_variable, puWeight);
 		}
 
 		if (passes_selection) {
 			float reco_variable(get_reco_variable(iEvent));
 
-			//measured_->Fill(reco_variable, weight);
+			measured_->Fill(reco_variable, weight);
 			measured_asym_bins_->Fill(reco_variable, weight);
 			//response_->Fill(reco_variable, gen_variable, weight);
 			response_asym_bins_->Fill(reco_variable, gen_variable, weight);
@@ -227,13 +228,13 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 				//response_without_fakes_->Fill(reco_variable, gen_variable, weight);
 				response_without_fakes_asym_bins_->Fill(reco_variable, gen_variable, weight);
 			} else {
-				//fake_->Fill(reco_variable, weight);
+				fake_->Fill(reco_variable, weight);
 				fake_asym_bins_->Fill(reco_variable, weight);
 				//contamination from other ttbar processes
 				if (is_fully_hadronic || is_dileptonic || is_semileptonic_tau || is_semileptonic_muon) {
-					//contamination_in_reco_variable_->Fill(reco_variable, weight);
+					contamination_in_reco_variable_->Fill(reco_variable, weight);
 					contamination_asym_bins_in_reco_variable_->Fill(reco_variable, weight);
-					//contamination_in_gen_variable_->Fill(gen_variable, weight);
+					contamination_in_gen_variable_->Fill(gen_variable, weight);
 					contamination_asym_bins_in_gen_variable_->Fill(gen_variable, weight);
 				}
 			}
@@ -243,7 +244,7 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	} else { //muon channel
 		if (is_semileptonic_muon) {
 			//PU weight only (no btag-weight) as no b-tagging is applied
-			//truth_->Fill(gen_variable, puWeight);
+			truth_->Fill(gen_variable, puWeight);
 			truth_asym_bins_->Fill(gen_variable, puWeight);
 		}
 
@@ -254,7 +255,7 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
 			weight *= muonCorrection;
 			
-			//measured_->Fill(reco_variable, weight);
+			measured_->Fill(reco_variable, weight);
 			measured_asym_bins_->Fill(reco_variable, weight);
 			//response_->Fill(reco_variable, gen_variable, weight);
 			response_asym_bins_->Fill(reco_variable, gen_variable, weight);
@@ -263,12 +264,12 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 				//response_without_fakes_->Fill(reco_variable, gen_variable, weight);
 				response_without_fakes_asym_bins_->Fill(reco_variable, gen_variable, weight);
 			} else {
-				//fake_->Fill(reco_variable, weight);
+				fake_->Fill(reco_variable, weight);
 				fake_asym_bins_->Fill(reco_variable, weight);
 				if (is_fully_hadronic || is_dileptonic || is_semileptonic_tau || is_semileptonic_electron) {
-					//contamination_in_reco_variable_->Fill(reco_variable, weight);
+					contamination_in_reco_variable_->Fill(reco_variable, weight);
 					contamination_asym_bins_in_reco_variable_->Fill(reco_variable, weight);
-					//contamination_in_gen_variable_->Fill(gen_variable, weight);
+					contamination_in_gen_variable_->Fill(gen_variable, weight);
 					contamination_asym_bins_in_gen_variable_->Fill(gen_variable, weight);
 				}
 			}

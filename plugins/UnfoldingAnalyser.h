@@ -56,7 +56,7 @@ private:
 	// - fill fake (1D)
 	//histograms with 1 GeV binning
 	TH1F* truth_, *measured_, *fake_, *contamination_in_gen_variable_, *contamination_in_reco_variable_;
-	TH2F* response_, *response_without_fakes_;
+//	TH2F* response_, *response_without_fakes_;
 	//histograms with analysis binning: [0,25,45,70,100, inf]
 	TH1F* truth_asym_bins_, *measured_asym_bins_, *fake_asym_bins_, *contamination_asym_bins_in_gen_variable_,
 			*contamination_asym_bins_in_reco_variable_;
