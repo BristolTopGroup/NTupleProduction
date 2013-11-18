@@ -10,16 +10,18 @@ from PhysicsTools.PatAlgos.tools.coreTools import *
 
 #Globals tags have been updated with the new JEC from https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECDataMC
 #Data Global Tag
-GLOBALTAG_DATA = 'FT_53_V21_AN3::All' # Used for 2012 A, B, C and D: 22Jan2013 re-reco
+#GLOBALTAG_DATA = 'FT_53_V21_AN3::All' # Used for 2012 A, B, C and D: 22Jan2013 re-reco
 #GLOBALTAG_DATA = 'FT53_V10A_AN4::All' # Used for 2012 C: 24Aug2012 re-reco (v1)
 #GLOBALTAG_DATA = 'GR_P_V42_AN4::All' # Used for 2012 C prompt reco (v2) and Run 2012 D prompt reco (v1)
 #GLOBALTAG_DATA = 'FT_P_V42C_AN4::All' # Used for 2012 C run 201191: ecal recovery of run 201191 (11Dec2012 re-reco)
+GLOBALTAG_DATA = 'FT_R_53_LV5::All' #Winter 2013 2011A&B Legacy re-reco in CMSSW_5_3_X
 
 #Monte Carlo Global Tag
-GLOBALTAG_MC = 'START53_V21::All'
+GLOBALTAG_MC = 'START53_V21::All' #TO BE UPDATED TO RELEVANT 5_3_X 2011 7TEV PRODUCTION GLOBAL TAGS
 FILETAG = '53X'
 
 TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/SingleElectron_Run2012B_13Jul2012_ReReco_AOD.root'
+#TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/ElectronHad_Run2011A-12Oct2013-v1_AOD.root' # test file for 2011 7TEV RunA Oct2013 re-reco
 TEST_MC_FILE = 'file:///storage/TopQuarkGroup/mc/8TeV/SynchEx/Summer12_DR53X_TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_AODSIM_PU_S10_START53_V7A-v1.root'
 
 #CERN
