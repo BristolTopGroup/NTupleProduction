@@ -6,25 +6,6 @@ import FWCore.PythonUtilities.LumiList as LumiList
 
 from PhysicsTools.PatAlgos.tools.coreTools import *
 #set up analysis
-#https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions
-
-#Globals tags have been updated with the new JEC from https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECDataMC
-#Data Global Tag
-GLOBALTAG_DATA = 'FT_53_V21_AN3::All' # Used for 2012 A, B, C and D: 22Jan2013 re-reco
-#GLOBALTAG_DATA = 'FT53_V10A_AN4::All' # Used for 2012 C: 24Aug2012 re-reco (v1)
-#GLOBALTAG_DATA = 'GR_P_V42_AN4::All' # Used for 2012 C prompt reco (v2) and Run 2012 D prompt reco (v1)
-#GLOBALTAG_DATA = 'FT_P_V42C_AN4::All' # Used for 2012 C run 201191: ecal recovery of run 201191 (11Dec2012 re-reco)
-
-#Monte Carlo Global Tag
-GLOBALTAG_MC = 'START53_V21::All'
-FILETAG = '53X'
-
-TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/SingleElectron_Run2012B_13Jul2012_ReReco_AOD.root'
-TEST_MC_FILE = 'file:///storage/TopQuarkGroup/mc/8TeV/SynchEx/Summer12_DR53X_TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_AODSIM_PU_S10_START53_V7A-v1.root'
-
-#CERN
-#TEST_DATA_FILE = '/store/data/Run2012A/ElectronHad/AOD/PromptReco-v1/000/193/336/C47F154E-A697-E111-83F5-001D09F24D8A.root'
-#TEST_MC_FILE = 'file:///afs/cern.ch/user/s/senkin/workspace/public/Summer12_DR53X_TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_AODSIM_PU_S10_START53_V7A-v1.root'
 
 #use jet energy correction from database (loaded from BristolAnalysis/NTupleTools/python_custom_JEC_cff.py)
 #==False -> use JEC from Global Tag 
@@ -130,6 +111,12 @@ options.register ('CMSSW',
                   VarParsing.varType.string,
                   "CMSSW version used: 53X (default), 52X or 44X")
 
+options.register ('centreOfMassEnergy',
+                  8,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.float,
+                  "Centre of Mass Energy in TeV; 7TeV for 2011, 8TeV for 2012")
+
 options.register ('storePDFWeights',
                   False,
                   VarParsing.multiplicity.singleton,
@@ -153,8 +140,6 @@ options.register ('skipEvents',
                   VarParsing.multiplicity.singleton,
                   VarParsing.varType.int,
                   "Number of events to skip (0 for none)")
-
-			       
 			       
 #CMSSW 44X can't compile this file in the python directory correctly 
 #as it fails to identify the file ending. This hack helps.
@@ -168,7 +153,26 @@ if not hasCorrectEnding:
 
 options.parseArguments()
 
-if options.CMSSW == '44X':
+#https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions
+#Globals tags have been updated with the new JEC from https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECDataMC
+
+if options.CMSSW == "53X" and options.centreOfMassEnergy == 8:
+    #Data Global Tag
+    GLOBALTAG_DATA = 'FT_53_V21_AN3::All' # Used for 2012 A, B, C and D: 22Jan2013 re-reco
+    #Monte Carlo Global Tag
+    GLOBALTAG_MC = 'START53_V21::All' #TO BE UPDATED TO RELEVANT 5_3_X 2011 7TEV PRODUCTION GLOBAL TAGS
+    FILETAG = '53X'
+    TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/SingleElectron_Run2012B_13Jul2012_ReReco_AOD.root'
+    TEST_MC_FILE = 'file:///storage/TopQuarkGroup/mc/8TeV/SynchEx/Summer12_DR53X_TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_AODSIM_PU_S10_START53_V7A-v1.root'
+elif options.CMSSW == "53X" and options.centreOfMassEnergy == 7:
+    #Data Global Tag
+    GLOBALTAG_DATA = 'FT_R_53_LV5::All' #Winter 2013 2011A&B Legacy re-reco in CMSSW_5_3_X
+    #Monte Carlo Global Tag
+    GLOBALTAG_MC = 'START53_V21::All' #TO BE UPDATED TO RELEVANT 5_3_X 2011 7TEV PRODUCTION GLOBAL TAGS WHEN AVAILABLE
+    FILETAG = '53X'
+    TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/ElectronHad_Run2011A-12Oct2013-v1_AOD.root' #test file for 2011 7TEV RunA Oct2013 re-reco
+    TEST_MC_FILE = '' # NOT AVAILABLE YET
+elif options.CMSSW == '44X':
     GLOBALTAG_DATA = 'GR_R_44_V15::All'
     GLOBALTAG_MC = 'START44_V13::All'
     FILETAG = '44X'
@@ -177,8 +181,7 @@ if options.CMSSW == '44X':
     #CERN
     #TEST_DATA_FILE = '/store/data/Run2011A/ElectronHad/AOD/08Nov2011-v1/0012/C481C0D4-1D1A-E111-8B01-E0CB4E1A1190.root'
     #TEST_MC_FILE =  '/store/mc/Fall11/TTJets_TuneZ2_7TeV-madgraph-tauola/AODSIM/PU_S6_START44_V9B-v1/0003/FEE78BEE-0237-E111-9CBC-003048678F06.root'
-
-if options.CMSSW == '52X':
+elif options.CMSSW == '52X':
     GLOBALTAG_DATA = 'GR_R_52_V9D::All'
     GLOBALTAG_MC = 'START52_V11C::All'
     FILETAG = '52X'
@@ -187,6 +190,10 @@ if options.CMSSW == '52X':
     #CERN
 #    TEST_DATA_FILE = '/store/data/Run2012A/ElectronHad/AOD/PromptReco-v1/000/193/336/C47F154E-A697-E111-83F5-001D09F24D8A.root'
 #    TEST_MC_FILE = '/store/mc/Summer12/TTJets_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S7_START52_V9-v1/0000/FEDDBC6A-9290-E111-B7FD-0018F3D09628.root'
+
+#CERN
+#TEST_DATA_FILE = '/store/data/Run2012A/ElectronHad/AOD/PromptReco-v1/000/193/336/C47F154E-A697-E111-83F5-001D09F24D8A.root'
+#TEST_MC_FILE = 'file:///afs/cern.ch/user/s/senkin/workspace/public/Summer12_DR53X_TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_AODSIM_PU_S10_START53_V7A-v1.root'
 
 maxLooseLeptonRelIso = options.maxLooseLeptonRelIso
 
@@ -282,7 +289,7 @@ if not options.useData :
         process.genParticlesForJetsNoNu.excludeFromResonancePids = [11, 12, 13, 14, 16]
 
 process.patseq = cms.Sequence(
-    process.HBHENoiseFilter * 
+#    process.HBHENoiseFilter * 
     process.goodOfflinePrimaryVertices * 
     process.eidMVASequence *
     process.genParticlesForJetsNoNu *

@@ -98,7 +98,7 @@ void TopPairElectronPlusJets2012SelectionFilter::fillDescriptions(edm::Configura
 	desc.add<double>("min3JetPt", 30.0);
 	desc.add<double>("min4JetPt", 30.0);
 	desc.add<double>("tightElectronIsolation", 0.1);
-	desc.add<double>("looseElectronIsolation", 0.2);
+	desc.add<double>("looseElectronIsolation", 0.15);
 	desc.add<double>("looseMuonIsolation", 0.2);
 
 	desc.add<bool>("useDeltaBetaCorrectionsForMuons", true);
@@ -231,7 +231,7 @@ void TopPairElectronPlusJets2012SelectionFilter::getLooseMuons() {
 
 bool TopPairElectronPlusJets2012SelectionFilter::isLooseMuon(const pat::Muon& muon) const {
 	bool passesPtAndEta = muon.pt() > 10 && fabs(muon.eta()) < 2.5;
-	bool passesID = muon.isPFMuon() && (muon.isGlobalMuon()); //removed || muon.isTrackerMuon());
+	bool passesID = muon.isPFMuon() && (muon.isGlobalMuon() || muon.isTrackerMuon());
 	bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < looseMuonIso_;
 
 	return passesPtAndEta && passesID && passesIso;
@@ -258,9 +258,9 @@ bool TopPairElectronPlusJets2012SelectionFilter::isGoodElectron(const pat::Elect
 	bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
 	//2D impact w.r.t primary vertex
 	bool passesD0 = fabs(electron.dB(pat::Electron::PV2D)) < 0.02; //cm
-	bool passesHOverE = electron.hadronicOverEm() < 0.05; // same for EE and EB
+//	bool passesHOverE = electron.hadronicOverEm() < 0.05; // same for EE and EB
 	bool passesID = electron.electronID("mvaTrigV0") > 0.5;
-	return passesPtAndEta && notInCrack && passesD0 && passesID && passesHOverE;
+	return passesPtAndEta && notInCrack && passesD0 && passesID; //&& passesHOverE;
 }
 
 void TopPairElectronPlusJets2012SelectionFilter::cleanedJets() {
@@ -429,6 +429,7 @@ bool TopPairElectronPlusJets2012SelectionFilter::passesScrapingVeto(edm::Event& 
 
 bool TopPairElectronPlusJets2012SelectionFilter::passesTriggerSelection() const {
 	if (isRealData_) {
+		//2011 data: run 160404 to run 180252
 		if (runNumber_ >= 160404 && runNumber_ <= 163869)
 			return triggerFired("HLT_Ele25_CaloIdVT_TrkIdT_CentralTriJet30", hltConfig_, triggerResults_);
 		else if (runNumber_ > 163869 && runNumber_ <= 165633)
@@ -436,20 +437,20 @@ bool TopPairElectronPlusJets2012SelectionFilter::passesTriggerSelection() const 
 		else if (runNumber_ > 165633 && runNumber_ <= 178380)
 			return triggerFired("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralJet30", hltConfig_,
 					triggerResults_);
-		else if (runNumber_ > 178380 && runNumber_ < 190456)
+		else if (runNumber_ > 178380 && runNumber_ <= 180252)
 			return triggerFired("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFJet30", hltConfig_,
 					triggerResults_);
-		else //2012 data
+		//2012 data: run 190456 to run 208686
+		else if (runNumber_ >= 190456 && runNumber_ <= 208686) //2012 data
 			return triggerFired("HLT_Ele27_WP80_v", hltConfig_, triggerResults_);
 
 	} else {
-		if (MCSampleTag_ == "Fall11") {
-			//Fall11 MC
+		if (MCSampleTag_ == "Fall11") {	//Fall11 MC
 			return triggerFired("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralJet30", hltConfig_, triggerResults_);
-		} else {
-			//Summer12 MC
+		} else if (MCSampleTag_ == "Summer12") { //Summer12 MC
 			return triggerFired("HLT_Ele27_WP80_v", hltConfig_, triggerResults_);
-		}
+		} else
+			return false;
 	}
 	return false;
 }
