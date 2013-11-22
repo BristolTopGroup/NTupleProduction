@@ -289,7 +289,7 @@ if not options.useData :
         process.genParticlesForJetsNoNu.excludeFromResonancePids = [11, 12, 13, 14, 16]
 
 process.patseq = cms.Sequence(
-    process.HBHENoiseFilter * 
+#    process.HBHENoiseFilter * 
     process.goodOfflinePrimaryVertices * 
     process.eidMVASequence *
     process.genParticlesForJetsNoNu *
