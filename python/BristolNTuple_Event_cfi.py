@@ -2,6 +2,7 @@ import FWCore.ParameterSet.Config as cms
 rootTupleEvent = cms.EDProducer(
         "BristolNTuple_Event",
         DCSInputTag=cms.InputTag('scalersRawToDigi'),
+        HBHENoiseFilterInput=cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult'),
         HCALLaserFilterInput=cms.InputTag('HcalLaserEventFilter'),
         ECALDeadCellFilterInput=cms.InputTag('EcalDeadCellBoundaryEnergyFilter'),
         ECALDeadCellTriggerPrimitiveFilterInput=cms.InputTag('EcalDeadCellTriggerPrimitiveFilter'),

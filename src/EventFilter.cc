@@ -14,7 +14,7 @@ using namespace edm;
 using namespace std;
 
 EventFilter::EventFilter(const edm::ParameterSet& iConfig) :
-		hcalNoiseInput_(iConfig.getParameter < edm::InputTag > ("HBHENoiseFilterInput")), //
+		hbheNoiseFilterInput_(iConfig.getParameter < edm::InputTag > ("HBHENoiseFilterInput")), //
 		hcalLaserFilterInput_(iConfig.getParameter < edm::InputTag > ("HCALLaserFilterInput")), //
 		ecalDeadCellFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellFilterInput")), //
 		ecalDeadCellTriggerPrimitiveFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellTriggerPrimitiveFilterInput")), //
@@ -93,7 +93,7 @@ bool EventFilter::passesSelectionStep(edm::Event& event, Filters::value filter) 
 	case Filters::allEvents:
 		return true;
 	case Filters::passHBHENoiseFilter:
-		return passesFilter(event, hcalNoiseInput_);
+		return passesFilter(event, hbheNoiseFilterInput_);
 	case Filters::passCSCBeamHaloFilter:
 		return passesCSCTightBeamHaloID(event);
 	case Filters::passHCALLaserFilter:

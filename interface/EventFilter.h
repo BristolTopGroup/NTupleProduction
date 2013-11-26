@@ -75,7 +75,7 @@ private:
 	bool passesMuonCuts(edm::Event& event);
 	bool passesJetCuts(edm::Event& event);
 
-	edm::InputTag hcalNoiseInput_, hcalLaserFilterInput_, ecalDeadCellFilterInput_, ecalDeadCellTriggerPrimitiveFilterInput_,//
+	edm::InputTag hbheNoiseFilterInput_, hcalLaserFilterInput_, ecalDeadCellFilterInput_, ecalDeadCellTriggerPrimitiveFilterInput_,//
 			trackingFailureFilterInput_, //
 			eeBadSCFilterInput_, //
 			ecalLaserCorrFilterInput_, //

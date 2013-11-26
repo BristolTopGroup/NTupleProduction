@@ -10,6 +10,7 @@
 
 BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig) :
 		dcsInputTag(iConfig.getParameter < edm::InputTag > ("DCSInputTag")), //
+		hbheNoiseFilterInput_(iConfig.getParameter < edm::InputTag > ("HBHENoiseFilterInput")), //
 		hcalLaserFilterInput_(iConfig.getParameter < edm::InputTag > ("HCALLaserFilterInput")), //
 		ecalDeadCellFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellFilterInput")), //
 		ecalDeadCellTriggerPrimitiveFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellTriggerPrimitiveFilterInput")), //
@@ -34,6 +35,7 @@ BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig) :
 	produces<double>(prefix + "SumET" + suffix);
 
 	//optional MET filter decisions
+	produces<bool>(prefix + "HBHENoiseFilter" + suffix);
 	produces<bool>(prefix + "HCALLaserFilter" + suffix);
 	produces<bool>(prefix + "ECALDeadCellFilter" + suffix);
 	produces<bool>(prefix + "ECALDeadCellTriggerPrimitiveFilter" + suffix);
@@ -99,6 +101,7 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	std::auto_ptr<double> rho(new double(*rhoH.product()));
 	std::auto_ptr<double> SumET(new double(mets->at(0).sumEt()));
 
+	std::auto_ptr<bool> HBHENoiseFilter(new bool(passesFilter(iEvent, hbheNoiseFilterInput_)));
 	std::auto_ptr<bool> HCALLaserFilter(new bool(passesFilter(iEvent, hcalLaserFilterInput_)));
 	std::auto_ptr<bool> ECALDeadCellFilter(new bool(passesFilter(iEvent, ecalDeadCellFilterInput_)));
 	std::auto_ptr<bool> ECALDeadCellTriggerPrimitiveFilter(new bool(passesFilter(iEvent, ecalDeadCellTriggerPrimitiveFilterInput_)));
@@ -131,6 +134,7 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	iEvent.put(rho, prefix + "rho" + suffix);
 	iEvent.put(SumET, prefix + "SumET" + suffix);
 
+	iEvent.put(HBHENoiseFilter, prefix + "HBHENoiseFilter" + suffix);
 	iEvent.put(HCALLaserFilter, prefix + "HCALLaserFilter" + suffix);
 	iEvent.put(ECALDeadCellFilter, prefix + "ECALDeadCellFilter" + suffix);
 	iEvent.put(ECALDeadCellTriggerPrimitiveFilter, prefix + "ECALDeadCellTriggerPrimitiveFilter" + suffix);
