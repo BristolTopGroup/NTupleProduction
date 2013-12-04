@@ -429,6 +429,7 @@ bool TopPairElectronPlusJets2012SelectionFilter::passesScrapingVeto(edm::Event& 
 
 bool TopPairElectronPlusJets2012SelectionFilter::passesTriggerSelection() const {
 	if (isRealData_) {
+		//2011 data: run 160404 to run 180252
 		if (runNumber_ >= 160404 && runNumber_ <= 163869)
 			return triggerFired("HLT_Ele25_CaloIdVT_TrkIdT_CentralTriJet30", hltConfig_, triggerResults_);
 		else if (runNumber_ > 163869 && runNumber_ <= 165633)
@@ -436,20 +437,20 @@ bool TopPairElectronPlusJets2012SelectionFilter::passesTriggerSelection() const 
 		else if (runNumber_ > 165633 && runNumber_ <= 178380)
 			return triggerFired("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralJet30", hltConfig_,
 					triggerResults_);
-		else if (runNumber_ > 178380 && runNumber_ < 190456)
+		else if (runNumber_ > 178380 && runNumber_ <= 180252)
 			return triggerFired("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFJet30", hltConfig_,
 					triggerResults_);
-		else //2012 data
+		//2012 data: run 190456 to run 208686
+		else if (runNumber_ >= 190456 && runNumber_ <= 208686) //2012 data
 			return triggerFired("HLT_Ele27_WP80_v", hltConfig_, triggerResults_);
 
 	} else {
-		if (MCSampleTag_ == "Fall11") {
-			//Fall11 MC
+		if (MCSampleTag_ == "Fall11") {	//Fall11 MC
 			return triggerFired("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralJet30", hltConfig_, triggerResults_);
-		} else {
-			//Summer12 MC
+		} else if (MCSampleTag_ == "Summer12") { //Summer12 MC
 			return triggerFired("HLT_Ele27_WP80_v", hltConfig_, triggerResults_);
-		}
+		} else
+			return false;
 	}
 	return false;
 }
