@@ -10,13 +10,24 @@ def setup_eventfilters(process, cms, options, useTrackingFailureFilter=False):
     process.EcalDeadCellBoundaryEnergyFilter = setup_ECALDeadCellFilter(process, cms)
     process.EcalDeadCellTriggerPrimitiveFilter = setup_ECALDeadCellTriggerPrimitiveFilter(process, cms)
     process.trackingFailureFilter = setup_trackingFailureFilter(process, cms)
-    process.EventFilter = setup_skim(process, cms, options)
-    
+#    process.eeBadScFilter = setup_eeBadScFilter(process, cms)
+#    process.ecalLaserCorrFilter = setup_ecalLaserCorrFilter(process, cms)
+    #setting up tracking POG filters
+#    setup_trackingPOGfilters(process, cms)
+
+    process.EventFilter = setup_skim(process, cms, options)    
     process.EventFilter.HCALNoiseFilterInput = cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult')
     process.EventFilter.HCALLaserFilterInput = cms.InputTag('HcalLaserEventFilter')
     process.EventFilter.ECALDeadCellFilterInput = cms.InputTag('EcalDeadCellBoundaryEnergyFilter')
     process.EventFilter.ECALDeadCellTriggerPrimitiveFilterInput = cms.InputTag('EcalDeadCellTriggerPrimitiveFilter')
     process.EventFilter.TrackingFailureFilterInput = cms.InputTag('trackingFailureFilter')
+    process.EventFilter.EEBadSCFilterInput = cms.InputTag('eeBadScFilter')
+    process.EventFilter.ECALLaserCorrFilterInput = cms.InputTag('ecalLaserCorrFilter')
+    #tracking POG filters
+    process.EventFilter.manystripclus53XInput = cms.InputTag('manystripclus53X')
+    process.EventFilter.toomanystripclus53XInput = cms.InputTag('toomanystripclus53X')
+    process.EventFilter.logErrorTooManyClustersInput = cms.InputTag('logErrorTooManyClusters')
+    process.EventFilter.useTrackingPOGFilters = cms.bool(True)
     process.EventFilter.useTrackingFailureFilter = cms.bool(True)
     #disable optional MET filters for now
     process.EventFilter.useOptionalMETFilters = cms.bool(False)
@@ -132,6 +143,19 @@ def setup_ecalLaserCorrFilter(process, cms):
     ecalLaserCorrFilter.Debug = cms.bool (False)
     return ecalLaserCorrFilter
 
+def setup_trackingPOGfilters(process, cms):
+    from RecoMET.METFilters.trackingPOGFilters_cfi import manystripclus53X
+    from RecoMET.METFilters.trackingPOGFilters_cfi import toomanystripclus53X
+    from RecoMET.METFilters.trackingPOGFilters_cfi import logErrorTooManyClusters
+    manystripclus53X.taggedMode = cms.untracked.bool(True)
+    manystripclus53X.forcedValue = cms.untracked.bool(False)
+    toomanystripclus53X.taggedMode = cms.untracked.bool(True)
+    toomanystripclus53X.forcedValue = cms.untracked.bool(False)
+    logErrorTooManyClusters.taggedMode = cms.untracked.bool(True)
+    logErrorTooManyClusters.forcedValue = cms.untracked.bool(False)
+    process.manystripclus53X = manystripclus53X
+    process.toomanystripclus53X = toomanystripclus53X
+    process.logErrorTooManyClusters = logErrorTooManyClusters
     
 def setup_skim(process, cms, options):
     print '=' * 60

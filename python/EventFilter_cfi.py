@@ -9,8 +9,16 @@ EventFilter = cms.EDFilter(
     ECALDeadCellFilterInput=cms.InputTag('EcalDeadCellBoundaryEnergyFilter'),
     ECALDeadCellTriggerPrimitiveFilterInput = cms.InputTag('EcalDeadCellTriggerPrimitiveFilter'),
     TrackingFailureFilterInput=cms.InputTag('trackingFailureFilter'),
+    EEBadSCFilterInput = cms.InputTag('eeBadScFilter'),
+    ECALLaserCorrFilterInput = cms.InputTag('ecalLaserCorrFilter'),
+    #tracking POG filters
+    manystripclus53XInput = cms.InputTag('manystripclus53X'),
+    toomanystripclus53XInput = cms.InputTag('toomanystripclus53X'),
+    logErrorTooManyClustersInput = cms.InputTag('logErrorTooManyClusters'),
+
     useOptionalMETFilters=cms.bool(False),
     useTrackingFailureFilter=cms.bool(False),
+    useTrackingPOGFilters=cms.bool(True),
 
     #track input for scraping filter
     TracksInput=cms.InputTag('generalTracks'),

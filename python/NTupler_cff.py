@@ -6,6 +6,7 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
     ################################## nTuple Configuration ##############################################
     ######################################################################################################
     process.load('BristolAnalysis.NTupleTools.Ntuple_cff')
+    
     #vertices
     process.rootTupleVertex.InputTag = cms.InputTag('goodOfflinePrimaryVertices')
     process.rootTupleVertex.Prefix = cms.string('goodOfflinePrimaryVertices.')
@@ -77,6 +78,10 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
             'keep *_rootTuplePFMet*_*_*',
             'keep *_rootTupleType1CorrectedPFMet*_*_*',
             'keep *_rootTupleType1p2CorrectedPFMet*_*_*',
+            #MET corrections
+            'keep *_rootTupleSysShiftMetCorrections_*_*',
+            'keep *_rootTupleType0MetCorrections_*_*',
+            'keep *_rootTupleType1MetCorrections_*_*',
             #muons
             'keep *_nTupleMuons_*_*',
             'keep *_nTuplePFMuons_*_*',
@@ -129,6 +134,10 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
         process.rootTuplePFType1CorrectedMET +
         process.rootTuplePFType1p2CorrectedMET +
         process.rootTuplePFType1p2CorrectedMetPFlow +
+        #MET corrections
+        process.rootTupleSysShiftMetCorrections +
+        process.rootTupleType0MetCorrections +
+        process.rootTupleType1MetCorrections +
         #MET uncertainties
         process.rootTuplePFMetElectronEnUp +
         process.rootTuplePFMetElectronEnDown +

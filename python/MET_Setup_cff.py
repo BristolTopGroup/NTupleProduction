@@ -8,6 +8,7 @@ def setup_MET(process, cms, options, postfix="PFlow"):
     process.patPFMet.addGenMET = cms.bool(not options.useData)
     
     process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
+#    process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
     
     setup_MET_uncertainties(process, cms, options, postfix)
     
@@ -57,6 +58,7 @@ def setup_MET_manually(process, cms, options, postfix="PFlow"):
     process.patPFMet.addGenMET = cms.bool(not options.useData)
     
     process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
+#    process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
     
     #these flags are false for '+postfix' mets by default, but true for non-postfix ones!
     getattr(process,'patPFJetMETtype1p2Corr'+postfix).skipEM = cms.bool(False)

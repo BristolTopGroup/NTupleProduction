@@ -97,6 +97,12 @@ options.register ('CMSSW',
                   VarParsing.varType.string,
                   "CMSSW version used: 53X (default), 52X or 44X")
 
+options.register ('CentreOfMassEnergy',
+                  8,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.float,
+                  "Centre of Mass Energy in TeV; 7TeV for 2011, 8TeV for 2012")
+
 options.register ('storePDFWeights',
                   False,
                   VarParsing.multiplicity.singleton,
@@ -233,7 +239,7 @@ if options.useData :
     process.looseLeptonSequence.remove(process.muonMatchLoosePFlow)
 
 process.patseq = cms.Sequence(
-    process.HBHENoiseFilterResultProducer * 
+    process.HBHENoiseFilterResultProducer *
     process.goodOfflinePrimaryVertices * 
     process.genParticlesForJetsNoNu * 
     getattr(process, "patPF2PATSequence" + postfix) * 
@@ -308,6 +314,21 @@ else :
 # reduce verbosity
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(100)
 
+#----------------------------------------------------------------------------------------------------
+# The ECAL laser correction filter (ecalLaserCorrFilter) occasionally
+# interpolates laser correction values of < 1 and issues a LogError message
+#
+# This does not affect the laser correction that is applied: only the interpolated estimate
+# that the filter uses. The filter runs in "Tagging Mode", so no events can be removed.
+#
+# Error message comes from line 173 of:
+# CalibCalorimetry/EcalLaserCorrection/src/EcalLaserDbService.cc
+# function = EcalLaserDbService::getLaserCorrection
+# Message = "The interpolated laser correction is <= zero!"
+#
+# We suppress these messages. Suppression can be removed by commenting the following line.
+#----------------------------------------------------------------------------------------------------
+process.MessageLogger.suppressError = cms.untracked.vstring ('ecalLaserCorrFilter')
 
 # process all the events
 if options.maxEvents:

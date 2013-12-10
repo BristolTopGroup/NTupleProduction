@@ -6,6 +6,7 @@
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_GenMET.h"
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_RecoMET.h"
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_MET.h"
+#include "BristolAnalysis/NTupleTools/interface/BristolNTuple_METcorrections.h"
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_Muons.h"
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_Electrons.h"
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_BeamSpot.h"
@@ -25,6 +26,7 @@ DEFINE_FWK_MODULE(BristolNTuple_GenJets);
 DEFINE_FWK_MODULE(BristolNTuple_GenMET);
 DEFINE_FWK_MODULE(BristolNTuple_RecoMET);
 DEFINE_FWK_MODULE(BristolNTuple_MET);
+DEFINE_FWK_MODULE(BristolNTuple_METcorrections);
 DEFINE_FWK_MODULE(BristolNTuple_Muons);
 DEFINE_FWK_MODULE(BristolNTuple_BeamSpot);
 DEFINE_FWK_MODULE(BristolNTuple_Tracks);

@@ -14,19 +14,22 @@
 
 namespace Filters {
 enum value {
-	allEvents,
-	passHBHENoiseFilter,
-	passCSCBeamHaloFilter,
-	passHCALLaserFilter,
-	passECALDeadCellFilter,
-	passECALDeadCellTriggerPrimitiveFilter,
-	passTrackingFailureFilter,
-	passScrapingVeto,
-	passGoodPrimaryVertex,
-	passElectronCuts,
-	passMuonCuts,
-	passJetCuts,
-	NUMBER_OF_FILTERS
+    allEvents,
+    passHBHENoiseFilter,
+    passCSCBeamHaloFilter,
+    passHCALLaserFilter,
+    passECALDeadCellFilter,
+    passECALDeadCellTriggerPrimitiveFilter,
+    passTrackingFailureFilter,
+    passEEBadSCFilter,
+    passECALLaserCorrFilter,
+    passTrackingPOGFilters,
+    passScrapingVeto,
+    passGoodPrimaryVertex,
+    passElectronCuts,
+    passMuonCuts,
+    passJetCuts,
+    NUMBER_OF_FILTERS
 };
 
 const std::string names[NUMBER_OF_FILTERS] = { "All Events", //
@@ -36,6 +39,9 @@ const std::string names[NUMBER_OF_FILTERS] = { "All Events", //
 		"ECALDeadCellFilter", //
 		"ECALDeadCellTriggerPrimitiveFilter", //
 		"TrackingFailureFilter", //
+		"EEBadSupercrystalFilter", //
+		"ECALLaserCorrFilter", //
+		"TrackingPOGFilters", //
 		"ScrapingVeto", //
 		"GoodPrimaryVertex", //
 		"ElectronCuts", //
@@ -71,6 +77,11 @@ private:
 
 	edm::InputTag hcalNoiseInput_, hcalLaserFilterInput_, ecalDeadCellFilterInput_, ecalDeadCellTriggerPrimitiveFilterInput_,//
 			trackingFailureFilter_, //
+			eeBadSCFilterInput_, //
+			ecalLaserCorrFilterInput_,
+            manystripclus53XInput_, //
+            toomanystripclus53XInput_, //
+            logErrorTooManyClustersInput_, //
 			trkInput_, vertexInput_, //
 			jetInput_, electronInput_, muonInput_;
 
@@ -78,7 +89,7 @@ private:
 
 	double minJetPt_, maxAbsJetEta_, minElectronPt_, maxAbsElectronEta_, minMuonPt_, maxAbsMuonEta_;
 
-	bool debug_, counteitherleptontype_, useTrackingFailureFilter_, useOptionalMETFilters_;
+	bool debug_, counteitherleptontype_, useTrackingFailureFilter_, useTrackingPOGFilters_, useOptionalMETFilters_;
 	std::vector<int> eventCount_;
 
 	TH1I* hCount;

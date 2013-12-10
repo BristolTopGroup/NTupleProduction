@@ -106,7 +106,6 @@ private:
 	bool useDeltaBetaCorrections_, useRhoActiveAreaCorrections_, useMETFilters_, useEEBadScFilter_;
 
 	std::string prefix_, MCSampleTag_;
-
 	bool debug_, taggingMode_;
 
 	//internal
