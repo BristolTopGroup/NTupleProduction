@@ -65,6 +65,9 @@ nohup cmsRun BristolAnalysis/NTupleTools/test/makeTuples_cfg.py CMSSW=44X useDat
 
 ## Notes
 More information can be found at [Bristol Ntuple Recipes twiki page](https://twiki.cern.ch/twiki/bin/view/CMS/BristolNTuplerRecipes)
+When creating CRAB jobs with storePDFWeights=1, after creating the CRAB job, add the following two lines to the <job_folder>/job/CMSSW.sh file after the line "eval `scram runtime -sh | grep -v SCRAMRT_LSB_JOBNAME`", and then submit:
+scram setup lhapdffull
+scram b
 
 ## Bugs
 Please report any problems on our [issues page](https://github.com/BristolTopGroup/NTupleProduction/issues).
