@@ -98,7 +98,7 @@ void TopPairElectronPlusJets2012SelectionFilter::fillDescriptions(edm::Configura
 	desc.add<double>("min3JetPt", 30.0);
 	desc.add<double>("min4JetPt", 30.0);
 	desc.add<double>("tightElectronIsolation", 0.1);
-	desc.add<double>("looseElectronIsolation", 0.2);
+	desc.add<double>("looseElectronIsolation", 0.15);
 	desc.add<double>("looseMuonIsolation", 0.2);
 
 	desc.add<bool>("useDeltaBetaCorrectionsForMuons", true);
