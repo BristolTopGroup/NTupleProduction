@@ -4,9 +4,14 @@ from BristolAnalysis.NTupleTools.NTupleTools_cff import *
 #            Test files
 ##########################################################################################
 #TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TTJets_TuneZ2_7TeV_Fall11_44X_AODSIM.root'
-#TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TT_TuneZ2_7TeV_POWHEG_44X.root'
-TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TT_TuneZ2_7TeV_MCatNLO_44X.root'
-TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TT_TuneZ2_7TeV_MCatNLO_44X_D058CA1C-9A36-E111-A1A5-0026189438E9.root'
+#TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TT_TuneZ2_8TeV_POWHEG_53X.root'
+#TEST_MC_FILE = 'file:///storage/TopQuarkGroup/mc/8TeV/SynchEx/Summer12_DR53X_TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_AODSIM_PU_S10_START53_V7A-v1.root'
+TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TTJets_TuneZ2_7TeV_Fall11_44X_AODSIM.root'
+
+if options.isMCatNLO:
+    TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TT_TuneZ2_8TeV_MCatNLO_53X.root'
+    #TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TT_TuneZ2_7TeV_MCatNLO_44X.root'
+
 process.source.fileNames = [
             TEST_MC_FILE
             ]
@@ -60,7 +65,10 @@ muonselectionPrefix = 'TopPairMuonPlusJets2012Selection.'
 process.topPairEPlusJetsSelection.prefix = cms.untracked.string(electronselectionPrefix)
 process.topPairMuPlusJetsSelection.prefix = cms.untracked.string(muonselectionPrefix)
 
-process.MCFiltersInTaggingMode = cms.Sequence(process.ttFullHadronicFilter * 
+process.load("TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff")
+
+process.MCFiltersInTaggingMode = cms.Sequence(process.makeGenEvt *
+                                                     process.ttFullHadronicFilter * 
                                                      process.ttFullLeptonicFilter * 
                                                      process.ttSemiLeptonicElectronFilter * 
                                                      process.ttSemiLeptonicMuonFilter * 
@@ -91,36 +99,134 @@ process.eventWeightBtagMuPlusJets = process.eventWeightBtagEPlusJets.clone(
             numberOfTagsInput = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'NumberOfBtags', 'PAT')  ,  
             jetInput = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'cleanedJets', 'PAT'),       
                                                               )
-process.unfoldingAnalyserElectronChannel.selectionFlagInput = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'FullSelection', 'PAT')
-process.unfoldingAnalyserElectronChannel.BtagWeightInput = cms.InputTag( 'eventWeightBtagEPlusJets' )
-process.unfoldingAnalyserMuonChannel.selectionFlagInput = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'FullSelection', 'PAT')
-process.unfoldingAnalyserMuonChannel.BtagWeightInput = cms.InputTag( 'eventWeightBtagMuPlusJets' )
+electron_unfolding_analysers = [
+    process.unfolding_MET_analyser_electron_channel_patMETsPFlow,
+    process.unfolding_MET_nu_analyser_electron_channel_patMETsPFlow,
+    process.unfolding_ST_analyser_electron_channel_patMETsPFlow,
+    process.unfolding_ST_nocuts_analyser_electron_channel_patMETsPFlow,
+    process.unfolding_ST_parton_analyser_electron_channel_patMETsPFlow,
+    process.unfolding_MT_analyser_electron_channel_patMETsPFlow,
+    process.unfolding_MT_nu_analyser_electron_channel_patMETsPFlow,
+    process.unfolding_WPT_analyser_electron_channel_patMETsPFlow,
+    process.unfolding_WPT_nu_analyser_electron_channel_patMETsPFlow,
+    process.unfolding_MET_analyser_electron_channel_patType1CorrectedPFMet,
+    process.unfolding_MET_nu_analyser_electron_channel_patType1CorrectedPFMet,
+    process.unfolding_ST_analyser_electron_channel_patType1CorrectedPFMet,
+    process.unfolding_ST_nocuts_analyser_electron_channel_patType1CorrectedPFMet,
+    process.unfolding_ST_parton_analyser_electron_channel_patType1CorrectedPFMet,
+    process.unfolding_MT_analyser_electron_channel_patType1CorrectedPFMet,
+    process.unfolding_MT_nu_analyser_electron_channel_patType1CorrectedPFMet,   
+    process.unfolding_WPT_analyser_electron_channel_patType1CorrectedPFMet,
+    process.unfolding_WPT_nu_analyser_electron_channel_patType1CorrectedPFMet,
+    process.unfolding_HT_analyser_electron_channel,
+    process.unfolding_HT_nocuts_analyser_electron_channel,
+    process.unfolding_HT_parton_analyser_electron_channel
+]
+
+for analyser in electron_unfolding_analysers:
+    analyser.selection_flag_input = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'FullSelection', 'PAT')
+    analyser.b_tag_weight_input = cms.InputTag( 'eventWeightBtagEPlusJets' )
+    analyser.reco_jet_input = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'cleanedJets', 'PAT')
+    analyser.electron_input = cms.InputTag("topPairEPlusJetsSelection", electronselectionPrefix + 'signalElectron', 'PAT')
+
+muon_unfolding_analysers = [
+    process.unfolding_MET_analyser_muon_channel_patMETsPFlow,
+    process.unfolding_MET_nu_analyser_muon_channel_patMETsPFlow,
+    process.unfolding_ST_analyser_muon_channel_patMETsPFlow,
+    process.unfolding_ST_nocuts_analyser_muon_channel_patMETsPFlow,
+    process.unfolding_ST_parton_analyser_muon_channel_patMETsPFlow,
+    process.unfolding_MT_analyser_muon_channel_patMETsPFlow,
+    process.unfolding_MT_nu_analyser_muon_channel_patMETsPFlow,
+    process.unfolding_WPT_analyser_muon_channel_patMETsPFlow,
+    process.unfolding_WPT_nu_analyser_muon_channel_patMETsPFlow,
+    process.unfolding_MET_analyser_muon_channel_patType1CorrectedPFMet,
+    process.unfolding_MET_nu_analyser_muon_channel_patType1CorrectedPFMet,
+    process.unfolding_ST_analyser_muon_channel_patType1CorrectedPFMet,
+    process.unfolding_ST_nocuts_analyser_muon_channel_patType1CorrectedPFMet,
+    process.unfolding_ST_parton_analyser_muon_channel_patType1CorrectedPFMet,
+    process.unfolding_MT_analyser_muon_channel_patType1CorrectedPFMet,
+    process.unfolding_MT_nu_analyser_muon_channel_patType1CorrectedPFMet,
+    process.unfolding_WPT_analyser_muon_channel_patType1CorrectedPFMet,
+    process.unfolding_WPT_nu_analyser_muon_channel_patType1CorrectedPFMet,
+    process.unfolding_HT_analyser_muon_channel,
+    process.unfolding_HT_nocuts_analyser_muon_channel,
+    process.unfolding_HT_parton_analyser_muon_channel
     
-process.unfoldingAnalysisSequence = cms.Sequence(process.eventFiltersIntaggingMode * 
-                                                     process.eventWeightBtagEPlusJets *
-                                                     process.eventWeightBtagMuPlusJets *  
-                                                     process.printEventContent * 
-                                                     process.unfoldingAnalyserElectronChannel * 
-                                                     process.unfoldingAnalyserMuonChannel)
-    
+]
+
+for analyser in muon_unfolding_analysers:
+    analyser.selection_flag_input = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'FullSelection', 'PAT')
+    analyser.b_tag_weight_input = cms.InputTag( 'eventWeightBtagMuPlusJets' )
+    analyser.reco_jet_input = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'cleanedJets', 'PAT')
+    analyser.muon_input = cms.InputTag("topPairMuPlusJetsSelection", muonselectionPrefix + 'signalMuon', 'PAT')
+
+process.unfoldingAnalysisSequence = cms.Sequence(process.eventFiltersIntaggingMode *
+                                                 process.eventWeightBtagEPlusJets *
+                                                 process.eventWeightBtagMuPlusJets *
+                                                 process.printEventContent * 
+                                                 process.unfolding_MET_analyser_electron_channel_patMETsPFlow*
+                                                 process.unfolding_MET_analyser_muon_channel_patMETsPFlow*
+						 process.unfolding_MET_nu_analyser_electron_channel_patMETsPFlow*
+                                                 process.unfolding_MET_nu_analyser_muon_channel_patMETsPFlow*
+                                                 process.unfolding_ST_analyser_electron_channel_patMETsPFlow*
+                                                 process.unfolding_ST_analyser_muon_channel_patMETsPFlow*
+						 process.unfolding_ST_nocuts_analyser_electron_channel_patMETsPFlow*
+                                                 process.unfolding_ST_nocuts_analyser_muon_channel_patMETsPFlow*
+						 process.unfolding_ST_parton_analyser_electron_channel_patMETsPFlow*
+                                                 process.unfolding_ST_parton_analyser_muon_channel_patMETsPFlow*
+                                                 process.unfolding_MT_analyser_electron_channel_patMETsPFlow*
+                                                 process.unfolding_MT_analyser_muon_channel_patMETsPFlow*
+						 process.unfolding_MT_nu_analyser_electron_channel_patMETsPFlow*
+                                                 process.unfolding_MT_nu_analyser_muon_channel_patMETsPFlow*
+						 process.unfolding_WPT_analyser_electron_channel_patMETsPFlow*
+                                                 process.unfolding_WPT_analyser_muon_channel_patMETsPFlow*
+						 process.unfolding_WPT_nu_analyser_electron_channel_patMETsPFlow*
+                                                 process.unfolding_WPT_nu_analyser_muon_channel_patMETsPFlow*
+                                                 process.unfolding_MET_analyser_electron_channel_patType1CorrectedPFMet*
+                                                 process.unfolding_MET_analyser_muon_channel_patType1CorrectedPFMet*
+						 process.unfolding_MET_nu_analyser_electron_channel_patType1CorrectedPFMet*
+                                                 process.unfolding_MET_nu_analyser_muon_channel_patType1CorrectedPFMet*
+                                                 process.unfolding_ST_analyser_electron_channel_patType1CorrectedPFMet*
+                                                 process.unfolding_ST_analyser_muon_channel_patType1CorrectedPFMet*
+						 process.unfolding_ST_nocuts_analyser_electron_channel_patType1CorrectedPFMet*
+                                                 process.unfolding_ST_nocuts_analyser_muon_channel_patType1CorrectedPFMet*
+                                                 process.unfolding_ST_parton_analyser_electron_channel_patType1CorrectedPFMet*
+                                                 process.unfolding_ST_parton_analyser_muon_channel_patType1CorrectedPFMet*
+						 process.unfolding_MT_analyser_electron_channel_patType1CorrectedPFMet*
+                                                 process.unfolding_MT_analyser_muon_channel_patType1CorrectedPFMet*
+						 process.unfolding_MT_nu_analyser_electron_channel_patType1CorrectedPFMet*
+                                                 process.unfolding_MT_nu_analyser_muon_channel_patType1CorrectedPFMet*
+						 process.unfolding_WPT_analyser_electron_channel_patType1CorrectedPFMet*
+                                                 process.unfolding_WPT_analyser_muon_channel_patType1CorrectedPFMet*
+						 process.unfolding_WPT_nu_analyser_electron_channel_patType1CorrectedPFMet*
+                                                 process.unfolding_WPT_nu_analyser_muon_channel_patType1CorrectedPFMet*
+                                                 process.unfolding_HT_analyser_electron_channel*
+                                                 process.unfolding_HT_analyser_muon_channel*
+						 process.unfolding_HT_nocuts_analyser_electron_channel*
+                                                 process.unfolding_HT_nocuts_analyser_muon_channel*
+						 process.unfolding_HT_parton_analyser_electron_channel*
+						 process.unfolding_HT_parton_analyser_muon_channel)
+						 
     
 if not options.printEventContent:
     process.unfoldingAnalysisSequence.remove(process.printEventContent)
 
-if options.isTTbarMC:
-    process.unfoldingAnalysis = cms.Path(
-                      process.hlTrigReport * 
-                      process.egammaIDLikelihood * 
-                      process.patseq * 
-                      process.EventFilters * 
-                      getattr(process, "producePatPFMETCorrections" + postfix) * 
-                      getattr(process, "patMETs" + postfix)*
-                      process.eventWeightPU *
-                      process.unfoldingAnalysisSequence 
-                      )
-    if not options.CMSSW == '44X':
-        process.unfoldingAnalysis.remove(getattr(process, "producePatPFMETCorrections" + postfix))
-        process.unfoldingAnalysis.remove(getattr(process, "patMETs" + postfix))
+#if options.isTTbarMC:
+process.unfoldingAnalysis = cms.Path(
+		  process.hlTrigReport * 
+		  process.egammaIDLikelihood * 
+#		  process.pfMEtSysShiftCorrSequence *
+		  process.patseq * 
+		  process.EventFilters * 
+		  getattr(process, "producePatPFMETCorrections" + postfix) * 
+		  getattr(process, "patMETs" + postfix)*
+		  process.eventWeightPU *
+		  process.unfoldingAnalysisSequence 
+		  )
+#if not options.setupMETmanually:
+if not options.CMSSW == '44X': #in NTupleTools_cff, if CMSSW44X, then setup_MET_manually will be used. Basically we just don't want the following two lines to run since we are running on 44X datasets.
+    process.unfoldingAnalysis.remove(getattr(process, "producePatPFMETCorrections" + postfix))
+    process.unfoldingAnalysis.remove(getattr(process, "patMETs" + postfix))
 
 ##########################################################################################
 #            Selection Config
@@ -130,6 +236,7 @@ process.load('BristolAnalysis.NTupleTools.SelectionAnalyser_cfi')
 process.selectionAnalysis = cms.Path(
                       process.hlTrigReport * 
                       process.egammaIDLikelihood * 
+#                      process.pfMEtSysShiftCorrSequence *
                       process.patseq * 
                       process.EventFilters * 
                       getattr(process, "producePatPFMETCorrections" + postfix) * 
@@ -145,6 +252,7 @@ if options.useData:
     process.eventFiltersIntaggingMode.remove(process.MCFiltersInTaggingMode)
 if options.useData or not options.isTTbarMC:
     process.selectionAnalysis.remove(process.ttbarDecayAnalyser)
-if not options.CMSSW == '44X':
+#if not options.setupMETmanually:
+if not options.CMSSW == '44X': #in NTupleTools_cff, if CMSSW44X, then setup_MET_manually will be used. Basically we just don't want the following two lines to run since we are running on 44X datasets.
     process.selectionAnalysis.remove(getattr(process, "producePatPFMETCorrections" + postfix))
     process.selectionAnalysis.remove(getattr(process, "patMETs" + postfix))
