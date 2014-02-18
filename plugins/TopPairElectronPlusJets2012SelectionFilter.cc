@@ -37,7 +37,8 @@ TopPairElectronPlusJets2012SelectionFilter::TopPairElectronPlusJets2012Selection
 		tightElectronIso_(iConfig.getParameter<double>("tightElectronIsolation")), //
 		looseElectronIso_(iConfig.getParameter<double>("looseElectronIsolation")), //
 		looseMuonIso_(iConfig.getParameter<double>("looseMuonIsolation")), //
-		useDeltaBetaCorrections_(iConfig.getParameter<bool>("useDeltaBetaCorrections")), //
+		useDeltaBetaCorrectionsForMuons_(iConfig.getParameter<bool>("useDeltaBetaCorrectionsForMuons")), //
+		useDeltaBetaCorrectionsForElectrons_(iConfig.getParameter<bool>("useDeltaBetaCorrectionsForElectrons")), //
 		useRhoActiveAreaCorrections_(iConfig.getParameter<bool>("useRhoActiveAreaCorrections")), //
 		useMETFilters_(iConfig.getParameter<bool>("useMETFilters")), //
 		useEEBadScFilter_(iConfig.getParameter<bool>("useEEBadScFilter")), //
@@ -68,6 +69,7 @@ TopPairElectronPlusJets2012SelectionFilter::TopPairElectronPlusJets2012Selection
 	produces<bool>(prefix_ + "FullSelection");
 	produces<unsigned int>(prefix_ + "NumberOfBtags");
 	produces < pat::JetCollection > (prefix_ + "cleanedJets");
+	produces < pat::ElectronCollection > (prefix_ + "signalElectron");
 }
 
 void TopPairElectronPlusJets2012SelectionFilter::fillDescriptions(edm::ConfigurationDescriptions & descriptions) {
@@ -83,15 +85,16 @@ void TopPairElectronPlusJets2012SelectionFilter::fillDescriptions(edm::Configura
 	desc.add < InputTag > ("ECALDeadCellFilterInput");
 	desc.add < InputTag > ("TrackingFailureFilterInput");
 	desc.add < InputTag > ("BadEESupercrystalFilterInput");
-	desc.add<double>("min1JetPt", 45.0);
-	desc.add<double>("min2JetPt", 45.0);
-	desc.add<double>("min3JetPt", 45.0);
-	desc.add<double>("min4JetPt", 20.0);
+	desc.add<double>("min1JetPt", 30.0);
+	desc.add<double>("min2JetPt", 30.0);
+	desc.add<double>("min3JetPt", 30.0);
+	desc.add<double>("min4JetPt", 30.0);
 	desc.add<double>("tightElectronIsolation", 0.1);
 	desc.add<double>("looseElectronIsolation", 0.15);
 	desc.add<double>("looseMuonIsolation", 0.2);
 
-	desc.add<bool>("useDeltaBetaCorrections", false);
+	desc.add<bool>("useDeltaBetaCorrectionsForMuons", true);
+	desc.add<bool>("useDeltaBetaCorrectionsForElectrons", false);
 	desc.add<bool>("useRhoActiveAreaCorrections", true);
 	desc.add<bool>("useMETFilters", false);
 	desc.add<bool>("useEEBadScFilter", false);
@@ -130,9 +133,14 @@ bool TopPairElectronPlusJets2012SelectionFilter::filter(edm::Event& iEvent, cons
 		iEvent.put(passesStep, prefix_ + TTbarEPlusJetsReferenceSelection::StringSteps[step]);
 	}
 	iEvent.put(std::auto_ptr<bool>(new bool(passesSelection)), prefix_ + "FullSelection");
+
 	for (unsigned int index = 0; index < cleanedJets_.size(); ++index)
 		jetoutput->push_back(cleanedJets_.at(index));
 	iEvent.put(jetoutput, prefix_ + "cleanedJets");
+
+	std::auto_ptr < pat::ElectronCollection > signalElectron(new pat::ElectronCollection());
+	signalElectron->push_back(signalElectron_);
+	iEvent.put(signalElectron, prefix_ + "signalElectron");
 
 	return taggingMode_ || passesSelection;
 }
@@ -197,12 +205,11 @@ void TopPairElectronPlusJets2012SelectionFilter::getLooseElectrons() {
 bool TopPairElectronPlusJets2012SelectionFilter::isLooseElectron(const pat::Electron& electron) const {
 	bool passesPtAndEta = electron.pt() > 20 && fabs(electron.eta()) < 2.5;
 	//		bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
-	bool passesID = electron.electronID("mvaTrigV0") > 0.0;
-	bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrections_,
+	bool passesID = electron.electronID("mvaTrigV0") > 0.5;
+	bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrectionsForElectrons_,
 			useRhoActiveAreaCorrections_) < looseElectronIso_;
 	return passesPtAndEta && passesID && passesIso;
 }
-
 
 void TopPairElectronPlusJets2012SelectionFilter::getLooseMuons() {
 	looseMuons_.clear();
@@ -216,8 +223,14 @@ void TopPairElectronPlusJets2012SelectionFilter::getLooseMuons() {
 
 bool TopPairElectronPlusJets2012SelectionFilter::isLooseMuon(const pat::Muon& muon) const {
 	bool passesPtAndEta = muon.pt() > 10 && fabs(muon.eta()) < 2.5;
-	bool passesID = muon.isPFMuon() && (muon.isGlobalMuon() || muon.isTrackerMuon());
-	bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrections_) < looseMuonIso_;
+//	cout << "muon.pt() = " << muon.pt() << endl;
+//	cout << "fabs(muon.eta()) = " << fabs(muon.eta()) << endl;
+	bool passesID = muon.isPFMuon() && (muon.isGlobalMuon() || muon.isTrackerMuon()); // put TrackerMuon requirement back in, as per 2012 twiki...correct?
+//	cout << "muon.isPFMuon() = " << muon.isPFMuon() << endl;
+//	cout << "muon.isGlobalMuon() = " << muon.isGlobalMuon() << endl;
+//	cout << "muon.isTrackerMuon() = " << muon.isTrackerMuon() << endl;
+	bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < looseMuonIso_;
+//	cout << "getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) = " << getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) << endl;
 	return passesPtAndEta && passesID && passesIso;
 }
 
@@ -230,7 +243,7 @@ void TopPairElectronPlusJets2012SelectionFilter::goodIsolatedElectrons() {
 			cout << "pT: " << electron.pt() << " eta: " << electron.eta() << " phi: " << electron.phi() << endl;
 		}
 
-		bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrections_,
+		bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrectionsForElectrons_,
 				useRhoActiveAreaCorrections_) < tightElectronIso_;
 		if (isGoodElectron(electron) && passesIso)
 			goodIsolatedElectrons_.push_back(electron);
@@ -241,9 +254,10 @@ bool TopPairElectronPlusJets2012SelectionFilter::isGoodElectron(const pat::Elect
 	bool passesPtAndEta = electron.pt() > 30. && fabs(electron.eta()) < 2.5;
 	bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
 	//2D impact w.r.t primary vertex
-	bool passesD0 = electron.dB(pat::Electron::PV2D) < 0.02; //cm
-	bool passesID = electron.electronID("mvaTrigV0") > 0.0;
-	return passesPtAndEta && notInCrack && passesD0 && passesID;
+	bool passesD0 = fabs(electron.dB(pat::Electron::PV2D)) < 0.02; //cm
+	bool passesID = electron.electronID("mvaTrigV0") > 0.5;
+//	cout << "Event " << ":" << runNumber_ << endl << "electron.pt() = " << electron.pt() << endl << "fabs(electron.eta()) = " << fabs(electron.eta()) << endl << "passesPtAndEta = " << passesPtAndEta << endl << "notInCrack = " << notInCrack << endl << "electron.dB(pat::Electron::PV2D) = " << electron.dB(pat::Electron::PV2D) << endl << "passesD0 = " << passesD0 << endl << "electron.electronID('mvaTrigV0') = " << electron.electronID("mvaTrigV0") << endl << "passesID = " << passesID << endl;
+	return passesPtAndEta && notInCrack && passesD0 && passesID; // removed passeHoverE...not in twiki
 }
 
 void TopPairElectronPlusJets2012SelectionFilter::cleanedJets() {
@@ -273,8 +287,24 @@ void TopPairElectronPlusJets2012SelectionFilter::cleanedBJets() {
 
 bool TopPairElectronPlusJets2012SelectionFilter::isGoodJet(const pat::Jet& jet) const {
 	//both cuts are done at PAT config level (selectedPATJets) this is just for safety
-	bool passesPtAndEta(jet.pt() > 20. && fabs(jet.eta() < 2.5));
-	return passesPtAndEta;
+	double smearFactor = getSmearedJetPtScale(jet, 0);
+	bool passesPtAndEta(smearFactor*jet.pt() > 20. && fabs(jet.eta() < 2.5)); // 30GeV and 2.4 for 2011, but set to 20 and 2.5 so the selection is the same as for 2012 8TeV. Not sure if this is the correct thing to do.
+	bool passesJetID(false);
+
+	bool passNOD = jet.numberOfDaughters() > 1;
+	//bool passNHF = (jet.neutralHadronEnergy() + jet.HFHadronEnergy()) / jet.energy() < 0.99;
+	bool passNHF = jet.neutralHadronEnergyFraction() < 0.99;
+	bool passNEF = jet.neutralEmEnergyFraction() < 0.99;
+	bool passCHF = true;
+	bool passNCH = true;
+	bool passCEF = true;
+	if (fabs(jet.eta()) < 2.4) {
+		passCEF = jet.chargedEmEnergyFraction() < 0.99;
+		passCHF = jet.chargedHadronEnergyFraction() > 0;
+		passNCH = jet.chargedMultiplicity() > 0;
+	}
+	passesJetID = passNOD && passCEF && passNHF && passNEF && passCHF && passNCH;
+	return passesPtAndEta && passesJetID;
 }
 
 bool TopPairElectronPlusJets2012SelectionFilter::passesSelectionStep(edm::Event& iEvent,
@@ -284,14 +314,29 @@ bool TopPairElectronPlusJets2012SelectionFilter::passesSelectionStep(edm::Event&
 	case TTbarEPlusJetsReferenceSelection::AllEvents:
 		return true;
 	case TTbarEPlusJetsReferenceSelection::EventCleaningAndTrigger:
+		if(passesEventCleaning(iEvent) && passesTriggerSelection()){
+           cout << "trig+evt: " << iEvent.id().event() << endl;
+           }
 		return passesEventCleaning(iEvent) && passesTriggerSelection();
 	case TTbarEPlusJetsReferenceSelection::OneIsolatedElectron:
+		if(hasExactlyOneIsolatedLepton()){
+           cout << "1electron: " <<  iEvent.id().event() << endl;
+           }
 		return hasExactlyOneIsolatedLepton();
 	case TTbarEPlusJetsReferenceSelection::LooseMuonVeto:
+        if(passesLooseLeptonVeto()){
+         cout << "mu veto: " <<  iEvent.id().event() << endl;
+         }
 		return passesLooseLeptonVeto();
 	case TTbarEPlusJetsReferenceSelection::DiLeptonVeto:
+		if(passesDileptonVeto()){
+           cout << "dilepton veto: "  << iEvent.id().event() << endl;
+           }
 		return passesDileptonVeto();
 	case TTbarEPlusJetsReferenceSelection::ConversionVeto:
+		if(passesConversionVeto()){
+           cout << "conversion veto: "  << iEvent.id().event() << endl;
+           }
 		return passesConversionVeto();
 	case TTbarEPlusJetsReferenceSelection::AtLeastOneGoodJet:
 		return hasAtLeastOneGoodJet();
@@ -300,10 +345,16 @@ bool TopPairElectronPlusJets2012SelectionFilter::passesSelectionStep(edm::Event&
 	case TTbarEPlusJetsReferenceSelection::AtLeastThreeGoodJets:
 		return hasAtLeastThreeGoodJets();
 	case TTbarEPlusJetsReferenceSelection::AtLeastFourGoodJets:
+		if(hasAtLeastFourGoodJets()){
+           cout << "ge4j: " <<  iEvent.id().event() << endl;
+           }
 		return hasAtLeastFourGoodJets();
 	case TTbarEPlusJetsReferenceSelection::AtLeastOneBtag:
 		return hasAtLeastOneGoodBJet();
 	case TTbarEPlusJetsReferenceSelection::AtLeastTwoBtags:
+		if(hasAtLeastTwoGoodBJets()){
+          cout << "ge2b: " <<  iEvent.id().event() << endl;
+          }
 		return hasAtLeastTwoGoodBJets();
 	default:
 		break;
@@ -379,7 +430,6 @@ bool TopPairElectronPlusJets2012SelectionFilter::passesScrapingVeto(edm::Event& 
 					numhighpurity++;
 			}
 			fraction = (double) numhighpurity / (double) tracks->size();
-
 		}
 	} else {
 		edm::LogError("EventFilterError") << "Error! Can't get the product " << trkInput_;
@@ -432,36 +482,35 @@ bool TopPairElectronPlusJets2012SelectionFilter::passesDileptonVeto() const {
 }
 
 bool TopPairElectronPlusJets2012SelectionFilter::passesConversionVeto() const {
-	if (hasSignalElectron_)
-		return signalElectron_.passConversionVeto()
-				&& signalElectron_.gsfTrack()->trackerExpectedHitsInner().numberOfHits() < 1;
+//	if (hasSignalElectron_)
+	if (hasExactlyOneIsolatedLepton())
+	return signalElectron_.passConversionVeto()	&& signalElectron_.gsfTrack()->trackerExpectedHitsInner().numberOfHits() < 1; // left in the trackerExpectedHitsInner <1 as per twikis, although it is not there in the AnalysisTools, because it seems to make no difference to number of events passing
 	return false;
 
 }
 
 bool TopPairElectronPlusJets2012SelectionFilter::hasAtLeastOneGoodJet() const {
 	if (cleanedJets_.size() > 0)
-		return cleanedJets_.at(0).pt() > min1JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(0), 0)*cleanedJets_.at(0).pt() > min1JetPt_;
 
 	return false;
-
 }
 
 bool TopPairElectronPlusJets2012SelectionFilter::hasAtLeastTwoGoodJets() const {
 	if (cleanedJets_.size() > 1)
-		return cleanedJets_.at(1).pt() > min2JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(1), 0)*cleanedJets_.at(1).pt() > min2JetPt_;
 	return false;
 }
 
 bool TopPairElectronPlusJets2012SelectionFilter::hasAtLeastThreeGoodJets() const {
 	if (cleanedJets_.size() > 2)
-		return cleanedJets_.at(2).pt() > min3JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(2), 0)*cleanedJets_.at(2).pt() > min3JetPt_;
 	return false;
 }
 
 bool TopPairElectronPlusJets2012SelectionFilter::hasAtLeastFourGoodJets() const {
 	if (cleanedJets_.size() > 3)
-		return cleanedJets_.at(3).pt() > min4JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(3), 0)*cleanedJets_.at(3).pt() > min4JetPt_;
 	return false;
 }
 

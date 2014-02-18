@@ -18,7 +18,8 @@ using namespace reco;
 using namespace isodeposit;
 using namespace pat;
 
-TopPairMuonPlusJets2012SelectionFilter::TopPairMuonPlusJets2012SelectionFilter(const edm::ParameterSet& iConfig) :
+TopPairMuonPlusJets2012SelectionFilter::TopPairMuonPlusJets2012SelectionFilter(
+		const edm::ParameterSet& iConfig) :
 		jetInput_(iConfig.getParameter < edm::InputTag > ("jetInput")), //
 		electronInput_(iConfig.getParameter < edm::InputTag > ("electronInput")), //
 		muonInput_(iConfig.getParameter < edm::InputTag > ("muonInput")), //
@@ -28,6 +29,9 @@ TopPairMuonPlusJets2012SelectionFilter::TopPairMuonPlusJets2012SelectionFilter(c
 		hcalNoiseInput_(iConfig.getParameter < edm::InputTag > ("HcalNoiseInput")), //
 		hcalLaserFilterInput_(iConfig.getParameter < edm::InputTag > ("HCALLaserFilterInput")), //
 		ecalDeadCellFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALDeadCellFilterInput")), //
+//		ecalLaserCorrFilterInput_(iConfig.getParameter < edm::InputTag > ("ECALLaserCorrFilterInput")), //
+//		manystripclus53X_(iConfig.getParameter < edm::InputTag > ("ManyStripClus53XInput")), //
+//		toomanystripclus53X_(iConfig.getParameter < edm::InputTag > ("TooManyStripClus53XInput")), //
 		trackingFailureFilter_(iConfig.getParameter < edm::InputTag > ("TrackingFailureFilterInput")), //
 		eeBadScFilter_(iConfig.getParameter < edm::InputTag > ("BadEESupercrystalFilterInput")), //
 		min1JetPt_(iConfig.getParameter<double>("min1JetPt")), //
@@ -38,7 +42,8 @@ TopPairMuonPlusJets2012SelectionFilter::TopPairMuonPlusJets2012SelectionFilter(c
 		looseElectronIso_(iConfig.getParameter<double>("looseElectronIsolation")), //
 		looseMuonIso_(iConfig.getParameter<double>("looseMuonIsolation")), //
 		useDeltaBetaCorrections_(iConfig.getParameter<bool>("useDeltaBetaCorrections")), //
-		useRhoActiveAreaCorrections_(iConfig.getParameter<bool>("useRhoActiveAreaCorrections")), //
+		useRhoActiveAreaCorrectionsForMuons_(iConfig.getParameter<bool>("useRhoActiveAreaCorrectionsForMuons")), //
+		useRhoActiveAreaCorrectionsForElectrons_(iConfig.getParameter<bool>("useRhoActiveAreaCorrectionsForElectrons")), //
 		useMETFilters_(iConfig.getParameter<bool>("useMETFilters")), //
 		useEEBadScFilter_(iConfig.getParameter<bool>("useEEBadScFilter")), //
 		prefix_(iConfig.getUntrackedParameter < std::string > ("prefix")), //
@@ -70,6 +75,7 @@ TopPairMuonPlusJets2012SelectionFilter::TopPairMuonPlusJets2012SelectionFilter(c
 	produces<bool>(prefix_ + "FullSelection");
 	produces<unsigned int>(prefix_ + "NumberOfBtags");
 	produces < pat::JetCollection > (prefix_ + "cleanedJets");
+	produces < pat::MuonCollection > (prefix_ + "signalMuon");
 }
 
 void TopPairMuonPlusJets2012SelectionFilter::fillDescriptions(edm::ConfigurationDescriptions & descriptions) {
@@ -85,15 +91,17 @@ void TopPairMuonPlusJets2012SelectionFilter::fillDescriptions(edm::Configuration
 	desc.add < InputTag > ("ECALDeadCellFilterInput");
 	desc.add < InputTag > ("TrackingFailureFilterInput");
 	desc.add < InputTag > ("BadEESupercrystalFilterInput");
-	desc.add<double>("min1JetPt", 45.0);
-	desc.add<double>("min2JetPt", 45.0);
-	desc.add<double>("min3JetPt", 45.0);
-	desc.add<double>("min4JetPt", 20.0);
+	desc.add<double>("min1JetPt", 30.0);
+	desc.add<double>("min2JetPt", 30.0);
+	desc.add<double>("min3JetPt", 30.0);
+	desc.add<double>("min4JetPt", 30.0);
 	desc.add<double>("tightMuonIsolation", 0.12);
 	desc.add<double>("looseElectronIsolation", 0.15);
 	desc.add<double>("looseMuonIsolation", 0.2);
 
-	desc.add<bool>("useDeltaBetaCorrections", false);
+	desc.add<bool>("useDeltaBetaCorrections", true);
+	desc.add<bool>("useRhoActiveAreaCorrectionsForMuons", false);
+	desc.add<bool>("useRhoActiveAreaCorrectionsForElectrons", true);
 	desc.add<bool>("useRhoActiveAreaCorrections", true);
 	desc.add<bool>("useMETFilters", false);
 	desc.add<bool>("useEEBadScFilter", false);
@@ -136,6 +144,10 @@ bool TopPairMuonPlusJets2012SelectionFilter::filter(edm::Event& iEvent, const ed
 		jetoutput->push_back(cleanedJets_.at(index));
 	iEvent.put(jetoutput, prefix_ + "cleanedJets");
 
+	std::auto_ptr < pat::MuonCollection > signalMuon(new pat::MuonCollection());
+	signalMuon->push_back(signalMuon_);
+	iEvent.put(signalMuon, prefix_ + "signalMuon");
+
 	return taggingMode_ || passesSelection;
 }
 
@@ -172,11 +184,13 @@ void TopPairMuonPlusJets2012SelectionFilter::setupEventContent(edm::Event& iEven
 	electrons_ = *electrons;
 
 	edm::Handle < pat::MuonCollection > muons;
+//	cout << "muonInput_ = " << muonInput_ << endl;
 	iEvent.getByLabel(muonInput_, muons);
 	muons_ = *muons;
 	if (debug_)
 		cout << "Getting loose electrons" << endl;
 	getLooseElectrons();
+//	cout << "muons.isValid() = " << muons.isValid() << endl;
 	if (muons.isValid()) {
 		if (debug_)
 			cout << "Getting loose muons" << endl;
@@ -188,8 +202,13 @@ void TopPairMuonPlusJets2012SelectionFilter::setupEventContent(edm::Event& iEven
 		if (debug_)
 			cout << "Getting signal muon" << endl;
 		hasSignalMuon_ = goodIsolatedMuons_.size() > 0;
-		if (hasSignalMuon_)
+//		cout << "goodIsolatedMuons_.size() = " << goodIsolatedMuons_.size() << endl;
+//		cout << "hasSignalMuon_ = " << hasSignalMuon_ << endl;
+		if (hasSignalMuon_){
 			signalMuon_ = goodIsolatedMuons_.front();
+//			cout << "signal Muon = " << signalMuon_ << endl;
+		}
+//		else cout << "No signal Muon" << endl;
 	} else {
 		edm::LogError("TopPairMuonPlusJets2012SelectionFilterError") << "Error! Can't get the product " << muonInput_;
 	}
@@ -212,11 +231,12 @@ void TopPairMuonPlusJets2012SelectionFilter::getLooseElectrons() {
 }
 
 bool TopPairMuonPlusJets2012SelectionFilter::isLooseElectron(const pat::Electron& electron) const {
-	bool passesPtAndEta = electron.pt() > 20 && fabs(electron.eta()) < 2.5;
+	bool passesPtAndEta = electron.et() > 20 && fabs(electron.eta()) < 2.5;
 	//		bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
-	bool passesID = electron.electronID("mvaTrigV0") > 0.0;
-	bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrections_,
-			useRhoActiveAreaCorrections_) < looseElectronIso_;
+	bool passesID = electron.electronID("mvaTrigV0") > 0.5;
+	bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_,	useDeltaBetaCorrections_, useRhoActiveAreaCorrectionsForElectrons_) < looseElectronIso_;
+//	cout << "getRelativeIsolation(electron, 0.3, rho_, isRealData_,	useDeltaBetaCorrections_, useRhoActiveAreaCorrectionsForElectrons_)" << getRelativeIsolation(electron, 0.3, rho_, isRealData_,	useDeltaBetaCorrections_, useRhoActiveAreaCorrectionsForElectrons_) << endl;
+//	cout << "passesIso = " << passesIso << endl;
 	return passesPtAndEta && passesID && passesIso;
 }
 
@@ -241,8 +261,11 @@ void TopPairMuonPlusJets2012SelectionFilter::goodIsolatedMuons() {
 	goodIsolatedMuons_.clear();
 	for (unsigned index = 0; index < muons_.size(); ++index) {
 		const pat::Muon muon = muons_.at(index);
-
+//		cout << "muons_.size() = " << muons_.size() << endl;
+//		cout << "muons_.size().index = " << index << endl;
 		bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrections_) < tightMuonIso_;
+//		cout << "isGoodMuon = " << isGoodMuon(muon) << endl;
+//		cout << "passesIso = " << passesIso << endl;
 		if (isGoodMuon(muon) && passesIso)
 			goodIsolatedMuons_.push_back(muon);
 	}
@@ -251,9 +274,9 @@ void TopPairMuonPlusJets2012SelectionFilter::goodIsolatedMuons() {
 bool TopPairMuonPlusJets2012SelectionFilter::isGoodMuon(const pat::Muon& muon) const {
 	if (debug_) {
 		cout << "isGoodMuon:" << "hasGoodPV: " << hasGoodPV_ << endl;
-		cout << "pT: " << muon.pt() << " eta: " << muon.eta() << " phi: " << muon.phi() << endl;
-		cout << "d0: " << muon.dB(pat::Muon::PV2D) << " z-dist: " << fabs(muon.vertex().z() - primaryVertex_.z());
-		cout << "isPFMuon: " << muon.isPFMuon() << " isGlobalMuon: " << muon.isGlobalMuon() << endl;
+//		cout << "pT: " << muon.pt() << " eta: " << muon.eta() << " phi: " << muon.phi() << endl;
+//		cout << "d0: " << muon.dB(pat::Muon::PV2D) << " z-dist: " << fabs(muon.vertex().z() - primaryVertex_.z());
+//		cout << "isPFMuon: " << muon.isPFMuon() << " isGlobalMuon: " << muon.isGlobalMuon() << endl;
 //		normChi2 is causing this:
 //		Exception Message:
 //		BadRefCore RefCore: Request to resolve a null or invalid reference to a product of type 'std::vector<reco::Track>' has been detected.
@@ -273,7 +296,7 @@ bool TopPairMuonPlusJets2012SelectionFilter::isGoodMuon(const pat::Muon& muon) c
 	//2D impact w.r.t primary vertex
 	if (!hasGoodPV_ or muon.globalTrack().isNull())
 		return false;
-	bool passesD0 = muon.dB(pat::Muon::PV2D) < 0.02 && fabs(muon.vertex().z() - primaryVertex_.z()) < 0.5; //cm
+	bool passesD0 = fabs(muon.dB(pat::Muon::PV2D)) < 0.2 && fabs(muon.vertex().z() - primaryVertex_.z()) < 0.5; //cm //0.02 for 2011 but kept as 0.2 from 2012 selection...correct?
 	bool passesID = muon.isPFMuon() && muon.isGlobalMuon();
 	bool trackQuality = muon.globalTrack()->normalizedChi2() < 10
 			&& muon.track()->hitPattern().trackerLayersWithMeasurement() > 5
@@ -286,14 +309,13 @@ void TopPairMuonPlusJets2012SelectionFilter::cleanedJets() {
 	cleanedJets_.clear();
 	for (unsigned index = 0; index < jets_.size(); ++index) {
 		const pat::Jet jet = jets_.at(index);
-		if (!isGoodJet(jet))
-			continue;
+
 		bool overlaps(false);
 		if (hasSignalMuon_) {
 			double dR = deltaR(signalMuon_, jet);
 			overlaps = dR < 0.3;
 		}
-		if (!overlaps)
+		if (!overlaps && isGoodJet(jet))
 			cleanedJets_.push_back(jet);
 	}
 }
@@ -309,22 +331,50 @@ void TopPairMuonPlusJets2012SelectionFilter::cleanedBJets() {
 
 bool TopPairMuonPlusJets2012SelectionFilter::isGoodJet(const pat::Jet& jet) const {
 	//both cuts are done at PAT config level (selectedPATJets) this is just for safety
-	bool passesPtAndEta(jet.pt() > 30. && fabs(jet.eta() < 2.4));
-	return passesPtAndEta;
+	double smearFactor = getSmearedJetPtScale(jet, 0);
+	bool passesPtAndEta(smearFactor * jet.pt() > 20. && fabs(jet.eta() < 2.5));
+	bool passesJetID(false);
+	bool passNOD = jet.numberOfDaughters() > 1;
+	//bool passNHF = (jet.neutralHadronEnergy() + jet.HFHadronEnergy()) / jet.energy() < 0.99;
+	bool passNHF = jet.neutralHadronEnergyFraction() < 0.99;
+	bool passNEF = jet.neutralEmEnergyFraction() < 0.99;
+	bool passCHF = true;
+	bool passNCH = true;
+	bool passCEF = true;
+	if (fabs(jet.eta()) < 2.4) {
+		passCEF = jet.chargedEmEnergyFraction() < 0.99;
+		passCHF = jet.chargedHadronEnergyFraction() > 0;
+		passNCH = jet.chargedMultiplicity() > 0;
+	}
+	passesJetID = passNOD && passCEF && passNHF && passNEF && passCHF && passNCH;
+	return passesPtAndEta && passesJetID;
 }
 
 bool TopPairMuonPlusJets2012SelectionFilter::passesSelectionStep(edm::Event& iEvent, unsigned int selectionStep) const {
 	TTbarMuPlusJetsReferenceSelection::Step step = TTbarMuPlusJetsReferenceSelection::Step(selectionStep);
+//	cout << "event number = " << iEvent.id().event() << endl;
 	switch (step) {
 	case TTbarMuPlusJetsReferenceSelection::AllEvents:
 		return true;
 	case TTbarMuPlusJetsReferenceSelection::EventCleaningAndTrigger:
+		if (passesEventCleaning(iEvent) && passesTriggerSelection()) {
+//			cout << "trig+evt: " << iEvent.id().event() << endl;
+		}
 		return passesEventCleaning(iEvent) && passesTriggerSelection();
 	case TTbarMuPlusJetsReferenceSelection::OneIsolatedMuon:
+		if (hasExactlyOneIsolatedLepton()) {
+//			cout << "1mu: " << iEvent.id().event() << endl;
+		}
 		return hasExactlyOneIsolatedLepton();
 	case TTbarMuPlusJetsReferenceSelection::LooseMuonVeto:
-			return passesLooseMuonVeto();
+		if (passesLooseMuonVeto()) {
+//			cout << "mu veto: " << iEvent.id().event() << endl;
+		}
+		return passesLooseMuonVeto();
 	case TTbarMuPlusJetsReferenceSelection::LooseElectronVeto:
+		if (passesLooseElectronVeto()) {
+//			cout << "e veto: " << iEvent.id().event() << endl;
+		}
 		return passesLooseElectronVeto();
 	case TTbarMuPlusJetsReferenceSelection::AtLeastOneGoodJet:
 		return hasAtLeastOneGoodJet();
@@ -333,10 +383,16 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesSelectionStep(edm::Event& iEv
 	case TTbarMuPlusJetsReferenceSelection::AtLeastThreeGoodJets:
 		return hasAtLeastThreeGoodJets();
 	case TTbarMuPlusJetsReferenceSelection::AtLeastFourGoodJets:
+		if (hasAtLeastFourGoodJets()) {
+//			cout << "ge4j: " << iEvent.id().event() << endl;
+		}
 		return hasAtLeastFourGoodJets();
 	case TTbarMuPlusJetsReferenceSelection::AtLeastOneBtag:
 		return hasAtLeastOneGoodBJet();
 	case TTbarMuPlusJetsReferenceSelection::AtLeastTwoBtags:
+		if (hasAtLeastTwoGoodBJets()) {
+//			cout << "ge2b: " << iEvent.id().event() << endl;
+		}
 		return hasAtLeastTwoGoodBJets();
 	default:
 		break;
@@ -370,6 +426,9 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesEventCleaning(edm::Event& iEv
 		passesMETFilters = passesMETFilters && passesFilter(iEvent, hcalLaserFilterInput_);
 		passesMETFilters = passesMETFilters && passesFilter(iEvent, ecalDeadCellFilterInput_);
 		passesMETFilters = passesMETFilters && passesFilter(iEvent, trackingFailureFilter_);
+//        passesMETFilters = passesMETFilters && passesFilter(iEvent, ecalLaserCorrFilterInput_);
+//        passesMETFilters = passesMETFilters && !passesFilter(iEvent, manystripclus53X_);
+//        passesMETFilters = passesMETFilters && !passesFilter(iEvent, toomanystripclus53X_);
 		if (useEEBadScFilter_)
 			passesMETFilters = passesMETFilters && passesFilter(iEvent, eeBadScFilter_);
 
@@ -424,38 +483,43 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesScrapingVeto(edm::Event& even
 
 bool TopPairMuonPlusJets2012SelectionFilter::passesTriggerSelection() const {
 	if (isRealData_) {
-		if (runNumber_ >= 160404 && runNumber_ <= 173236)
+		//2011 data: run 160404 to run 180252
+		if (runNumber_ >= 160404 && runNumber_ < 173236)
 			return triggerFired("HLT_IsoMu24", hltConfig_, triggerResults_);
-		else if (runNumber_ >= 173236 && runNumber_ < 190456) //other triggers available (mainly sTop
-			return triggerFired("HLT_IsoMu24_eta2p1", hltConfig_, triggerResults_);
-		else if (runNumber_ >= 190456 && runNumber_ <= 193805)
-			return triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFJet30", hltConfig_, triggerResults_)
-					|| triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFNoPUJet30", hltConfig_, triggerResults_);
-		else if (runNumber_ >= 193806)
-			return triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30", hltConfig_, triggerResults_)
-					|| triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30_30_20", hltConfig_, triggerResults_)
-					|| triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet45_35_25", hltConfig_, triggerResults_);
+		else if (runNumber_ >= 173236 && runNumber_ <= 180252) //other triggers available (mainly sTop
+			return triggerFired("HLT_IsoMu24_eta2p1", hltConfig_,
+					triggerResults_);
+		//2012 data: run 190456 to run 208686
+		else if (runNumber_ >= 190456 && runNumber_ <= 208686)
+			return triggerFired("HLT_IsoMu24_eta2p1_v", hltConfig_,
+					triggerResults_);
+//					|| triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFNoPUJet30", hltConfig_, triggerResults_);
+//		else if (runNumber_ >= 193806)
+//			return triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30", hltConfig_, triggerResults_)
+//					|| triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30_30_20", hltConfig_, triggerResults_)
+//					|| triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet45_35_25", hltConfig_, triggerResults_);
 		else
 			return false;
 	} else {
-		if (MCSampleTag_ == "Fall11") {
-			//Fall11 MC
+		if (MCSampleTag_ == "Fall11") { //Fall11 MC
 			return triggerFired("HLT_IsoMu24", hltConfig_, triggerResults_);
-		} else {
+		} else if (MCSampleTag_ == "Summer12") { //Summer12 MC
 			//do not use HLTs in Summer12 MC as they don't use JEC
 			//https://hypernews.cern.ch/HyperNews/CMS/get/top-trigger/66.html
 //			return true;
 			//let's put it back - discussion inconclusive but it is better to have a scale factor than efficiency corrections
 			//Summer12 MC
-			bool fired_START52_V5 = triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFJet30", hltConfig_, triggerResults_);
-			bool fired_START52_V9 = triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFJet30", hltConfig_, triggerResults_)
-					|| triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFNoPUJet30", hltConfig_, triggerResults_);
-			bool fired_START53_V7A = triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet50_40_30", hltConfig_,
+			return triggerFired("HLT_IsoMu24_eta2p1_v", hltConfig_,
 					triggerResults_);
-			return fired_START52_V5 || fired_START52_V9 || fired_START53_V7A;
-		}
+//			bool fired_START52_V5 = triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFJet30", hltConfig_, triggerResults_);
+//			bool fired_START52_V9 = triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFJet30", hltConfig_, triggerResults_)
+//					|| triggerFired("HLT_IsoMu20_eta2p1_TriCentralPFNoPUJet30", hltConfig_, triggerResults_);
+//			bool fired_START53_V7A = triggerFired("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet50_40_30", hltConfig_,
+//					triggerResults_);
+//			return fired_START52_V5 || fired_START52_V9 || fired_START53_V7A;
+		} else
+			return false;
 	}
-
 	return false;
 }
 
@@ -473,27 +537,25 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesLooseMuonVeto() const {
 
 bool TopPairMuonPlusJets2012SelectionFilter::hasAtLeastOneGoodJet() const {
 	if (cleanedJets_.size() > 0)
-		return cleanedJets_.at(0).pt() > min1JetPt_;
-
+		return getSmearedJetPtScale(cleanedJets_.at(0), 0)*cleanedJets_.at(0).pt() > min1JetPt_;
 	return false;
-
 }
 
 bool TopPairMuonPlusJets2012SelectionFilter::hasAtLeastTwoGoodJets() const {
 	if (cleanedJets_.size() > 1)
-		return cleanedJets_.at(1).pt() > min2JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(1), 0)*cleanedJets_.at(1).pt() > min2JetPt_;
 	return false;
 }
 
 bool TopPairMuonPlusJets2012SelectionFilter::hasAtLeastThreeGoodJets() const {
 	if (cleanedJets_.size() > 2)
-		return cleanedJets_.at(2).pt() > min3JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(2), 0)*cleanedJets_.at(2).pt() > min3JetPt_;
 	return false;
 }
 
 bool TopPairMuonPlusJets2012SelectionFilter::hasAtLeastFourGoodJets() const {
 	if (cleanedJets_.size() > 3)
-		return cleanedJets_.at(3).pt() > min4JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(3), 0)*cleanedJets_.at(3).pt() > min4JetPt_;
 	return false;
 }
 

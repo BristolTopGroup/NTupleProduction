@@ -11,26 +11,27 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJets2012SelectionFilte
     trkInput=cms.InputTag('generalTracks'),#track input for scraping filter
     HcalNoiseInput=cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult'),
     HCALLaserFilterInput=cms.InputTag('HcalLaserEventFilter'),
-    ECALDeadCellFilterInput=cms.InputTag('EcalDeadCellBoundaryEnergyFilter'),
+    ECALDeadCellFilterInput=cms.InputTag('EcalDeadCellTriggerPrimitiveFilter'),
     TrackingFailureFilterInput=cms.InputTag('trackingFailureFilter'),
     BadEESupercrystalFilterInput=cms.InputTag('BadEESupercrystalFilter'),
-    ECALLaserCorrFilterInput=cms.InputTag('ecalLaserCorrFilter'),
+#    ECALLaserCorrFilterInput=cms.InputTag('ecalLaserCorrFilter'),
     #trackingPOGfilters
-    ManyStripClus53XInput=cms.InputTag('manystripclus53X'),
-    TooManyStripClus53XInput=cms.InputTag('toomanystripclus53X'),
+#    ManyStripClus53XInput=cms.InputTag('manystripclus53X'),
+#    TooManyStripClus53XInput=cms.InputTag('toomanystripclus53X'),
     #LogErrorTooManyClusters=cms.InputTag('logErrorTooManyClusters'),
 
 #jet cuts
-    min1JetPt=cms.double(45.),
-    min2JetPt=cms.double(45.),
-    min3JetPt=cms.double(45.),
-    min4JetPt=cms.double(20.),
+    min1JetPt=cms.double(30.),
+    min2JetPt=cms.double(30.),
+    min3JetPt=cms.double(30.),
+    min4JetPt=cms.double(30.),
 #lepton isolation
     tightMuonIsolation=cms.double(0.12),
-    looseElectronIsolation=cms.double(0.15),
+    looseElectronIsolation=cms.double(0.15), #changed from 0.2 which I assume it was in 2011 
     looseMuonIsolation=cms.double(0.2),
     useDeltaBetaCorrections = cms.bool(True),
-    useRhoActiveAreaCorrections = cms.bool(False),
+    useRhoActiveAreaCorrectionsForMuons = cms.bool(False),
+    useRhoActiveAreaCorrectionsForElectrons = cms.bool(True),
     useMETFilters = cms.bool(True),
     useEEBadScFilter = cms.bool(False),
     

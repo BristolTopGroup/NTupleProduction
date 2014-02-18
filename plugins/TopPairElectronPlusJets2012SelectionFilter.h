@@ -103,7 +103,7 @@ private:
 	double min1JetPt_, min2JetPt_, min3JetPt_, min4JetPt_;
 
 	double tightElectronIso_, looseElectronIso_, looseMuonIso_;
-	bool useDeltaBetaCorrections_, useRhoActiveAreaCorrections_, useMETFilters_, useEEBadScFilter_;
+	bool useDeltaBetaCorrectionsForMuons_, useDeltaBetaCorrectionsForElectrons_, useRhoActiveAreaCorrections_, useMETFilters_, useEEBadScFilter_;
 
 	std::string prefix_, MCSampleTag_;
 	bool debug_, taggingMode_;
