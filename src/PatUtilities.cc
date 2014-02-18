@@ -122,10 +122,10 @@ double getRelativeIsolation(const pat::Electron& electron, double cone, double r
 	const double relIsodb = (chIso + max(0.0, nhIso + phIso - 0.5 * puChIso)) / electron.pt();
 	const double relIsorho = (chIso + max(0.0, nhIso + phIso - rho * AEff)) / electron.pt();
 
-	if (useDeltaBetaCorrections)
-		return relIsodb;
 	if (useRhoActiveAreaCorrections)
 		return relIsorho;
+	if (useDeltaBetaCorrections)
+		return relIsodb;
 
 	return relIso;
 }
@@ -144,4 +144,81 @@ double getRelativeIsolation(const pat::Muon& muon, double cone, bool useDeltaBet
 		return relIsodb;
 
 	return relIso;
+}
+
+double getSmearedJetPtScale(const pat::Jet& jet, int jet_smearing_systematic) {
+// Get the jet energy resolution scale factors, depending on the jet eta, from
+// https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution#Recommendations_for_7_and_8_TeV
+//Jeson's smeary code:
+	double scaleFactor(0.);
+	if (fabs(jet.eta()) >= 0.0 && fabs(jet.eta()) < 0.5) {
+		switch (jet_smearing_systematic) {
+		case -1:
+			scaleFactor = 0.990;
+			break;
+		case 1:
+			scaleFactor = 1.115;
+			break;
+		default:
+			scaleFactor = 1.052;
+		}
+	}
+	if (fabs(jet.eta()) >= 0.5 && fabs(jet.eta()) < 1.1) {
+		switch (jet_smearing_systematic) {
+		case -1:
+			scaleFactor = 1.001;
+			break;
+		case 1:
+			scaleFactor = 1.114;
+			break;
+		default:
+			scaleFactor = 1.057;
+		}
+	}
+	if (fabs(jet.eta()) >= 1.1 && fabs(jet.eta()) < 1.7) {
+		switch (jet_smearing_systematic) {
+		case -1:
+			scaleFactor = 1.032;
+			break;
+		case 1:
+			scaleFactor = 1.161;
+			break;
+		default:
+			scaleFactor = 1.096;
+		}
+	}
+	if (fabs(jet.eta()) >= 1.7 && fabs(jet.eta()) < 2.3) {
+		switch (jet_smearing_systematic) {
+		case -1:
+			scaleFactor = 1.042;
+			break;
+		case 1:
+			scaleFactor = 1.228;
+			break;
+		default:
+			scaleFactor = 1.134;
+		}
+	}
+	if (fabs(jet.eta()) >= 2.3 && fabs(jet.eta()) < 5.0) {
+		switch (jet_smearing_systematic) {
+		case -1:
+			scaleFactor = 1.089;
+			break;
+		case 1:
+			scaleFactor = 1.488;
+			break;
+		default:
+			scaleFactor = 1.288;
+		}
+	}
+	//use raw scaleFactors from above to calculate the final factors to apply
+	double matchedGeneratedJetpt = jet.pt();
+	if (jet.genJet()) {
+		matchedGeneratedJetpt = jet.genJet()->pt();
+	}
+	double jetPt = jet.pt();
+	double factor = 1 - scaleFactor;
+	double deltaPt = factor * (jetPt - matchedGeneratedJetpt);
+	double ptScale = std::max(0.0, ((jetPt + deltaPt) / jetPt));
+	return ptScale;
 }
