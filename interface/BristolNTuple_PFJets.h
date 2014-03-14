@@ -17,6 +17,7 @@ class BristolNTuple_PFJets : public edm::EDProducer {
   const std::string jecUncPath;
   const bool readJECuncertainty, doVertexAssociation;
   const edm::InputTag   vtxInputTag;
+  const bool isRealData;
 };
 
 #endif

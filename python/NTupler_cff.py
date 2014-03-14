@@ -16,6 +16,7 @@ def setup_ntupler(process, cms, options, includeCA08Jets = False):
     #PF2PAT jets
     process.rootTuplePF2PATJets.InputTag = cms.InputTag('goodPatJetsPFlow')
     process.rootTuplePF2PATJets.Prefix = cms.string('goodPatJetsPFlow.')
+    process.rootTuplePF2PATJets.isRealData = cms.bool(options.useData)
     #Cambridge-Aachen cone 0.8 jets
     process.rootTupleCA8PFJets = process.rootTuplePF2PATJets.clone()
     process.rootTupleCA8PFJets.InputTag = cms.InputTag('goodPatJetsCA8PF')
