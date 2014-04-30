@@ -8,14 +8,13 @@ bin_edges = {
              }
 
 variable_bins = {
-                 {
              'MET':{'min':0, 'max':1000, 'n_bins':1000},
              'HT':{'min':0, 'max':2000, 'n_bins':2000},
              'ST':{'min':0, 'max':2500, 'n_bins':2500},
              'MT':{'min':0, 'max':1000, 'n_bins':1000},
              'WPT':{'min':0, 'max':1000, 'n_bins':1000},
              }
-                 }
+
 do_variations = ['normal', 'parton', 'no_cuts']
 
 unfolding_MET_analyser_electron_channel_patMETsPFlow = cms.EDAnalyzer("UnfoldingAnalyser",
