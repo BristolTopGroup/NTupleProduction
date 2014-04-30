@@ -207,8 +207,9 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	is_semileptonic_ = is_semileptonic_tau || is_semileptonic_electron || is_semileptonic_muon;
 	
 		
-	float gen_variable(get_gen_variable(iEvent));
-		
+	float gen_variable(0);
+	if (is_semileptonic_electron || is_semileptonic_muon || is_semileptonic_tau)
+		gen_variable = get_gen_variable(iEvent);
 	if (do_electron_channel_) {
 		if (is_semileptonic_electron) {
 			//PU weight only (no btag-weight) as no b-tagging is applied
