@@ -48,8 +48,8 @@ cat download.url | xargs wget
 cd -
 
 #test release
-nohup cmsRun BristolAnalysis/NTupleTools/test/makeTuples_cfg.py CMSSW=53X useData=1 maxEvents=100 dataType=Test skim=NoSkim >&test_data.log &
-nohup cmsRun BristolAnalysis/NTupleTools/test/makeTuples_cfg.py CMSSW=53X useData=0 maxEvents=100 dataType=Test skim=NoSkim >&test_mc.log &
+nohup cmsRun BristolAnalysis/NTupleTools/test/makeTuples_cfg.py CMSSW=53X centreOfMassEnergy=8 useData=1 maxEvents=100 dataType=Test skim=NoSkim >&test_data.log &
+nohup cmsRun BristolAnalysis/NTupleTools/test/makeTuples_cfg.py CMSSW=53X centreOfMassEnergy=8 useData=0 maxEvents=100 dataType=Test skim=NoSkim >&test_mc.log &
 #wait until tasks finish
 ```
 

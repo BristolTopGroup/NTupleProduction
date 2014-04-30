@@ -178,10 +178,10 @@ double getSmearedJetPtScale(const pat::Jet& jet, int jet_smearing_systematic) {
 	if (fabs(jet.eta()) >= 0.0 && fabs(jet.eta()) < 0.5) {
 		switch (jet_smearing_systematic) {
 			case -1:
-				scaleFactor = 1.052-0.061;
+				scaleFactor = 0.990;
 				break;
 			case 1:
-				scaleFactor = 1.052+0.062;
+				scaleFactor = 1.115;
 				break;
 			default:
 				scaleFactor = 1.052;
@@ -190,10 +190,10 @@ double getSmearedJetPtScale(const pat::Jet& jet, int jet_smearing_systematic) {
 	if (fabs(jet.eta()) >= 0.5 && fabs(jet.eta()) < 1.1) {
 		switch (jet_smearing_systematic) {
 			case -1:
-				scaleFactor = 1.057-0.055;
+				scaleFactor = 1.001;
 				break;
 			case 1:
-				scaleFactor = 1.057+0.056;
+				scaleFactor = 1.114;
 				break;
 			default:
 				scaleFactor = 1.057;
@@ -202,10 +202,10 @@ double getSmearedJetPtScale(const pat::Jet& jet, int jet_smearing_systematic) {
 	if (fabs(jet.eta()) >= 1.1 && fabs(jet.eta()) < 1.7) {
 		switch (jet_smearing_systematic) {
 			case -1:
-				scaleFactor = 1.096-0.062;
+				scaleFactor = 1.032;
 				break;
 			case 1:
-				scaleFactor = 1.096+0.063;
+				scaleFactor = 1.161;
 				break;
 			default:
 				scaleFactor = 1.096;
@@ -214,10 +214,10 @@ double getSmearedJetPtScale(const pat::Jet& jet, int jet_smearing_systematic) {
 	if (fabs(jet.eta()) >= 1.7 && fabs(jet.eta()) < 2.3) {
 		switch (jet_smearing_systematic) {
 			case -1:
-				scaleFactor = 1.134-0.085;
+				scaleFactor = 1.042;
 				break;
 			case 1:
-				scaleFactor = 1.134+0.087;
+				scaleFactor = 1.228;
 				break;
 			default:
 				scaleFactor = 1.134;
@@ -226,10 +226,10 @@ double getSmearedJetPtScale(const pat::Jet& jet, int jet_smearing_systematic) {
 	if (fabs(jet.eta()) >= 2.3 && fabs(jet.eta()) < 5.0) {
 		switch (jet_smearing_systematic) {
 			case -1:
-				scaleFactor = 0.153;
+				scaleFactor = 1.089;
 				break;
 			case 1:
-				scaleFactor = 0.155;
+				scaleFactor = 1.488;
 				break;
 			default:
 				scaleFactor = 1.288;

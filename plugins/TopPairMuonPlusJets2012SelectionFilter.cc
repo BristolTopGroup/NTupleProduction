@@ -41,8 +41,9 @@ TopPairMuonPlusJets2012SelectionFilter::TopPairMuonPlusJets2012SelectionFilter(c
 		tightMuonIso_(iConfig.getParameter<double>("tightMuonIsolation")), //
 		looseElectronIso_(iConfig.getParameter<double>("looseElectronIsolation")), //
 		looseMuonIso_(iConfig.getParameter<double>("looseMuonIsolation")), //
-		useDeltaBetaCorrections_(iConfig.getParameter<bool>("useDeltaBetaCorrections")), //
-		useRhoActiveAreaCorrections_(iConfig.getParameter<bool>("useRhoActiveAreaCorrections")), //
+		useDeltaBetaCorrectionsForMuons_(iConfig.getParameter<bool>("useDeltaBetaCorrectionsForMuons")), //
+		useDeltaBetaCorrectionsForElectrons_(iConfig.getParameter<bool>("useDeltaBetaCorrectionsForElectrons")), //
+		useRhoActiveAreaCorrections_(iConfig.getParameter<bool>("useRhoActiveAreaCorrections")), // refers to electrons only
 		useMETFilters_(iConfig.getParameter<bool>("useMETFilters")), //
 		useEEBadScFilter_(iConfig.getParameter<bool>("useEEBadScFilter")), //
 		prefix_(iConfig.getUntrackedParameter < std::string > ("prefix")), //
@@ -102,8 +103,9 @@ void TopPairMuonPlusJets2012SelectionFilter::fillDescriptions(edm::Configuration
 	desc.add<double>("looseElectronIsolation", 0.15);
 	desc.add<double>("looseMuonIsolation", 0.2);
 
-	desc.add<bool>("useDeltaBetaCorrections", true);
-	desc.add<bool>("useRhoActiveAreaCorrections", true);
+	desc.add<bool>("useDeltaBetaCorrectionsForMuons", true);
+	desc.add<bool>("useDeltaBetaCorrectionsForElectrons", false);
+	desc.add<bool>("useRhoActiveAreaCorrections", true); // refers to electrons only
 	desc.add<bool>("useMETFilters", false);
 	desc.add<bool>("useEEBadScFilter", false);
 
@@ -229,7 +231,7 @@ bool TopPairMuonPlusJets2012SelectionFilter::isLooseElectron(const pat::Electron
 	bool passesPtAndEta = electron.pt() > 20 && fabs(electron.eta()) < 2.5;
 	//		bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
 	bool passesID = electron.electronID("mvaTrigV0") > 0.5;
-	bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrections_,
+	bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrectionsForElectrons_,
 			useRhoActiveAreaCorrections_) < looseElectronIso_;
 	
 	return passesPtAndEta && passesID && passesIso;
@@ -247,8 +249,8 @@ void TopPairMuonPlusJets2012SelectionFilter::getLooseMuons() {
 
 bool TopPairMuonPlusJets2012SelectionFilter::isLooseMuon(const pat::Muon& muon) const {
 	bool passesPtAndEta = muon.pt() > 10 && fabs(muon.eta()) < 2.5;
-	bool passesID = muon.isPFMuon() && muon.isGlobalMuon();  //had to remove || muon.isTrackerMuon()
-	bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrections_) < looseMuonIso_;
+	bool passesID = muon.isPFMuon() && muon.isGlobalMuon() || muon.isTrackerMuon();
+	bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < looseMuonIso_;
 	
 	return passesPtAndEta && passesID && passesIso;
 }
@@ -258,7 +260,7 @@ void TopPairMuonPlusJets2012SelectionFilter::goodIsolatedMuons() {
 	for (unsigned index = 0; index < muons_.size(); ++index) {
 		const pat::Muon muon = muons_.at(index);
 
-		bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrections_) < tightMuonIso_;
+		bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < tightMuonIso_;
 				
 		if (isGoodMuon(muon) && passesIso)
 			goodIsolatedMuons_.push_back(muon);
