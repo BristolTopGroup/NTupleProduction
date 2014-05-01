@@ -49,8 +49,8 @@ UnfoldingAnalyser::UnfoldingAnalyser(const edm::ParameterSet& iConfig) :
 		fake_(), //
 		contamination_in_gen_variable_(), //
 		contamination_in_reco_variable_(), //
-//		response_(), //
-//		response_without_fakes_(), //
+		response_(), //
+		response_without_fakes_(), //
 		//
 		truth_asym_bins_(), //
 		measured_asym_bins_(), //
@@ -116,14 +116,14 @@ void UnfoldingAnalyser::beginJob() {
  					> ("contamination_inRecoMET", TString(
  							"background distribution;RECO(" + variable_under_analysis_ + ");# Events"), variable_n_bins_, variable_min_, variable_max_);
 
-// 	response_ =
-// 			fs->make < TH2F
-// 					> ("response", TString(
-// 							"response;RECO(" + variable_under_analysis_ + ");GEN(" + variable_under_analysis_ + ")"), variable_n_bins_, variable_min_, variable_max_, variable_n_bins_, variable_min_, variable_max_);
-// 	response_without_fakes_ =
-// 			fs->make < TH2F
-// 					> ("response_withoutFakes", TString(
-// 							"response;RECO(" + variable_under_analysis_ + ");GEN(" + variable_under_analysis_ + ")"), variable_n_bins_, variable_min_, variable_max_, variable_n_bins_, variable_min_, variable_max_);
+ 	response_ =
+ 			fs->make < TH2F
+ 					> ("response", TString(
+ 							"response;RECO(" + variable_under_analysis_ + ");GEN(" + variable_under_analysis_ + ")"), variable_n_bins_, variable_min_, variable_max_, variable_n_bins_, variable_min_, variable_max_);
+ 	response_without_fakes_ =
+ 			fs->make < TH2F
+ 					> ("response_withoutFakes", TString(
+ 							"response;RECO(" + variable_under_analysis_ + ");GEN(" + variable_under_analysis_ + ")"), variable_n_bins_, variable_min_, variable_max_, variable_n_bins_, variable_min_, variable_max_);
 
 //histograms with asymmetric bins (final measurement)
 	//cout << "But what other options do I have?" << endl;
@@ -163,8 +163,8 @@ void UnfoldingAnalyser::beginJob() {
  	fake_->Sumw2();
  	contamination_in_gen_variable_->Sumw2();
  	contamination_in_reco_variable_->Sumw2();
-// 	response_->Sumw2();
-// 	response_without_fakes_->Sumw2();
+ 	response_->Sumw2();
+ 	response_without_fakes_->Sumw2();
 
 	truth_asym_bins_->Sumw2();
 	measured_asym_bins_->Sumw2();
@@ -207,8 +207,9 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	is_semileptonic_ = is_semileptonic_tau || is_semileptonic_electron || is_semileptonic_muon;
 	
 		
-	float gen_variable(get_gen_variable(iEvent));
-		
+	float gen_variable(0);
+	if (is_semileptonic_electron || is_semileptonic_muon || is_semileptonic_tau)
+		gen_variable = get_gen_variable(iEvent);
 	if (do_electron_channel_) {
 		if (is_semileptonic_electron) {
 			//PU weight only (no btag-weight) as no b-tagging is applied
@@ -221,11 +222,11 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
 			measured_->Fill(reco_variable, weight);
 			measured_asym_bins_->Fill(reco_variable, weight);
-			//response_->Fill(reco_variable, gen_variable, weight);
+			response_->Fill(reco_variable, gen_variable, weight);
 			response_asym_bins_->Fill(reco_variable, gen_variable, weight);
 
 			if (is_semileptonic_electron) {
-				//response_without_fakes_->Fill(reco_variable, gen_variable, weight);
+				response_without_fakes_->Fill(reco_variable, gen_variable, weight);
 				response_without_fakes_asym_bins_->Fill(reco_variable, gen_variable, weight);
 			} else {
 				fake_->Fill(reco_variable, weight);
@@ -257,11 +258,11 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 			
 			measured_->Fill(reco_variable, weight);
 			measured_asym_bins_->Fill(reco_variable, weight);
-			//response_->Fill(reco_variable, gen_variable, weight);
+			response_->Fill(reco_variable, gen_variable, weight);
 			response_asym_bins_->Fill(reco_variable, gen_variable, weight);
 
 			if (is_semileptonic_muon) {
-				//response_without_fakes_->Fill(reco_variable, gen_variable, weight);
+				response_without_fakes_->Fill(reco_variable, gen_variable, weight);
 				response_without_fakes_asym_bins_->Fill(reco_variable, gen_variable, weight);
 			} else {
 				fake_->Fill(reco_variable, weight);
@@ -331,13 +332,23 @@ float UnfoldingAnalyser::get_gen_met_nu(const edm::Event& iEvent) const {
 float UnfoldingAnalyser::get_gen_ht(const edm::Event& iEvent) const {
 	edm::Handle < reco::GenJetCollection > jets;
 	iEvent.getByLabel(gen_jet_input_, jets);
-	float ht(0.);
+	edm::Handle < TtGenEvent > genEvt;
+        iEvent.getByLabel(gen_event_input_, genEvt);
+        //get lepton
+        const reco::GenParticle* lepton = get_gen_lepton(iEvent);
 
-	//Take ALL the jets!
-	for (unsigned int index = 0; index < jets->size(); ++index) {
-	if(jets->at(index).pt() > 20)
-		ht += jets->at(index).pt();
-	}
+        float ht(0.);
+
+        //Take ALL the jets!
+        for (unsigned int index = 0; index < jets->size(); ++index) {
+                if (jets->at(index).pt() > 20) {
+                        double dR = deltaR(*lepton, jets->at(index));
+                        if (dR > 0.3)
+                                ht += jets->at(index).pt();
+
+                }
+        }
+
 	return ht;
 }
 

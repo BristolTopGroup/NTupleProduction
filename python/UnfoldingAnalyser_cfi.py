@@ -1,4 +1,21 @@
 import FWCore.ParameterSet.Config as cms
+bin_edges = {
+             'MET':[0, 25, 45, 70, 100, 150, 250],
+             'HT':[80, 240, 280, 330, 380, 450, 600, 1000],
+             'ST':[106, 350, 400, 450, 500, 580, 700, 1000],
+             'MT':[0, 30, 50, 80, 100, 200],
+             'WPT':[0, 40, 70, 100, 130, 170, 250]
+             }
+
+variable_bins = {
+             'MET':{'min':0, 'max':1000, 'n_bins':1000},
+             'HT':{'min':0, 'max':2000, 'n_bins':2000},
+             'ST':{'min':0, 'max':2500, 'n_bins':2500},
+             'MT':{'min':0, 'max':1000, 'n_bins':1000},
+             'WPT':{'min':0, 'max':1000, 'n_bins':1000},
+             }
+
+do_variations = ['normal', 'parton', 'no_cuts']
 
 unfolding_MET_analyser_electron_channel_patMETsPFlow = cms.EDAnalyzer("UnfoldingAnalyser",
     pu_weight_input=cms.InputTag('eventWeightPU'),
@@ -20,9 +37,9 @@ unfolding_MET_analyser_electron_channel_patMETsPFlow = cms.EDAnalyzer("Unfolding
     is_semileptonic_muon_flag=cms.InputTag('ttSemiLeptonicMuonFilter'),
     do_electron_channel=cms.untracked.bool(True),
     variable_under_analysis=cms.string('MET'),
-    variable_min=cms.double(0.),
-    variable_max=cms.double(2000.),
-    variable_n_bins=cms.uint32(2000),
+    variable_min=cms.double(variable_bins['MET']['min']),
+    variable_max=cms.double(variable_bins['MET']['max']),
+    variable_n_bins=cms.uint32(variable_bins['MET']['n_bins']),
     bin_edges=cms.vdouble([0, 25, 45, 70, 100, 150, 2000])
 )
 
@@ -40,9 +57,9 @@ unfolding_MET_nu_analyser_muon_channel_patMETsPFlow = unfolding_MET_nu_analyser_
 
 unfolding_HT_analyser_electron_channel = unfolding_MET_analyser_electron_channel_patMETsPFlow.clone(
     variable_under_analysis=cms.string('HT'),
-    variable_min=cms.double(0.),
-    variable_max=cms.double(2000.),
-    variable_n_bins=cms.uint32(2000),
+    variable_min=cms.double(variable_bins['HT']['min']),
+    variable_max=cms.double(variable_bins['ST']['max']),
+    variable_n_bins=cms.uint32(variable_bins['MET']['n_bins']),
     bin_edges=cms.vdouble([0,240,280,330,380,450,600,2000])
 )
 
@@ -68,9 +85,9 @@ unfolding_HT_parton_analyser_muon_channel = unfolding_HT_parton_analyser_electro
 
 unfolding_ST_analyser_electron_channel_patMETsPFlow = unfolding_MET_analyser_electron_channel_patMETsPFlow.clone(
     variable_under_analysis=cms.string('ST'),
-    variable_min=cms.double(0.),
-    variable_max=cms.double(2000.),
-    variable_n_bins=cms.uint32(2000),
+    variable_min=cms.double(variable_bins['ST']['min']),
+    variable_max=cms.double(variable_bins['ST']['max']),
+    variable_n_bins=cms.uint32(variable_bins['ST']['n_bins']),
     bin_edges=cms.vdouble([0, 350 , 400 , 450 , 500 , 580 , 700 , 2000])
 )
 
@@ -96,9 +113,9 @@ unfolding_ST_parton_analyser_muon_channel_patMETsPFlow = unfolding_ST_parton_ana
 
 unfolding_MT_analyser_electron_channel_patMETsPFlow = unfolding_MET_analyser_electron_channel_patMETsPFlow.clone(
     variable_under_analysis=cms.string('MT'),
-    variable_min=cms.double(0),
-    variable_max=cms.double(1000.),
-    variable_n_bins=cms.uint32(1000),
+    variable_min=cms.double(variable_bins['MT']['min']),
+    variable_max=cms.double(variable_bins['MT']['max']),
+    variable_n_bins=cms.uint32(variable_bins['MT']['n_bins']),
     bin_edges=cms.vdouble([0, 30, 50, 80, 100, 1000])
 )
 
@@ -116,9 +133,9 @@ unfolding_MT_nu_analyser_muon_channel_patMETsPFlow = unfolding_MT_nu_analyser_el
 
 unfolding_WPT_analyser_electron_channel_patMETsPFlow = unfolding_MET_analyser_electron_channel_patMETsPFlow.clone(
     variable_under_analysis=cms.string('WPT'),
-    variable_min=cms.double(0),
-    variable_max=cms.double(1000.),
-    variable_n_bins=cms.uint32(1000),
+    variable_min=cms.double(variable_bins['WPT']['min']),
+    variable_max=cms.double(variable_bins['WPT']['max']),
+    variable_n_bins=cms.uint32(variable_bins['WPT']['n_bins']),
     bin_edges=cms.vdouble([0, 40, 70, 100, 130, 170, 1000])
 )
 
