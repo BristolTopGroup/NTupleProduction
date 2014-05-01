@@ -17,16 +17,16 @@ export CMSSW_GIT_REFERENCE=/storage/.cmsgit-cache
 
 #change CMSSW installation paths
 export SCRAM_ARCH=slc5_amd64_gcc462
-scram p -n CMSSW_5_3_12_patch2_nTuple_v10 CMSSW_5_3_12_patch2
-cd CMSSW_5_3_12_patch2_nTuple_v10/src
+scram p -n CMSSW_5_3_16_patch1_nTuple_v10 CMSSW_5_3_16_patch1
+cd CMSSW_5_3_16_patch1_nTuple_v10/src
 cmsenv
 
-#PAT Recipe MVA electron ID update
-# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X#MVA_electron_ID_update
+# Latest PAT recipe
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X#Add_CSCTightHaloFilter_CMSSW_5_3
 git cms-addpkg PhysicsTools/PatAlgos
-git cms-merge-topic cms-analysis-tools:5_3_12_patch2-metUncertainties
-git cms-merge-topic cms-analysis-tools:5_3_12_patch2-newJECs
-git cms-merge-topic cms-analysis-tools:5_3_12_patch2-mvaElIdPatFunction
+
+git cms-addpkg EgammaAnalysis/ElectronTools
+git cms-addpkg PhysicsTools/PatUtils
 
 # ElectroWeakAnalysis needed for full LHAPDF libraries to work
 git cms-addpkg ElectroWeakAnalysis/Utilities
@@ -48,8 +48,12 @@ cat download.url | xargs wget
 cd -
 
 #test release
+#make nTuples
 nohup cmsRun BristolAnalysis/NTupleTools/test/makeTuples_cfg.py CMSSW=53X centreOfMassEnergy=8 useData=1 maxEvents=100 dataType=Test skim=NoSkim >&test_data.log &
 nohup cmsRun BristolAnalysis/NTupleTools/test/makeTuples_cfg.py CMSSW=53X centreOfMassEnergy=8 useData=0 maxEvents=100 dataType=Test skim=NoSkim >&test_mc.log &
+#unfolding
+nohup cmsRun BristolAnalysis/NTupleTools/test/unfoldingAndCutflow_cfg.py CMSSW=53X centreOfMassEnergy=8 useData=0 maxEvents=100 dataType=TestUnfold skim=NoSkim >&test_unfolding.log &
+
 #wait until tasks finish
 ```
 
