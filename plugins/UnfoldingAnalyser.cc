@@ -122,7 +122,7 @@ void UnfoldingAnalyser::beginJob() {
  							"response;RECO(" + variable_under_analysis_ + ");GEN(" + variable_under_analysis_ + ")"), variable_n_bins_, variable_min_, variable_max_, variable_n_bins_, variable_min_, variable_max_);
  	response_without_fakes_ =
  			fs->make < TH2F
- 					> ("response_withoutFakes", TString(
+ 					> ("response_without_fakes", TString(
  							"response;RECO(" + variable_under_analysis_ + ");GEN(" + variable_under_analysis_ + ")"), variable_n_bins_, variable_min_, variable_max_, variable_n_bins_, variable_min_, variable_max_);
 
 //histograms with asymmetric bins (final measurement)
