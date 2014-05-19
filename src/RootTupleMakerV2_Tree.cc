@@ -43,7 +43,7 @@ TypedBranchConnector(edm::BranchDescription const* desc,
 
 void RootTupleMakerV2_Tree::
 beginJob() {
-  tree = fs->make<TTree>("tree", "");
+  tree = fs->make<TTree>(treeName.c_str(), "");
 
   typedef std::map<std::string,       bool> mapStringBool;
   typedef std::map<std::string,        int> mapStringInt;
