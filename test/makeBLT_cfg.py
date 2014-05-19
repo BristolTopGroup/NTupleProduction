@@ -129,7 +129,7 @@ process.rootTupleGlobalEventVarsEPlusJets.jetInputTag = cms.InputTag("topPairEPl
 process.rootTupleGlobalEventVarsEPlusJets.signalElectronInputTag = cms.InputTag("topPairEPlusJetsSelection", 'TopPairElectronPlusJets2012Selection.signalElectron')
 
 # Replace jet collection that ends up in ntuple to cleaned collection
-process.rootTuplePF2PATJetsEPlusJets = process.rootTuplePF2PATJets.clone( InputTag=cms.InputTag("topPairEPlusJetsSelection", 'TopPairElectronPlusJets2012Selection.cleanedJets'), Prefix='cleanedJetsPFlowEPlusJets' )
+process.rootTuplePF2PATJetsEPlusJets = process.rootTuplePF2PATJets.clone( InputTag=cms.InputTag("topPairEPlusJetsSelection", 'TopPairElectronPlusJets2012Selection.cleanedJets'), Prefix='cleanedJetsPFlowEPlusJets.' )
 process.rootNTuplesEPlusJets.replace( process.rootTuplePF2PATJets, process.rootTuplePF2PATJetsEPlusJets )
 
 # Run selection twice.  First time in tagging mode so we can run the selection analyser
@@ -157,7 +157,7 @@ process.rootNTuplesMuPlusJets *= process.rootTupleGlobalEventVarsMuPlusJets
 process.rootNTuplesMuPlusJets *= process.rootTupleTreeMuPlusJets
 process.rootTupleGlobalEventVarsMuPlusJets.jetInputTag = cms.InputTag("topPairMuPlusJetsSelection", 'TopPairMuonPlusJets2012Selection.cleanedJets')
 process.rootTupleGlobalEventVarsMuPlusJets.signalElectronInputTag = cms.InputTag("topPairMuPlusJetsSelection", 'TopPairMuonPlusJets2012Selection.signalMuon')
-process.rootTuplePF2PATJetsMuPlusJets = process.rootTuplePF2PATJets.clone( InputTag=cms.InputTag("topPairMuPlusJetsSelection", 'TopPairMuonPlusJets2012Selection.cleanedJets'), Prefix='cleanedJetsPFlowMuPlusJets' )
+process.rootTuplePF2PATJetsMuPlusJets = process.rootTuplePF2PATJets.clone( InputTag=cms.InputTag("topPairMuPlusJetsSelection", 'TopPairMuonPlusJets2012Selection.cleanedJets'), Prefix='cleanedJetsPFlowMuPlusJets.' )
 process.rootNTuplesMuPlusJets.replace( process.rootTuplePF2PATJets, process.rootTuplePF2PATJetsMuPlusJets )
 
 process.muPlusJetsSelection = cms.Path( 
