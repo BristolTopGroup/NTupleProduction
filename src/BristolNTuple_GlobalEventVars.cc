@@ -5,6 +5,7 @@
 BristolNTuple_GlobalEventVars::BristolNTuple_GlobalEventVars(const edm::ParameterSet& iConfig) :
 	jetInputTag(iConfig.getParameter < edm::InputTag > ("jetInputTag")), //
 	leptonInputTag(iConfig.getParameter < edm::InputTag > ("signalLeptonInputTag")), //
+	leptonIndexInputTag(iConfig.getParameter < edm::InputTag > ("signalLeptonIndexInputTag")), //
 	metInputTag(iConfig.getParameter < edm::InputTag > ("metInputTag")), //
 	prefix(iConfig.getParameter < std::string > ("Prefix")), //
 	suffix(iConfig.getParameter < std::string > ("Suffix")), //
@@ -17,6 +18,7 @@ BristolNTuple_GlobalEventVars::BristolNTuple_GlobalEventVars(const edm::Paramete
 	produces<double>(prefix + "anglebl" + suffix);
 	produces<double>(prefix + "MT" + suffix);
 	produces<double>(prefix + "WPT" + suffix);
+	produces<unsigned int>(prefix + "signalLeptonIndex" + suffix);
 }
 
 void BristolNTuple_GlobalEventVars::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -50,6 +52,9 @@ void BristolNTuple_GlobalEventVars::produce(edm::Event& iEvent, const edm::Event
     	std::cout << "Properly handle this error" << std::endl;
     	std::cout << "Channel : " << channel.c_str() << std::endl;
     }
+
+    edm::Handle < unsigned int> signalLeptonIndex;
+    iEvent.getByLabel( leptonIndexInputTag, signalLeptonIndex );
 
 	edm::Handle < std::vector<pat::MET> > mets;
 	iEvent.getByLabel(metInputTag, mets);
@@ -92,6 +97,8 @@ void BristolNTuple_GlobalEventVars::produce(edm::Event& iEvent, const edm::Event
 	iEvent.put(anglebl, prefix + "anglebl" + suffix);
 	iEvent.put(MT, prefix + "MT" + suffix);
 	iEvent.put(WPT, prefix + "WPT" + suffix);
+
+	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(*signalLeptonIndex)),prefix + "signalLeptonIndex" + suffix);
 
 }
 

@@ -24,6 +24,7 @@ class BristolNTuple_GlobalEventVars : public edm::EDProducer {
   void produce( edm::Event &, const edm::EventSetup & );
   const edm::InputTag   jetInputTag;
   const edm::InputTag   leptonInputTag;
+  const edm::InputTag   leptonIndexInputTag;
   const edm::InputTag   metInputTag;
 
   const std::string     prefix,suffix,channel;
