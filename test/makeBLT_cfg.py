@@ -114,14 +114,16 @@ process.rootNTuplesEPlusJets.remove( process.rootTupleTree )
 process.rootTupleGlobalEventVarsEPlusJets = process.rootTupleGlobalEventVars.clone( 
                                                                                    signalLeptonInputTag=cms.InputTag('topPairEPlusJetsSelection', 'TopPairElectronPlusJets2012Selection.signalElectron'), 
                                                                                    Channel='EPlusJets', 
-                                                                                   Prefix='recoGlobalEventVarsEPlusJets.',
-                                                                                   signalLeptonIndexInputTag=cms.InputTag('topPairEPlusJetsSelection', 'TopPairElectronPlusJets2012Selection.signalElectronIndex')
+                                                                                   metInputTag=cms.InputTag('patMETsPFlow'),
+                                                                                   Prefix='Event.',
+                                                                                   signalLeptonIndexInputTag=cms.InputTag('topPairEPlusJetsSelection', 'TopPairElectronPlusJets2012Selection.signalElectronIndex'),
+                                                                                   Suffix='.patMETsPFlow',
                                                                                    )
 process.rootTupleGlobalEventVarsEPlusJetsPatType1CorrectedPFMet = process.rootTupleGlobalEventVars.clone( 
                                                                                    signalLeptonInputTag=cms.InputTag('topPairEPlusJetsSelection', 'TopPairElectronPlusJets2012Selection.signalElectron'), 
                                                                                    metInputTag=cms.InputTag('patType1CorrectedPFMet'),
                                                                                    Channel='EPlusJets', 
-                                                                                   Prefix='recoGlobalEventVarsEPlusJets.',
+                                                                                   Prefix='Event.',
                                                                                    signalLeptonIndexInputTag=cms.InputTag('topPairEPlusJetsSelection', 'TopPairElectronPlusJets2012Selection.signalElectronIndex'),
                                                                                    Suffix='.patType1CorrectedPFMet',
                                                                                    )
@@ -132,7 +134,13 @@ process.rootNTuplesEPlusJets *= process.rootTupleTreeEPlusJets
 # Use the jet collection produced by the selection filter in tagging mode for calculation of HT etc.
 process.rootTupleGlobalEventVarsEPlusJets.jetInputTag = cms.InputTag("topPairEPlusJetsSelection", 'TopPairElectronPlusJets2012Selection.cleanedJets')
 # Use signal electrons for ST etc,
-process.rootTupleGlobalEventVarsEPlusJets.signalElectronInputTag = cms.InputTag("topPairEPlusJetsSelection", 'TopPairElectronPlusJets2012Selection.signalElectron')
+process.rootTupleGlobalEventVarsEPlusJets.signalLeptonIndexInputTag = cms.InputTag("topPairEPlusJetsSelection", 'TopPairElectronPlusJets2012Selection.signalElectron')
+process.rootTupleGlobalEventVarsEPlusJets.signalLeptonIndexInputTag = cms.InputTag('topPairEPlusJetsSelection', 'TopPairElectronPlusJets2012Selection.signalElectronIndex')
+
+# Same for global variables calculated with other MET
+process.rootTupleGlobalEventVarsEPlusJetsPatType1CorrectedPFMet.jetInputTag = cms.InputTag("topPairEPlusJetsSelection", 'TopPairElectronPlusJets2012Selection.cleanedJets')
+process.rootTupleGlobalEventVarsEPlusJetsPatType1CorrectedPFMet.signalLeptonIndexInputTag = cms.InputTag("topPairEPlusJetsSelection", 'TopPairElectronPlusJets2012Selection.signalElectron')
+process.rootTupleGlobalEventVarsEPlusJetsPatType1CorrectedPFMet.signalLeptonIndexInputTag = cms.InputTag('topPairEPlusJetsSelection', 'TopPairElectronPlusJets2012Selection.signalElectronIndex')
 
 # Replace jet collection that ends up in ntuple to cleaned collection
 process.rootTuplePF2PATJetsEPlusJets = process.rootTuplePF2PATJets.clone( 
@@ -165,14 +173,30 @@ process.rootTupleTreeMuPlusJets.outputCommands.append('drop *_rootTuplePFElectro
 process.rootNTuplesMuPlusJets.remove( process.rootTupleTree )
 process.rootTupleGlobalEventVarsMuPlusJets = process.rootTupleGlobalEventVars.clone( 
                                                                                     signalLeptonInputTag=cms.InputTag('topPairMuPlusJetsSelection', 'TopPairMuonPlusJets2012Selection.signalMuon'), 
-                                                                                    Channel='MuPlusJets', 
-                                                                                    Prefix='recoGlobalEventVarsMuPlusJets.',
-                                                                                    signalLeptonIndexInputTag=cms.InputTag('topPairMuPlusJetsSelection', 'TopPairMuonPlusJets2012Selection.signalMuonIndex')
+                                                                                    Channel='MuPlusJets',
+                                                                                    metInputTag=cms.InputTag('patMETsPFlow'),
+                                                                                    Prefix='Event.',
+                                                                                    signalLeptonIndexInputTag=cms.InputTag('topPairMuPlusJetsSelection', 'TopPairMuonPlusJets2012Selection.signalMuonIndex'),
+                                                                                    Suffix='.patMETsPFlow',
+                                                                                    )
+process.rootTupleGlobalEventVarsMuPlusJetsPatType1CorrectedPFMet = process.rootTupleGlobalEventVars.clone( 
+                                                                                    signalLeptonInputTag=cms.InputTag('topPairMuPlusJetsSelection', 'TopPairMuonPlusJets2012Selection.signalMuon'), 
+                                                                                    Channel='MuPlusJets',
+                                                                                    metInputTag=cms.InputTag('patType1CorrectedPFMet'),
+                                                                                    Prefix='Event.',
+                                                                                    signalLeptonIndexInputTag=cms.InputTag('topPairMuPlusJetsSelection', 'TopPairMuonPlusJets2012Selection.signalMuonIndex'),
+                                                                                    Suffix='.patType1CorrectedPFMet',
                                                                                     )
 process.rootNTuplesMuPlusJets *= process.rootTupleGlobalEventVarsMuPlusJets
+process.rootNTuplesMuPlusJets *= process.rootTupleGlobalEventVarsMuPlusJetsPatType1CorrectedPFMet
 process.rootNTuplesMuPlusJets *= process.rootTupleTreeMuPlusJets
 process.rootTupleGlobalEventVarsMuPlusJets.jetInputTag = cms.InputTag("topPairMuPlusJetsSelection", 'TopPairMuonPlusJets2012Selection.cleanedJets')
-process.rootTupleGlobalEventVarsMuPlusJets.signalElectronInputTag = cms.InputTag("topPairMuPlusJetsSelection", 'TopPairMuonPlusJets2012Selection.signalMuon')
+process.rootTupleGlobalEventVarsMuPlusJets.signalLeptonInputTag = cms.InputTag("topPairMuPlusJetsSelection", 'TopPairMuonPlusJets2012Selection.signalMuon')
+process.rootTupleGlobalEventVarsMuPlusJets.signalLeptonIndexInputTag = cms.InputTag('topPairMuPlusJetsSelection', 'TopPairMuonPlusJets2012Selection.signalMuonIndex')
+process.rootTupleGlobalEventVarsMuPlusJetsPatType1CorrectedPFMet.jetInputTag = cms.InputTag("topPairMuPlusJetsSelection", 'TopPairMuonPlusJets2012Selection.cleanedJets')
+process.rootTupleGlobalEventVarsMuPlusJetsPatType1CorrectedPFMet.signalLeptonInputTag = cms.InputTag("topPairMuPlusJetsSelection", 'TopPairMuonPlusJets2012Selection.signalMuon')
+process.rootTupleGlobalEventVarsMuPlusJetsPatType1CorrectedPFMet.signalLeptonIndexInputTag = cms.InputTag('topPairMuPlusJetsSelection', 'TopPairMuonPlusJets2012Selection.signalMuonIndex')
+
 process.rootTuplePF2PATJetsMuPlusJets = process.rootTuplePF2PATJets.clone( 
                                                                           InputTag=cms.InputTag("topPairMuPlusJetsSelection", 'TopPairMuonPlusJets2012Selection.cleanedJets'), 
                                                                           Prefix='cleanedJetsPFlowMuPlusJets.' )

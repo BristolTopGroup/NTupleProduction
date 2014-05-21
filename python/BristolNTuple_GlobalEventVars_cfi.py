@@ -5,7 +5,7 @@ rootTupleGlobalEventVars = cms.EDProducer('BristolNTuple_GlobalEventVars',
     signalLeptonInputTag=cms.InputTag('topPairEPlusJetsSelection', 'TopPairElectronPlusJets2012Selection.signalElectron'),
     signalLeptonIndexInputTag=cms.InputTag('topPairEPlusJetsSelection', 'TopPairElectronPlusJets2012Selection.signalElectronIndex'),
     metInputTag=cms.InputTag('patMETsPFlow'),
-    Prefix=cms.string('recoGlobalEventVars.'),
+    Prefix=cms.string('Event.'),
     Suffix=cms.string(''),
     Channel=cms.string('EPlusJets')
 )
