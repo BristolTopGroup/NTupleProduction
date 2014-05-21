@@ -19,7 +19,8 @@ private:
 					manystripclus53XInput_, //
 					toomanystripclus53XInput_, //
 					logErrorTooManyClustersInput_, //
-					METInputForSumET_;
+					METInputForSumET_, //
+					recoVertexInputTag_;
 
 	const std::string prefix, suffix;
 
