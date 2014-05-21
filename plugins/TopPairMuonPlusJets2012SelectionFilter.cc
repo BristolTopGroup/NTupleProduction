@@ -52,6 +52,7 @@ TopPairMuonPlusJets2012SelectionFilter::TopPairMuonPlusJets2012SelectionFilter(c
 		taggingMode_(iConfig.getParameter<bool>("taggingMode")), //
 		passes_(), //
 		runNumber_(0), //
+		signalMuonIndex_(999), //
 		isRealData_(false), //
 		hasSignalMuon_(false), //
 		hasGoodPV_(false), //
@@ -76,6 +77,7 @@ TopPairMuonPlusJets2012SelectionFilter::TopPairMuonPlusJets2012SelectionFilter(c
 	produces<unsigned int>(prefix_ + "NumberOfBtags");
 	produces < pat::JetCollection > (prefix_ + "cleanedJets");
 	produces < pat::MuonCollection > (prefix_ + "signalMuon");
+	produces<unsigned int>(prefix_ + "signalMuonIndex");
 }
 
 void TopPairMuonPlusJets2012SelectionFilter::fillDescriptions(edm::ConfigurationDescriptions & descriptions) {
@@ -150,6 +152,8 @@ bool TopPairMuonPlusJets2012SelectionFilter::filter(edm::Event& iEvent, const ed
 	std::auto_ptr < pat::MuonCollection > signalMuon(new pat::MuonCollection());
 	signalMuon->push_back(signalMuon_);
 	iEvent.put(signalMuon, prefix_ + "signalMuon");
+
+	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(signalMuonIndex_)),prefix_ + "signalMuonIndex");
 
 	return taggingMode_ || passesSelection;
 }
@@ -249,7 +253,7 @@ void TopPairMuonPlusJets2012SelectionFilter::getLooseMuons() {
 
 bool TopPairMuonPlusJets2012SelectionFilter::isLooseMuon(const pat::Muon& muon) const {
 	bool passesPtAndEta = muon.pt() > 10 && fabs(muon.eta()) < 2.5;
-	bool passesID = muon.isPFMuon() && muon.isGlobalMuon() || muon.isTrackerMuon();
+	bool passesID = muon.isPFMuon() && (muon.isGlobalMuon() || muon.isTrackerMuon());
 	bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < looseMuonIso_;
 	
 	return passesPtAndEta && passesID && passesIso;
@@ -262,8 +266,11 @@ void TopPairMuonPlusJets2012SelectionFilter::goodIsolatedMuons() {
 
 		bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < tightMuonIso_;
 				
-		if (isGoodMuon(muon) && passesIso)
+		if (isGoodMuon(muon) && passesIso) {
 			goodIsolatedMuons_.push_back(muon);
+			//Check if this is the first, and therefore the signal, muon
+			if ( goodIsolatedMuons_.size()==1 ) signalMuonIndex_ = index;
+		}
 	}
 }
 

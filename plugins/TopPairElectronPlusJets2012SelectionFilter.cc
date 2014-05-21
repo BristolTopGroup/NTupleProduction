@@ -52,6 +52,7 @@ TopPairElectronPlusJets2012SelectionFilter::TopPairElectronPlusJets2012Selection
 		taggingMode_(iConfig.getParameter<bool>("taggingMode")), //
 		passes_(), //
 		runNumber_(0), //
+		signalElectronIndex_(999), //
 		isRealData_(false), //
 		hasSignalElectron_(false), //
 		rho_(0), //
@@ -74,6 +75,7 @@ TopPairElectronPlusJets2012SelectionFilter::TopPairElectronPlusJets2012Selection
 	produces<unsigned int>(prefix_ + "NumberOfBtags");
 	produces < pat::JetCollection > (prefix_ + "cleanedJets");
 	produces < pat::ElectronCollection > (prefix_ + "signalElectron");
+	produces<unsigned int>(prefix_ + "signalElectronIndex");
 }
 
 void TopPairElectronPlusJets2012SelectionFilter::fillDescriptions(edm::ConfigurationDescriptions & descriptions) {
@@ -149,6 +151,8 @@ bool TopPairElectronPlusJets2012SelectionFilter::filter(edm::Event& iEvent, cons
 	std::auto_ptr < pat::ElectronCollection > signalElectron(new pat::ElectronCollection());
 	signalElectron->push_back(signalElectron_);
 	iEvent.put(signalElectron, prefix_ + "signalElectron");
+
+	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(signalElectronIndex_)),prefix_ + "signalElectronIndex");
 
 	return taggingMode_ || passesSelection;
 }
@@ -248,8 +252,11 @@ void TopPairElectronPlusJets2012SelectionFilter::goodIsolatedElectrons() {
 
 		bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrectionsForElectrons_,
 				useRhoActiveAreaCorrections_) < tightElectronIso_;
-		if (isGoodElectron(electron) && passesIso)
+		if (isGoodElectron(electron) && passesIso) {
 			goodIsolatedElectrons_.push_back(electron);
+			//Check if this is the first, and therefore the signal, electron
+			if ( goodIsolatedElectrons_.size()==1 ) signalElectronIndex_ = index;
+		}
 	}
 }
 
