@@ -19,6 +19,7 @@ BristolNTuple_GlobalEventVars::BristolNTuple_GlobalEventVars(const edm::Paramete
 	produces<double>(prefix + "MT" + suffix);
 	produces<double>(prefix + "WPT" + suffix);
 	produces<unsigned int>(prefix + "signalLeptonIndex" + suffix);
+	produces<unsigned int>(prefix + "numberOfBTags" + suffix);
 }
 
 void BristolNTuple_GlobalEventVars::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -98,6 +99,7 @@ void BristolNTuple_GlobalEventVars::produce(edm::Event& iEvent, const edm::Event
 	iEvent.put(MT, prefix + "MT" + suffix);
 	iEvent.put(WPT, prefix + "WPT" + suffix);
 
+	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(b_jets.size())),prefix + "numberOfBTags" + suffix);
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(*signalLeptonIndex)),prefix + "signalLeptonIndex" + suffix);
 
 }
