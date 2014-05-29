@@ -10,6 +10,7 @@ from BristolAnalysis.NTupleTools.BristolNTuple_RecoMET_cfi import *
 from BristolAnalysis.NTupleTools.BristolNTuple_METcorrections_cfi import *
 from BristolAnalysis.NTupleTools.BristolNTuple_Muons_cfi import *
 from BristolAnalysis.NTupleTools.BristolNTuple_Trigger_cfi import *
+from BristolAnalysis.NTupleTools.BristolNTuple_TriggerObjects_cfi import *
 from BristolAnalysis.NTupleTools.BristolNTuple_Vertex_cfi import *
 from BristolAnalysis.NTupleTools.BristolNTuple_GenEventInfo_cfi import *
 from BristolAnalysis.NTupleTools.BristolNTuple_GenParticles_cfi import *
