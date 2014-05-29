@@ -1,5 +1,5 @@
 import FWCore.ParameterSet.Config as cms
-selectionPrefix = 'TopPairElectronPlusJets2012Selection.'
+selectionPrefix = 'TopPairElectronPlusJetsSelection.'
 selectionName = 'topPairEPlusJetsSelection'
 selectionCuts = [
                 "AllEvents",
@@ -23,7 +23,7 @@ topPairEPlusJetsSelectionAnalyser = cms.EDAnalyzer("SelectionAnalyser",
     selectionNames=cms.vstring(selectionCuts),
 )
 
-selectionPrefix = 'TopPairMuonPlusJets2012Selection.'
+selectionPrefix = 'TopPairMuonPlusJetsSelection.'
 selectionName = 'topPairMuPlusJetsSelection'
 selectionCuts = [
                "AllEvents", 

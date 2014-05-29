@@ -1,4 +1,4 @@
-#include "BristolAnalysis/NTupleTools/plugins/TopPairMuonPlusJets2012SelectionFilter.h"
+#include "BristolAnalysis/NTupleTools/plugins/TopPairMuonPlusJetsSelectionFilter.h"
 #include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
 // system include files
 #include <memory>
@@ -18,7 +18,7 @@ using namespace reco;
 using namespace isodeposit;
 using namespace pat;
 
-TopPairMuonPlusJets2012SelectionFilter::TopPairMuonPlusJets2012SelectionFilter(const edm::ParameterSet& iConfig) :
+TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm::ParameterSet& iConfig) :
 		jetInput_(iConfig.getParameter < edm::InputTag > ("jetInput")), //
 		electronInput_(iConfig.getParameter < edm::InputTag > ("electronInput")), //
 		muonInput_(iConfig.getParameter < edm::InputTag > ("muonInput")), //
@@ -46,6 +46,7 @@ TopPairMuonPlusJets2012SelectionFilter::TopPairMuonPlusJets2012SelectionFilter(c
 		useRhoActiveAreaCorrections_(iConfig.getParameter<bool>("useRhoActiveAreaCorrections")), // refers to electrons only
 		useMETFilters_(iConfig.getParameter<bool>("useMETFilters")), //
 		useEEBadScFilter_(iConfig.getParameter<bool>("useEEBadScFilter")), //
+		tagAndProbeStudies_(iConfig.getParameter<bool>("tagAndProbeStudies")), //
 		prefix_(iConfig.getUntrackedParameter < std::string > ("prefix")), //
 		MCSampleTag_(iConfig.getParameter < std::string > ("MCSampleTag")), //
 		debug_(iConfig.getUntrackedParameter<bool>("debug")), //
@@ -80,7 +81,7 @@ TopPairMuonPlusJets2012SelectionFilter::TopPairMuonPlusJets2012SelectionFilter(c
 	produces<unsigned int>(prefix_ + "signalMuonIndex");
 }
 
-void TopPairMuonPlusJets2012SelectionFilter::fillDescriptions(edm::ConfigurationDescriptions & descriptions) {
+void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDescriptions & descriptions) {
 	edm::ParameterSetDescription desc;
 	desc.add < InputTag > ("jetInput");
 	desc.add < InputTag > ("electronInput");
@@ -110,19 +111,20 @@ void TopPairMuonPlusJets2012SelectionFilter::fillDescriptions(edm::Configuration
 	desc.add<bool>("useRhoActiveAreaCorrections", true); // refers to electrons only
 	desc.add<bool>("useMETFilters", false);
 	desc.add<bool>("useEEBadScFilter", false);
+	desc.add<bool>("tagAndProbeStudies", false);
 
 	desc.add < std::string > ("MCSampleTag", "Summer12");
-	desc.addUntracked < std::string > ("prefix", "TopPairElectronPlusJets2012Selection.");
+	desc.addUntracked < std::string > ("prefix", "TopPairMuonPlusJetsSelection.");
 	desc.addUntracked<bool>("debug", false);
 	desc.add<bool>("taggingMode", false);
-	descriptions.add("applyTopPairMuonPlusJets2012Selection", desc);
+	descriptions.add("applyTopPairMuonPlusJetsSelection", desc);
 }
 
-TopPairMuonPlusJets2012SelectionFilter::~TopPairMuonPlusJets2012SelectionFilter() {
+TopPairMuonPlusJetsSelectionFilter::~TopPairMuonPlusJetsSelectionFilter() {
 
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
+bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	setupEventContent(iEvent);
 	unsigned int numberOfBtags(cleanedBJets_.size());
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfBtags)), prefix_ + "NumberOfBtags");
@@ -158,7 +160,7 @@ bool TopPairMuonPlusJets2012SelectionFilter::filter(edm::Event& iEvent, const ed
 	return taggingMode_ || passesSelection;
 }
 
-void TopPairMuonPlusJets2012SelectionFilter::setupEventContent(edm::Event& iEvent) {
+void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent) {
 	
 	if (debug_)
 		cout << "Setting up the event content" << endl;
@@ -181,7 +183,7 @@ void TopPairMuonPlusJets2012SelectionFilter::setupEventContent(edm::Event& iEven
 		} else
 			hasGoodPV_ = false;
 	} else
-		edm::LogError("TopPairMuonPlusJets2012SelectionFilterError") << "Error! Can't get the product " << VertexInput_;
+		edm::LogError("TopPairMuonPlusJetsSelectionFilterError") << "Error! Can't get the product " << VertexInput_;
 
 	edm::Handle < pat::JetCollection > jets;
 	iEvent.getByLabel(jetInput_, jets);
@@ -211,7 +213,7 @@ void TopPairMuonPlusJets2012SelectionFilter::setupEventContent(edm::Event& iEven
 		if (hasSignalMuon_)
 			signalMuon_ = goodIsolatedMuons_.front();
 	} else {
-		edm::LogError("TopPairMuonPlusJets2012SelectionFilterError") << "Error! Can't get the product " << muonInput_;
+		edm::LogError("TopPairMuonPlusJetsSelectionFilterError") << "Error! Can't get the product " << muonInput_;
 	}
 	if (debug_)
 		cout << "Getting clean jets" << endl;
@@ -221,7 +223,7 @@ void TopPairMuonPlusJets2012SelectionFilter::setupEventContent(edm::Event& iEven
 	cleanedBJets();
 }
 
-void TopPairMuonPlusJets2012SelectionFilter::getLooseElectrons() {
+void TopPairMuonPlusJetsSelectionFilter::getLooseElectrons() {
 	looseElectrons_.clear();
 
 	for (unsigned index = 0; index < electrons_.size(); ++index) {
@@ -231,7 +233,7 @@ void TopPairMuonPlusJets2012SelectionFilter::getLooseElectrons() {
 	}
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::isLooseElectron(const pat::Electron& electron) const {
+bool TopPairMuonPlusJetsSelectionFilter::isLooseElectron(const pat::Electron& electron) const {
 	bool passesPtAndEta = electron.pt() > 20 && fabs(electron.eta()) < 2.5;
 	//		bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
 	bool passesID = electron.electronID("mvaTrigV0") > 0.5;
@@ -241,7 +243,7 @@ bool TopPairMuonPlusJets2012SelectionFilter::isLooseElectron(const pat::Electron
 	return passesPtAndEta && passesID && passesIso;
 }
 
-void TopPairMuonPlusJets2012SelectionFilter::getLooseMuons() {
+void TopPairMuonPlusJetsSelectionFilter::getLooseMuons() {
 	looseMuons_.clear();
 
 	for (unsigned index = 0; index < muons_.size(); ++index) {
@@ -251,7 +253,7 @@ void TopPairMuonPlusJets2012SelectionFilter::getLooseMuons() {
 	}
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::isLooseMuon(const pat::Muon& muon) const {
+bool TopPairMuonPlusJetsSelectionFilter::isLooseMuon(const pat::Muon& muon) const {
 	bool passesPtAndEta = muon.pt() > 10 && fabs(muon.eta()) < 2.5;
 	bool passesID = muon.isPFMuon() && (muon.isGlobalMuon() || muon.isTrackerMuon());
 	bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < looseMuonIso_;
@@ -259,7 +261,7 @@ bool TopPairMuonPlusJets2012SelectionFilter::isLooseMuon(const pat::Muon& muon) 
 	return passesPtAndEta && passesID && passesIso;
 }
 
-void TopPairMuonPlusJets2012SelectionFilter::goodIsolatedMuons() {
+void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
 	goodIsolatedMuons_.clear();
 	for (unsigned index = 0; index < muons_.size(); ++index) {
 		const pat::Muon muon = muons_.at(index);
@@ -274,7 +276,7 @@ void TopPairMuonPlusJets2012SelectionFilter::goodIsolatedMuons() {
 	}
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::isGoodMuon(const pat::Muon& muon) const {
+bool TopPairMuonPlusJetsSelectionFilter::isGoodMuon(const pat::Muon& muon) const {
 	if (debug_) {
 		cout << "isGoodMuon:" << "hasGoodPV: " << hasGoodPV_ << endl;
 		cout << "pT: " << muon.pt() << " eta: " << muon.eta() << " phi: " << muon.phi() << endl;
@@ -308,7 +310,7 @@ bool TopPairMuonPlusJets2012SelectionFilter::isGoodMuon(const pat::Muon& muon) c
 	return passesPtAndEta && passesD0 && passesID && trackQuality;
 }
 
-void TopPairMuonPlusJets2012SelectionFilter::cleanedJets() {
+void TopPairMuonPlusJetsSelectionFilter::cleanedJets() {
 	cleanedJets_.clear();
 	for (unsigned index = 0; index < jets_.size(); ++index) {
 		const pat::Jet jet = jets_.at(index);
@@ -323,7 +325,7 @@ void TopPairMuonPlusJets2012SelectionFilter::cleanedJets() {
 	}
 }
 
-void TopPairMuonPlusJets2012SelectionFilter::cleanedBJets() {
+void TopPairMuonPlusJetsSelectionFilter::cleanedBJets() {
 	cleanedBJets_.clear();
 	for (unsigned index = 0; index < cleanedJets_.size(); ++index) {
 		const pat::Jet jet = cleanedJets_.at(index);
@@ -332,7 +334,7 @@ void TopPairMuonPlusJets2012SelectionFilter::cleanedBJets() {
 	}
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::isGoodJet(const pat::Jet& jet) const {
+bool TopPairMuonPlusJetsSelectionFilter::isGoodJet(const pat::Jet& jet) const {
 	//both cuts are done at PAT config level (selectedPATJets) this is just for safety
 	double smearFactor = getSmearedJetPtScale(jet, 0);
 	bool passesPtAndEta(smearFactor*jet.pt() > 20. && fabs(jet.eta()) < 2.5);
@@ -356,7 +358,7 @@ bool TopPairMuonPlusJets2012SelectionFilter::isGoodJet(const pat::Jet& jet) cons
 	return passesPtAndEta && passesJetID;
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::passesSelectionStep(edm::Event& iEvent, unsigned int selectionStep) const {
+bool TopPairMuonPlusJetsSelectionFilter::passesSelectionStep(edm::Event& iEvent, unsigned int selectionStep) const {
 	TTbarMuPlusJetsReferenceSelection::Step step = TTbarMuPlusJetsReferenceSelection::Step(selectionStep);
 	switch (step) {
 	case TTbarMuPlusJetsReferenceSelection::AllEvents:
@@ -388,7 +390,7 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesSelectionStep(edm::Event& iEv
 	return false;
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::passesEventCleaning(edm::Event& iEvent) const {
+bool TopPairMuonPlusJetsSelectionFilter::passesEventCleaning(edm::Event& iEvent) const {
 	// Scraping veto is filtered on at
 	if (!passesScrapingVeto(iEvent))
 		return false;
@@ -399,7 +401,7 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesEventCleaning(edm::Event& iEv
 //	iEvent.getByLabel(VertexInput_, primaryVertices);
 //	if (primaryVertices.isValid()) {
 //		int nVertices = primaryVertices->size();
-//		edm::LogInfo("TopPairMuonPlusJets2012SelectionFilter") << "Total # Primary Vertices: " << nVertices;
+//		edm::LogInfo("TopPairMuonPlusJetsSelectionFilter") << "Total # Primary Vertices: " << nVertices;
 //		if (nVertices > 0)
 //			passesPrimaryVertexRequirement = true;
 //	} else
@@ -425,11 +427,11 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesEventCleaning(edm::Event& iEv
 		edm::Handle < reco::BeamHaloSummary > TheBeamHaloSummary;
 		iEvent.getByLabel("BeamHaloSummary", TheBeamHaloSummary);
 		if (TheBeamHaloSummary.isValid()) {
-			edm::LogInfo("TopPairMuonPlusJets2012SelectionFilter") << "Successfully obtained BeamHaloSummary";
+			edm::LogInfo("TopPairMuonPlusJetsSelectionFilter") << "Successfully obtained BeamHaloSummary";
 			const reco::BeamHaloSummary TheSummary = (*TheBeamHaloSummary.product());
 			cscTightID = TheSummary.CSCTightHaloId();
 		} else
-			edm::LogError("TopPairMuonPlusJets2012SelectionFilter_Error")
+			edm::LogError("TopPairMuonPlusJetsSelectionFilter_Error")
 					<< "Error! Can't get the product BeamHaloSummary";
 		//passes MET filters and is not BeamHalo
 		passesMETFilters = passesMETFilters && !cscTightID;
@@ -438,7 +440,7 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesEventCleaning(edm::Event& iEv
 	return passesMETFilters;
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::passesScrapingVeto(edm::Event& event) const {
+bool TopPairMuonPlusJetsSelectionFilter::passesScrapingVeto(edm::Event& event) const {
 	bool result(false);
 	edm::Handle < reco::TrackCollection > tracks;
 	event.getByLabel(trkInput_, tracks);
@@ -469,7 +471,7 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesScrapingVeto(edm::Event& even
 	return result;
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::passesTriggerSelection() const {
+bool TopPairMuonPlusJetsSelectionFilter::passesTriggerSelection() const {
 	if (isRealData_) {
 		if (runNumber_ >= 160404 && runNumber_ <= 173236)
 			return triggerFired("HLT_IsoMu24", hltConfig_, triggerResults_);
@@ -489,70 +491,73 @@ bool TopPairMuonPlusJets2012SelectionFilter::passesTriggerSelection() const {
 	return false;
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::hasExactlyOneIsolatedLepton() const {
+bool TopPairMuonPlusJetsSelectionFilter::hasExactlyOneIsolatedLepton() const {
 	return goodIsolatedMuons_.size() == 1;
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::passesLooseElectronVeto() const {
+bool TopPairMuonPlusJetsSelectionFilter::passesLooseElectronVeto() const {
 	return looseElectrons_.size() == 0;
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::passesLooseMuonVeto() const {
-	return looseMuons_.size() < 2;
+bool TopPairMuonPlusJetsSelectionFilter::passesLooseMuonVeto() const {
+	if (tagAndProbeStudies_)
+		return true; // need to add the invariant mass cut for Z window
+	else
+		return looseMuons_.size() < 2;
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::hasAtLeastOneGoodJet() const {
+bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastOneGoodJet() const {
 	if (cleanedJets_.size() > 0)		
 		return getSmearedJetPtScale(cleanedJets_.at(0), 0)*cleanedJets_.at(0).pt() > min1JetPt_;
 	return false;
 
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::hasAtLeastTwoGoodJets() const {
+bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastTwoGoodJets() const {
 	if (cleanedJets_.size() > 1)
 		return getSmearedJetPtScale(cleanedJets_.at(1), 0)*cleanedJets_.at(1).pt() > min2JetPt_;
 	return false;
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::hasAtLeastThreeGoodJets() const {
+bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastThreeGoodJets() const {
 	if (cleanedJets_.size() > 2)
 		return getSmearedJetPtScale(cleanedJets_.at(2), 0)*cleanedJets_.at(2).pt() > min3JetPt_;
 	return false;
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::hasAtLeastFourGoodJets() const {
+bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastFourGoodJets() const {
 	if (cleanedJets_.size() > 3)
 		return getSmearedJetPtScale(cleanedJets_.at(3), 0)*cleanedJets_.at(3).pt() > min4JetPt_;
 	return false;
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::hasAtLeastOneGoodBJet() const {
+bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastOneGoodBJet() const {
 	return cleanedBJets_.size() > 0;
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::hasAtLeastTwoGoodBJets() const {
+bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastTwoGoodBJets() const {
 	return cleanedBJets_.size() > 1;
 }
 
 // ------------ method called once each job just before starting event loop  ------------
-void TopPairMuonPlusJets2012SelectionFilter::beginJob() {
+void TopPairMuonPlusJetsSelectionFilter::beginJob() {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
-void TopPairMuonPlusJets2012SelectionFilter::endJob() {
+void TopPairMuonPlusJetsSelectionFilter::endJob() {
 }
 
-bool TopPairMuonPlusJets2012SelectionFilter::beginRun(edm::Run& iRun, const edm::EventSetup& iSetup) {
+bool TopPairMuonPlusJetsSelectionFilter::beginRun(edm::Run& iRun, const edm::EventSetup& iSetup) {
 
 	bool changed = true;
 	if (hltConfig_.init(iRun, iSetup, hltInputTag_.process(), changed)) {
 		// if init returns TRUE, initialisation has succeeded!
-		edm::LogInfo("TopPairMuonPlusJets2012SelectionFilter") << "HLT config with process name "
+		edm::LogInfo("TopPairMuonPlusJetsSelectionFilter") << "HLT config with process name "
 				<< hltInputTag_.process() << " successfully extracted";
 	} else {
 		// if init returns FALSE, initialisation has NOT succeeded, which indicates a problem
 		// with the file and/or code and needs to be investigated!
-		edm::LogError("TopPairMuonPlusJets2012SelectionFilter_Error")
+		edm::LogError("TopPairMuonPlusJetsSelectionFilter_Error")
 				<< "Error! HLT config extraction with process name " << hltInputTag_.process() << " failed";
 		// In this case, all access methods will return empty values!
 	}
@@ -560,4 +565,4 @@ bool TopPairMuonPlusJets2012SelectionFilter::beginRun(edm::Run& iRun, const edm:
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE (TopPairMuonPlusJets2012SelectionFilter);
+DEFINE_FWK_MODULE (TopPairMuonPlusJetsSelectionFilter);

@@ -22,8 +22,8 @@ process.load( 'TopQuarkAnalysis.TopSkimming.TtFullyHadronicFilter_cfi' )
 process.load( 'TopQuarkAnalysis.TopSkimming.TtFullyLeptonicFilter_cfi' )
 process.load( 'TopQuarkAnalysis.TopSkimming.TtSemiLeptonicFilter_cfi' )
 
-process.load( 'BristolAnalysis.NTupleTools.TopPairElectronPlusJets2012SelectionFilter_cfi' )
-process.load( 'BristolAnalysis.NTupleTools.TopPairMuonPlusJets2012SelectionFilter_cfi' )
+process.load( 'BristolAnalysis.NTupleTools.TopPairElectronPlusJetsSelectionFilter_cfi' )
+process.load( 'BristolAnalysis.NTupleTools.TopPairMuonPlusJetsSelectionFilter_cfi' )
  # filters only in tagging mode
 process.topPairEPlusJetsSelection.taggingMode = cms.bool( True )
 process.topPairMuPlusJetsSelection.taggingMode = cms.bool( True )
@@ -60,8 +60,8 @@ else:
     process.topPairEPlusJetsSelection.MCSampleTag = cms.string( 'Summer12' )  
     process.topPairMuPlusJetsSelection.MCSampleTag = cms.string( 'Summer12' )
 
-electronselectionPrefix = 'TopPairElectronPlusJets2012Selection.'
-muonselectionPrefix = 'TopPairMuonPlusJets2012Selection.'
+electronselectionPrefix = 'TopPairElectronPlusJetsSelection.'
+muonselectionPrefix = 'TopPairMuonPlusJetsSelection.'
 process.topPairEPlusJetsSelection.prefix = cms.untracked.string( electronselectionPrefix )
 process.topPairMuPlusJetsSelection.prefix = cms.untracked.string( muonselectionPrefix )
 

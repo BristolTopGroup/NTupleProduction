@@ -1,5 +1,5 @@
-#ifndef BristolTopPairMuonPlusJets2012SelectionFilter
-#define BristolTopPairMuonPlusJets2012SelectionFilter
+#ifndef BristolTopPairMuonPlusJetsSelectionFilter
+#define BristolTopPairMuonPlusJetsSelectionFilter
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDFilter.h"
@@ -48,10 +48,10 @@ const std::string StringSteps[NUMBER_OF_SELECTION_STEPS] = { //
 		};
 }
 
-class TopPairMuonPlusJets2012SelectionFilter: public edm::EDFilter {
+class TopPairMuonPlusJetsSelectionFilter: public edm::EDFilter {
 public:
-	explicit TopPairMuonPlusJets2012SelectionFilter(const edm::ParameterSet&);
-	virtual ~TopPairMuonPlusJets2012SelectionFilter();
+	explicit TopPairMuonPlusJetsSelectionFilter(const edm::ParameterSet&);
+	virtual ~TopPairMuonPlusJetsSelectionFilter();
 
 	virtual void beginJob();
 	virtual bool filter(edm::Event&, const edm::EventSetup&);
@@ -99,7 +99,7 @@ private:
 	double min1JetPt_, min2JetPt_, min3JetPt_, min4JetPt_;
 
 	double tightMuonIso_, looseElectronIso_, looseMuonIso_;
-	bool useDeltaBetaCorrectionsForMuons_, useDeltaBetaCorrectionsForElectrons_, useRhoActiveAreaCorrections_, useMETFilters_, useEEBadScFilter_;
+	bool useDeltaBetaCorrectionsForMuons_, useDeltaBetaCorrectionsForElectrons_, useRhoActiveAreaCorrections_, useMETFilters_, useEEBadScFilter_, tagAndProbeStudies_;
 
 	std::string prefix_, MCSampleTag_;
 
