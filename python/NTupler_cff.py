@@ -50,6 +50,7 @@ def setup_ntupler(process, cms, options):
     process.rootTupleGenEventInfo.isTTbarMC = cms.bool(options.isTTbarMC)
     
     process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
+        treeName = cms.string('tree'),
         outputCommands=cms.untracked.vstring(
            'drop *',
            #beamspot
@@ -96,6 +97,8 @@ def setup_ntupler(process, cms, options):
             'keep *_rootTupleGenParticles_*_*',
             'keep *_rootTupleGenJets_*_*',
             'keep *_rootTupleGenMETTrue_*_*',
+            # Global event variables
+            'keep *_rootTupleGlobalEventVars_*_*',
         )
     )
     

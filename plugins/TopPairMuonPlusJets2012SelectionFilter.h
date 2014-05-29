@@ -107,7 +107,7 @@ private:
 
 	//internal
 	boost::array<bool, TTbarMuPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS> passes_;
-	unsigned int runNumber_;
+	unsigned int runNumber_, signalMuonIndex_;
 	bool isRealData_, hasSignalMuon_, hasGoodPV_;
 	double rho_;
 	pat::JetCollection jets_, cleanedJets_, cleanedBJets_;

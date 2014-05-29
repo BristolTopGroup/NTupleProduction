@@ -111,7 +111,7 @@ private:
 
 	//internal
 	boost::array<bool, TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS> passes_;
-	unsigned int runNumber_;
+	unsigned int runNumber_, signalElectronIndex_;
 	bool isRealData_, hasSignalElectron_;
 	double rho_;
 	pat::JetCollection jets_, cleanedJets_, cleanedBJets_;

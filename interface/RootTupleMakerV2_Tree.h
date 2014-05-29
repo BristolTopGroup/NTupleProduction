@@ -53,12 +53,16 @@ private:
 
   edm::Service<TFileService> fs;
   TTree * tree;
+  const std::string treeName;
 
   std::vector<BranchConnector*> connectors;
   edm::ParameterSet pset;
 
 public:
-  explicit RootTupleMakerV2_Tree(const edm::ParameterSet& iConfig) : pset(iConfig) {}
+  explicit RootTupleMakerV2_Tree(const edm::ParameterSet& iConfig) :
+  	  treeName(iConfig.getParameter <std::string> ("treeName")),
+	  pset(iConfig)
+  {}
 
   enum LEAFTYPE {BOOL=1,  BOOL_V,
                  SHORT,   SHORT_V,           U_SHORT, U_SHORT_V,

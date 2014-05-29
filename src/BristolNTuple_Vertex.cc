@@ -22,6 +22,7 @@ BristolNTuple_Vertex::BristolNTuple_Vertex(const edm::ParameterSet& iConfig) :
   produces <std::vector<int> >    ( prefix + "NTracks" + suffix );
   produces <std::vector<int> >    ( prefix + "NTracksW05" + suffix );
   produces <std::vector<int> >   ( prefix + "IsFake" + suffix );
+  produces < unsigned int > ( prefix + "NRecoVertices" + suffix );
 }
 
 void BristolNTuple_Vertex::
@@ -39,6 +40,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<int> >     ntracks  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >     ntracksw05  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >    isfake  ( new std::vector<int>()  );
+  std::auto_ptr< unsigned int >    nvertices  ( new unsigned int (0)  );
 
   //-----------------------------------------------------------------
   edm::Handle<reco::VertexCollection> primaryVertices;
@@ -46,6 +48,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   if(primaryVertices.isValid()) {
     edm::LogInfo("BristolNTuple_VertexInfo") << "Total # Primary Vertices: " << primaryVertices->size();
+
+    *nvertices = primaryVertices->size();
 
     for( reco::VertexCollection::const_iterator it=primaryVertices->begin() ; it!=primaryVertices->end() ; ++it ) {
       x->push_back( it->x() );
@@ -79,4 +83,5 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( ntracks, prefix + "NTracks" + suffix );
   iEvent.put( ntracksw05, prefix + "NTracksW05" + suffix );
   iEvent.put( isfake, prefix + "IsFake" + suffix );
+  iEvent.put( nvertices, prefix + "NRecoVertices" + suffix );
 }

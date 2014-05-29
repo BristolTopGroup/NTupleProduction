@@ -13,6 +13,8 @@ rootTupleEvent = cms.EDProducer(
         manystripclus53XInput = cms.InputTag('manystripclus53X'),
         toomanystripclus53XInput = cms.InputTag('toomanystripclus53X'),
         logErrorTooManyClustersInput = cms.InputTag('logErrorTooManyClusters'),
+        
+        recoVertexInputTag = cms.InputTag('rootTupleVertex','goodOfflinePrimaryVertices.NRecoVertices'),
 
         METInputForSumET=cms.InputTag('patMETsPFlow'),
         Prefix=cms.string('Event.'),

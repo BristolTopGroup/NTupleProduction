@@ -18,3 +18,4 @@ from BristolAnalysis.NTupleTools.BristolNTuple_GenMET_cfi import *
 from BristolAnalysis.NTupleTools.BristolNTuple_Tracks_cfi import *
 from BristolAnalysis.NTupleTools.BristolNTuple_Photons_cfi import *
 from BristolAnalysis.NTupleTools.BristolNTuple_Taus_cfi import *
+from BristolAnalysis.NTupleTools.BristolNTuple_GlobalEventVars_cfi import *

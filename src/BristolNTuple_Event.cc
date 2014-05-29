@@ -21,6 +21,7 @@ BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig) :
 		toomanystripclus53XInput_(iConfig.getParameter < edm::InputTag > ("toomanystripclus53XInput")), //
 		logErrorTooManyClustersInput_(iConfig.getParameter < edm::InputTag > ("logErrorTooManyClustersInput")), //
 		METInputForSumET_(iConfig.getParameter < edm::InputTag > ("METInputForSumET")), //
+		recoVertexInputTag_(iConfig.getParameter < edm::InputTag > ("recoVertexInputTag")), //
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //
 		suffix(iConfig.getParameter < std::string > ("Suffix")) {
 	produces<double>(prefix + "MagneticField" + suffix);
@@ -33,6 +34,7 @@ BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig) :
 	produces<bool>(prefix + "isData" + suffix);
 	produces<double>(prefix + "rho" + suffix);
 	produces<double>(prefix + "SumET" + suffix);
+	produces<unsigned int>(prefix + "NRecoVertices" + suffix);
 
 	//optional MET filter decisions
 	produces<bool>(prefix + "HBHENoiseFilter" + suffix);
@@ -91,6 +93,9 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	edm::Handle < std::vector<pat::MET> > mets;
 	iEvent.getByLabel(METInputForSumET_, mets);
 
+	edm::Handle < unsigned int> nRecoVertices;
+	iEvent.getByLabel(recoVertexInputTag_, nRecoVertices);
+
 	std::auto_ptr<unsigned int> run(new unsigned int(iEvent.id().run()));
 	std::auto_ptr<unsigned int> eventNumber(new unsigned int(iEvent.id().event()));
 	std::auto_ptr<unsigned int> ls(new unsigned int(iEvent.luminosityBlock()));
@@ -100,6 +105,7 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	std::auto_ptr<bool> isdata(new bool(iEvent.isRealData()));
 	std::auto_ptr<double> rho(new double(*rhoH.product()));
 	std::auto_ptr<double> SumET(new double(mets->at(0).sumEt()));
+	std::auto_ptr<unsigned int> nv(new unsigned int(*nRecoVertices));
 
 	std::auto_ptr<bool> HBHENoiseFilter(new bool(passesFilter(iEvent, hbheNoiseFilterInput_)));
 	std::auto_ptr<bool> HCALLaserFilter(new bool(passesFilter(iEvent, hcalLaserFilterInput_)));
@@ -133,6 +139,7 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	iEvent.put(isdata, prefix + "isData" + suffix);
 	iEvent.put(rho, prefix + "rho" + suffix);
 	iEvent.put(SumET, prefix + "SumET" + suffix);
+	iEvent.put(nv, prefix + "NRecoVertices" + suffix);
 
 	iEvent.put(HBHENoiseFilter, prefix + "HBHENoiseFilter" + suffix);
 	iEvent.put(HCALLaserFilter, prefix + "HCALLaserFilter" + suffix);
