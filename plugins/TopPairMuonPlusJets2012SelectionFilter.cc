@@ -335,7 +335,7 @@ void TopPairMuonPlusJets2012SelectionFilter::cleanedBJets() {
 bool TopPairMuonPlusJets2012SelectionFilter::isGoodJet(const pat::Jet& jet) const {
 	//both cuts are done at PAT config level (selectedPATJets) this is just for safety
 	double smearFactor = getSmearedJetPtScale(jet, 0);
-	bool passesPtAndEta(smearFactor*jet.pt() > 20. && fabs(jet.eta() < 2.5));
+	bool passesPtAndEta(smearFactor*jet.pt() > 20. && fabs(jet.eta()) < 2.5);
 	
 	bool passesJetID(false);
 	
