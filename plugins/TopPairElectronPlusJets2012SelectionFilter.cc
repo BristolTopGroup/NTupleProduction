@@ -277,7 +277,7 @@ void TopPairElectronPlusJets2012SelectionFilter::cleanedJets() {
 		if (!isGoodJet(jet))
 			continue;
 		bool overlaps(false);
-		if (hasSignalElectron_) {
+		if (hasSignalElectron_ && goodIsolatedElectrons_.size() == 1) {
 			double dR = deltaR(signalElectron_, jet);
 			overlaps = dR < 0.3;
 		}
