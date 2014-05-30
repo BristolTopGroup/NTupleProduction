@@ -476,8 +476,22 @@ bool TopPairElectronPlusJetsSelectionFilter::passesLooseLeptonVeto() const {
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::passesDileptonVeto() const {
-	if (tagAndProbeStudies_)
-		return true; // need to add the invariant mass cut for Z window
+	double invariantMass = 0;
+	bool isZEvent = false;
+
+	if (tagAndProbeStudies_) {
+		if (looseElectrons_.size() >= 1) {
+			for (unsigned int index = 0; index < looseElectrons_.size(); ++index) {
+				const pat::Electron looseElectron_ = looseElectrons_.at(index);
+				invariantMass = (signalElectron_.p4()+looseElectron_.p4()).mass();
+				bool passesLowerLimit = invariantMass > 60;
+				bool passesUpperLimit = invariantMass < 120;
+				if (passesLowerLimit && passesUpperLimit)
+					isZEvent = true;
+			}
+		}
+		return isZEvent == true;
+	}
 	else
 		return looseElectrons_.size() < 2;
 }

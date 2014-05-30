@@ -504,8 +504,22 @@ bool TopPairMuonPlusJetsSelectionFilter::passesLooseElectronVeto() const {
 }
 
 bool TopPairMuonPlusJetsSelectionFilter::passesLooseMuonVeto() const {
-	if (tagAndProbeStudies_)
-		return true; // need to add the invariant mass cut for Z window
+	double invariantMass = 0;
+	bool isZEvent = false;
+
+	if (tagAndProbeStudies_) {
+		if (looseMuons_.size() >= 1) {
+			for (unsigned int index = 0; index < looseMuons_.size(); ++index) {
+				const pat::Muon looseMuon_ = looseMuons_.at(index);
+				invariantMass = (signalMuon_.p4()+looseMuon_.p4()).mass();
+				bool passesLowerLimit = invariantMass > 60;
+				bool passesUpperLimit = invariantMass < 120;
+				if (passesLowerLimit && passesUpperLimit)
+					isZEvent = true;
+			}
+		}
+		return isZEvent == true;
+	}
 	else
 		return looseMuons_.size() < 2;
 }
