@@ -60,6 +60,14 @@ else:
     process.topPairEPlusJetsSelection.MCSampleTag = cms.string( 'Summer12' )  
     process.topPairMuPlusJetsSelection.MCSampleTag = cms.string( 'Summer12' )
 
+if options.applyZselection:
+    process.topPairEPlusJetsSelection.tagAndProbeStudies = cms.bool( True )
+    process.topPairMuPlusJetsSelection.tagAndProbeStudies = cms.bool( True )
+
+if options.dropTriggerSelection:
+    process.topPairEPlusJetsSelection.dropTriggerSelection = cms.bool( True )
+    process.topPairMuPlusJetsSelection.dropTriggerSelection = cms.bool( True )
+
 electronselectionPrefix = 'TopPairElectronPlusJetsSelection.'
 muonselectionPrefix = 'TopPairMuonPlusJetsSelection.'
 process.topPairEPlusJetsSelection.prefix = cms.untracked.string( electronselectionPrefix )

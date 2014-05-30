@@ -51,6 +51,12 @@ options.register ('applyZselection',
                   VarParsing.varType.bool,
                   "Replace dilepton veto with Z mass window requirement for tag and probe studies")
 
+options.register ('dropTriggerSelection',
+                  False,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.bool,
+                  "Remove trigger selection for trigger studies")
+
 options.register ('writeFat',
                   False,
                   VarParsing.multiplicity.singleton,

@@ -47,6 +47,7 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 		useMETFilters_(iConfig.getParameter<bool>("useMETFilters")), //
 		useEEBadScFilter_(iConfig.getParameter<bool>("useEEBadScFilter")), //
 		tagAndProbeStudies_(iConfig.getParameter<bool>("tagAndProbeStudies")), //
+		dropTriggerSelection_(iConfig.getParameter<bool>("dropTriggerSelection")), //
 		prefix_(iConfig.getUntrackedParameter < std::string > ("prefix")), //
 		MCSampleTag_(iConfig.getParameter < std::string > ("MCSampleTag")), //
 		debug_(iConfig.getUntrackedParameter<bool>("debug")), //
@@ -112,6 +113,7 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 	desc.add<bool>("useMETFilters", false);
 	desc.add<bool>("useEEBadScFilter", false);
 	desc.add<bool>("tagAndProbeStudies", false);
+	desc.add<bool>("dropTriggerSelection", false);
 
 	desc.add < std::string > ("MCSampleTag", "Summer12");
 	desc.addUntracked < std::string > ("prefix", "TopPairMuonPlusJetsSelection.");
@@ -472,7 +474,9 @@ bool TopPairMuonPlusJetsSelectionFilter::passesScrapingVeto(edm::Event& event) c
 }
 
 bool TopPairMuonPlusJetsSelectionFilter::passesTriggerSelection() const {
-	if (isRealData_) {
+	if (dropTriggerSelection_) 
+		return true;
+	else if (isRealData_) {
 		if (runNumber_ >= 160404 && runNumber_ <= 173236)
 			return triggerFired("HLT_IsoMu24", hltConfig_, triggerResults_);
 		else if (runNumber_ >= 173236 && runNumber_ < 190456) //other triggers available (mainly sTop

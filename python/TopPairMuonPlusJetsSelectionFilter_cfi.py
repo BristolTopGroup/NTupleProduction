@@ -35,6 +35,7 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     useMETFilters = cms.bool(True),
     useEEBadScFilter = cms.bool(False),
     tagAndProbeStudies = cms.bool(False),
+    dropTriggerSelection = cms.bool(False),
     
     prefix=cms.untracked.string('TopPairMuonPlusJetsSelection.'),
     MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12

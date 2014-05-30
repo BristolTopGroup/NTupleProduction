@@ -47,6 +47,7 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		useMETFilters_(iConfig.getParameter<bool>("useMETFilters")), //
 		useEEBadScFilter_(iConfig.getParameter<bool>("useEEBadScFilter")), //
 		tagAndProbeStudies_(iConfig.getParameter<bool>("tagAndProbeStudies")), //
+		dropTriggerSelection_(iConfig.getParameter<bool>("dropTriggerSelection")), //
 		prefix_(iConfig.getUntrackedParameter < std::string > ("prefix")), //
 		MCSampleTag_(iConfig.getParameter < std::string > ("MCSampleTag")), //
 		debug_(iConfig.getUntrackedParameter<bool>("debug")), //
@@ -110,6 +111,7 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 	desc.add<bool>("useMETFilters", false);
 	desc.add<bool>("useEEBadScFilter", false);
 	desc.add<bool>("tagAndProbeStudies", false);
+	desc.add<bool>("dropTriggerSelection", false);
 
 	desc.add < std::string > ("MCSampleTag", "Summer12");
 	desc.addUntracked < std::string > ("prefix", "TopPairElectronPlusJetsSelection.");
@@ -436,7 +438,9 @@ bool TopPairElectronPlusJetsSelectionFilter::passesScrapingVeto(edm::Event& even
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::passesTriggerSelection() const {
-	if (isRealData_) {
+	if (dropTriggerSelection_) 
+		return true;
+	else if (isRealData_) {
 		//2011 data: run 160404 to run 180252
 		if (runNumber_ >= 160404 && runNumber_ <= 163869)
 			return triggerFired("HLT_Ele25_CaloIdVT_TrkIdT_CentralTriJet30", hltConfig_, triggerResults_);
