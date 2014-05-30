@@ -265,9 +265,8 @@ bool TopPairElectronPlusJets2012SelectionFilter::isGoodElectron(const pat::Elect
 	bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
 	//2D impact w.r.t primary vertex
 	bool passesD0 = fabs(electron.dB(pat::Electron::PV2D)) < 0.02; //cm
-//	bool passesHOverE = electron.hadronicOverEm() < 0.05; // same for EE and EB
 	bool passesID = electron.electronID("mvaTrigV0") > 0.5;
-	return passesPtAndEta && notInCrack && passesD0 && passesID; //&& passesHOverE;
+	return passesPtAndEta && notInCrack && passesD0 && passesID;
 }
 
 void TopPairElectronPlusJets2012SelectionFilter::cleanedJets() {
