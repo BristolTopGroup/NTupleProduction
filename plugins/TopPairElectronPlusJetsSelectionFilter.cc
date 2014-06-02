@@ -303,20 +303,18 @@ bool TopPairElectronPlusJetsSelectionFilter::isGoodJet(const pat::Jet& jet) cons
 	double smearFactor = getSmearedJetPtScale(jet, 0);
 	bool passesPtAndEta(smearFactor*jet.pt() > 20. && fabs(jet.eta()) < 2.5);
 	bool passesJetID(false);
-	
 	bool passNOD = jet.numberOfDaughters() > 1;
- 	//bool passNHF = (jet.neutralHadronEnergy() + jet.HFHadronEnergy()) / jet.energy() < 0.99;
 	bool passNHF = jet.neutralHadronEnergyFraction() < 0.99;
- 	bool passNEF = jet.neutralEmEnergyFraction() < 0.99;
- 	bool passCHF = true;
- 	bool passNCH = true;
- 	bool passCEF = true;
- 	if (fabs(jet.eta()) < 2.4) {
- 	        passCEF = jet.chargedEmEnergyFraction() < 0.99;
- 	        passCHF = jet.chargedHadronEnergyFraction() > 0;
- 	        passNCH = jet.chargedMultiplicity() > 0;
- 	}
- 	passesJetID = passNOD && passCEF && passNHF && passNEF && passCHF && passNCH;
+	bool passNEF = jet.neutralEmEnergyFraction() < 0.99;
+	bool passCHF = true;
+	bool passNCH = true;
+	bool passCEF = true;
+	if (fabs(jet.eta()) < 2.4) {
+		passCEF = jet.chargedEmEnergyFraction() < 0.99;
+		passCHF = jet.chargedHadronEnergyFraction() > 0;
+		passNCH = jet.chargedMultiplicity() > 0;
+	}
+	passesJetID = passNOD && passCEF && passNHF && passNEF && passCHF && passNCH;
 
 	return passesPtAndEta && passesJetID;
 }
