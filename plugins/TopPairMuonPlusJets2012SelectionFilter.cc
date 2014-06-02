@@ -314,7 +314,7 @@ void TopPairMuonPlusJets2012SelectionFilter::cleanedJets() {
 		const pat::Jet jet = jets_.at(index);
 
 		bool overlaps(false);
-		if (hasSignalMuon_) {
+		if (hasSignalMuon_ && goodIsolatedMuons_.size() == 1) {
 			double dR = deltaR(signalMuon_, jet);
 			overlaps = dR < 0.3;
 		}
