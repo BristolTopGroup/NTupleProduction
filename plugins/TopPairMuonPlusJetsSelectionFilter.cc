@@ -474,9 +474,9 @@ bool TopPairMuonPlusJetsSelectionFilter::passesTriggerSelection() const {
 	if (dropTriggerSelection_) 
 		return true;
 	else if (isRealData_) {
-		if (runNumber_ >= 160404 && runNumber_ <= 173236)
+		if (runNumber_ >= 160404 && runNumber_ < 173236)
 			return triggerFired("HLT_IsoMu24", hltConfig_, triggerResults_);
-		else if (runNumber_ >= 173236 && runNumber_ < 190456) //other triggers available (mainly sTop
+		else if (runNumber_ >= 173236 && runNumber_ < 190456)
 			return triggerFired("HLT_IsoMu24_eta2p1", hltConfig_, triggerResults_);
 		else //2012 Data
 			return triggerFired("HLT_IsoMu24_eta2p1_v", hltConfig_, triggerResults_);
