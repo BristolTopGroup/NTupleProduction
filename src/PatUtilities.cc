@@ -235,17 +235,19 @@ double getSmearedJetPtScale(const pat::Jet& jet, int jet_smearing_systematic) {
 				scaleFactor = 1.288;
 		}
 	}
-	
+
 	//use raw scaleFactors from above to calculate the final factors to apply
 	double matchedGeneratedJetpt = jet.pt();
 	if(jet.genJet()){
-	matchedGeneratedJetpt = jet.genJet()->pt();
+		if ( jet.genJet()->energy() != 0 ) { // Check done in Analysis Tools
+			matchedGeneratedJetpt = jet.genJet()->pt();
+		}
 	}
 	double jetPt = jet.pt();
 	double factor = 1-scaleFactor;
 	double deltaPt = factor * (jetPt - matchedGeneratedJetpt);
 	double ptScale = std::max(0.0, ((jetPt + deltaPt)/jetPt));
-	
+
 	return ptScale;
 
 }
