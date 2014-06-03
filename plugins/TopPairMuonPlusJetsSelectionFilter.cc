@@ -493,7 +493,10 @@ bool TopPairMuonPlusJetsSelectionFilter::passesTriggerSelection() const {
 }
 
 bool TopPairMuonPlusJetsSelectionFilter::hasExactlyOneIsolatedLepton() const {
-	return goodIsolatedMuons_.size() == 1;
+	if (tagAndProbeStudies_)
+		return goodIsolatedMuons_.size() >= 1;
+	else
+		return goodIsolatedMuons_.size() == 1;
 }
 
 bool TopPairMuonPlusJetsSelectionFilter::passesLooseElectronVeto() const {

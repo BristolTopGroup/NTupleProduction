@@ -466,7 +466,10 @@ bool TopPairElectronPlusJetsSelectionFilter::passesTriggerSelection() const {
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::hasExactlyOneIsolatedLepton() const {
-	return goodIsolatedElectrons_.size() == 1;
+	if (tagAndProbeStudies_)
+		return goodIsolatedElectrons_.size() >= 1;
+	else
+		return goodIsolatedElectrons_.size() == 1;
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::passesLooseLeptonVeto() const {
