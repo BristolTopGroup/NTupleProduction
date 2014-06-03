@@ -269,7 +269,7 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 			// exit from loop when you reach the required number of muons
 			if (px->size() >= maxSize)
 				break;
-			if (!it->isGlobalMuon())
+			if (!( it->isGlobalMuon() || it->isTrackerMuon() ) )
 				continue;
 
 			double trkd0 = it->track()->d0();
@@ -439,8 +439,14 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 			trackValidFractionOfHits->push_back(validFraction(it->track()));
 
 			//associated global track
-			globalChi2->push_back(it->globalTrack()->normalizedChi2());
-			globalTrackNumberOfValidMuonHits->push_back(it->globalTrack()->hitPattern().numberOfValidMuonHits());
+			if ( !( it->globalTrack().isNull() ) ) {
+				globalChi2->push_back(it->globalTrack()->normalizedChi2());
+				globalTrackNumberOfValidMuonHits->push_back(it->globalTrack()->hitPattern().numberOfValidMuonHits());
+			}
+			else {
+				globalChi2->push_back(99999);
+				globalTrackNumberOfValidMuonHits->push_back(-1);
+			}
 
 			//associated inner track
 			innerTrackNumberOfValidHits->push_back(it->innerTrack()->numberOfValidHits());
