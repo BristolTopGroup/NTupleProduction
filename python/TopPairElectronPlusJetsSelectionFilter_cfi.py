@@ -38,7 +38,8 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     dropTriggerSelection = cms.bool(False),
     
     prefix=cms.untracked.string('TopPairElectronPlusJetsSelection.'),
-    MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12
+    MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12 or Summer11Leg
+
     #flags
     debug=cms.untracked.bool(False),
     taggingMode=cms.untracked.bool(False),

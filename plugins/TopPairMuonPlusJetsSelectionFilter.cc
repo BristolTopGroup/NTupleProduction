@@ -491,12 +491,12 @@ bool TopPairMuonPlusJetsSelectionFilter::passesTriggerSelection() const {
 		else //2012 Data
 			return triggerFired("HLT_IsoMu24_eta2p1_v", hltConfig_, triggerResults_);
 	} else {
-		if (MCSampleTag_ == "Fall11") {
-			//Fall11 MC
+		if (MCSampleTag_ == "Fall11") {//Fall11 MC
 			return triggerFired("HLT_IsoMu24", hltConfig_, triggerResults_);
-		} else {//Summer12 MC
-
+		} else if (MCSampleTag_ == "Summer12") {//Summer12 MC
 			return triggerFired("HLT_IsoMu24_eta2p1_v", hltConfig_, triggerResults_);
+		} else if (MCSampleTag_ == "Summer11Leg") {//Summer11Leg
+			return true; // to be updated once we have trigger efficiencies
 		}
 	}
 	return false;
