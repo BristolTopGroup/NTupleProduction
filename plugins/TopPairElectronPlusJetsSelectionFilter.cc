@@ -280,9 +280,18 @@ void TopPairElectronPlusJetsSelectionFilter::cleanedJets() {
 		if (!isGoodJet(jet))
 			continue;
 		bool overlaps(false);
-		if (hasSignalElectron_ && goodIsolatedElectrons_.size() == 1) {
-			double dR = deltaR(signalElectron_, jet);
-			overlaps = dR < 0.3;
+		if (tagAndProbeStudies_) {
+			if (goodIsolatedElectrons_.size() >= 1)
+				for (unsigned index = 0; index < goodIsolatedElectrons_.size(); ++index) {
+					double dR = deltaR(goodIsolatedElectrons_.at(index), jet);
+					if (dR < 0.3) overlaps = true;
+				}
+		}
+		else {
+			if (hasSignalElectron_ && goodIsolatedElectrons_.size() == 1) {
+				double dR = deltaR(signalElectron_, jet);
+				overlaps = dR < 0.3;
+			}
 		}
 		if (!overlaps)
 			cleanedJets_.push_back(jet);

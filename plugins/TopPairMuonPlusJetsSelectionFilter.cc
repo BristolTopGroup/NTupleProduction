@@ -316,13 +316,23 @@ void TopPairMuonPlusJetsSelectionFilter::cleanedJets() {
 	cleanedJets_.clear();
 	for (unsigned index = 0; index < jets_.size(); ++index) {
 		const pat::Jet jet = jets_.at(index);
-
+		if (!isGoodJet(jet))
+			continue;
 		bool overlaps(false);
-		if (hasSignalMuon_ && goodIsolatedMuons_.size() == 1) {
-			double dR = deltaR(signalMuon_, jet);
-			overlaps = dR < 0.3;
+		if (tagAndProbeStudies_) {
+			if (goodIsolatedMuons_.size() >= 1)
+				for (unsigned index = 0; index < goodIsolatedMuons_.size(); ++index) {
+					double dR = deltaR(goodIsolatedMuons_.at(index), jet);
+					if (dR < 0.3) overlaps = true;
+				}
 		}
-		if (!overlaps && isGoodJet(jet))
+		else {
+			if (hasSignalMuon_ && goodIsolatedMuons_.size() == 1) {
+				double dR = deltaR(signalMuon_, jet);
+				overlaps = dR < 0.3;
+			}
+		}
+		if (!overlaps)
 			cleanedJets_.push_back(jet);
 	}
 }
