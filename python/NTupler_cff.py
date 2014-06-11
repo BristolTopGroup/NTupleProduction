@@ -43,8 +43,17 @@ def setup_ntupler(process, cms, options):
     #PF photons
     process.rootTuplePhotons.InputTag = cms.InputTag('patPhotons')
     process.rootTuplePhotons.Prefix = cms.string('patPhotons.')
-    #trigger
+    #trigger and trigger objects
     process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults', '', options.hltProcess)
+    process.rootTupleTriggerObjectElectronLeg.HLTObjectsInputTag = cms.InputTag('hltTriggerSummaryAOD', '', options.hltProcess)
+    process.rootTupleTriggerObjectElectronIsoLeg.HLTObjectsInputTag = cms.InputTag('hltTriggerSummaryAOD', '', options.hltProcess)
+    process.rootTupleTriggerObjectHadronLeg.HLTObjectsInputTag = cms.InputTag('hltTriggerSummaryAOD', '', options.hltProcess)
+    process.rootTupleTriggerObjectHadronIsoLeg.HLTObjectsInputTag = cms.InputTag('hltTriggerSummaryAOD', '', options.hltProcess)
+    process.rootTupleTriggerObjectHadronPFIsoLeg.HLTObjectsInputTag = cms.InputTag('hltTriggerSummaryAOD', '', options.hltProcess)
+    process.rootTupleTriggerObjectMuon1.HLTObjectsInputTag = cms.InputTag('hltTriggerSummaryAOD', '', options.hltProcess)
+    process.rootTupleTriggerObjectMuon2.HLTObjectsInputTag = cms.InputTag('hltTriggerSummaryAOD', '', options.hltProcess)
+    process.rootTupleTriggerObjectMuon2p1.HLTObjectsInputTag = cms.InputTag('hltTriggerSummaryAOD', '', options.hltProcess)
+    process.rootTupleTriggerObjectQuadJets.HLTObjectsInputTag = cms.InputTag('hltTriggerSummaryAOD', '', options.hltProcess)
     #GEN event
     process.rootTupleGenEventInfo.StorePDFWeights = cms.bool(options.storePDFWeights)
     process.rootTupleGenEventInfo.isTTbarMC = cms.bool(options.isTTbarMC)
@@ -86,8 +95,8 @@ def setup_ntupler(process, cms, options):
             'keep *_rootTupleTaus_*_*',
             #photons
             'keep *_rootTuplePhotons_*_*',
-            #trigger
-            'keep *_rootTupleTrigger_*_*',
+            #trigger and trigger objects
+            'keep *_rootTupleTrigger*_*_*',
             #vertices (DA)
             'keep *_rootTupleVertex_*_*',
             #tracks
@@ -174,8 +183,17 @@ def setup_ntupler(process, cms, options):
         process.rootTupleType1p2CorrectedPFMetUnclusteredEnDown +
         #Event
         process.rootTupleEvent + 
-        #trigger
+        #trigger and trigger objects
         process.rootTupleTrigger + 
+        process.rootTupleTriggerObjectElectronLeg + 
+        process.rootTupleTriggerObjectElectronIsoLeg + 
+        process.rootTupleTriggerObjectHadronLeg + 
+        process.rootTupleTriggerObjectHadronIsoLeg + 
+        process.rootTupleTriggerObjectHadronPFIsoLeg + 
+        process.rootTupleTriggerObjectMuon1 + 
+        process.rootTupleTriggerObjectMuon2 + 
+        process.rootTupleTriggerObjectMuon2p1 + 
+        process.rootTupleTriggerObjectQuadJets + 
         #genEventInfos
         process.rootTupleGenEventInfo + 
         process.rootTupleGenParticles + 
@@ -208,3 +226,15 @@ def setup_ntupler(process, cms, options):
         #isolated leptons
         process.rootNTuples.remove(process.rootTuplePFElectrons)
         process.rootNTuples.remove(process.nTuplePFMuons)
+
+    if not options.writeTriggerObjects:
+        process.rootNTuples.remove(process.rootTupleTriggerObjectElectronLeg)
+        process.rootNTuples.remove(process.rootTupleTriggerObjectElectronIsoLeg)
+        process.rootNTuples.remove(process.rootTupleTriggerObjectHadronLeg)
+        process.rootNTuples.remove(process.rootTupleTriggerObjectHadronIsoLeg)
+        process.rootNTuples.remove(process.rootTupleTriggerObjectHadronPFIsoLeg)
+        process.rootNTuples.remove(process.rootTupleTriggerObjectMuon1)
+        process.rootNTuples.remove(process.rootTupleTriggerObjectMuon2)
+        process.rootNTuples.remove(process.rootTupleTriggerObjectMuon2p1)
+        process.rootNTuples.remove(process.rootTupleTriggerObjectQuadJets)
+

@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJets2012SelectionFilter',
+topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     # Specify input collections
     jetInput=cms.InputTag("selectedPatJetsPFlow"),
     electronInput=cms.InputTag("selectedPatElectronsLoosePFlow"),
@@ -34,8 +34,10 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJets2012SelectionFilte
     useRhoActiveAreaCorrections = cms.bool(True),
     useMETFilters = cms.bool(True),
     useEEBadScFilter = cms.bool(False),
+    tagAndProbeStudies = cms.bool(False),
+    dropTriggerSelection = cms.bool(False),
     
-    prefix=cms.untracked.string('TopPairMuonPlusJets2012Selection.'),
+    prefix=cms.untracked.string('TopPairMuonPlusJetsSelection.'),
     MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12
     #flags
     debug=cms.untracked.bool(False),

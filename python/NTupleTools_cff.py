@@ -39,6 +39,24 @@ options.register ('hltProcess',
                   VarParsing.varType.string,
                   "HLT process name to use.")
 
+options.register ('writeTriggerObjects',
+                  False,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.bool,
+                  "Include trigger objects of interests")
+
+options.register ('applyZselection',
+                  False,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.bool,
+                  "Replace dilepton veto with Z mass window requirement for tag and probe studies")
+
+options.register ('dropTriggerSelection',
+                  False,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.bool,
+                  "Remove trigger selection for trigger studies")
+
 options.register ('writeFat',
                   False,
                   VarParsing.multiplicity.singleton,
@@ -171,7 +189,7 @@ elif options.CMSSW == "53X" and options.centreOfMassEnergy == 7:
     GLOBALTAG_MC = 'START53_V21::All' #TO BE UPDATED TO RELEVANT 5_3_X 2011 7TEV PRODUCTION GLOBAL TAGS WHEN AVAILABLE
     FILETAG = '53X'
     TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/ElectronHad_Run2011A-12Oct2013-v1_AOD.root' #test file for 2011 7TEV RunA Oct2013 re-reco
-    TEST_MC_FILE = '' # NOT AVAILABLE YET
+    TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11LegDR_53X_AODSIM.root'
 elif options.CMSSW == '44X':
     GLOBALTAG_DATA = 'GR_R_44_V15::All'
     GLOBALTAG_MC = 'START44_V13::All'
