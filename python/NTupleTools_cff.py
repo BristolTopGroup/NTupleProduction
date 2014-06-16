@@ -313,8 +313,8 @@ process.patseq = cms.Sequence(
     process.genParticlesForJetsNoNu *
     getattr(process, "patPF2PATSequence" + postfix) * 
     process.looseLeptonSequence * 
-    process.patDefaultSequence * 
-    process.goodPatJets * 
+    #process.patDefaultSequence * 
+    #process.goodPatJets * 
     process.goodPatJetsPFlow * 
     process.metUncertaintySequence * 
     process.EventFilters * 
