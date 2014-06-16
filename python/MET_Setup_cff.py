@@ -97,17 +97,27 @@ def setup_MET_uncertainties(process, cms, options, postfix="PFlow"):
     #runMEtUncertainties(process, doSmearJets=not options.useData, jetCollection='goodPatJetsPFlow', addToPatDefaultSequence=False)                                                                                                             
     if options.useData:
         inputJetCorrLabelForMETuncertainties = 'L2L3Residual'
-        metSysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
+        if options.centreOfMassEnergy == 8:
+            metSysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data
+            print "using pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data"
+        elif options.centreOfMassEnergy == 7:
+            metSysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2011runAplusBvsNvtx_data
+            print "using pfMEtSysShiftCorrParameters_2011runAplusBvsNvtx_data"
     else:
         inputJetCorrLabelForMETuncertainties = 'L3Absolute'
-        metSysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
+        if options.centreOfMassEnergy == 8:
+            metSysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_mc
+            print "using pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_mc"
+        elif options.centreOfMassEnergy == 7:
+            metSysShiftCorrParameter = process.pfMEtSysShiftCorrParameters_2011runAplusBvsNvtx_mc
+            print "using pfMEtSysShiftCorrParameters_2011runAplusBvsNvtx_mc"
         
     process.pfMEtSysShiftCorr.parameter = metSysShiftCorrParameter
 
     runMEtUncertainties(process,
-                    electronCollection = cms.InputTag('cleanPatElectrons'),
-                    muonCollection = 'cleanPatMuons',
-                    tauCollection = 'cleanPatTaus',
+                    electronCollection = cms.InputTag('patElectronsPFlow'),
+                    muonCollection = 'patMuonsPFlow',
+                    tauCollection = 'patTausPFlow',
                     jetCollection = cms.InputTag('goodPatJetsPFlow'),
                     jetCorrLabel = inputJetCorrLabelForMETuncertainties,
                     doSmearJets = not options.useData,

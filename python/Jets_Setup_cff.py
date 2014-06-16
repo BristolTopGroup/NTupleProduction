@@ -14,15 +14,11 @@ def setup_jets(process, cms, options, postfix="PFlow"):
     print '=' * 60
     #MC setup
     inputJetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'])
-    caloJetCorrection = ('AK5Calo', ['L1Offset' , 'L2Relative', 'L3Absolute'])
     
     if options.useData :#data set up
         inputJetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual'])
-        caloJetCorrection = ('AK5Calo', ['L1Offset' , 'L2Relative', 'L3Absolute', 'L2L3Residual'])   
          
     print 'Using jet energy corrections: '
-    print 'Calo Jets'
-    print caloJetCorrection
     print 'PF Jets'
     print inputJetCorrLabel
 
@@ -36,21 +32,6 @@ def setup_jets(process, cms, options, postfix="PFlow"):
     ###############################
 
     from RecoJets.JetProducers.SubJetParameters_cfi import SubJetParameters
-    
-
-    ###############################
-    #### Calo Jet Setup    ########
-    ###############################
-    #this has to run after PF2PAT and before removeMCMatching
-    #see https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookPAT38xChanges#Details_with_PF2PAT
-    from PhysicsTools.PatAlgos.tools.jetTools import switchJetCollection, addJetCollection
-#    print 'adding calo jets'
-    switchJetCollection(process,
-                     jetCollection=cms.InputTag('ak5CaloJets'),
-                     jetCorrLabel=caloJetCorrection,
-                     doBTagging=True,
-                     doType1MET=False,)
-    
     
     ###############################
     ###### Bare KT 0.6 jets #######
@@ -97,3 +78,4 @@ def setup_jets(process, cms, options, postfix="PFlow"):
     pfNoElectron = getattr(process, "pfNoElectron" + postfix)
     for module in additionalJets :
         getattr(process, "patPF2PATSequence" + postfix).replace(pfNoElectron, pfNoElectron * module)
+

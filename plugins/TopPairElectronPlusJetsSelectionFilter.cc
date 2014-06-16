@@ -468,6 +468,8 @@ bool TopPairElectronPlusJetsSelectionFilter::passesTriggerSelection() const {
 			return triggerFired("HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralJet30", hltConfig_, triggerResults_);
 		} else if (MCSampleTag_ == "Summer12") { //Summer12 MC
 			return triggerFired("HLT_Ele27_WP80_v", hltConfig_, triggerResults_);
+		} else if (MCSampleTag_ == "Summer11Leg") { //7TeV legacy MC
+			return true; // to be updated once we have trigger efficiencies
 		} else
 			return false;
 	}

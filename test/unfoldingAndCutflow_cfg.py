@@ -55,10 +55,13 @@ if options.isMCatNLO:
 
 if options.CMSSW == '44X':
     process.topPairEPlusJetsSelection.MCSampleTag = cms.string( 'Fall11' )  
-    process.topPairMuPlusJetsSelection.MCSampleTag = cms.string( 'Fall11' )  
-else:
+    process.topPairMuPlusJetsSelection.MCSampleTag = cms.string( 'Fall11' )
+elif options.CMSSW == '53X' and options.centreOfMassEnergy == 8:
     process.topPairEPlusJetsSelection.MCSampleTag = cms.string( 'Summer12' )  
     process.topPairMuPlusJetsSelection.MCSampleTag = cms.string( 'Summer12' )
+elif options.CMSSW == '53X' and options.centreOfMassEnergy == 7:
+    process.topPairEPlusJetsSelection.MCSampleTag = cms.string( 'Summer11Leg' )  
+    process.topPairMuPlusJetsSelection.MCSampleTag = cms.string( 'Summer11Leg' )
 
 if options.applyZselection:
     process.topPairEPlusJetsSelection.tagAndProbeStudies = cms.bool( True )
@@ -70,6 +73,7 @@ if options.dropTriggerSelection:
 
 electronselectionPrefix = 'TopPairElectronPlusJetsSelection.'
 muonselectionPrefix = 'TopPairMuonPlusJetsSelection.'
+
 process.topPairEPlusJetsSelection.prefix = cms.untracked.string( electronselectionPrefix )
 process.topPairMuPlusJetsSelection.prefix = cms.untracked.string( muonselectionPrefix )
 

@@ -221,6 +221,7 @@ def setup_ntupler(process, cms, options):
         process.rootNTuples.remove(process.rootTupleCaloMET)
         process.rootNTuples.remove(process.rootTupleElectrons)
         process.rootNTuples.remove(process.nTupleMuons)
+        process.rootNTuples.remove(process.rootTuplePhotons)
         
     if not options.writeFat and not options.writeIsolatedPFLeptons:#write only PF particles
         #isolated leptons

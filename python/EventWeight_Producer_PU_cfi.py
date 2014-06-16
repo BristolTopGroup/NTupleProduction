@@ -5,7 +5,7 @@ eventWeightPU = cms.EDProducer("EventWeight_Producer_PU",
     PUSource            = cms.InputTag("addPileupInfo"),
     WeightName          = cms.string("eventWeightPU"),                           
 
-    MCSampleTag         = cms.string("Summer12"),  # valid identifier: Fall11, Summer12                               
+    MCSampleTag         = cms.string("Summer12"),  # valid identifier: Fall11, Summer12 or Summer11Leg
                                
     MCSampleFile        = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Default2012.root"),
     MCSampleHistoName   = cms.string("puhisto"),

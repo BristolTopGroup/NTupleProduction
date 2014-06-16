@@ -18,7 +18,7 @@ EventWeight_Producer_PU::EventWeight_Producer_PU(const edm::ParameterSet& cfg) :
 
 	error_code = 0;
 
-	if (inTag_MCSampleTag == "Fall11" || inTag_MCSampleTag == "Summer12") {
+	if (inTag_MCSampleTag == "Fall11" || inTag_MCSampleTag == "Summer12" || inTag_MCSampleTag == "Summer11Leg") {
 
 		LumiWeights_ = edm::LumiReWeighting(inTag_MCSampleFile.fullPath(), inTag_DataFile.fullPath(),
 				inTag_MCSampleHistoName, inTag_DataHistoName);
@@ -65,13 +65,13 @@ void EventWeight_Producer_PU::produce(edm::Event& evt, const edm::EventSetup& se
 				{
 			int BX = iterPU->getBunchCrossing(); // -1: previous BX, 0: current BX,  1: next BX
 
-			if (inTag_MCSampleTag == "Fall11" || inTag_MCSampleTag == "Summer12") {
+			if (inTag_MCSampleTag == "Fall11" || inTag_MCSampleTag == "Summer12" || inTag_MCSampleTag == "Summer11Leg") {
 				if (BX == 0)
 					nvtx = iterPU->getTrueNumInteractions();
 			}
 		}
 
-		if (inTag_MCSampleTag == "Fall11" || inTag_MCSampleTag == "Summer12")
+		if (inTag_MCSampleTag == "Fall11" || inTag_MCSampleTag == "Summer12" || inTag_MCSampleTag == "Summer11Leg")
 			wght_ = LumiWeights_.weight(nvtx);
 	}
 	std::auto_ptr<double> eventWeightPUProduct(new double(wght_));

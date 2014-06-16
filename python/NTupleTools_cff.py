@@ -176,20 +176,20 @@ options.parseArguments()
 
 if options.CMSSW == "53X" and options.centreOfMassEnergy == 8:
     #Data Global Tag
-    GLOBALTAG_DATA = 'FT_53_V21_AN3::All' # Used for 2012 A, B, C and D: 22Jan2013 re-reco
+    GLOBALTAG_DATA = 'FT53_V21A_AN6::All' # Used for 2012 A, B, C and D: 22Jan2013 re-reco: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Winter13_2012_A_B_C_D_datasets_r
     #Monte Carlo Global Tag
-    GLOBALTAG_MC = 'START53_V21::All' #TO BE UPDATED TO RELEVANT 5_3_X 2011 7TEV PRODUCTION GLOBAL TAGS
+    GLOBALTAG_MC = 'START53_V27::All' #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Winter13_2012_A_B_C_D_datasets_r
     FILETAG = '53X'
     TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/SingleElectron_Run2012B_13Jul2012_ReReco_AOD.root'
     TEST_MC_FILE = 'file:///storage/TopQuarkGroup/mc/8TeV/SynchEx/Summer12_DR53X_TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_AODSIM_PU_S10_START53_V7A-v1.root'
 elif options.CMSSW == "53X" and options.centreOfMassEnergy == 7:
     #Data Global Tag
-    GLOBALTAG_DATA = 'FT_R_53_LV5::All' #Winter 2013 2011A&B Legacy re-reco in CMSSW_5_3_X
+    GLOBALTAG_DATA = 'FT_53_LV5_AN1::All' #2011 7TeV 53X legacy data re-reco: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#2011AB_Legacy_re_reco_CMSSW_5_3
     #Monte Carlo Global Tag
-    GLOBALTAG_MC = 'START53_V21::All' #TO BE UPDATED TO RELEVANT 5_3_X 2011 7TEV PRODUCTION GLOBAL TAGS WHEN AVAILABLE
+    GLOBALTAG_MC = 'START53_LV6A1::All' #2011 7TeV 53X legaco MC: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#7_TeV_MC_Legacy_reprocessing_in
     FILETAG = '53X'
-    TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/ElectronHad_Run2011A-12Oct2013-v1_AOD.root' #test file for 2011 7TEV RunA Oct2013 re-reco
-    TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11LegDR_53X_AODSIM.root'
+    TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/ElectronHad_Run2011A-12Oct2013-v1_AOD.root' #test file for 2011 7TeV 53X RunA Oct2013 re-reco
+    TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11LegDR_53X_AODSIM.root' #test file for 2011 7TeV 53X TTJets Monte Carlo
 elif options.CMSSW == '44X':
     GLOBALTAG_DATA = 'GR_R_44_V15::All'
     GLOBALTAG_MC = 'START44_V13::All'
@@ -313,8 +313,8 @@ process.patseq = cms.Sequence(
     process.genParticlesForJetsNoNu *
     getattr(process, "patPF2PATSequence" + postfix) * 
     process.looseLeptonSequence * 
-    process.patDefaultSequence * 
-    process.goodPatJets * 
+    #process.patDefaultSequence * 
+    #process.goodPatJets * 
     process.goodPatJetsPFlow * 
     process.metUncertaintySequence * 
     process.EventFilters * 
@@ -352,11 +352,17 @@ if options.CMSSW == '44X':
     	process.eventWeightPU.MCSampleHistoName   = cms.string("histo_Fall11_true")
     	process.eventWeightPU.DataFile            = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/Data_PUDist_2011Full.root")
     	process.eventWeightPU.DataHistoName       = cms.string("histoData_true")
-else:
+elif options.CMSSW == '53X' and options.centreOfMassEnergy == 7:
+        process.eventWeightPU.MCSampleTag = cms.string("Summer11Leg")
+        process.eventWeightPU.MCSampleFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Default2011.root")
+        process.eventWeightPU.MCSampleHistoName = cms.string("histo_Fall11_true")
+        process.eventWeightPU.DataFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/Data_PUDist_2011Full.root")
+        process.eventWeightPU.DataHistoName = cms.string("histoData_true")
+elif options.CMSSW == '53X' and options.centreOfMassEnergy == 8:
         process.eventWeightPU.MCSampleTag = cms.string("Summer12")
-        #process.eventWeightPU.MCSampleFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Summer2012.root")
+        # process.eventWeightPU.MCSampleFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Summer2012.root")
         process.eventWeightPU.MCSampleFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Default2012.root")
-	process.eventWeightPU.MCSampleHistoName   = cms.string("puhisto")
+        process.eventWeightPU.MCSampleHistoName = cms.string("puhisto")
 
 process.TFileService = cms.Service("TFileService",
                            fileName=cms.string('ntuple.root')
