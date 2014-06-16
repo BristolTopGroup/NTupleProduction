@@ -24,9 +24,9 @@ EventFilter = cms.EDFilter(
     TracksInput=cms.InputTag('generalTracks'),
     
     # Specify input collections
-    electronInput=cms.InputTag("gsfElectrons"),
-    muonInput=cms.InputTag("cleanPatMuons"),
-    jetInput=cms.InputTag("ak5CaloJets"),
+    electronInput=cms.InputTag("selectedPatElectronsLoosePFlow"),
+    muonInput=cms.InputTag("selectedPatMuonsLoosePFlow"),
+    jetInput=cms.InputTag("selectedPatJetsPFlow"),
 
     # Specifiy number of jets
     minNJets=cms.int32(-1),

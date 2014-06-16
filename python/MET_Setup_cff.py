@@ -115,9 +115,9 @@ def setup_MET_uncertainties(process, cms, options, postfix="PFlow"):
     process.pfMEtSysShiftCorr.parameter = metSysShiftCorrParameter
 
     runMEtUncertainties(process,
-                    electronCollection = cms.InputTag('cleanPatElectrons'),
-                    muonCollection = 'cleanPatMuons',
-                    tauCollection = 'cleanPatTaus',
+                    electronCollection = cms.InputTag('patElectronsPFlow'),
+                    muonCollection = 'patMuonsPFlow',
+                    tauCollection = 'patTausPFlow',
                     jetCollection = cms.InputTag('goodPatJetsPFlow'),
                     jetCorrLabel = inputJetCorrLabelForMETuncertainties,
                     doSmearJets = not options.useData,

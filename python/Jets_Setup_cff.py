@@ -78,5 +78,4 @@ def setup_jets(process, cms, options, postfix="PFlow"):
     pfNoElectron = getattr(process, "pfNoElectron" + postfix)
     for module in additionalJets :
         getattr(process, "patPF2PATSequence" + postfix).replace(pfNoElectron, pfNoElectron * module)
-    
-    process.patJets.discriminatorSources = cms.VInputTag(cms.InputTag("combinedSecondaryVertexBJetTags"), cms.InputTag("combinedSecondaryVertexMVABJetTags"), cms.InputTag("jetBProbabilityBJetTags"), cms.InputTag("jetProbabilityBJetTags"), cms.InputTag("simpleSecondaryVertexHighEffBJetTags"), cms.InputTag("simpleSecondaryVertexHighPurBJetTags"), cms.InputTag("trackCountingHighEffBJetTags"), cms.InputTag("trackCountingHighPurBJetTags"))
+
