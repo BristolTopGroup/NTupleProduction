@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter',
+topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     # Specify input collections
     jetInput=cms.InputTag("selectedPatJetsPFlow"),
     electronInput=cms.InputTag("selectedPatElectronsLoosePFlow"),
@@ -26,7 +26,7 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     min3JetPt=cms.double(30.),
     min4JetPt=cms.double(30.),
 #lepton isolation
-    tightElectronIsolation=cms.double(0.1),
+    tightMuonIsolation=cms.double(0.12),
     looseElectronIsolation=cms.double(0.15),
     looseMuonIsolation=cms.double(0.2),
     useDeltaBetaCorrectionsForMuons = cms.bool(True),
@@ -37,12 +37,11 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     tagAndProbeStudies = cms.bool(False),
     dropTriggerSelection = cms.bool(False),
     
-    prefix=cms.untracked.string('TopPairElectronPlusJetsSelection.'),
+    prefix=cms.untracked.string('TopPairMuonPlusJetsSelection.'),
     MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12 or Summer11Leg
 
     #flags
     debug=cms.untracked.bool(False),
     taggingMode=cms.untracked.bool(False),
-    bSelectionInTaggingMode=cms.untracked.bool(False),
 )
 

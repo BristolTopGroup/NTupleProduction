@@ -43,5 +43,6 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     #flags
     debug=cms.untracked.bool(False),
     taggingMode=cms.untracked.bool(False),
+    bSelectionInTaggingMode=cms.untracked.bool(False),
 )
 
