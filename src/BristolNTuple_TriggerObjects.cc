@@ -21,9 +21,10 @@ BristolNTuple_TriggerObjects::BristolNTuple_TriggerObjects(const edm::ParameterS
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //
 		suffix(iConfig.getParameter < std::string > ("Suffix")) {
 
-	produces <std::vector<double> > ( prefix + "Pt" + suffix );
-	produces <std::vector<double> > ( prefix + "Eta" + suffix );
-	produces <std::vector<double> > ( prefix + "Phi" + suffix );
+	produces <std::vector<double> > ( prefix + "Px" + suffix );
+	produces <std::vector<double> > ( prefix + "Py" + suffix );
+	produces <std::vector<double> > ( prefix + "Pz" + suffix );
+        produces <std::vector<double> > ( prefix + "Energy" + suffix );
 }
 
 void BristolNTuple_TriggerObjects::beginRun(edm::Run& iRun, const edm::EventSetup& iSetup) {
@@ -44,9 +45,10 @@ void BristolNTuple_TriggerObjects::beginRun(edm::Run& iRun, const edm::EventSetu
 
 void BristolNTuple_TriggerObjects::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-	std::auto_ptr < std::vector<double> > pt(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > eta(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > phi(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > px(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > py(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > pz(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > E(new std::vector<double>());
 
 	//-----------------------------------------------------------------
 	// open the trigger summary to retrieve trigger objects of interest
@@ -71,16 +73,18 @@ void BristolNTuple_TriggerObjects::produce(edm::Event& iEvent, const edm::EventS
 	}
 
 	for (size_t t = 0; t < selectedObjects.size() ; t++) {
-		pt->push_back(selectedObjects[t].pt());
-		eta->push_back(selectedObjects[t].eta());
-		phi->push_back(selectedObjects[t].phi());
+		px->push_back(selectedObjects[t].px());
+		py->push_back(selectedObjects[t].py());
+		pz->push_back(selectedObjects[t].pz());
+		E->push_back(selectedObjects[t].energy());
 	}
 
 	//-----------------------------------------------------------------
 	// put vectors in the event
-	iEvent.put(pt, prefix + "Pt" + suffix);
-	iEvent.put(eta, prefix + "Eta" + suffix);
-	iEvent.put(phi, prefix + "Phi" + suffix);
+	iEvent.put(px, prefix + "Px" + suffix);
+	iEvent.put(py, prefix + "Py" + suffix);
+	iEvent.put(pz, prefix + "Pz" + suffix);
+        iEvent.put(E, prefix + "Energy" + suffix);
 }
 
 
