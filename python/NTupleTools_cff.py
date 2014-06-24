@@ -57,6 +57,12 @@ options.register ('dropTriggerSelection',
                   VarParsing.varType.bool,
                   "Remove trigger selection for trigger studies")
 
+options.register ('bSelectionInTaggingMode',
+                  False,
+                  VarParsing.multiplicity.singleton,
+                  VarParsing.varType.bool,
+                  "Apply b-tagging requirement (last 2 selection steps) in tagging mode")
+
 options.register ('writeFat',
                   False,
                   VarParsing.multiplicity.singleton,

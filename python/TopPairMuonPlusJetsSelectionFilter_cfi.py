@@ -32,10 +32,6 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     useDeltaBetaCorrectionsForMuons = cms.bool(True),
     useDeltaBetaCorrectionsForElectrons = cms.bool(False),
     useRhoActiveAreaCorrections = cms.bool(True),
-    useMETFilters = cms.bool(True),
-    useEEBadScFilter = cms.bool(False),
-    tagAndProbeStudies = cms.bool(False),
-    dropTriggerSelection = cms.bool(False),
     
     prefix=cms.untracked.string('TopPairMuonPlusJetsSelection.'),
     MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12 or Summer11Leg
@@ -43,5 +39,10 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     #flags
     debug=cms.untracked.bool(False),
     taggingMode=cms.untracked.bool(False),
+    useMETFilters = cms.bool(True),
+    useEEBadScFilter = cms.bool(False),
+    tagAndProbeStudies = cms.bool(False),
+    dropTriggerSelection = cms.bool(False),
+    bSelectionInTaggingMode = cms.bool(False),
 )
 
