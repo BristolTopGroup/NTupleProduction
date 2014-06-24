@@ -499,13 +499,13 @@ bool TopPairElectronPlusJetsSelectionFilter::passesDileptonVeto() const {
 	bool isZEvent = false;
 
 	if (tagAndProbeStudies_) {
-		if (looseElectrons_.size() > 1) {
-			for (unsigned int index = 0; index < looseElectrons_.size(); ++index) {
-				const pat::Electron looseElectron_ = looseElectrons_.at(index);
+		if (looseElectrons_.size() >= 1) {
+			for (unsigned int index = 0; index < electrons_.size(); ++index) {
+				const pat::Electron probeElectron_ = electrons_.at(index);
 				// skip the tag electron itself
-				if (looseElectron_.p4() == signalElectron_.p4())
+				if (probeElectron_.p4() == signalElectron_.p4())
 					continue;
-				invariantMass = (signalElectron_.p4()+looseElectron_.p4()).mass();
+				invariantMass = (signalElectron_.p4()+probeElectron_.p4()).mass();
 				bool passesLowerLimit = invariantMass > 60;
 				bool passesUpperLimit = invariantMass < 120;
 				if (passesLowerLimit && passesUpperLimit)

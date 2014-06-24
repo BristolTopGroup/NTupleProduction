@@ -525,13 +525,13 @@ bool TopPairMuonPlusJetsSelectionFilter::passesLooseMuonVeto() const {
 	bool isZEvent = false;
 
 	if (tagAndProbeStudies_) {
-		if (looseMuons_.size() > 1) {
-			for (unsigned int index = 0; index < looseMuons_.size(); ++index) {
-				const pat::Muon looseMuon_ = looseMuons_.at(index);
+		if (looseMuons_.size() >= 1) {
+			for (unsigned int index = 0; index < muons_.size(); ++index) {
+				const pat::Muon probeMuon_ = muons_.at(index);
 				// skip the tag muon itself
-				if (looseMuon_.p4() == signalMuon_.p4())
+				if (probeMuon_.p4() == signalMuon_.p4())
 					continue;
-				invariantMass = (signalMuon_.p4()+looseMuon_.p4()).mass();
+				invariantMass = (signalMuon_.p4()+probeMuon_.p4()).mass();
 				bool passesLowerLimit = invariantMass > 60;
 				bool passesUpperLimit = invariantMass < 120;
 				if (passesLowerLimit && passesUpperLimit)
