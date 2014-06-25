@@ -258,7 +258,10 @@ void TopPairElectronPlusJetsSelectionFilter::goodIsolatedElectrons() {
 		const pat::Electron electron = electrons_.at(index);
 		if (debug_) {
 			cout << "Electron:" << endl;
-			cout << "pT: " << electron.pt() << " eta: " << electron.eta() << " phi: " << electron.phi() << endl;
+			cout << "pT: " << electron.pt() << " eta: " << electron.eta() << " phi: " << electron.phi() << " iso: "
+			     << getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrectionsForElectrons_,
+				    useRhoActiveAreaCorrections_) << " MVA ID: " << electron.electronID("mvaTrigV0") << " d0: "
+			     << fabs(electron.dB(pat::Electron::PV2D)) << endl;
 		}
 
 		bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrectionsForElectrons_,
@@ -452,7 +455,7 @@ bool TopPairElectronPlusJetsSelectionFilter::passesScrapingVeto(edm::Event& even
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::passesTriggerSelection() const {
-	if (dropTriggerSelection_) 
+	if (dropTriggerSelection_)
 		return true;
 	else if (isRealData_) {
 		//2011 data: run 160404 to run 180252
@@ -499,7 +502,7 @@ bool TopPairElectronPlusJetsSelectionFilter::passesDileptonVeto() const {
 	bool isZEvent = false;
 
 	if (tagAndProbeStudies_) {
-		if (looseElectrons_.size() >= 1) {
+		if ( (looseElectrons_.size() >= 1) && hasSignalElectron_ ) {
 			for (unsigned int index = 0; index < electrons_.size(); ++index) {
 				const pat::Electron probeElectron_ = electrons_.at(index);
 				// skip the tag electron itself

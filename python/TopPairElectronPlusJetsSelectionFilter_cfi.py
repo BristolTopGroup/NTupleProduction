@@ -20,12 +20,12 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     TooManyStripClus53XInput=cms.InputTag('toomanystripclus53X'),
     #LogErrorTooManyClusters=cms.InputTag('logErrorTooManyClusters'),
 
-#jet cuts
+    #jet cuts
     min1JetPt=cms.double(30.),
     min2JetPt=cms.double(30.),
     min3JetPt=cms.double(30.),
     min4JetPt=cms.double(30.),
-#lepton isolation
+    #lepton isolation
     tightElectronIsolation=cms.double(0.1),
     looseElectronIsolation=cms.double(0.15),
     looseMuonIsolation=cms.double(0.2),
