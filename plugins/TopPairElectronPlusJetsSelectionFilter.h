@@ -107,7 +107,7 @@ private:
 
 	std::string prefix_, MCSampleTag_;
 
-	bool debug_, taggingMode_;
+	bool debug_, taggingMode_, bSelectionInTaggingMode_;
 
 	//internal
 	boost::array<bool, TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS> passes_;
