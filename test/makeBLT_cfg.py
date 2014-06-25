@@ -55,14 +55,26 @@ else:
     process.topPairMuPlusJetsSelection.MCSampleTag = cms.string( 'Summer12' )
 
 if options.applyZselection:
+    #apply to filters in tagging mode (for monitoring)
     process.topPairEPlusJetsSelection.tagAndProbeStudies = cms.bool( True )
     process.topPairMuPlusJetsSelection.tagAndProbeStudies = cms.bool( True )
+    #apply to actual BLT filters
+    process.topPairEPlusJetsSelectionApply.tagAndProbeStudies = cms.bool( True )
+    process.topPairMuPlusJetsSelectionApply.tagAndProbeStudies = cms.bool( True )
 
 if options.dropTriggerSelection:
+    #apply to filters in tagging mode (for monitoring)
     process.topPairEPlusJetsSelection.dropTriggerSelection = cms.bool( True )
     process.topPairMuPlusJetsSelection.dropTriggerSelection = cms.bool( True )
+    #apply to actual BLT filters
+    process.topPairEPlusJetsSelectionApply.dropTriggerSelection = cms.bool( True )
+    process.topPairMuPlusJetsSelectionApply.dropTriggerSelection = cms.bool( True )
 
 if options.bSelectionInTaggingMode:
+    #apply to filters in tagging mode (for monitoring)
+    process.topPairEPlusJetsSelection.bSelectionInTaggingMode = cms.bool( True )
+    process.topPairMuPlusJetsSelection.bSelectionInTaggingMode = cms.bool( True )
+    #apply to actual BLT filters
     process.topPairEPlusJetsSelectionApply.bSelectionInTaggingMode = cms.bool( True )
     process.topPairMuPlusJetsSelectionApply.bSelectionInTaggingMode = cms.bool( True )
 
