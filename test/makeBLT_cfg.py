@@ -62,10 +62,6 @@ if options.dropTriggerSelection:
     process.topPairEPlusJetsSelection.dropTriggerSelection = cms.bool( True )
     process.topPairMuPlusJetsSelection.dropTriggerSelection = cms.bool( True )
 
-if options.bSelectionInTaggingMode:
-    process.topPairEPlusJetsSelectionApply.bSelectionInTaggingMode = cms.bool( True )
-    process.topPairMuPlusJetsSelectionApply.bSelectionInTaggingMode = cms.bool( True )
-
 electronselectionPrefix = 'TopPairElectronPlusJetsSelection.'
 muonselectionPrefix = 'TopPairMuonPlusJetsSelection.'
 process.topPairEPlusJetsSelection.prefix = cms.untracked.string( electronselectionPrefix )
