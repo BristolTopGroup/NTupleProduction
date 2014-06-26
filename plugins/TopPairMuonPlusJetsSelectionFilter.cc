@@ -525,7 +525,7 @@ bool TopPairMuonPlusJetsSelectionFilter::passesLooseMuonVeto() const {
 	bool isZEvent = false;
 
 	if (tagAndProbeStudies_) {
-		if (looseMuons_.size() >= 1) {
+		if ( (looseMuons_.size() >= 1) && hasSignalMuon_ ) {
 			for (unsigned int index = 0; index < muons_.size(); ++index) {
 				const pat::Muon probeMuon_ = muons_.at(index);
 				// skip the tag muon itself
