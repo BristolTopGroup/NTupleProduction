@@ -135,6 +135,7 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 	std::auto_ptr < pat::JetCollection > jetoutput(new pat::JetCollection());
 
 	bool passesSelection(true);
+	bool passesSelectionExceptBtagging(true);
 
 	for (unsigned int step = 0; step < TTbarMuPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
 		if (debug_)
@@ -142,13 +143,12 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 		bool passesStep(passesSelectionStep(iEvent, step));
 		passesSelection = passesSelection && passesStep;
 		passes_.at(step) = passesStep;
-		// Optionally want btag requirement in tagging mode, but apply rest of selection
-		if ( step == TTbarMuPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS - 1 || step == TTbarMuPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS - 2 ) {
-			if ( !(bSelectionInTaggingMode_ || taggingMode_ || passesSelection) )
-				break;
-		}
-		//if not in tagginmode and selection step doesn't pass leave loop.
-		else if (!(taggingMode_ || passesSelection))
+
+		if ( step < TTbarMuPlusJetsReferenceSelection::AtLeastOneBtag )
+			passesSelectionExceptBtagging = passesSelectionExceptBtagging && passesStep;
+
+		// if doesn't pass selection and not in tagging mode, stop here to save CPU time
+		if ( !(taggingMode_ || passesSelection) )
 			break;
 	}
 	for (unsigned int step = 0; step < TTbarMuPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
@@ -166,7 +166,10 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(signalMuonIndex_)),prefix_ + "signalMuonIndex");
 
-	return taggingMode_ || passesSelection;
+	if ( !bSelectionInTaggingMode_ )
+		return taggingMode_ || passesSelection;
+	else
+		return taggingMode_ || passesSelectionExceptBtagging;
 }
 
 void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent) {
