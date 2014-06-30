@@ -196,8 +196,6 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	double btagWeight(*btagWeightHandle);
 	double weight(puWeight * btagWeight);
 
-	
-
 	bool passes_selection(passesFilter(iEvent, selection_flag_input_));
 	bool is_fully_hadronic(passesFilter(iEvent, is_fully_hadronic_ttbar_flag_));
 	bool is_dileptonic(passesFilter(iEvent, is_dileptonic_ttbar_flag_));

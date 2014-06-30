@@ -32,19 +32,19 @@ public:
 
 	bool filter(unsigned int t) const;
 
-	double getAverageBScaleFactor(const pat::JetCollection&, double uncertaintyFactor = 1.) const;
-	double getBScaleFactor(const pat::Jet& jet, double uncertaintyFactor = 1.) const;
+	double getAverageBScaleFactor(const pat::JetCollection&, std::string MCSampleTag, double uncertaintyFactor = 1.) const;
+	double getBScaleFactor(const pat::Jet& jet, std::string MCSampleTag, double uncertaintyFactor = 1.) const;
 	double getAverageBEfficiency() const;
-	double getAverageCScaleFactor(const pat::JetCollection&) const;
-	double getCScaleFactor(const pat::Jet&) const;
+	double getAverageCScaleFactor(const pat::JetCollection&, std::string MCSampleTag) const;
+	double getCScaleFactor(const pat::Jet&, std::string MCSampleTag) const;
 	double getAverageCEfficiency() const;
-	double getAverageUDSGScaleFactor(const pat::JetCollection&) const;
-	double getUDSGScaleFactor(const pat::Jet&) const;
+	double getAverageUDSGScaleFactor(const pat::JetCollection&, std::string MCSampleTag) const;
+	double getUDSGScaleFactor(const pat::Jet&, std::string MCSampleTag) const;
 	double getAverageUDSGEfficiency(const pat::JetCollection&) const;
 
-	double getMeanUDSGScaleFactor(double jetPT, double jetEta) const;
-	double getMinUDSGScaleFactor(double jetPT, double jetEta) const;
-	double getMaxUDSGScaleFactor(double jetPT, double jetEta) const;
+	double getMeanUDSGScaleFactor(double jetPT, double jetEta, std::string MCSampleTag) const;
+	double getMinUDSGScaleFactor(double jetPT, double jetEta, std::string MCSampleTag) const;
+	double getMaxUDSGScaleFactor(double jetPT, double jetEta, std::string MCSampleTag) const;
 
 	double getMeanUDSGEfficiency(double jetPT) const;
 private:
@@ -54,7 +54,7 @@ private:
 
 };
 
-std::vector<double> BjetWeights(const pat::JetCollection& jets, unsigned int numberOfBtags);
-std::vector<double> BjetWeights(const pat::JetCollection& jets, unsigned int numberOfBtags, int btagSystematicFactor, int lightJetSystematicFactor);
+std::vector<double> BjetWeights(const pat::JetCollection& jets, unsigned int numberOfBtags, std::string MCSampleTag);
+std::vector<double> BjetWeights(const pat::JetCollection& jets, unsigned int numberOfBtags, int btagSystematicFactor, int lightJetSystematicFactor, std::string MCSampleTag);
 #endif
 

@@ -98,6 +98,16 @@ process.eventWeightBtagMuPlusJets = process.eventWeightBtagEPlusJets.clone(
             jetInput = cms.InputTag( "topPairMuPlusJetsSelection", muonselectionPrefix + 'cleanedJets', 'PAT' ),
                                                               )
 
+if options.CMSSW == '44X':
+    process.eventWeightBtagEPlusJets.MCSampleTag = cms.string( 'Fall11')
+    process.eventWeightBtagMuPlusJets.MCSampleTag = cms.string( 'Fall11')
+elif options.CMSSW == '53X' and options.centreOfMassEnergy == 8:
+    process.eventWeightBtagEPlusJets.MCSampleTag = cms.string( 'Summer12')
+    process.eventWeightBtagMuPlusJets.MCSampleTag = cms.string( 'Summer12')
+elif options.CMSSW == '53X' and options.centreOfMassEnergy == 7:
+    process.eventWeightBtagEPlusJets.MCSampleTag = cms.string( 'Summer11Leg')
+    process.eventWeightBtagMuPlusJets.MCSampleTag = cms.string( 'Summer11Leg')
+
 electron_unfolding_analysers = [
     process.unfolding_MET_analyser_electron_channel_patMETsPFlow,
     process.unfolding_MET_nu_analyser_electron_channel_patMETsPFlow,
