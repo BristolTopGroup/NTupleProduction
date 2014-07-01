@@ -195,7 +195,7 @@ elif options.CMSSW == "53X" and options.centreOfMassEnergy == 7:
     GLOBALTAG_MC = 'START53_LV6A1::All' #2011 7TeV 53X legaco MC: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#7_TeV_MC_Legacy_reprocessing_in
     FILETAG = '53X'
     TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/ElectronHad_Run2011A-12Oct2013-v1_AOD.root' #test file for 2011 7TeV 53X RunA Oct2013 re-reco
-    TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11LegDR_53X_AODSIM.root' #test file for 2011 7TeV 53X TTJets Monte Carlo
+    TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TTJets_MSDecays_central_TuneZ2_7TeV-madgraph-tauola_Summer11LegDR-PU_S13_START53_LV6-v1_AODSIM.root' #test file for 2011 7TeV 53X TTJets Monte Carlo
 elif options.CMSSW == '44X':
     GLOBALTAG_DATA = 'GR_R_44_V15::All'
     GLOBALTAG_MC = 'START44_V13::All'
@@ -360,15 +360,17 @@ if options.CMSSW == '44X':
     	process.eventWeightPU.DataHistoName       = cms.string("histoData_true")
 elif options.CMSSW == '53X' and options.centreOfMassEnergy == 7:
         process.eventWeightPU.MCSampleTag = cms.string("Summer11Leg")
-        process.eventWeightPU.MCSampleFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Default2011.root")
-        process.eventWeightPU.MCSampleHistoName = cms.string("histo_Fall11_true")
-        process.eventWeightPU.DataFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/Data_PUDist_2011Full.root")
-        process.eventWeightPU.DataHistoName = cms.string("histoData_true")
+        process.eventWeightPU.MCSampleFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_DefaultSummer11Leg.root")
+        process.eventWeightPU.MCSampleHistoName = cms.string("histo_Summer11Leg_true")
+        process.eventWeightPU.DataFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/Data_PUDist_2011Full_central_68000mb_June2014.root")
+        process.eventWeightPU.DataHistoName = cms.string("pileup")
 elif options.CMSSW == '53X' and options.centreOfMassEnergy == 8:
         process.eventWeightPU.MCSampleTag = cms.string("Summer12")
         # process.eventWeightPU.MCSampleFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Summer2012.root")
         process.eventWeightPU.MCSampleFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Default2012.root")
         process.eventWeightPU.MCSampleHistoName = cms.string("puhisto")
+        process.eventWeightPU.DataFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/Data_PUDist_2012Full.root")
+        process.eventWeightPU.DataHistoName = cms.string("pileup")
 
 process.TFileService = cms.Service("TFileService",
                            fileName=cms.string('ntuple.root')
