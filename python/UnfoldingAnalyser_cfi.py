@@ -40,7 +40,8 @@ unfolding_MET_analyser_electron_channel_patMETsPFlow = cms.EDAnalyzer("Unfolding
     variable_min=cms.double(variable_bins['MET']['min']),
     variable_max=cms.double(variable_bins['MET']['max']),
     variable_n_bins=cms.uint32(variable_bins['MET']['n_bins']),
-    bin_edges=cms.vdouble([0, 25, 45, 70, 100, 150, 2000])
+    bin_edges=cms.vdouble([0, 25, 45, 70, 100, 150, 2000]),
+    centre_of_mass_energy = cms.double( 8 ),
 )
 
 unfolding_MET_analyser_muon_channel_patMETsPFlow = unfolding_MET_analyser_electron_channel_patMETsPFlow.clone(

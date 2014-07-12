@@ -43,6 +43,7 @@ UnfoldingAnalyser::UnfoldingAnalyser(const edm::ParameterSet& iConfig) :
 		variable_max_(iConfig.getParameter<double>("variable_max")), //
 		variable_n_bins_(iConfig.getParameter<unsigned int>("variable_n_bins")), //
 		bin_edges_(iConfig.getParameter < vector<double> > ("bin_edges")), //
+		centre_of_mass_energy_(iConfig.getParameter<double>("centre_of_mass_energy")), //
 		is_semileptonic_(false), //
 		truth_(), //
 		measured_(), //
@@ -87,6 +88,7 @@ void UnfoldingAnalyser::fillDescriptions(edm::ConfigurationDescriptions & descri
 	desc.add<unsigned int>("variable_n_bins");
 	desc.add < vector<double> > ("bin_edges");
 	desc.addUntracked<bool>("do_electron_channel", false);
+	desc.add<double>("centre_of_mass_energy");
 
 	descriptions.add("UnfoldingAnalyser", desc);
 }
@@ -215,8 +217,12 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 			truth_asym_bins_->Fill(gen_variable, puWeight);
 		}
 
+		double electronCorrection = get_electron_correction(iEvent, centre_of_mass_energy_);
+
 		if (passes_selection) {
 			float reco_variable(get_reco_variable(iEvent));
+
+			weight *= electronCorrection;
 
 			measured_->Fill(reco_variable, weight);
 			measured_asym_bins_->Fill(reco_variable, weight);
@@ -247,7 +253,7 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 			truth_asym_bins_->Fill(gen_variable, puWeight);
 		}
 
-		double muonCorrection = get_muon_correction(iEvent);
+		double muonCorrection = get_muon_correction(iEvent, centre_of_mass_energy_);
 
 		if (passes_selection) {
 			float reco_variable(get_reco_variable(iEvent));
@@ -466,13 +472,10 @@ float UnfoldingAnalyser::get_gen_mt_nu(const edm::Event& iEvent) const {
 		return sqrt(MT_squared);
 	else
 		return -1;
-    
-
 }
 
 
 float UnfoldingAnalyser::get_gen_wpt(const edm::Event& iEvent) const {
-
 
 	if (!is_semileptonic_)
 		return -1.;
@@ -489,7 +492,6 @@ float UnfoldingAnalyser::get_gen_wpt(const edm::Event& iEvent) const {
 }
 
 float UnfoldingAnalyser::get_gen_wpt_nu(const edm::Event& iEvent) const {
-
 
 	if (!is_semileptonic_)
 		return -1.;
@@ -520,7 +522,6 @@ float UnfoldingAnalyser::get_reco_variable(const edm::Event& iEvent) const {
 float UnfoldingAnalyser::get_reco_met(const edm::Event& iEvent) const {
 	edm::Handle < std::vector<pat::MET> > recoMETs;
 	iEvent.getByLabel(reco_MET_input_, recoMETs);
-
 
 	pat::MET recoMETObject(recoMETs->at(0));
 	
@@ -604,25 +605,400 @@ const reco::Candidate* UnfoldingAnalyser::get_reco_lepton(const edm::Event& iEve
 	return 0;
 }
 
-float UnfoldingAnalyser::get_muon_correction(const edm::Event& iEvent) const {
-	//ID, iso and trigger correction respectively from:  https://indico.cern.ch/getFile.py/access?contribId=3&resId=0&materialId=slides&confId=214870
-	
+float UnfoldingAnalyser::get_electron_correction(const edm::Event& iEvent, double centre_of_mass_energy_) const {
 	double correction(1.);
-	
+
+	edm::Handle < pat::ElectronCollection > signalElectron;
+	iEvent.getByLabel(electron_input_, signalElectron);
+
+	double electronEta = std::abs(signalElectron->at(0).eta());
+	double electronPt = signalElectron->at(0).pt();
+
+//	if(centre_of_mass_energy == 7){
+//		// hard coded values since pickle file not available...not updated because I couldn't find any values on twikis!
+//		if (electronEta < -1.5)
+//			correction = 1.003;
+//		else if (electronEta >= -1.5 && electronEta < -1.2)
+//			correction = 0.980;
+//		else if (electronEta >= -1.2 && electronEta < -0.9)
+//			correction = 0.941;
+//		else if (electronEta >= -0.9 && electronEta < 0)
+//			correction = 0.974;
+//		else if (electronEta >= 0 && electronEta < 0.9)
+//			correction = 0.977;
+//		else if (electronEta >= 0.9 && electronEta < 1.2)
+//			correction = 0.939;
+//		else if (electronEta >= 1.2 && electronEta < 1.5)
+//			correction = 0.967;
+//		else if (electronEta >= 1.5)
+//			correction = 1.023;
+//	}
+	//8TeV scale factors from https://twiki.cern.ch/twiki/bin/viewauth/CMS/KoPFAElectronTagAndProbe
+	//Only factors from PromptReco available (in the "Efficiency for e+jet channel (promptreco)" section)
+	//Specifically: ID & Iso: "ID/Isolation efficiency" sub-section
+	//Specifically: Trigger: "Trigger efficiency" sub-section
+	//These values are hard coded because, unlike for Muons, there is no pickle file provided.
+//	else if(centre_of_mass_energy == 8){ //corrections for (ID & Iso) and Trigger respectively
+		if(fabs(electronEta)<0.8) {
+			if(20<=electronPt && electronPt<30) {  //Note: Trigger scale factors only provided down to electron electronPt of 30GeV in the link above, so I have used the same as for the 30GeV-40GeV range.
+				correction = 0.949*0.987;
+			}
+			else if(30<=electronPt && electronPt<40) {
+				correction = 0.939*0.987;
+			}
+			else if(40<=electronPt && electronPt<50) {
+				correction = 0.950*0.997;
+			}
+			else if(50<=electronPt && electronPt<=200) {
+				correction = 0.957*0.998;
+			}
+		}
+		else if(fabs(electronEta)>=0.8 && fabs(electronEta)<1.478) {
+			if(20<=electronPt && electronPt<30) { //Note: Trigger scale factors only provided down to electron pt of 30GeV in the link above, so I have used the same as for the 30GeV-40GeV range.
+				correction = 0.900*0.964;
+			}
+			if(30<=electronPt && electronPt<40) {
+				correction = 0.920*0.964;
+			}
+			if(40<=electronPt && electronPt<50) {
+				correction = 0.949*0.980;
+			}
+			if(50<=electronPt && electronPt<=200) {
+				correction = 0.959*0.988;
+			}
+		}
+		else if(fabs(electronEta)>=1.478 && fabs(electronEta)<2.5) {
+			if(20<=electronPt && electronPt<30) { //Note: Trigger scale factors only provided down to electron pt of 30GeV in the link above, so I have used the same as for the 30GeV-40GeV range.
+				correction = 0.857*1.004;
+			}
+			if(30<=electronPt && electronPt<40) {
+				correction = 0.907*1.004;
+			}
+			if(40<=electronPt && electronPt<50) {
+				correction = 0.937*1.033;
+			}
+			if(50<=electronPt && electronPt<=200) {
+				correction = 0.954*0.976;
+			}
+		}
+//	}
+	return correction;
+}
+
+//old get_muon_correction method
+//float UnfoldingAnalyser::get_muon_correction(const edm::Event& iEvent) const {
+//	//ID, iso and trigger correction respectively from:  https://indico.cern.ch/getFile.py/access?contribId=3&resId=0&materialId=slides&confId=214870
+//
+//	double correction(1.);
+//
+//	edm::Handle < pat::MuonCollection > signalMuon;
+//	iEvent.getByLabel(muon_input_, signalMuon);
+//
+//	double muEta = signalMuon->at(0).eta();
+//
+//	if(abs(muEta)<0.9)
+//		correction = 0.9941*0.9923*0.9560;
+//	else if(abs(muEta)>=0.9 && abs(muEta)<1.2)
+//		correction = 0.9917*0.9979*0.9528;
+//	else if(abs(muEta)>=1.2)
+//		correction = 0.9982*1.0019*0.9809;
+//
+//	return correction;
+//}
+
+float UnfoldingAnalyser::get_muon_correction(const edm::Event& iEvent, double centre_of_mass_energy_) const {
+	double correction(1.);
+
 	edm::Handle < pat::MuonCollection > signalMuon;
 	iEvent.getByLabel(muon_input_, signalMuon);
-	
-	double muEta = signalMuon->at(0).eta();
 
-	if(abs(muEta)<0.9)
-		correction = 0.9941*0.9923*0.9560;
-	else if(abs(muEta)>=0.9 && abs(muEta)<1.2)
-		correction = 0.9917*0.9979*0.9528;
-	else if(abs(muEta)>=1.2)
-		correction = 0.9982*1.0019*0.9809;
-	
-	return correction; 
+	double muEta = std::abs(signalMuon->at(0).eta());
+	double muonPt = signalMuon->at(0).pt();
+	double id_correction(0), iso_correction(0), trigger_correction(0), correction_A(0), correction_B(0), lumi_2011A(0), lumi_2011B(0), lumi_2011(0);
+
+	// 7TeV scale factors from https://twiki.cern.ch/twiki/bin/viewauth/CMS/MuonReferenceEffs#2011_data (from 44X pickle file)
+	if (centre_of_mass_energy_ == 7) { //Luminosity weighted average of 'combRelPFISO12_2011A' and 'combRelPFISO12_2011B' from pickle file
+		//get scale factors based on muon eta bin
+		if (fabs(muEta) <= 1.2) { // 'pt_abseta<1.2' in pickle file
+			//get scale factors based on muon pt
+			if ((10 <= muonPt) && (muonPt < 20)) {
+				correction_A = 0.97187329075;
+				correction_B = 0.958160663139;
+			}
+			else if ((20 <= muonPt) && (muonPt < 30)) {
+				correction_A = 0.984568503228;
+				correction_B = 0.975536117201;
+			}
+			else if ((30 <= muonPt) && (muonPt < 40)) {
+				correction_A = 0.992423030756;
+				correction_B = 0.984073788145;
+			}
+			else if ((40 <= muonPt) && (muonPt < 50)) {
+				correction_A = 0.99535554365;
+				correction_B = 0.990656279301;
+			}
+			else if ((50 <= muonPt) && (muonPt < 60)) {
+				correction_A = 0.992170058662;
+				correction_B = 0.991084452935;
+			}
+			else if ((60 <= muonPt) && (muonPt < 80)) {
+				correction_A = 0.993872313396;
+				correction_B = 0.98892037777;
+			}
+			else if ((80 <= muonPt) && (muonPt < 250)) {
+				correction_A = 0.993271247496;
+				correction_B = 0.999774630941;
+			}
+		}
+		else if (fabs(muEta) > 1.2) { // 'pt_abseta>1.2' in pickle file
+			//get scale factors based on muon pt
+			if ((10 <= muonPt) && (muonPt < 20)) {
+				correction_A = 0.989190191868;
+				correction_B = 0.999006216758;
+			}
+			else if ((20 <= muonPt) && (muonPt < 30)) {
+				correction_A = 1.00271480782;
+				correction_B = 1.00043597215;
+			}
+			else if ((30 <= muonPt) && (muonPt < 40)) {
+				correction_A = 1.00274598636;
+				correction_B = 1.0019607868;
+			}
+			else if ((40 <= muonPt) && (muonPt < 50)) {
+				correction_A = 1.00158789661;
+				correction_B = 1.00242767691;
+			}
+			else if ((50 <= muonPt) && (muonPt < 60)) {
+				correction_A = 0.99539699871;
+				correction_B = 1.00113878923;
+			}
+			else if ((60 <= muonPt) && (muonPt < 80)) {
+				correction_A = 0.995568584925;
+				correction_B = 0.993575837027;
+			}
+			else if ((80 <= muonPt) && (muonPt < 250)) {
+				correction_A = 0.988039073331;
+				correction_B = 0.993270235255;
+			}
+		}
+		//luminosity weighted average of correction_A and correction_B:
+		lumi_2011A = 2.311; //fb^-1
+		lumi_2011B = 2.739; //fb^-1
+		lumi_2011 = 5.050; //fb^-1
+		correction = ((lumi_2011A/lumi_2011) * correction_A) + ((lumi_2011B/lumi_2011)*correction_B);
+
+		//8TeV scale factors from https://twiki.cern.ch/twiki/bin/viewauth/CMS/MuonReferenceEffs#22Jan2013_ReReco_of_2012_data_re (from pickle files)
+	} else if (centre_of_mass_energy_ == 8){ //corrections for ID ('Tight'), Iso ('combRelIsoPF04dBeta<012_Tight') and Trigger ('IsoMu24', 'TightID_IsodB') respectively (keys used in pickle file)
+		if (fabs(muEta) < 0.9) { // 'ptabseta<0.9' in pickle file
+			if ((10 <= muonPt) && (muonPt < 20)) {
+				id_correction = 0.9702748917248193;
+				iso_correction = 0.9403381500487888;
+				trigger_correction = 1.0; // corrections only provided for pt>=25 so 1.0 used
+			}
+			else if ((20 <= muonPt) && (muonPt < 25)) {
+				id_correction = 0.9888647105027486;
+				iso_correction = 0.9767384928595166;
+				trigger_correction = 1.0; // corrections only provided for pt>=25 so 1.0 used
+			}
+			else if ((25 <= muonPt) && (muonPt < 30)) {
+				id_correction = 0.9923382289443887;
+				iso_correction = 0.9961727553245637;
+				trigger_correction = 0.9837252438433461;
+			}
+			else if ((30 <= muonPt) && (muonPt < 35)) {
+				id_correction = 0.9932832435710769;
+				iso_correction = 0.9932276697519965;
+				trigger_correction = 0.9840634431547701;
+			}
+			else if ((35 <= muonPt) && (muonPt < 40)) {
+				id_correction = 0.9936619045236875;
+				iso_correction = 0.993713125125077;
+				trigger_correction = 0.9839165818168554;
+			}
+			else if ((40 <= muonPt) && (muonPt < 50)) {
+				id_correction = 0.9923918872503162;
+				iso_correction = 0.9940841647892507;
+				trigger_correction = 0.9834525270057036;
+			}
+			else if ((50 <= muonPt) && (muonPt < 60)) {
+				id_correction = 0.9911899786643166;
+				iso_correction = 0.9964353940407351;
+				trigger_correction = 0.9842917703915748;
+			}
+			else if ((60 <= muonPt) && (muonPt < 90)) {
+				id_correction = 0.9894167956611032;
+				iso_correction = 0.9986584316076454;
+				trigger_correction = 0.9846720184248945;
+			}
+			else if ((90 <= muonPt) && (muonPt < 140)) {
+				id_correction = 1.0037489877154855;
+				iso_correction = 1.0003297152126076;
+				trigger_correction = 0.9809171165806959;
+			}
+			else if ((140 <= muonPt) && (muonPt < 300)) {
+				id_correction = 1.0185025540365602;
+				iso_correction = 0.998812853360961;
+				trigger_correction = 0.9804174981053351; // given for pt '140_500' in pickle file
+			}
+		} else if ((abs(muEta) >= 0.9 && abs(muEta) < 1.2)) { // 'ptabseta0.9-1.2' in pickle file
+			if ((10 <= muonPt) && (muonPt < 20)) {
+				id_correction = 1.0017313093647269;
+				iso_correction = 0.9484342057793206;
+				trigger_correction = 1.0; // corrections only provided for pt>=25 so 1.0 used
+			}
+			else if ((20 <= muonPt) && (muonPt < 25)) {
+				id_correction = 0.9939466451892177;
+				iso_correction = 0.9863669311896185;
+				trigger_correction = 1.0; // corrections only provided for pt>=25 so 1.0 used
+			}
+			else if ((25 <= muonPt) && (muonPt < 30)) {
+				id_correction = 0.9947219657132994;
+				iso_correction = 1.0003560413214891;
+				trigger_correction = 0.9683812755993191;
+			}
+			else if ((30 <= muonPt) && (muonPt < 35)) {
+				id_correction = 0.9933913481874554;
+				iso_correction = 1.0000867333890535;
+				trigger_correction = 0.965380548896101;
+			}
+			else if ((35 <= muonPt) && (muonPt < 40)) {
+				id_correction = 0.9922848270630622;
+				iso_correction = 0.9990915568314974;
+				trigger_correction = 0.9669651415167049;
+			}
+			else if ((40 <= muonPt) && (muonPt < 50)) {
+				id_correction = 0.9918700391817427;
+				iso_correction = 0.9988684367869946;
+				trigger_correction = 0.966679581608325;
+			}
+			else if ((50 <= muonPt) && (muonPt < 60)) {
+				id_correction = 0.995010062219747;
+				iso_correction = 0.9978903999478148;
+				trigger_correction = 0.9627395755250187;
+			}
+			else if ((60 <= muonPt) && (muonPt < 90)) {
+				id_correction = 0.99040605451701;
+				iso_correction = 0.9992149992903525;
+				trigger_correction = 0.9595241683475331;
+			}
+			else if ((90 <= muonPt) && (muonPt < 140)) {
+				id_correction = 1.0090275981046186;
+				iso_correction = 1.0014212099113895;
+				trigger_correction = 0.9644418246112644;
+			}
+			else if ((140 <= muonPt) && (muonPt < 300)) {
+				id_correction = 1.010956056270124;
+				iso_correction = 1.0018540386614887;
+				trigger_correction = 0.9712789619617556; // given for pt '140_500' in pickle file
+			}
+		} else if ((abs(muEta) >= 1.2 && abs(muEta) < 2.1)) { // 'ptabseta1.2-2.1' in pickle file
+			if ((10 <= muonPt) && (muonPt < 20)) {
+				id_correction = 1.0180184284620057;
+				iso_correction = 0.9724367240900078;
+				trigger_correction = 1.0; // corrections only provided for pt>=25 so 1.0 used
+			}
+			else if ((20 <= muonPt) && (muonPt < 25)) {
+				id_correction = 1.0003513994342943;
+				iso_correction = 0.9900544131155273;
+				trigger_correction = 1.0; // corrections only provided for pt>=25 so 1.0 used
+			}
+			else if ((25 <= muonPt) && (muonPt < 30)) {
+				id_correction = 0.9984860359215375;
+				iso_correction = 1.0028199004178158;
+				trigger_correction = 1.0051991254438037;
+			}
+			else if ((30 <= muonPt) && (muonPt < 35)) {
+				id_correction = 0.9965584500063546;
+				iso_correction = 1.0040456735929117;
+				trigger_correction = 1.0013781590159485;
+			}
+			else if ((35 <= muonPt) && (muonPt < 40)) {
+				id_correction = 0.996026448928709;
+				iso_correction = 1.0021465355614672;
+				trigger_correction = 0.99616640424792;
+			}
+			else if ((40 <= muonPt) && (muonPt < 50)) {
+				id_correction = 0.9960618126306268;
+				iso_correction = 1.0009158373782485;
+				trigger_correction = 0.9942541014104305;
+			}
+			else if ((50 <= muonPt) && (muonPt < 60)) {
+				id_correction = 0.9951827274866013;
+				iso_correction = 1.0004039805545037;
+				trigger_correction = 0.990544673012178;
+			}
+			else if ((60 <= muonPt) && (muonPt < 90)) {
+				id_correction = 0.9924861810666658;
+				iso_correction = 1.00050232016842;
+				trigger_correction = 0.9882937419288585;
+			}
+			else if ((90 <= muonPt) && (muonPt < 140)) {
+				id_correction = 1.023129380083607;
+				iso_correction = 0.9991578234416382;
+				trigger_correction = 0.9818759899390823;
+			}
+			else if ((140 <= muonPt) && (muonPt < 300)) {
+				id_correction = 0.9747541719440429;
+				iso_correction = 0.9964395746067783;
+				trigger_correction = 0.9941686682904833; // given for pt '140_500' in pickle file
+			}
+		} else if (abs(muEta) >= 2.1 && abs(muEta) <= 2.4) { // 'ptabseta2.1-2.4' in pickle file. Note: Trigger scale factors only provided up to absolute eta of 2.1 in the link above, so I have used the same as for the 1.2 to 2.1 eta range.
+			if ((10 <= muonPt) && (muonPt < 20)) {
+				id_correction = 1.0050443332472756;
+				iso_correction = 1.1167270384985806;
+				trigger_correction = 1.0; // corrections only provided for pt>=25 so 1.0 used
+			}
+			else if ((20 <= muonPt) && (muonPt < 25)) {
+				id_correction = 0.9980890826544107;
+				iso_correction = 1.1155400869984835;
+				trigger_correction = 1.0; // corrections only provided for pt>=25 so 1.0 used
+			}
+			else if ((25 <= muonPt) && (muonPt < 30)) {
+				id_correction = 0.9961828904505218;
+				iso_correction = 1.096718301830121;
+				trigger_correction = 1.0051991254438037;
+			}
+			else if ((30 <= muonPt) && (muonPt < 35)) {
+				id_correction = 1.000551051988681;
+				iso_correction = 1.074812169170078;
+				trigger_correction = 1.0013781590159485;
+			}
+			else if ((35 <= muonPt) && (muonPt < 40)) {
+				id_correction = 0.9925634188516349;
+				iso_correction = 1.0605853576108657;
+				trigger_correction = 0.99616640424792;
+			}
+			else if ((40 <= muonPt) && (muonPt < 50)) {
+				id_correction = 0.9951441282077462;
+				iso_correction = 1.0377065931130076;
+				trigger_correction = 0.9942541014104305;
+			}
+			else if ((50 <= muonPt) && (muonPt < 60)) {
+				id_correction = 0.993590319966609;
+				iso_correction = 1.0252924559186363;
+				trigger_correction = 0.990544673012178;
+			}
+			else if ((60 <= muonPt) && (muonPt < 90)) {
+				id_correction = 0.9894841861002339;
+				iso_correction = 1.0149496896687298;
+				trigger_correction = 0.9882937419288585;
+			}
+			else if ((90 <= muonPt) && (muonPt < 140)) {
+				id_correction = 1.0601733432927236;
+				iso_correction = 1.0081292468302308;
+				trigger_correction = 0.9818759899390823;
+			}
+			else if ((140 <= muonPt) && (muonPt < 300)) {
+				id_correction = 0.890546814737379;
+				iso_correction = 1.0106204522044593;
+				trigger_correction = 0.9941686682904833; // given for pt '140_500' in pickle file
+			}
+		}
+		correction = id_correction * iso_correction * trigger_correction;
+	}
+	return correction;
 }
+
 
 DEFINE_FWK_MODULE (UnfoldingAnalyser);
 
