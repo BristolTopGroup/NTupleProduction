@@ -2,7 +2,7 @@ NTupleProduction
 ================
 
 ## Brief Description
-Software for nTuples production (v10) from AOD files for ttbar+X differential cross section analysis
+Software for nTuples production (v11) from AOD files for ttbar+X differential cross section analysis
 
 ## General Recipe
 
@@ -17,8 +17,8 @@ export CMSSW_GIT_REFERENCE=/storage/.cmsgit-cache
 
 #change CMSSW installation paths
 export SCRAM_ARCH=slc5_amd64_gcc462
-scram p -n CMSSW_5_3_18_nTuple_v10 CMSSW_5_3_18
-cd CMSSW_5_3_18_nTuple_v10/src
+scram p -n CMSSW_5_3_18_nTuple_v11 CMSSW_5_3_18
+cd CMSSW_5_3_18_nTuple_v11/src
 cmsenv
 
 # Latest PAT recipe

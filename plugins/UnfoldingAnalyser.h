@@ -43,6 +43,7 @@ private:
 	double variable_max_;
 	unsigned int variable_n_bins_;
 	std::vector<double> bin_edges_;
+	double centre_of_mass_energy_;
 	bool is_semileptonic_;
 	//in order to be able to create a RooResponse object one needs
 	//Does not pass selection
@@ -96,7 +97,8 @@ private:
 	const reco::GenParticle* get_gen_lepton(const edm::Event& iEvent) const;
 	const reco::Candidate* get_reco_lepton(const edm::Event& iEvent) const;
 
-	float get_muon_correction(const edm::Event& iEvent) const;
+	float get_muon_correction(const edm::Event& iEvent, double centre_of_mass_energy_) const;
+	float get_electron_correction(const edm::Event& iEvent, double centre_of_mass_energy_) const;
 };
 #endif
 

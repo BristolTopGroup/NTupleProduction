@@ -97,6 +97,15 @@ process.eventWeightBtagMuPlusJets = process.eventWeightBtagEPlusJets.clone(
             numberOfTagsInput = cms.InputTag( "topPairMuPlusJetsSelection", muonselectionPrefix + 'NumberOfBtags', 'PAT' )  ,
             jetInput = cms.InputTag( "topPairMuPlusJetsSelection", muonselectionPrefix + 'cleanedJets', 'PAT' ),
                                                               )
+if options.CMSSW == '44X':
+    process.eventWeightBtagEPlusJets.MCSampleTag = cms.string( 'Fall11')
+    process.eventWeightBtagMuPlusJets.MCSampleTag = cms.string( 'Fall11')
+elif options.CMSSW == '53X' and options.centreOfMassEnergy == 8:
+    process.eventWeightBtagEPlusJets.MCSampleTag = cms.string( 'Summer12')
+    process.eventWeightBtagMuPlusJets.MCSampleTag = cms.string( 'Summer12')
+elif options.CMSSW == '53X' and options.centreOfMassEnergy == 7:
+    process.eventWeightBtagEPlusJets.MCSampleTag = cms.string( 'Summer11Leg')
+    process.eventWeightBtagMuPlusJets.MCSampleTag = cms.string( 'Summer11Leg')
 
 electron_unfolding_analysers = [
     process.unfolding_MET_analyser_electron_channel_patMETsPFlow,
@@ -127,6 +136,7 @@ for analyser in electron_unfolding_analysers:
     analyser.b_tag_weight_input = cms.InputTag( 'eventWeightBtagEPlusJets' )
     analyser.reco_jet_input = cms.InputTag( "topPairEPlusJetsSelection", electronselectionPrefix + 'cleanedJets', 'PAT' )
     analyser.electron_input = cms.InputTag( "topPairEPlusJetsSelection", electronselectionPrefix + 'signalElectron', 'PAT' )
+    analyser.centre_of_mass_energy = cms.double( options.centreOfMassEnergy )
 
 muon_unfolding_analysers = [
     process.unfolding_MET_analyser_muon_channel_patMETsPFlow,
@@ -150,7 +160,6 @@ muon_unfolding_analysers = [
     process.unfolding_HT_analyser_muon_channel,
     process.unfolding_HT_nocuts_analyser_muon_channel,
     process.unfolding_HT_parton_analyser_muon_channel
-    
 ]
 
 for analyser in muon_unfolding_analysers:
@@ -158,6 +167,7 @@ for analyser in muon_unfolding_analysers:
     analyser.b_tag_weight_input = cms.InputTag( 'eventWeightBtagMuPlusJets' )
     analyser.reco_jet_input = cms.InputTag( "topPairMuPlusJetsSelection", muonselectionPrefix + 'cleanedJets', 'PAT' )
     analyser.muon_input = cms.InputTag( "topPairMuPlusJetsSelection", muonselectionPrefix + 'signalMuon', 'PAT' )
+    analyser.centre_of_mass_energy = cms.double( options.centreOfMassEnergy )
 
 process.unfoldingAnalysisSequence = cms.Sequence( process.eventFiltersIntaggingMode * 
                                                  process.eventWeightBtagEPlusJets * 

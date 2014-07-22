@@ -11,6 +11,7 @@ BTagWeight_Producer::BTagWeight_Producer(const edm::ParameterSet& iConfig) :
 		numberOfTagsInput_(iConfig.getParameter < InputTag > ("numberOfTagsInput")), //
 		jetInput_(iConfig.getParameter < InputTag > ("jetInput")), //
 		prefix_(iConfig.getParameter < string > ("prefix")), //
+		MCSampleTag_(iConfig.getParameter < std::string > ("MCSampleTag")) , //
 		targetBtagMultiplicity_(iConfig.getParameter<unsigned int>("targetBtagMultiplicity")), //
 		BJetSystematic_(iConfig.getParameter<int>("BJetSystematic")), //
 		LightJetSystematic_(iConfig.getParameter<int>("LightJetSystematic")) {
@@ -29,7 +30,7 @@ void BTagWeight_Producer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 		//get jets and numberOfBtags
 		edm::Handle < pat::JetCollection > jets;
 		iEvent.getByLabel(jetInput_, jets);
-		bjetWeights = BjetWeights(*jets, numberOfBjets, BJetSystematic_, LightJetSystematic_);
+		bjetWeights = BjetWeights(*jets, numberOfBjets, BJetSystematic_, LightJetSystematic_, MCSampleTag_);
 
 		btagWeight = 0;
 		//calculate inclusive weights
@@ -48,6 +49,7 @@ void BTagWeight_Producer::fillDescriptions(edm::ConfigurationDescriptions & desc
 	desc.add < InputTag > ("numberOfTagsInput");
 	desc.add < InputTag > ("jetInput");
 	desc.add < string > ("prefix", "BTagWeight_Producer");
+	desc.add < string > ("MCSampleTag");
 	desc.add<unsigned int>("targetBtagMultiplicity", 0);
 	desc.add<int>("BJetSystematic", 0);
 	desc.add<int>("LightJetSystematic", 0);
