@@ -232,28 +232,27 @@ float UnfoldingProducer::get_gen_met(const edm::Event& iEvent) const {
 float UnfoldingProducer::get_gen_ht(const edm::Event& iEvent) const {
 	edm::Handle < reco::GenJetCollection > jets;
 	iEvent.getByLabel(gen_jet_input_, jets);
-	edm::Handle < TtGenEvent > genEvt;
-        iEvent.getByLabel(gen_event_input_, genEvt);
-        //get lepton
-        const reco::GenParticle* lepton = 0;
-        if ( is_semileptonic_ )
-        	lepton = get_gen_lepton(iEvent);
 
-        float ht(0.);
+    //get lepton
+    const reco::GenParticle* lepton = 0;
+    if ( is_semileptonic_ )
+    	lepton = get_gen_lepton(iEvent);
 
-        //Take ALL the jets!
-        for (unsigned int index = 0; index < jets->size(); ++index) {
-                if (jets->at(index).pt() > 20) {
-                	if ( lepton != 0 ) {
-                        double dR = deltaR(*lepton, jets->at(index));
-                        if (dR > 0.3)
-                                ht += jets->at(index).pt();
-                	}
-                	else {
-                		ht += jets->at(index).pt();
-                	}
-                }
-        }
+    float ht(0.);
+
+    //Take ALL the jets!
+    for (unsigned int index = 0; index < jets->size(); ++index) {
+            if (jets->at(index).pt() > 20) {
+            	if ( lepton != 0 ) {
+                    double dR = deltaR(*lepton, jets->at(index));
+                    if (dR > 0.3)
+                            ht += jets->at(index).pt();
+            	}
+            	else {
+            		ht += jets->at(index).pt();
+            	}
+            }
+    }
 
 	return ht;
 }
@@ -272,8 +271,6 @@ float UnfoldingProducer::get_gen_st(const edm::Event& iEvent) const {
 
 
 float UnfoldingProducer::get_gen_mt(const edm::Event& iEvent) const {
-
-
 	if (!is_semileptonic_)
 		return -1.;
 	//get electron/muon
@@ -296,8 +293,6 @@ float UnfoldingProducer::get_gen_mt(const edm::Event& iEvent) const {
 }
 
 float UnfoldingProducer::get_gen_wpt(const edm::Event& iEvent) const {
-
-
 	if (!is_semileptonic_)
 		return -1.;
 
@@ -352,7 +347,7 @@ float UnfoldingProducer::get_reco_mt(const edm::Event& iEvent) const {
 	const reco::Candidate* lepton = get_reco_lepton(iEvent);
 	if ( lepton == 0 )
 		return -1;
-
+	
 	//get MET
 	edm::Handle < std::vector<pat::MET> > recoMETs;
 	iEvent.getByLabel(reco_MET_input_, recoMETs);
