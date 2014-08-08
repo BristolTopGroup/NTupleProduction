@@ -250,6 +250,13 @@ if not options.printEventContent:
 if options.useData or not options.storePDFWeights:
         process.commonSequence.remove(process.pdfWeights)
 
+if options.bSelectionInTaggingMode:
+    process.topPairEPlusJetsSelectionApply.bSelectionInTaggingMode =  bSelectionInTaggingMode=cms.bool(True)
+    process.topPairMuPlusJetsSelectionApply.bSelectionInTaggingMode =  bSelectionInTaggingMode=cms.bool(True)
+    process.rootTupleTreeMuPlusJets.treeName='muPlusJetsTree_noBTag'
+    process.rootTupleTreeEPlusJets.treeName='ePlusJetsTree_noBTag'
+    pass
+   
 # Keep pu weights for data, so 
 # if options.useData:
 #     process.commonSequence.remove(process.eventWeightPU) 
