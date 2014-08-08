@@ -208,8 +208,8 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	
 		
 	float gen_variable(0);
-	if (is_semileptonic_electron || is_semileptonic_muon || is_semileptonic_tau)
-		gen_variable = get_gen_variable(iEvent);
+	gen_variable = get_gen_variable(iEvent);
+
 	if (do_electron_channel_) {
 		if (is_semileptonic_electron) {
 			//PU weight only (no btag-weight) as no b-tagging is applied
@@ -336,22 +336,27 @@ float UnfoldingAnalyser::get_gen_met_nu(const edm::Event& iEvent) const {
 float UnfoldingAnalyser::get_gen_ht(const edm::Event& iEvent) const {
 	edm::Handle < reco::GenJetCollection > jets;
 	iEvent.getByLabel(gen_jet_input_, jets);
-	edm::Handle < TtGenEvent > genEvt;
-        iEvent.getByLabel(gen_event_input_, genEvt);
-        //get lepton
-        const reco::GenParticle* lepton = get_gen_lepton(iEvent);
 
-        float ht(0.);
+    //get lepton
+    const reco::GenParticle* lepton = 0;
+    if ( is_semileptonic_ )
+    	lepton = get_gen_lepton(iEvent);
 
-        //Take ALL the jets!
-        for (unsigned int index = 0; index < jets->size(); ++index) {
-                if (jets->at(index).pt() > 20) {
-                        double dR = deltaR(*lepton, jets->at(index));
-                        if (dR > 0.3)
-                                ht += jets->at(index).pt();
+    float ht(0.);
 
-                }
-        }
+    //Take ALL the jets!
+    for (unsigned int index = 0; index < jets->size(); ++index) {
+            if (jets->at(index).pt() > 20) {
+            	if ( lepton != 0 ) {
+                    double dR = deltaR(*lepton, jets->at(index));
+                    if (dR > 0.3)
+                            ht += jets->at(index).pt();
+            	}
+            	else {
+            		ht += jets->at(index).pt();
+            	}
+            }
+    }
 
 	return ht;
 }
@@ -373,9 +378,21 @@ float UnfoldingAnalyser::get_gen_ht_nocuts(const edm::Event& iEvent) const {
 	iEvent.getByLabel(gen_jet_input_, jets);
 	float ht(0.);
 
+    //get lepton
+    const reco::GenParticle* lepton = 0;
+    if ( is_semileptonic_ )
+    	lepton = get_gen_lepton(iEvent);
+
 	//Take ALL the jets!
 	for (unsigned int index = 0; index < jets->size(); ++index) {
+		if ( lepton != 0 ) {
+			double dR = deltaR(*lepton, jets->at(index));
+			if (dR > 0.3)
+				ht += jets->at(index).pt();
+		}
+		else {
 			ht += jets->at(index).pt();
+		}
 	}
 	return ht;
 }
@@ -385,7 +402,7 @@ float UnfoldingAnalyser::get_gen_ht_parton(const edm::Event& iEvent) const {
 		return -1.;
 
 	edm::Handle < TtGenEvent > genEvt;
-    	iEvent.getByLabel(gen_event_input_, genEvt);
+    iEvent.getByLabel(gen_event_input_, genEvt);
 	
 	//radiation from leptonic top
 	double leptTopRad = 0;
@@ -421,7 +438,7 @@ float UnfoldingAnalyser::get_gen_st_parton(const edm::Event& iEvent) const {
 		return -1.;
 
 	edm::Handle < TtGenEvent > genEvt;
-    	iEvent.getByLabel(gen_event_input_, genEvt);
+    iEvent.getByLabel(gen_event_input_, genEvt);
 
 	float ht = get_gen_ht_parton(iEvent);
 	
@@ -431,8 +448,6 @@ float UnfoldingAnalyser::get_gen_st_parton(const edm::Event& iEvent) const {
 }
 
 float UnfoldingAnalyser::get_gen_mt(const edm::Event& iEvent) const {
-
-
 	if (!is_semileptonic_)
 		return -1.;
 	//get electron/muon
@@ -446,7 +461,6 @@ float UnfoldingAnalyser::get_gen_mt(const edm::Event& iEvent) const {
 	double energy_squared = pow(lepton->et() + met.pt(), 2);
 	double momentum_squared = pow(lepton->px() + met.px(), 2) + pow(lepton->py() + met.py(), 2);
 	double MT_squared = energy_squared - momentum_squared;
-//	cout << "MTgen: " << sqrt(MT_squared) << endl;
 	
 	if (MT_squared > 0)
 		return sqrt(MT_squared);
@@ -455,14 +469,13 @@ float UnfoldingAnalyser::get_gen_mt(const edm::Event& iEvent) const {
 }
 
 float UnfoldingAnalyser::get_gen_mt_nu(const edm::Event& iEvent) const {
-    
     if (!is_semileptonic_)
 	return -1.;
     
     edm::Handle < TtGenEvent > genEvt;
     iEvent.getByLabel(gen_event_input_, genEvt);
 
-//need to use lepton and neutrino for this!
+	//need to use lepton and neutrino for this!
 	
 	double energy_squared = pow(genEvt->singleLepton()->et() + genEvt->singleNeutrino()->et(), 2);
 	double momentum_squared = pow(genEvt->singleLepton()->px() + genEvt->singleNeutrino()->px(), 2) + pow(genEvt->singleLepton()->py() + genEvt->singleNeutrino()->py(), 2);
@@ -476,7 +489,6 @@ float UnfoldingAnalyser::get_gen_mt_nu(const edm::Event& iEvent) const {
 
 
 float UnfoldingAnalyser::get_gen_wpt(const edm::Event& iEvent) const {
-
 	if (!is_semileptonic_)
 		return -1.;
 
@@ -492,7 +504,6 @@ float UnfoldingAnalyser::get_gen_wpt(const edm::Event& iEvent) const {
 }
 
 float UnfoldingAnalyser::get_gen_wpt_nu(const edm::Event& iEvent) const {
-
 	if (!is_semileptonic_)
 		return -1.;
 		
@@ -547,20 +558,23 @@ float UnfoldingAnalyser::get_reco_st(const edm::Event& iEvent) const {
 	float met = get_reco_met(iEvent);
 	//get lepton
 	const reco::Candidate* lepton = get_reco_lepton(iEvent);
+	if ( lepton == 0 )
+		return -1;
+
 	return ht + met + lepton->pt();
 }
 
 float UnfoldingAnalyser::get_reco_mt(const edm::Event& iEvent) const {
 	//get electron/muon
 	const reco::Candidate* lepton = get_reco_lepton(iEvent);
+	if ( lepton == 0 )
+		return -1;
+
 	//get MET
 	edm::Handle < std::vector<pat::MET> > recoMETs;
 	iEvent.getByLabel(reco_MET_input_, recoMETs);
 
 	pat::MET met(recoMETs->at(0));
-	
-        //cout << "RECO lep py: " <<  lepton->py() << " , met px: " << met.px() << endl;
-	
 	
 	//combine their x & y momenta to get the transverse W boson mass
 	double energy_squared = pow(lepton->et() + met.et(), 2);
@@ -576,6 +590,9 @@ float UnfoldingAnalyser::get_reco_mt(const edm::Event& iEvent) const {
 float UnfoldingAnalyser::get_reco_wpt(const edm::Event& iEvent) const {
 	//get electron/muon
 	const reco::Candidate* lepton = get_reco_lepton(iEvent);
+	if ( lepton == 0 )
+		return -1;
+
 	//get MET
 	edm::Handle < std::vector<pat::MET> > recoMETs;
 	iEvent.getByLabel(reco_MET_input_, recoMETs);
@@ -589,18 +606,24 @@ const reco::GenParticle* UnfoldingAnalyser::get_gen_lepton(const edm::Event& iEv
 	edm::Handle < TtGenEvent > genEvt;
 	iEvent.getByLabel(gen_event_input_, genEvt);
 
-	return genEvt->singleLepton()->clone();
+	return genEvt->singleLepton();
 }
 
 const reco::Candidate* UnfoldingAnalyser::get_reco_lepton(const edm::Event& iEvent) const {
 	if (do_electron_channel_) {
 		edm::Handle < pat::ElectronCollection > signalElectron;
 		iEvent.getByLabel(electron_input_, signalElectron);
-		return signalElectron->at(0).clone();
+		if ( signalElectron->size() > 0 )
+			return &(signalElectron->at(0));
+		else
+			return 0;
 	} else {
 		edm::Handle < pat::MuonCollection > signalMuon;
 		iEvent.getByLabel(muon_input_, signalMuon);
-		return signalMuon->at(0).clone();
+		if ( signalMuon->size() > 0 )
+			return &(signalMuon->at(0));
+		else
+			return 0;
 	}
 	return 0;
 }
