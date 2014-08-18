@@ -59,8 +59,8 @@ unfolding_MET_nu_analyser_muon_channel_patMETsPFlow = unfolding_MET_nu_analyser_
 unfolding_HT_analyser_electron_channel = unfolding_MET_analyser_electron_channel_patMETsPFlow.clone(
     variable_under_analysis=cms.string('HT'),
     variable_min=cms.double(variable_bins['HT']['min']),
-    variable_max=cms.double(variable_bins['ST']['max']),
-    variable_n_bins=cms.uint32(variable_bins['MET']['n_bins']),
+    variable_max=cms.double(variable_bins['HT']['max']),
+    variable_n_bins=cms.uint32(variable_bins['HT']['n_bins']),
     bin_edges=cms.vdouble([0,240,280,330,380,450,600,2000])
 )
 
