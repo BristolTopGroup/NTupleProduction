@@ -114,7 +114,7 @@ double getRelativeIsolation(const pat::Electron& electron, double cone, double r
 	Direction Dir = Direction(electron.superCluster()->eta(), electron.superCluster()->phi());
 
 	//pf isolation veto setup EGM recommendation
-	if (abs(electron.superCluster()->eta()) > 1.479) {
+	if (fabs(electron.superCluster()->eta()) > 1.479) {
 		vetos_ch.push_back(new ConeVeto(Dir, 0.015));
 		vetos_ph.push_back(new ConeVeto(Dir, 0.08));
 	}

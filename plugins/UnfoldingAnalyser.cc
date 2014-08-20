@@ -634,7 +634,7 @@ float UnfoldingAnalyser::get_electron_correction(const edm::Event& iEvent, doubl
 	edm::Handle < pat::ElectronCollection > signalElectron;
 	iEvent.getByLabel(electron_input_, signalElectron);
 
-	double electronEta = std::abs(signalElectron->at(0).eta());
+	double electronEta = fabs(signalElectron->at(0).eta());
 	double electronPt = signalElectron->at(0).pt();
 
 //	if(centre_of_mass_energy == 7){
@@ -719,11 +719,11 @@ float UnfoldingAnalyser::get_electron_correction(const edm::Event& iEvent, doubl
 //
 //	double muEta = signalMuon->at(0).eta();
 //
-//	if(abs(muEta)<0.9)
+//	if(fabs(muEta)<0.9)
 //		correction = 0.9941*0.9923*0.9560;
-//	else if(abs(muEta)>=0.9 && abs(muEta)<1.2)
+//	else if(fabs(muEta)>=0.9 && fabs(muEta)<1.2)
 //		correction = 0.9917*0.9979*0.9528;
-//	else if(abs(muEta)>=1.2)
+//	else if(fabs(muEta)>=1.2)
 //		correction = 0.9982*1.0019*0.9809;
 //
 //	return correction;
@@ -735,7 +735,7 @@ float UnfoldingAnalyser::get_muon_correction(const edm::Event& iEvent, double ce
 	edm::Handle < pat::MuonCollection > signalMuon;
 	iEvent.getByLabel(muon_input_, signalMuon);
 
-	double muEta = std::abs(signalMuon->at(0).eta());
+	double muEta = fabs(signalMuon->at(0).eta());
 	double muonPt = signalMuon->at(0).pt();
 	double id_correction(0), iso_correction(0), trigger_correction(0), correction_A(0), correction_B(0), lumi_2011A(0), lumi_2011B(0), lumi_2011(0);
 
@@ -863,7 +863,7 @@ float UnfoldingAnalyser::get_muon_correction(const edm::Event& iEvent, double ce
 				iso_correction = 0.998812853360961;
 				trigger_correction = 0.9804174981053351; // given for pt '140_500' in pickle file
 			}
-		} else if ((abs(muEta) >= 0.9 && abs(muEta) < 1.2)) { // 'ptabseta0.9-1.2' in pickle file
+		} else if ((fabs(muEta) >= 0.9 && fabs(muEta) < 1.2)) { // 'ptabseta0.9-1.2' in pickle file
 			if ((10 <= muonPt) && (muonPt < 20)) {
 				id_correction = 1.0017313093647269;
 				iso_correction = 0.9484342057793206;
@@ -914,7 +914,7 @@ float UnfoldingAnalyser::get_muon_correction(const edm::Event& iEvent, double ce
 				iso_correction = 1.0018540386614887;
 				trigger_correction = 0.9712789619617556; // given for pt '140_500' in pickle file
 			}
-		} else if ((abs(muEta) >= 1.2 && abs(muEta) < 2.1)) { // 'ptabseta1.2-2.1' in pickle file
+		} else if ((fabs(muEta) >= 1.2 && fabs(muEta) < 2.1)) { // 'ptabseta1.2-2.1' in pickle file
 			if ((10 <= muonPt) && (muonPt < 20)) {
 				id_correction = 1.0180184284620057;
 				iso_correction = 0.9724367240900078;
@@ -965,7 +965,7 @@ float UnfoldingAnalyser::get_muon_correction(const edm::Event& iEvent, double ce
 				iso_correction = 0.9964395746067783;
 				trigger_correction = 0.9941686682904833; // given for pt '140_500' in pickle file
 			}
-		} else if (abs(muEta) >= 2.1 && abs(muEta) <= 2.4) { // 'ptabseta2.1-2.4' in pickle file. Note: Trigger scale factors only provided up to absolute eta of 2.1 in the link above, so I have used the same as for the 1.2 to 2.1 eta range.
+		} else if (fabs(muEta) >= 2.1 && fabs(muEta) <= 2.4) { // 'ptabseta2.1-2.4' in pickle file. Note: Trigger scale factors only provided up to absolute eta of 2.1 in the link above, so I have used the same as for the 1.2 to 2.1 eta range.
 			if ((10 <= muonPt) && (muonPt < 20)) {
 				id_correction = 1.0050443332472756;
 				iso_correction = 1.1167270384985806;
