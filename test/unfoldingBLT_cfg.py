@@ -91,7 +91,7 @@ process.eventWeightBtagEPlusJets = process.eventWeightBtag.clone(
             numberOfTagsInput = cms.InputTag( "topPairEPlusJetsSelection", electronselectionPrefix + 'NumberOfBtags', 'PAT' ),
             jetInput = cms.InputTag( "topPairEPlusJetsSelection", electronselectionPrefix + 'cleanedJets', 'PAT' ),
             targetBtagMultiplicity = cms.uint32( 2 ),  # will calculate the weight for b-tag multiplicity >=2
-            BJetSystematic = cms.int32( 0 )
+            BTagSystematic = cms.int32( 0 )
             )
 process.eventWeightBtagMuPlusJets = process.eventWeightBtagEPlusJets.clone( 
             numberOfTagsInput = cms.InputTag( "topPairMuPlusJetsSelection", muonselectionPrefix + 'NumberOfBtags', 'PAT' )  ,
