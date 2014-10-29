@@ -86,6 +86,8 @@ public:
 	virtual bool hasAtLeastTwoGoodJets() const;
 	virtual bool hasAtLeastThreeGoodJets() const;
 	virtual bool hasAtLeastFourGoodJets() const;
+	virtual bool hasExactlyZeroGoodBJet() const;
+	virtual bool hasExactlyOneGoodBJet() const;
 	virtual bool hasAtLeastOneGoodBJet() const;
 	virtual bool hasAtLeastTwoGoodBJets() const;
 
@@ -98,12 +100,15 @@ private:
 
 	double min1JetPt_, min2JetPt_, min3JetPt_, min4JetPt_;
 
-	double tightMuonIso_, looseElectronIso_, looseMuonIso_;
+	double tightMuonIso_, controlMuonIso_, looseElectronIso_, looseMuonIso_;
 	bool useDeltaBetaCorrectionsForMuons_, useDeltaBetaCorrectionsForElectrons_, useRhoActiveAreaCorrections_, useMETFilters_, useEEBadScFilter_, tagAndProbeStudies_, dropTriggerSelection_;
 
 	std::string prefix_, MCSampleTag_;
 
 	bool debug_, taggingMode_, bSelectionInTaggingMode_;
+
+	// Control region selections
+	bool nonIsolatedMuonSelection_;
 
 	//internal
 	boost::array<bool, TTbarMuPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS> passes_;

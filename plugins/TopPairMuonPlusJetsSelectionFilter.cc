@@ -39,6 +39,7 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 		min3JetPt_(iConfig.getParameter<double>("min3JetPt")), //
 		min4JetPt_(iConfig.getParameter<double>("min4JetPt")), //
 		tightMuonIso_(iConfig.getParameter<double>("tightMuonIsolation")), //
+		controlMuonIso_(iConfig.getParameter<double>("controlMuonIsolation")), //
 		looseElectronIso_(iConfig.getParameter<double>("looseElectronIsolation")), //
 		looseMuonIso_(iConfig.getParameter<double>("looseMuonIsolation")), //
 		useDeltaBetaCorrectionsForMuons_(iConfig.getParameter<bool>("useDeltaBetaCorrectionsForMuons")), //
@@ -53,6 +54,7 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 		debug_(iConfig.getUntrackedParameter<bool>("debug")), //
 		taggingMode_(iConfig.getParameter<bool>("taggingMode")), //
 		bSelectionInTaggingMode_(iConfig.getParameter<bool>("bSelectionInTaggingMode")), //
+		nonIsolatedMuonSelection_(iConfig.getParameter<bool>("nonIsolatedMuonSelection")), //
 		passes_(), //
 		runNumber_(0), //
 		signalMuonIndex_(999), //
@@ -105,6 +107,7 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 	desc.add<double>("min3JetPt", 30.0);
 	desc.add<double>("min4JetPt", 30.0);
 	desc.add<double>("tightMuonIsolation", 0.12);
+	desc.add<double>("controlMuonIsolation", 0.3);
 	desc.add<double>("looseElectronIsolation", 0.15);
 	desc.add<double>("looseMuonIsolation", 0.2);
 
@@ -121,6 +124,7 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 	desc.addUntracked<bool>("debug", false);
 	desc.add<bool>("taggingMode", false);
 	desc.add<bool>("bSelectionInTaggingMode", false);
+	desc.add<bool>("nonIsolatedMuonSelection", false);
 	descriptions.add("applyTopPairMuonPlusJetsSelection", desc);
 }
 
@@ -138,9 +142,24 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 	bool passesSelectionExceptBtagging(true);
 
 	for (unsigned int step = 0; step < TTbarMuPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
+		TTbarMuPlusJetsReferenceSelection::Step stepName = TTbarMuPlusJetsReferenceSelection::Step(step);
 		if (debug_)
-			cout << "Doing selection step: " << TTbarMuPlusJetsReferenceSelection::StringSteps[step] << endl;
+			cout << "Doing selection step: " << TTbarMuPlusJetsReferenceSelection::StringSteps[stepName] << " " << passesSelectionStep(iEvent, step) << endl;
+
 		bool passesStep(passesSelectionStep(iEvent, step));
+
+		// Remove at least 4 jet selection for QCD control region (only need at least 3)
+		// Also require exactly zero b jets
+		// Or exactly one b jet, as e.g. angle(b,l) only makes sense if there is at least one b jet
+		if ( nonIsolatedMuonSelection_ ) {
+			if ( stepName == TTbarMuPlusJetsReferenceSelection::AtLeastFourGoodJets )
+				passesStep = true;
+
+			if ( stepName == TTbarMuPlusJetsReferenceSelection::AtLeastOneBtag || stepName == TTbarMuPlusJetsReferenceSelection::AtLeastTwoBtags ) {
+				passesStep = hasExactlyZeroGoodBJet() || hasExactlyOneGoodBJet() ;
+			}
+		}
+
 		passesSelection = passesSelection && passesStep;
 		passes_.at(step) = passesStep;
 
@@ -278,8 +297,13 @@ void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
 	for (unsigned index = 0; index < muons_.size(); ++index) {
 		const pat::Muon muon = muons_.at(index);
 
-		bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < tightMuonIso_;
-				
+		bool passesIso = false;
+
+		if ( nonIsolatedMuonSelection_ )
+			passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) > tightMuonIso_;
+		else
+			passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < controlMuonIso_;
+
 		if (isGoodMuon(muon) && passesIso) {
 			goodIsolatedMuons_.push_back(muon);
 			//Check if this is the first, and therefore the signal, muon
@@ -570,6 +594,14 @@ bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastFourGoodJets() const {
 	if (cleanedJets_.size() > 3)
 		return getSmearedJetPtScale(cleanedJets_.at(3), 0)*cleanedJets_.at(3).pt() > min4JetPt_;
 	return false;
+}
+
+bool TopPairMuonPlusJetsSelectionFilter::hasExactlyZeroGoodBJet() const {
+	return cleanedBJets_.size() == 0;
+}
+
+bool TopPairMuonPlusJetsSelectionFilter::hasExactlyOneGoodBJet() const {
+	return cleanedBJets_.size() == 1;
 }
 
 bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastOneGoodBJet() const {

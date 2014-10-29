@@ -20,6 +20,8 @@ process.topPairMuPlusJetsSelection.taggingMode = cms.bool( True )
 # Selection filters that will actually apply selection
 process.topPairEPlusJetsSelectionApply = process.topPairEPlusJetsSelection.clone( taggingMode = cms.bool(False) )
 process.topPairMuPlusJetsSelectionApply = process.topPairMuPlusJetsSelection.clone( taggingMode = cms.bool(False) )
+# Selection filters for control regions
+process.topPairMuPlusJetsNonIsolatedSelection = process.topPairMuPlusJetsSelection.clone( nonIsolatedMuonSelection = cms.bool(True), taggingMode = cms.bool(False))
 
 # Filters characterizing tt decay in tagging mode
 process.ttFullHadronicFilter.taggingMode = cms.bool( True )
@@ -232,6 +234,50 @@ process.muPlusJetsSelection = cms.Path(
                       process.topPairMuPlusJetsSelectionAnalyser *
                       process.topPairMuPlusJetsSelectionApply *
                       process.rootNTuplesMuPlusJets
+                      )
+
+# Muon QCD control region
+process.rootNTuplesMuPlusJetsNonIsolated = copy.copy( process.rootNTuples )
+process.rootTupleTreeMuPlusJetsNonIsolated = process.rootTupleTree.clone( treeName='muPlusJetsNonIsolatedTree' )
+process.rootTupleTreeMuPlusJetsNonIsolated.outputCommands.append('keep *_rootTupleGlobalEventVarsMuPlusJetsNonIsolated_*_*')
+process.rootTupleTreeMuPlusJetsNonIsolated.outputCommands.append('keep *_rootTuplePF2PATJetsMuPlusJetsNonIsolated_*_*')
+process.rootTupleTreeMuPlusJetsNonIsolated.outputCommands.append('drop *_rootTupleVertex_*_*')
+process.rootTupleTreeMuPlusJetsNonIsolated.outputCommands.append('drop *_nTuplePFMuons_*_*')
+process.rootTupleTreeMuPlusJetsNonIsolated.outputCommands.append('drop *_rootTuplePFElectrons_*_*')
+process.rootNTuplesMuPlusJetsNonIsolated.remove( process.rootTupleTree )
+process.rootTupleGlobalEventVarsMuPlusJetsNonIsolated = process.rootTupleGlobalEventVars.clone( 
+                                                                                    signalLeptonInputTag=cms.InputTag('topPairMuPlusJetsNonIsolatedSelection', 'TopPairMuonPlusJetsSelection.signalMuon'), 
+                                                                                    Channel='MuPlusJets',
+                                                                                    metInputTag=cms.InputTag('patMETsPFlow'),
+                                                                                    Prefix='Event.',
+                                                                                    signalLeptonIndexInputTag=cms.InputTag('topPairMuPlusJetsNonIsolatedSelection', 'TopPairMuonPlusJetsSelection.signalMuonIndex'),
+                                                                                    Suffix='.patMETsPFlow.nonIsolated',
+                                                                                    )
+process.rootTupleGlobalEventVarsMuPlusJetsPatType1CorrectedPFMetNonIsolated = process.rootTupleGlobalEventVars.clone( 
+                                                                                    signalLeptonInputTag=cms.InputTag('NonIsolated', 'TopPairMuonPlusJetsSelection.signalMuon'), 
+                                                                                    Channel='MuPlusJets',
+                                                                                    metInputTag=cms.InputTag('patType1CorrectedPFMet'),
+                                                                                    Prefix='Event.',
+                                                                                    signalLeptonIndexInputTag=cms.InputTag('topPairMuPlusJetsNonIsolatedSelection', 'TopPairMuonPlusJetsSelection.signalMuonIndex'),
+                                                                                    Suffix='.patType1CorrectedPFMet.nonIsolated',
+                                                                                    )
+process.rootNTuplesMuPlusJetsNonIsolated *= process.rootTupleGlobalEventVarsMuPlusJetsNonIsolated
+process.rootNTuplesMuPlusJetsNonIsolated *= process.rootTupleTreeMuPlusJetsNonIsolated
+process.rootTupleGlobalEventVarsMuPlusJetsNonIsolated.jetInputTag = cms.InputTag("topPairMuPlusJetsNonIsolatedSelection", 'TopPairMuonPlusJetsSelection.cleanedJets')
+process.rootTupleGlobalEventVarsMuPlusJetsNonIsolated.signalLeptonInputTag = cms.InputTag("topPairMuPlusJetsNonIsolatedSelection", 'TopPairMuonPlusJetsSelection.signalMuon')
+process.rootTupleGlobalEventVarsMuPlusJetsPatType1CorrectedPFMetNonIsolated.jetInputTag = cms.InputTag("topPairMuPlusJetsNonIsolatedSelection", 'TopPairMuonPlusJetsSelection.cleanedJets')
+process.rootTupleGlobalEventVarsMuPlusJetsPatType1CorrectedPFMetNonIsolated.signalLeptonInputTag = cms.InputTag("topPairMuPlusJetsNonIsolatedSelection", 'TopPairMuonPlusJetsSelection.signalMuon')
+process.rootTupleGlobalEventVarsMuPlusJetsPatType1CorrectedPFMetNonIsolated.signalLeptonIndexInputTag = cms.InputTag('topPairMuPlusJetsNonIsolatedSelection', 'TopPairMuonPlusJetsSelection.signalMuonIndex')
+
+process.rootTuplePF2PATJetsMuPlusJetsNonIsolated = process.rootTuplePF2PATJets.clone( 
+                                                                          InputTag=cms.InputTag("topPairMuPlusJetsNonIsolatedSelection", 'TopPairMuonPlusJetsSelection.cleanedJets'), 
+                                                                          Prefix='cleanedJetsPFlowMuPlusJets.nonIsolated.')
+process.rootNTuplesMuPlusJetsNonIsolated.replace( process.rootTuplePF2PATJets, process.rootTuplePF2PATJetsMuPlusJetsNonIsolated )
+
+process.muPlusJetsNonIsolatedSelection = cms.Path( 
+                      process.commonSequence *
+                      process.topPairMuPlusJetsNonIsolatedSelection *
+                      process.rootNTuplesMuPlusJetsNonIsolated
                       )
 
 if options.useData or not options.isTTbarMC:

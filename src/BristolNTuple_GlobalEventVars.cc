@@ -48,6 +48,7 @@ void BristolNTuple_GlobalEventVars::produce(edm::Event& iEvent, const edm::Event
 
         pat::Muon lepton = leptons->at(0);
         signalLepton.SetPxPyPzE(lepton.px(), lepton.py(), lepton.pz(), lepton.energy());
+
     }
     else {
     	std::cout << "Properly handle this error" << std::endl;
