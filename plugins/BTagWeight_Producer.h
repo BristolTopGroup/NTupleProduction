@@ -16,7 +16,7 @@ private:
 	const edm::InputTag numberOfTagsInput_, jetInput_;
 	const std::string prefix_, MCSampleTag_;
 	const unsigned int targetBtagMultiplicity_;//0 means >= 0, 1: >=1 etc
-	const int BJetSystematic_, LightJetSystematic_;
+	const int BTagSystematic_;
 
 };
 
