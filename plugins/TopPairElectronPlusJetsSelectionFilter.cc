@@ -147,13 +147,9 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 		TTbarEPlusJetsReferenceSelection::Step stepName = TTbarEPlusJetsReferenceSelection::Step(step);
 		bool passesStep(passesSelectionStep(iEvent, step));
 
-		// Remove at least 4 jet selection for both QCD control regions (only need at least 3)
-		// Also require exactly zero b jets
+		// Require exactly zero b jets for QCD control region
 		// Or exactly one b jet, as e.g. angle(b,l) only makes sense if there is at least one b jet
 		if ( nonIsolatedElectronSelection_ || invertedConversionSelection_ ) {
-			if ( stepName == TTbarEPlusJetsReferenceSelection::AtLeastFourGoodJets )
-				passesStep = true;
-
 			if ( stepName == TTbarEPlusJetsReferenceSelection::AtLeastOneBtag || stepName == TTbarEPlusJetsReferenceSelection::AtLeastTwoBtags ) {
 				passesStep = hasExactlyZeroGoodBJet() || hasExactlyOneGoodBJet() ;
 			}
