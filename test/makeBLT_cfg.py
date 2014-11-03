@@ -132,7 +132,7 @@ process.commonSequence = cms.Sequence(
 # And also have different input collections for the two channels
 process.rootNTuplesEPlusJets = copy.copy( process.rootNTuples )
 process.rootTupleTreeEPlusJets = process.rootTupleTree.clone( treeName='ePlusJetsTree' )
-process.rootTupleTreeEPlusJets.outputCommands.append('keep *_rootTupleGlobalEventVarsEPlusJets*_*_*')
+process.rootTupleTreeEPlusJets.outputCommands.append('keep *_rootTupleGlobalEventVarsEPlusJets_*_*')
 process.rootTupleTreeEPlusJets.outputCommands.append('keep *_rootTuplePF2PATJetsEPlusJets_*_*')
 process.rootTupleTreeEPlusJets.outputCommands.append('drop *_rootTupleVertex_*_*')
 process.rootTupleTreeEPlusJets.outputCommands.append('drop *_nTuplePFMuons_*_*')
@@ -216,9 +216,9 @@ process.rootTupleGlobalEventVarsEPlusJetsPatType1CorrectedPFMetNonIsolated = pro
 process.rootNTuplesEPlusJetsNonIsolated *= process.rootTupleGlobalEventVarsEPlusJetsNonIsolated
 process.rootNTuplesEPlusJetsNonIsolated *= process.rootTupleGlobalEventVarsEPlusJetsPatType1CorrectedPFMetNonIsolated
 process.rootNTuplesEPlusJetsNonIsolated *= process.rootTupleTreeEPlusJetsNonIsolated
-process.rootTupleGlobalEventVarsEPlusJets.jetInputTag = cms.InputTag("topPairEPlusJetsNonIsolatedSelection", 'TopPairElectronPlusJetsSelection.cleanedJets')
-process.rootTupleGlobalEventVarsEPlusJets.signalLeptonIndexInputTag = cms.InputTag("topPairEPlusJetsNonIsolatedSelection", 'TopPairElectronPlusJetsSelection.signalElectron')
-process.rootTupleGlobalEventVarsEPlusJets.signalLeptonIndexInputTag = cms.InputTag('topPairEPlusJetsNonIsolatedSelection', 'TopPairElectronPlusJetsSelection.signalElectronIndex')
+process.rootTupleGlobalEventVarsEPlusJetsNonIsolated.jetInputTag = cms.InputTag("topPairEPlusJetsNonIsolatedSelection", 'TopPairElectronPlusJetsSelection.cleanedJets')
+process.rootTupleGlobalEventVarsEPlusJetsNonIsolated.signalLeptonIndexInputTag = cms.InputTag("topPairEPlusJetsNonIsolatedSelection", 'TopPairElectronPlusJetsSelection.signalElectron')
+process.rootTupleGlobalEventVarsEPlusJetsNonIsolated.signalLeptonIndexInputTag = cms.InputTag('topPairEPlusJetsNonIsolatedSelection', 'TopPairElectronPlusJetsSelection.signalElectronIndex')
 process.rootTupleGlobalEventVarsEPlusJetsPatType1CorrectedPFMetNonIsolated.jetInputTag = cms.InputTag("topPairEPlusJetsNonIsolatedSelection", 'TopPairElectronPlusJetsSelection.cleanedJets')
 process.rootTupleGlobalEventVarsEPlusJetsPatType1CorrectedPFMetNonIsolated.signalLeptonIndexInputTag = cms.InputTag("topPairEPlusJetsNonIsolatedSelection", 'TopPairElectronPlusJetsSelection.signalElectron')
 process.rootTupleGlobalEventVarsEPlusJetsPatType1CorrectedPFMetNonIsolated.signalLeptonIndexInputTag = cms.InputTag('topPairEPlusJetsNonIsolatedSelection', 'TopPairElectronPlusJetsSelection.signalElectronIndex')
@@ -227,7 +227,7 @@ process.rootTuplePF2PATJetsEPlusJetsNonIsolated = process.rootTuplePF2PATJets.cl
                                                                          Prefix='cleanedJetsPFlowEPlusJets.nonIsolated' )
 process.rootNTuplesEPlusJetsNonIsolated.replace( process.rootTuplePF2PATJets, process.rootTuplePF2PATJetsEPlusJetsNonIsolated )
 
-process.ePlusJetsSelection = cms.Path( 
+process.ePlusJetsNonIsolatedSelection = cms.Path( 
                       process.commonSequence *
                       process.topPairEPlusJetsNonIsolatedSelection *
                       process.rootNTuplesEPlusJetsNonIsolated
@@ -261,9 +261,9 @@ process.rootTupleGlobalEventVarsEPlusJetsPatType1CorrectedPFMetInvertedConversio
 process.rootNTuplesEPlusJetsInvertedConversion *= process.rootTupleGlobalEventVarsEPlusJetsInvertedConversion
 process.rootNTuplesEPlusJetsInvertedConversion *= process.rootTupleGlobalEventVarsEPlusJetsPatType1CorrectedPFMetInvertedConversion
 process.rootNTuplesEPlusJetsInvertedConversion *= process.rootTupleTreeEPlusJetsInvertedConversion
-process.rootTupleGlobalEventVarsEPlusJets.jetInputTag = cms.InputTag("topPairEPlusJetsInvertedConversionSelection", 'TopPairElectronPlusJetsSelection.cleanedJets')
-process.rootTupleGlobalEventVarsEPlusJets.signalLeptonIndexInputTag = cms.InputTag("topPairEPlusJetsInvertedConversionSelection", 'TopPairElectronPlusJetsSelection.signalElectron')
-process.rootTupleGlobalEventVarsEPlusJets.signalLeptonIndexInputTag = cms.InputTag('topPairEPlusJetsInvertedConversionSelection', 'TopPairElectronPlusJetsSelection.signalElectronIndex')
+process.rootTupleGlobalEventVarsEPlusJetsInvertedConversion.jetInputTag = cms.InputTag("topPairEPlusJetsInvertedConversionSelection", 'TopPairElectronPlusJetsSelection.cleanedJets')
+process.rootTupleGlobalEventVarsEPlusJetsInvertedConversion.signalLeptonIndexInputTag = cms.InputTag("topPairEPlusJetsInvertedConversionSelection", 'TopPairElectronPlusJetsSelection.signalElectron')
+process.rootTupleGlobalEventVarsEPlusJetsInvertedConversion.signalLeptonIndexInputTag = cms.InputTag('topPairEPlusJetsInvertedConversionSelection', 'TopPairElectronPlusJetsSelection.signalElectronIndex')
 process.rootTupleGlobalEventVarsEPlusJetsPatType1CorrectedPFMetInvertedConversion.jetInputTag = cms.InputTag("topPairEPlusJetsInvertedConversionSelection", 'TopPairElectronPlusJetsSelection.cleanedJets')
 process.rootTupleGlobalEventVarsEPlusJetsPatType1CorrectedPFMetInvertedConversion.signalLeptonIndexInputTag = cms.InputTag("topPairEPlusJetsInvertedConversionSelection", 'TopPairElectronPlusJetsSelection.signalElectron')
 process.rootTupleGlobalEventVarsEPlusJetsPatType1CorrectedPFMetInvertedConversion.signalLeptonIndexInputTag = cms.InputTag('topPairEPlusJetsInvertedConversionSelection', 'TopPairElectronPlusJetsSelection.signalElectronIndex')
@@ -272,7 +272,7 @@ process.rootTuplePF2PATJetsEPlusJetsInvertedConversion = process.rootTuplePF2PAT
                                                                          Prefix='cleanedJetsPFlowEPlusJets.InvertedConversion' )
 process.rootNTuplesEPlusJetsInvertedConversion.replace( process.rootTuplePF2PATJets, process.rootTuplePF2PATJetsEPlusJetsInvertedConversion )
 
-process.ePlusJetsSelection = cms.Path( 
+process.ePlusJetsInvertedConversionSelection = cms.Path( 
                       process.commonSequence *
                       process.topPairEPlusJetsInvertedConversionSelection *
                       process.rootNTuplesEPlusJetsInvertedConversion
