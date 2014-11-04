@@ -39,6 +39,7 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		min3JetPt_(iConfig.getParameter<double>("min3JetPt")), //
 		min4JetPt_(iConfig.getParameter<double>("min4JetPt")), //
 		tightElectronIso_(iConfig.getParameter<double>("tightElectronIsolation")), //
+		controlElectronIso_(iConfig.getParameter<double>("controlElectronIsolation")), //
 		looseElectronIso_(iConfig.getParameter<double>("looseElectronIsolation")), //
 		looseMuonIso_(iConfig.getParameter<double>("looseMuonIsolation")), //
 		useDeltaBetaCorrectionsForMuons_(iConfig.getParameter<bool>("useDeltaBetaCorrectionsForMuons")), //
@@ -53,6 +54,8 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		debug_(iConfig.getUntrackedParameter<bool>("debug")), //
 		taggingMode_(iConfig.getParameter<bool>("taggingMode")), //
 		bSelectionInTaggingMode_(iConfig.getParameter<bool>("bSelectionInTaggingMode")), //
+		nonIsolatedElectronSelection_(iConfig.getParameter<bool>("nonIsolatedElectronSelection")), //
+		invertedConversionSelection_(iConfig.getParameter<bool>("invertedConversionSelection")), //
 		passes_(), //
 		runNumber_(0), //
 		signalElectronIndex_(999), //
@@ -103,6 +106,7 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 	desc.add<double>("min3JetPt", 30.0);
 	desc.add<double>("min4JetPt", 30.0);
 	desc.add<double>("tightElectronIsolation", 0.1);
+	desc.add<double>("controlElectronIsolation", 0.3);
 	desc.add<double>("looseElectronIsolation", 0.15);
 	desc.add<double>("looseMuonIsolation", 0.2);
 
@@ -119,6 +123,8 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 	desc.addUntracked<bool>("debug", false);
 	desc.add<bool>("taggingMode", false);
 	desc.add<bool>("bSelectionInTaggingMode", false);
+	desc.add<bool>("nonIsolatedElectronSelection", false);
+	desc.add<bool>("invertedConversionSelection", false);
 	descriptions.add("applyTopPairElectronPlusJetsSelection", desc);
 }
 
@@ -138,7 +144,17 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 	for (unsigned int step = 0; step < TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
 		if (debug_)
 			cout << "Doing selection step: " << TTbarEPlusJetsReferenceSelection::StringSteps[step] << endl;
+		TTbarEPlusJetsReferenceSelection::Step stepName = TTbarEPlusJetsReferenceSelection::Step(step);
 		bool passesStep(passesSelectionStep(iEvent, step));
+
+		// Require exactly zero b jets for QCD control region
+		// Or exactly one b jet, as e.g. angle(b,l) only makes sense if there is at least one b jet
+		if ( nonIsolatedElectronSelection_ || invertedConversionSelection_ ) {
+			if ( stepName == TTbarEPlusJetsReferenceSelection::AtLeastOneBtag || stepName == TTbarEPlusJetsReferenceSelection::AtLeastTwoBtags ) {
+				passesStep = hasExactlyZeroGoodBJet() || hasExactlyOneGoodBJet() ;
+			}
+		}
+
 		passesSelection = passesSelection && passesStep;
 		passes_.at(step) = passesStep;
 
@@ -267,8 +283,15 @@ void TopPairElectronPlusJetsSelectionFilter::goodIsolatedElectrons() {
 			     << fabs(electron.dB(pat::Electron::PV2D)) << endl;
 		}
 
-		bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrectionsForElectrons_,
+		bool passesIso = false;
+
+		if ( nonIsolatedElectronSelection_ )
+			passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrectionsForElectrons_,
+				useRhoActiveAreaCorrections_) > controlElectronIso_;
+		else
+			passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrectionsForElectrons_,
 				useRhoActiveAreaCorrections_) < tightElectronIso_;
+
 		if (isGoodElectron(electron) && passesIso) {
 			goodIsolatedElectrons_.push_back(electron);
 			//Check if this is the first, and therefore the signal, electron
@@ -527,8 +550,13 @@ bool TopPairElectronPlusJetsSelectionFilter::passesDileptonVeto() const {
 bool TopPairElectronPlusJetsSelectionFilter::passesConversionVeto() const {
 	if (!hasExactlyOneIsolatedLepton())
 		return false;
-	return signalElectron_.passConversionVeto()
+
+	bool passVeto = signalElectron_.passConversionVeto()
 				&& signalElectron_.gsfTrack()->trackerExpectedHitsInner().numberOfHits() < 1; // left in the trackerExpectedHitsInner <1, although it is not there in the AnalysisTools, because it seems to make no difference
+	if ( invertedConversionSelection_ )
+		return !passVeto;
+	else
+		return passVeto;
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastOneGoodJet() const {
@@ -558,6 +586,14 @@ bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastFourGoodJets() const {
 		return getSmearedJetPtScale(cleanedJets_.at(3), 0)*cleanedJets_.at(3).pt() > min4JetPt_;
 
 	return false;
+}
+
+bool TopPairElectronPlusJetsSelectionFilter::hasExactlyZeroGoodBJet() const {
+	return cleanedBJets_.size() == 0;
+}
+
+bool TopPairElectronPlusJetsSelectionFilter::hasExactlyOneGoodBJet() const {
+	return cleanedBJets_.size() == 1;
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastOneGoodBJet() const {

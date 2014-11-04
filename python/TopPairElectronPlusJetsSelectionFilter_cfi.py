@@ -27,6 +27,7 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     min4JetPt=cms.double(30.),
     #lepton isolation
     tightElectronIsolation=cms.double(0.1),
+    controlElectronIsolation=cms.double(0.2),
     looseElectronIsolation=cms.double(0.15),
     looseMuonIsolation=cms.double(0.2),
     useDeltaBetaCorrectionsForMuons = cms.bool(True),
@@ -44,5 +45,7 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     tagAndProbeStudies = cms.bool(False),
     dropTriggerSelection = cms.bool(False),
     bSelectionInTaggingMode = cms.bool(False),
+    nonIsolatedElectronSelection = cms.bool(False),
+    invertedConversionSelection = cms.bool(False),
 )
 
