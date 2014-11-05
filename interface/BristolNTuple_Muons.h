@@ -17,7 +17,6 @@ class BristolNTuple_Muons : public edm::EDProducer {
   const std::string     muonID;
   const bool            beamSpotCorr;
   const bool storePFIsolation;
-  const bool            useCocktailRefits;
   const edm::InputTag   vtxInputTag;
 };
 

@@ -24,8 +24,7 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 		debugRelease_(iConfig.getParameter<bool>("debugRelease")), //
 		vtxInputTag(iConfig.getParameter < edm::InputTag > ("VertexInputTag")), //
 		beamSpotInputTag(iConfig.getParameter < edm::InputTag > ("BeamSpotInputTag")), //
-		conversionsInputTag(iConfig.getParameter < edm::InputTag > ("ConversionsInputTag")), //
-		likelihoodInputTag(iConfig.getParameter < edm::InputTag > ("LikelihoodInputTag")) //
+		conversionsInputTag(iConfig.getParameter < edm::InputTag > ("ConversionsInputTag")) //
 {
 
 	//kinematic variables
@@ -48,7 +47,6 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 	produces < std::vector<double> > (prefix + "SigmaIEtaIEta" + suffix);
 	produces < std::vector<double> > (prefix + "DeltaPhiTrkSC" + suffix);
 	produces < std::vector<double> > (prefix + "DeltaEtaTrkSC" + suffix);
-	produces < std::vector<double> > (prefix + "Likelihood" + suffix);
 	produces < std::vector<int> > (prefix + "NumberOfBrems" + suffix);
 	produces < std::vector<double> > (prefix + "mvaTrigV0" + suffix);
 	produces < std::vector<double> > (prefix + "mvaNonTrigV0" + suffix);
@@ -70,7 +68,6 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 		produces < std::vector<double> > (prefix + "PFGammaIso03" + suffix);
 		produces < std::vector<double> > (prefix + "PFRelIso03" + suffix);
 		produces < std::vector<double> > (prefix + "PFRelIso03DeltaBeta" + suffix);
-		produces < std::vector<double> > (prefix + "PFRelIso03RhoEA" + suffix);
 
 		produces < std::vector<double> > (prefix + "PfChargedHadronIso04" + suffix);
 		produces < std::vector<double> > (prefix + "PfNeutralHadronIso04" + suffix);
@@ -154,7 +151,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > sigmaIEtaIEta(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > deltaPhiTrkSC(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > deltaEtaTrkSC(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > likelihood(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > numberOfBrems(new std::vector<int>());
 	std::auto_ptr < std::vector<double> > mvaTrigV0(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > mvaNonTrigV0(new std::vector<double>());
@@ -176,7 +172,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > PFGammaIso03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PFRelIso03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PFRelIso03DeltaBeta(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > PFRelIso03RhoEA(new std::vector<double>());
 
 	std::auto_ptr < std::vector<double> > PfChargedHadronIso04(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PfNeutralHadronIso04(new std::vector<double>());
@@ -240,9 +235,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > primaryVertexDXYCorr(new std::vector<double>());
 
 	//-----------------------------------------------------------------
-	edm::Handle<double> rhoH;
-	iEvent.getByLabel(edm::InputTag("kt6PFJets", "rho"), rhoH);
-	double rho(*rhoH);
 
 	edm::Handle < std::vector<pat::Electron> > electrons;
 	iEvent.getByLabel(inputTag, electrons);
@@ -261,10 +253,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 	edm::Handle < reco::VertexCollection > primaryVertices;
 	iEvent.getByLabel(vtxInputTag, primaryVertices);
-
-	std::vector < edm::Handle<edm::ValueMap<float> > > eIDValueMap(1);
-	iEvent.getByLabel(likelihoodInputTag, eIDValueMap[0]);
-	const edm::ValueMap<float> & eIDmapLikelihood = *eIDValueMap[0];
 
 	edm::Handle < reco::PFCandidateCollection > pfCandidates;
 	iEvent.getByLabel("particleFlow", pfCandidates);
@@ -328,12 +316,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 				edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << vtxInputTag;
 			}
 
-			// Likelihood Based Ele ID ( https://twiki.cern.ch/twiki/bin/view/CMS/LikelihoodBasedEleID2011 )
-			double likelihood_ = -999.;
-			if (eIDValueMap[0].isValid()) {
-				likelihood_ = eIDmapLikelihood[it->originalObjectRef()];
-			}
-
 			//kinematic variables
 			px->push_back(it->px());
 			py->push_back(it->py());
@@ -353,10 +335,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			sigmaIEtaIEta->push_back(it->sigmaIetaIeta());
 			deltaPhiTrkSC->push_back(it->deltaPhiSuperClusterTrackAtVtx());
 			deltaEtaTrkSC->push_back(it->deltaEtaSuperClusterTrackAtVtx());
-			likelihood->push_back(likelihood_);
 			numberOfBrems->push_back(it->numberOfBrems());
-			mvaTrigV0->push_back(it->electronID("mvaTrigV0"));
-			mvaNonTrigV0->push_back(it->electronID("mvaNonTrigV0"));
 
 			//electron isolation variables
 			trkIso03->push_back(it->dr03TkSumPt());
@@ -435,8 +414,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 				PFRelIso03->push_back(pfRelIso03 / it->et());
 				PFRelIso04->push_back(pfRelIso04 / it->et());
 				PFRelIso05->push_back(pfRelIso05 / it->et());
-				PFRelIso03DeltaBeta->push_back(getRelativeIsolation(*it, 0.3, rho, iEvent.isRealData(), true, false));
-				PFRelIso03RhoEA->push_back(getRelativeIsolation(*it, 0.3, rho, iEvent.isRealData(), false, true));
 
 				if (PfPUChargedHadronIso) {
 					PfPUChargedHadronIso03->push_back(PfPUChargedHadronIso->depositWithin(0.3));
@@ -459,7 +436,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			trkIsoHeep04->push_back(it->dr04TkSumPt());
 
 			// Conversion variables
-			missingHits->push_back(it->gsfTrack()->trackerExpectedHitsInner().numberOfHits());
+			// missingHits->push_back(it->gsfTrack()->numberOfLostTrackerHits(HitPattern::MISSING_INNER_HITS));
+			missingHits->push_back(0);
 			dist_vec->push_back(it->convDist());
 			dCotTheta->push_back(it->convDcot());
 			conversionRadius->push_back(it->convRadius());
@@ -512,7 +490,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	iEvent.put(sigmaIEtaIEta, prefix + "SigmaIEtaIEta" + suffix);
 	iEvent.put(deltaPhiTrkSC, prefix + "DeltaPhiTrkSC" + suffix);
 	iEvent.put(deltaEtaTrkSC, prefix + "DeltaEtaTrkSC" + suffix);
-	iEvent.put(likelihood, prefix + "Likelihood" + suffix);
 	iEvent.put(numberOfBrems, prefix + "NumberOfBrems" + suffix);
 	iEvent.put(mvaTrigV0, prefix + "mvaTrigV0" + suffix);
 	iEvent.put(mvaNonTrigV0, prefix + "mvaNonTrigV0" + suffix);
@@ -535,7 +512,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 		iEvent.put(PFGammaIso03, prefix + "PFGammaIso03" + suffix);
 		iEvent.put(PFRelIso03, prefix + "PFRelIso03" + suffix);
 		iEvent.put(PFRelIso03DeltaBeta, prefix + "PFRelIso03DeltaBeta" + suffix);
-		iEvent.put(PFRelIso03RhoEA, prefix + "PFRelIso03RhoEA" + suffix);
 
 		iEvent.put(PfChargedHadronIso04, prefix + "PfChargedHadronIso04" + suffix);
 		iEvent.put(PfNeutralHadronIso04, prefix + "PfNeutralHadronIso04" + suffix);

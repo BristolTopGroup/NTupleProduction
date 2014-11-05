@@ -25,15 +25,15 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     min2JetPt=cms.double(30.),
     min3JetPt=cms.double(30.),
     min4JetPt=cms.double(30.),
-    #lepton isolation
-    tightMuonIsolation=cms.double(0.12),
-    controlMuonIsolation=cms.double(0.3),
-    looseElectronIsolation=cms.double(0.15),
-    looseMuonIsolation=cms.double(0.2),
-    useDeltaBetaCorrectionsForMuons = cms.bool(True),
-    useDeltaBetaCorrectionsForElectrons = cms.bool(False),
-    useRhoActiveAreaCorrections = cms.bool(True),
-    
+
+    # Jet cleaning delta R
+    cleaningDeltaR=cms.double(0.3),
+
+    # B Jet Selection
+    # Working points taken from https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
+    bJetDiscriminator=cms.string('combinedInclusiveSecondaryVertexV2BJetTags'),
+    minBJetDiscriminator=cms.double(0.814),
+
     prefix=cms.untracked.string('TopPairMuonPlusJetsSelection.'),
     MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12 or Summer11Leg
 

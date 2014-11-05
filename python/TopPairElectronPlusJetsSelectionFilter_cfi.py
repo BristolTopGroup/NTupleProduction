@@ -6,34 +6,33 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     electronInput=cms.InputTag("selectedPatElectronsLoosePFlow"),
     muonInput=cms.InputTag("selectedPatMuonsLoosePFlow"),
     HLTInput=cms.InputTag('TriggerResults', '', 'HLT'),
-    VertexInput=cms.InputTag('goodOfflinePrimaryVertices'),
-    #event cleaning filters
-    trkInput=cms.InputTag('generalTracks'),#track input for scraping filter
-    HcalNoiseInput=cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult'),
-    HCALLaserFilterInput=cms.InputTag('HcalLaserEventFilter'),
-    ECALDeadCellFilterInput=cms.InputTag('EcalDeadCellTriggerPrimitiveFilter'),
-    TrackingFailureFilterInput=cms.InputTag('trackingFailureFilter'),
-    BadEESupercrystalFilterInput=cms.InputTag('BadEESupercrystalFilter'),
-    ECALLaserCorrFilterInput=cms.InputTag('ecalLaserCorrFilter'),
-    #trackingPOGfilters
-    ManyStripClus53XInput=cms.InputTag('manystripclus53X'),
-    TooManyStripClus53XInput=cms.InputTag('toomanystripclus53X'),
-    #LogErrorTooManyClusters=cms.InputTag('logErrorTooManyClusters'),
+
+    # Lepton cuts
+    minSignalElectronPt=cms.double(30.),
+    maxSignalElectronEta=cms.double(2.5),
+    signalElectronIDCriteria=cms.string('cutBasedElectronID-CSA14-PU20bx25-V0-standalone-tight'),
+    minSignalElectronID=cms.double(0),
+    minLooseMuonPt=cms.double(10.),
+    maxLooseMuonEta=cms.double(2.5),
+    minLooseElectronPt=cms.double(20.),
+    maxLooseElectronEta=cms.double(2.5),
+    looseElectronIDCriteria=cms.string('cutBasedElectronID-CSA14-PU20bx25-V0-standalone-veto'),
+    minLooseElectronID=cms.double(0),
 
     #jet cuts
     min1JetPt=cms.double(30.),
     min2JetPt=cms.double(30.),
     min3JetPt=cms.double(30.),
     min4JetPt=cms.double(30.),
-    #lepton isolation
-    tightElectronIsolation=cms.double(0.1),
-    controlElectronIsolation=cms.double(0.2),
-    looseElectronIsolation=cms.double(0.15),
-    looseMuonIsolation=cms.double(0.2),
-    useDeltaBetaCorrectionsForMuons = cms.bool(True),
-    useDeltaBetaCorrectionsForElectrons = cms.bool(False),
-    useRhoActiveAreaCorrections = cms.bool(True),
-    
+
+    # Jet cleaning delta R
+    cleaningDeltaR=cms.double(0.3),
+
+    # B Jet Selection
+    # Working points taken from https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
+    bJetDiscriminator=cms.string('combinedInclusiveSecondaryVertexV2BJetTags'),
+    minBJetDiscriminator=cms.double(0.814),  
+
     prefix=cms.untracked.string('TopPairElectronPlusJetsSelection.'),
     MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12 or Summer11Leg
 

@@ -17,7 +17,6 @@ BristolNTuple_Muons::BristolNTuple_Muons(const edm::ParameterSet& iConfig) :
 		muonID(iConfig.getParameter < std::string > ("MuonID")), //
 		beamSpotCorr(iConfig.getParameter<bool>("BeamSpotCorr")), //
 		storePFIsolation(iConfig.getParameter<bool>("storePFIsolation")), //
-		useCocktailRefits(iConfig.getParameter<bool>("UseCocktailRefits")), //
 		vtxInputTag(iConfig.getParameter < edm::InputTag > ("VertexInputTag")) //
 {
 
@@ -120,21 +119,6 @@ BristolNTuple_Muons::BristolNTuple_Muons(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "PrimaryVertexDXYError" + suffix);
 	produces < std::vector<double> > (prefix + "BeamSpotDXY" + suffix);
 	produces < std::vector<double> > (prefix + "BeamSpotDXYError" + suffix);
-
-	if (useCocktailRefits) {
-		//muon cocktail variables
-		produces < std::vector<double> > (prefix + "Cocktail.Px" + suffix);
-		produces < std::vector<double> > (prefix + "Cocktail.Py" + suffix);
-		produces < std::vector<double> > (prefix + "Cocktail.Pz" + suffix);
-		produces < std::vector<int> > (prefix + "Cocktail.Charge" + suffix);
-		produces < std::vector<int> > (prefix + "Cocktail.NumberOfValidTrackerHits" + suffix);
-		produces < std::vector<double> > (prefix + "Cocktail.D0" + suffix);
-		produces < std::vector<double> > (prefix + "Cocktail.D0Error" + suffix);
-		produces < std::vector<double> > (prefix + "Cocktail.Dz" + suffix);
-		produces < std::vector<double> > (prefix + "Cocktail.DzError" + suffix);
-		produces < std::vector<double> > (prefix + "Cocktail.NormalizedChi2" + suffix);
-	}
-
 }
 
 void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -436,7 +420,7 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 			trkD0Error->push_back(it->track()->d0Error());
 			trkDz->push_back(it->track()->dz());
 			trkDzError->push_back(it->track()->dzError());
-			trackValidFractionOfHits->push_back(validFraction(it->track()));
+			trackValidFractionOfHits->push_back(it->track()->validFraction());
 
 			//associated global track
 			if ( !( it->globalTrack().isNull() ) ) {
@@ -462,28 +446,6 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 			primaryVertexDXYError->push_back(it->edB());
 			beamSpotDXY->push_back(it->dB(pat::Muon::BS2D));
 			beamSpotDXYError->push_back(it->edB(pat::Muon::BS2D));
-
-			if (useCocktailRefits) {
-				int refit_id = -999;
-				const reco::TrackRef& cocktail_track = pmcTrack(*it, refit_id);
-
-				double cttrkd0 = cocktail_track->d0();
-
-				if (beamSpotCorr && beamSpot.isValid())
-					cttrkd0 = -(cocktail_track->dxy(beamSpot->position()));
-
-				ctPx->push_back(cocktail_track->px());
-				ctPy->push_back(cocktail_track->py());
-				ctPz->push_back(cocktail_track->pz());
-				ctCharge->push_back(cocktail_track->charge());
-				ctNumberOfValidTrackerHits->push_back(cocktail_track->numberOfValidHits());
-				ctTrkD0->push_back(cttrkd0);
-				ctTrkD0Error->push_back(cocktail_track->d0Error());
-				ctTrkDz->push_back(cocktail_track->dz());
-				ctTrkDzError->push_back(cocktail_track->dzError());
-				ctNormalizedChi2->push_back(cocktail_track->normalizedChi2());
-			}
-
 		}
 	} else {
 		edm::LogError("BristolNTuple_MuonsExtraError") << "Error! Can't get the product " << inputTag;
@@ -590,17 +552,4 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	iEvent.put(primaryVertexDXYError, prefix + "PrimaryVertexDXYError" + suffix);
 	iEvent.put(beamSpotDXY, prefix + "BeamSpotDXY" + suffix);
 	iEvent.put(beamSpotDXYError, prefix + "BeamSpotDXYError" + suffix);
-
-	if (useCocktailRefits) {
-		iEvent.put(ctPx, prefix + "Cocktail.Px" + suffix);
-		iEvent.put(ctPy, prefix + "Cocktail.Py" + suffix);
-		iEvent.put(ctPz, prefix + "Cocktail.Pz" + suffix);
-		iEvent.put(ctCharge, prefix + "Cocktail.Charge" + suffix);
-		iEvent.put(ctNumberOfValidTrackerHits, prefix + "Cocktail.NumberOfValidTrackerHits" + suffix);
-		iEvent.put(ctTrkD0, prefix + "Cocktail.D0" + suffix);
-		iEvent.put(ctTrkD0Error, prefix + "Cocktail.D0Error" + suffix);
-		iEvent.put(ctTrkDz, prefix + "Cocktail.Dz" + suffix);
-		iEvent.put(ctTrkDzError, prefix + "Cocktail.DzError" + suffix);
-		iEvent.put(ctNormalizedChi2, prefix + "Cocktail.NormalizedChi2" + suffix);
-	}
 }

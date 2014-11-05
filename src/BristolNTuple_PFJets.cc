@@ -75,18 +75,8 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<int> > (prefix + "PassLooseID" + suffix);
 	produces < std::vector<int> > (prefix + "PassTightID" + suffix);
 	//b-tagging information
-	produces < std::vector<double> > (prefix + "TrackCountingHighEffBTag" + suffix);
-	produces < std::vector<double> > (prefix + "TrackCountingHighPurBTag" + suffix);
-	produces < std::vector<double> > (prefix + "SimpleSecondaryVertexHighEffBTag" + suffix);
-	produces < std::vector<double> > (prefix + "SimpleSecondaryVertexHighPurBTag" + suffix);
-	produces < std::vector<double> > (prefix + "JetProbabilityBTag" + suffix);
-	produces < std::vector<double> > (prefix + "JetBProbabilityBTag" + suffix);
-
-	produces < std::vector<double> > (prefix + "SoftMuonBJetTag" + suffix);
-	produces < std::vector<double> > (prefix + "SoftMuonByIP3dBJetTag" + suffix);
-	produces < std::vector<double> > (prefix + "SoftMuonByPtBJetTag" + suffix);
-	produces < std::vector<double> > (prefix + "CombinedSecondaryVertexMVABJetTag" + suffix);
-	produces < std::vector<double> > (prefix + "CombinedSecondaryVertexBJetTag" + suffix);
+	produces < std::vector<double> > (prefix + "combinedInclusiveSecondaryVertexV2BJetTags" + suffix);
+	produces < std::vector<bool> > (prefix + "passesMediumCSV" + suffix);
 
 	//jet-vertex association
 	if (doVertexAssociation) {
@@ -155,19 +145,8 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<int> > passLooseID(new std::vector<int>());
 	std::auto_ptr < std::vector<int> > passTightID(new std::vector<int>());
 	//b-tagging information
-	std::auto_ptr < std::vector<double> > trackCountingHighEffBTag(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > trackCountingHighPurBTag(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > simpleSecondaryVertexHighEffBTag(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > simpleSecondaryVertexHighPurBTag(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > jetProbabilityBTag(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > jetBProbabilityBTag(new std::vector<double>());
-
-	std::auto_ptr < std::vector<double> > softMuonBJetTag(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > softMuonByIP3dBJetTags(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > softMuonByPtBJetTags(new std::vector<double>());
-
-	std::auto_ptr < std::vector<double> > combinedSecondaryVertexBJetTags(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > combinedSecondaryVertexMVABJetTag(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > combinedInclusiveSecondaryVertexV2BJetTags(new std::vector<double>());
+	std::auto_ptr < std::vector<bool> > passesMediumCSV(new std::vector<bool>());
 
 	//jet-vertex association
 	std::auto_ptr < std::vector<double> > bestVertexTrackAssociationFactor(new std::vector<double>());
@@ -422,21 +401,8 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
 			//b-tagging information
 			//names are changing between major software releases
-			trackCountingHighEffBTag->push_back(it->bDiscriminator("trackCountingHighEffBJetTags")); // checked 19.09.2011
-			trackCountingHighPurBTag->push_back(it->bDiscriminator("trackCountingHighPurBJetTags")); // checked 19.09.2011
-			simpleSecondaryVertexHighEffBTag->push_back(it->bDiscriminator("simpleSecondaryVertexHighEffBJetTags")); // checked 19.09.2011
-			simpleSecondaryVertexHighPurBTag->push_back(it->bDiscriminator("simpleSecondaryVertexHighPurBJetTags")); // checked 19.09.2011
-			jetProbabilityBTag->push_back(it->bDiscriminator("jetProbabilityBJetTags")); // checked 19.09.2011
-			jetBProbabilityBTag->push_back(it->bDiscriminator("jetBProbabilityBJetTags")); // checked 19.09.2011
-
-//			softElectronByIP3dBJetTags->push_back(it->bDiscriminator("softElectronByIP3dBJetTags")); // corrected 19.09.2011
-//			softElectronByPtBJetTags->push_back(it->bDiscriminator("softElectronByPtBJetTags")); // introduced 19.09.2011
-
-			softMuonBJetTag->push_back(it->bDiscriminator("softMuonBJetTags")); // checked 19.09.2011
-			softMuonByIP3dBJetTags->push_back(it->bDiscriminator("softMuonByIP3dBJetTags")); // corrected 19.09.2011
-			softMuonByPtBJetTags->push_back(it->bDiscriminator("softMuonByPtBJetTags")); // introduced 19.09.2011
-			combinedSecondaryVertexBJetTags->push_back(it->bDiscriminator("combinedSecondaryVertexBJetTags")); // corrected 19.09.2011
-			combinedSecondaryVertexMVABJetTag->push_back(it->bDiscriminator("combinedSecondaryVertexMVABJetTags")); // corrected 19.09.2011
+			combinedInclusiveSecondaryVertexV2BJetTags->push_back(it->bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags"));
+			passesMediumCSV->push_back(it->bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags") > 0.814 );
 
 			//jet-vertex association
 			if (doVertexAssociation) {
@@ -511,19 +477,8 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(passTightID, prefix + "PassTightID" + suffix);
 
 	//b-tagging information
-	iEvent.put(trackCountingHighEffBTag, prefix + "TrackCountingHighEffBTag" + suffix);
-	iEvent.put(trackCountingHighPurBTag, prefix + "TrackCountingHighPurBTag" + suffix);
-	iEvent.put(simpleSecondaryVertexHighEffBTag, prefix + "SimpleSecondaryVertexHighEffBTag" + suffix);
-	iEvent.put(simpleSecondaryVertexHighPurBTag, prefix + "SimpleSecondaryVertexHighPurBTag" + suffix);
-	iEvent.put(jetProbabilityBTag, prefix + "JetProbabilityBTag" + suffix);
-	iEvent.put(jetBProbabilityBTag, prefix + "JetBProbabilityBTag" + suffix);
-//	iEvent.put(softElectronByIP3dBJetTags, prefix + "SoftElectronByIP3dBJetTag" + suffix);
-//	iEvent.put(softElectronByPtBJetTags, prefix + "SoftElectronByPtBJetTag" + suffix);
-	iEvent.put(softMuonBJetTag, prefix + "SoftMuonBJetTag" + suffix);
-	iEvent.put(softMuonByIP3dBJetTags, prefix + "SoftMuonByIP3dBJetTag" + suffix);
-	iEvent.put(softMuonByPtBJetTags, prefix + "SoftMuonByPtBJetTag" + suffix);
-	iEvent.put(combinedSecondaryVertexBJetTags, prefix + "CombinedSecondaryVertexBJetTag" + suffix);
-	iEvent.put(combinedSecondaryVertexMVABJetTag, prefix + "CombinedSecondaryVertexMVABJetTag" + suffix);
+	iEvent.put(combinedInclusiveSecondaryVertexV2BJetTags, prefix + "combinedInclusiveSecondaryVertexV2BJetTags" + suffix);
+	iEvent.put(passesMediumCSV, prefix + "passesMediumCSV" + suffix);
 
 	//jet-vertex association
 	if (doVertexAssociation) {
