@@ -265,7 +265,7 @@ std::vector<double> BTagWeight::getUDSGScaleFactor(const pat::Jet& jet, std::str
 				SF_udsg_max = getMaxUDSGScaleFactor(pt, eta, MCSampleTag);
 			}
 	}
-	double SF_udsg_error = abs(SF_udsg_max - SF_udsg_mean) > abs(SF_udsg_min - SF_udsg_mean) ? abs(SF_udsg_max - SF_udsg_mean) : abs(SF_udsg_min - SF_udsg_mean);
+	double SF_udsg_error = fabs(SF_udsg_max - SF_udsg_mean) > fabs(SF_udsg_min - SF_udsg_mean) ? fabs(SF_udsg_max - SF_udsg_mean) : fabs(SF_udsg_min - SF_udsg_mean);
 	SF_udsg_and_error.push_back(SF_udsg_mean);
 	SF_udsg_and_error.push_back(SF_udsg_error);
 	return SF_udsg_and_error;
