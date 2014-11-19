@@ -170,7 +170,7 @@ std::vector<double> BTagWeight::getBScaleFactor(const pat::Jet& jet, std::string
 				0.0655432 } };
 
 		//2011 pt bins low edges
-		const boost::array<double, 16> ptbins = { { 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500 } };
+		const boost::array<double, 14> ptbins = { { 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500 } };
 
 		if (pt < 30) {
 			SFb = 0.6981 * ((1. + (0.414063 * pt)) / (1. + (0.300155 * 30)));
@@ -226,7 +226,7 @@ std::vector<double> BTagWeight::getUDSGScaleFactor(const pat::Jet& jet, std::str
 			SF_udsg_and_error.push_back(0.);
 			return SF_udsg_and_error;
 			// return 0;
-		} else if (pt > 850 && eta >= 1.6 && eta <= 2.4) {
+		} else if (pt > 850 && eta >= 1.6 && eta <= 2.5) {
 			SF_udsg_mean = getMeanUDSGScaleFactor(850., eta, MCSampleTag);
 			SF_udsg_min = getMinUDSGScaleFactor(850, eta, MCSampleTag);
 			SF_udsg_max = getMaxUDSGScaleFactor(850, eta, MCSampleTag);
@@ -251,7 +251,7 @@ std::vector<double> BTagWeight::getUDSGScaleFactor(const pat::Jet& jet, std::str
 				SF_udsg_and_error.push_back(0.);
 				return SF_udsg_and_error;
 				// return 0;
-			} else if (pt > 670 && eta >= 0. && eta <= 2.4) {
+			} else if (pt > 670 && eta >= 0. && eta <= 2.5) {
 				// Use integrated over all eta
 				SF_udsg_mean = getMeanUDSGScaleFactor(pt, eta, MCSampleTag);
 				SF_udsg_min = getMinUDSGScaleFactor(pt, eta, MCSampleTag);
@@ -265,7 +265,7 @@ std::vector<double> BTagWeight::getUDSGScaleFactor(const pat::Jet& jet, std::str
 				SF_udsg_max = getMaxUDSGScaleFactor(pt, eta, MCSampleTag);
 			}
 	}
-	double SF_udsg_error = abs(SF_udsg_max - SF_udsg_mean) > abs(SF_udsg_min - SF_udsg_mean) ? abs(SF_udsg_max - SF_udsg_mean) : abs(SF_udsg_min - SF_udsg_mean);
+	double SF_udsg_error = fabs(SF_udsg_max - SF_udsg_mean) > fabs(SF_udsg_min - SF_udsg_mean) ? fabs(SF_udsg_max - SF_udsg_mean) : fabs(SF_udsg_min - SF_udsg_mean);
 	SF_udsg_and_error.push_back(SF_udsg_mean);
 	SF_udsg_and_error.push_back(SF_udsg_error);
 	return SF_udsg_and_error;
@@ -280,17 +280,17 @@ double BTagWeight::getMeanUDSGScaleFactor(double jetPT, double jetEta, std::stri
 			return ((1.07541+(0.00231827*jetPT))+(-4.74249e-06*(jetPT*jetPT)))+(2.70862e-09*(jetPT*(jetPT*jetPT)));
 		} else if(jetEta >= 0.8 && jetEta < 1.6) {
 			return ((1.05613+(0.00114031*jetPT))+(-2.56066e-06*(jetPT*jetPT)))+(1.67792e-09*(jetPT*(jetPT*jetPT)));
-		} else if(jetEta >= 1.6 && jetEta <= 2.4){
+		} else if(jetEta >= 1.6 && jetEta <= 2.5){ // Technically only valid up to 2.4, but we go up to 2.5
 			return ((1.05625+(0.000487231*jetPT))+(-2.22792e-06*(jetPT*jetPT)))+(1.70262e-09*(jetPT*(jetPT*jetPT)));
 		}
 	} else if (MCSampleTag == "Summer11Leg") { // 2011
-		if (jetPT > 670 && jetEta >=0. && jetEta <= 2.4){ // Integrated over eta
+		if (jetPT > 670 && jetEta >=0. && jetEta <= 2.5){ // Integrated over eta
 			return ((1.04318+(0.000848162*jetPT))+(-2.5795e-06*(jetPT*jetPT)))+(1.64156e-09*(jetPT*(jetPT*jetPT)));
 		} else if(jetEta >= 0 && jetEta < 0.8) {
 			return ((1.06182+(0.000617034*jetPT))+(-1.5732e-06*(jetPT*jetPT)))+(3.02909e-10*(jetPT*(jetPT*jetPT)));
 		} else if(jetEta >= 0.8 && jetEta < 1.6) {
 			return ((1.111+(-9.64191e-06*jetPT))+(1.80811e-07*(jetPT*jetPT)))+(-5.44868e-10*(jetPT*(jetPT*jetPT)));
-		} else if(jetEta >= 1.6 && jetEta <= 2.4) {
+		} else if(jetEta >= 1.6 && jetEta <= 2.5) { // Technically only valid up to 2.4, but we go up to 2.5
 			return ((1.08498+(-0.000701422*jetPT))+(3.43612e-06*(jetPT*jetPT)))+(-4.11794e-09*(jetPT*(jetPT*jetPT)));
 		}
 	}
@@ -306,18 +306,18 @@ double BTagWeight::getMinUDSGScaleFactor(double jetPT, double jetEta, std::strin
 				return ((0.964527+(0.00149055*jetPT))+(-2.78338e-06*(jetPT*jetPT)))+(1.51771e-09*(jetPT*(jetPT*jetPT)));
 			} else if (jetEta >= 0.8 && jetEta < 1.6) {
 				return ((0.946051+(0.000759584*jetPT))+(-1.52491e-06*(jetPT*jetPT)))+(9.65822e-10*(jetPT*(jetPT*jetPT)));
-			} else if (jetEta >-1.6 && jetEta <= 2.4) {
+			} else if (jetEta >-1.6 && jetEta <= 2.5) { // Technically only valid up to 2.4, but we go up to 2.5
 			return ((0.956736 + (0.000280197 * jetPT)) + (-1.42739e-06 * (jetPT * jetPT))) + (1.0085e-09 * (jetPT * (jetPT * jetPT)));
 		}
 	}
 	if (MCSampleTag == "Summer11Leg") { //2011
-		if (jetPT > 670 && jetEta >= 0. && jetEta <= 2.4) { // Integrated over eta
+		if (jetPT > 670 && jetEta >= 0. && jetEta <= 2.5) { // Integrated over eta
 			return ((0.962627 + (0.000448344 * jetPT)) + (-1.25579e-06 * (jetPT * jetPT))) + (4.82283e-10 * (jetPT * (jetPT * jetPT)));
 		} else if (jetEta >= 0 && jetEta < 0.8) {
 			return ((0.972455 + (7.51396e-06 * jetPT)) + (4.91857e-07 * (jetPT * jetPT))) + (-1.47661e-09 * (jetPT * (jetPT * jetPT)));
 		} else if (jetEta >= 0.8 && jetEta < 1.6) {
 			return ((1.02055 + (-0.000378856 * jetPT)) + (1.49029e-06 * (jetPT * jetPT))) + (-1.74966e-09 * (jetPT * (jetPT * jetPT)));
-		} else if (jetEta >= 1.6 && jetEta < 2.4) {
+		} else if (jetEta >= 1.6 && jetEta < 2.5) { // Technically only valid up to 2.4, but we go up to 2.5
 			return ((0.983476 + (-0.000607242 * jetPT)) + (3.17997e-06 * (jetPT * jetPT))) + (-4.01242e-09 * (jetPT * (jetPT * jetPT)));
 		}
 	}
@@ -332,18 +332,17 @@ double BTagWeight::getMaxUDSGScaleFactor(double jetPT, double jetEta, std::strin
 			return ((1.18638+(0.00314148*jetPT))+(-6.68993e-06*(jetPT*jetPT)))+(3.89288e-09*(jetPT*(jetPT*jetPT)));
 		} else if (jetEta >= 0.8 && jetEta < 1.6) {
 			return ((1.16624+(0.00151884*jetPT))+(-3.59041e-06*(jetPT*jetPT)))+(2.38681e-09*(jetPT*(jetPT*jetPT)));
-		} else if (jetEta >= 1.6 && jetEta <= 2.4) {
+		} else if (jetEta >= 1.6 && jetEta <= 2.5) { // Technically only valid up to 2.4, but we go up to 2.5
 			return ((1.15575+(0.000693344*jetPT))+(-3.02661e-06*(jetPT*jetPT)))+(2.39752e-09*(jetPT*(jetPT*jetPT)));
 		}
 	} else if (MCSampleTag == "Summer11Leg") { // 2011
-		if (jetEta >670 && jetEta >=0. && jetEta <=2.4){
-			// Integrated over eta
+		if (jetEta >670 && jetEta >=0. && jetEta <=2.5){ // Integrated over eta
 			return ((1.12368+(0.00124806*jetPT))+(-3.9032e-06*(jetPT*jetPT)))+(2.80083e-09*(jetPT*(jetPT*jetPT)));
 		}else if (jetEta >= 0 && jetEta < 0.8) {
 			return ((1.15116+(0.00122657*jetPT))+(-3.63826e-06*(jetPT*jetPT)))+(2.08242e-09*(jetPT*(jetPT*jetPT)));
 		} else if (jetEta >= 0.8 && jetEta < 1.6) {
 			return ((1.20146+(0.000359543*jetPT))+(-1.12866e-06*(jetPT*jetPT)))+(6.59918e-10*(jetPT*(jetPT*jetPT)));
-		} else if (jetEta >= 1.6 && jetEta <= 2.4) {
+		} else if (jetEta >= 1.6 && jetEta <= 2.5) { // Technically only valid up to 2.4, but we go up to 2.5
 			return ((1.18654+(-0.000795808*jetPT))+(3.69226e-06*(jetPT*jetPT)))+(-4.22347e-09*(jetPT*(jetPT*jetPT)));
 		}
 	}
@@ -489,7 +488,6 @@ double BTagWeight::getCEfficiency(const pat::Jet& jet, std::string MCSampleTag) 
 double BTagWeight::getUDSGEfficiency(const pat::Jet& jet, std::string MCSampleTag) const {
 	std::vector<double> binEdges{ 20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600, 800 };
 	double jetPt = getSmearedJetPtScale(jet, 0)*jet.pt();
-//	double eta = fabs(jet.eta());
 
 	if (MCSampleTag == "Summer12") { // 2012
 		std::vector<double> eff{
