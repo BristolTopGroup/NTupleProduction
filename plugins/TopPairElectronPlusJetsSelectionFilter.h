@@ -21,9 +21,9 @@ namespace TTbarEPlusJetsReferenceSelection {
 enum Step {
 	AllEvents,
 	EventCleaningAndTrigger,
-	OneIsolatedElectron,
+	ExactlyOneSignalElectron,
 	LooseMuonVeto,
-	DiLeptonVeto,
+	LooseElectronVeto,
 	ConversionVeto,
 	AtLeastOneGoodJet,
 	AtLeastTwoGoodJets,
@@ -37,9 +37,9 @@ enum Step {
 const std::string StringSteps[NUMBER_OF_SELECTION_STEPS] = { //
 		"AllEvents", //
 				"EventCleaningAndTrigger", //
-				"OneIsolatedElectron", //
+				"ExactlyOneSignalElectron", //
 				"LooseMuonVeto", //
-				"DiLeptonVeto", //
+				"LooseElectronVeto", //
 				"ConversionVeto", //
 				"AtLeastOneGoodJet", //
 				"AtLeastTwoGoodJets", //
@@ -69,8 +69,6 @@ public:
 	virtual bool isLooseElectron(const pat::Electron& electron) const;
 	virtual bool isLooseMuon(const pat::Muon& muon) const;
 	//isolation definitions
-//	virtual double getRelativeIsolation(const pat::Electron& electron) const;
-//	virtual double getRelativeIsolation(const pat::Muon& muon) const;
 	virtual void getLooseElectrons();
 	virtual void getLooseMuons();
 	virtual void goodIsolatedElectrons();
@@ -80,11 +78,10 @@ public:
 	virtual bool passesSelectionStep(edm::Event& iEvent, unsigned int selectionStep) const;
 
 	virtual bool passesEventCleaning(edm::Event& iEvent) const;
-	virtual bool passesScrapingVeto(edm::Event& event) const;
 	virtual bool passesTriggerSelection() const;
-	virtual bool hasExactlyOneIsolatedLepton() const;
-	virtual bool passesLooseLeptonVeto() const;
-	virtual bool passesDileptonVeto() const;
+	virtual bool hasExactlyOneSignalElectron() const;
+	virtual bool passesLooseMuonVeto() const;
+	virtual bool passesLooseElectronVeto() const;
 	virtual bool passesConversionVeto() const;
 	virtual bool hasAtLeastOneGoodJet() const;
 	virtual bool hasAtLeastTwoGoodJets() const;
@@ -99,13 +96,18 @@ private:
 	virtual void setupEventContent(edm::Event& iEvent);
 
 	//config
-	edm::InputTag jetInput_, electronInput_, muonInput_, hltInputTag_, VertexInput_, trkInput_, hcalNoiseInput_;
-	edm::InputTag hcalLaserFilterInput_, ecalDeadCellFilterInput_, ecalLaserCorrFilterInput_, manystripclus53X_, toomanystripclus53X_, logErrorTooManyClusters_, trackingFailureFilter_, eeBadScFilter_;
+	edm::InputTag jetInput_, electronInput_, muonInput_, hltInputTag_;
 
+	double minSignalElectronPt_, maxSignalElectronEta_;
+	double minLooseMuonPt_, maxLooseMuonEta_, minLooseElectronPt_, maxLooseElectronEta_;
 	double min1JetPt_, min2JetPt_, min3JetPt_, min4JetPt_;
 
-	double tightElectronIso_, controlElectronIso_, looseElectronIso_, looseMuonIso_;
-	bool useDeltaBetaCorrectionsForMuons_, useDeltaBetaCorrectionsForElectrons_, useRhoActiveAreaCorrections_, useMETFilters_, useEEBadScFilter_, tagAndProbeStudies_, dropTriggerSelection_;
+	double cleaningDeltaR_;
+
+	std::string bJetDiscriminator_;
+	double minBJetDiscriminator_;
+
+	bool tagAndProbeStudies_, dropTriggerSelection_;
 
 	std::string prefix_, MCSampleTag_;
 
@@ -119,7 +121,6 @@ private:
 	boost::array<bool, TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS> passes_;
 	unsigned int runNumber_, signalElectronIndex_;
 	bool isRealData_, hasSignalElectron_;
-	double rho_;
 	pat::JetCollection jets_, cleanedJets_, cleanedBJets_;
 	pat::ElectronCollection electrons_, goodIsolatedElectrons_, looseElectrons_;
 	pat::MuonCollection muons_, looseMuons_;

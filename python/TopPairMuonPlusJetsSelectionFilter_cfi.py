@@ -2,23 +2,19 @@ import FWCore.ParameterSet.Config as cms
 
 topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     # Specify input collections
-    jetInput=cms.InputTag("selectedPatJetsPFlow"),
-    electronInput=cms.InputTag("selectedPatElectronsLoosePFlow"),
-    muonInput=cms.InputTag("selectedPatMuonsLoosePFlow"),
+    jetInput=cms.InputTag("slimmedJets"),
+    electronInput=cms.InputTag("slimmedElectrons"),
+    muonInput=cms.InputTag("slimmedMuons"),
     HLTInput=cms.InputTag('TriggerResults', '', 'HLT'),
-    VertexInput=cms.InputTag('goodOfflinePrimaryVertices'),
-    #event cleaning filters
-    trkInput=cms.InputTag('generalTracks'),#track input for scraping filter
-    HcalNoiseInput=cms.InputTag('HBHENoiseFilterResultProducer', 'HBHENoiseFilterResult'),
-    HCALLaserFilterInput=cms.InputTag('HcalLaserEventFilter'),
-    ECALDeadCellFilterInput=cms.InputTag('EcalDeadCellTriggerPrimitiveFilter'),
-    TrackingFailureFilterInput=cms.InputTag('trackingFailureFilter'),
-    BadEESupercrystalFilterInput=cms.InputTag('BadEESupercrystalFilter'),
-    ECALLaserCorrFilterInput=cms.InputTag('ecalLaserCorrFilter'),
-    #trackingPOGfilters
-    ManyStripClus53XInput=cms.InputTag('manystripclus53X'),
-    TooManyStripClus53XInput=cms.InputTag('toomanystripclus53X'),
-    #LogErrorTooManyClusters=cms.InputTag('logErrorTooManyClusters'),
+    VertexInput=cms.InputTag('offlineSlimmedPrimaryVertices'),
+
+    # Signal muon cuts
+    minSignalMuonPt=cms.double(30.),
+    maxSignalMuonEta=cms.double(2.1),
+    minLooseMuonPt=cms.double(10.),
+    maxLooseMuonEta=cms.double(2.5),
+    minLooseElectronPt=cms.double(20.),
+    maxLooseElectronEta=cms.double(2.5),
 
     #jet cuts
     min1JetPt=cms.double(30.),
@@ -30,18 +26,21 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     cleaningDeltaR=cms.double(0.3),
 
     # B Jet Selection
+<<<<<<< HEAD
     # Working points taken from https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
     bJetDiscriminator=cms.string('combinedInclusiveSecondaryVertexV2BJetTags'),
     minBJetDiscriminator=cms.double(0.814),
+=======
+    bJetDiscriminator=cms.string('combinedSecondaryVertexBJetTags'),
+    minBJetDiscriminator=cms.double(0.679),
+>>>>>>> 3a4a153... Update our selection filtersand add to paths.  Simplify by removing many events filters etc.
 
     prefix=cms.untracked.string('TopPairMuonPlusJetsSelection.'),
-    MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12 or Summer11Leg
 
     #flags
     debug=cms.untracked.bool(False),
-    taggingMode=cms.untracked.bool(False),
-    useMETFilters = cms.bool(True),
-    useEEBadScFilter = cms.bool(False),
+    taggingMode=cms.bool(False),
+
     tagAndProbeStudies = cms.bool(False),
     dropTriggerSelection = cms.bool(False),
     bSelectionInTaggingMode = cms.bool(False),

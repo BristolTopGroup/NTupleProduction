@@ -26,10 +26,13 @@ def setup_ntupler(process, cms):
                # jets
                'keep *_nTuplePFJets_*_*',
                # MET
-               'keep *_nTupleMET_*_*'
+               'keep *_nTupleMET_*_*',
             )
         )
-    
+
+    process.nTupleTreeMuon = process.nTupleTree.clone( treeName = cms.string('muonTree') )
+    process.nTupleTreeElectron = process.nTupleTree.clone( treeName = cms.string('electronTree') )
+
     process.nTuples = cms.Sequence(
         # Event
         process.nTupleEvent +
@@ -53,8 +56,9 @@ def setup_ntupler(process, cms):
         process.nTuplePFJets +
 
         # MET
-        process.nTupleMET +
+        process.nTupleMET
+    )
 
-        # Make ntuple
-        process.nTupleTree)
+    process.muonNTuples = cms.Sequence( process.nTuples * process.nTupleTreeMuon )
+    process.electronNTuples = cms.Sequence( process.nTuples * process.nTupleTreeElectron )
 

@@ -2,9 +2,9 @@ import FWCore.ParameterSet.Config as cms
 
 topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter',
     # Specify input collections
-    jetInput=cms.InputTag("selectedPatJetsPFlow"),
-    electronInput=cms.InputTag("selectedPatElectronsLoosePFlow"),
-    muonInput=cms.InputTag("selectedPatMuonsLoosePFlow"),
+    jetInput=cms.InputTag("slimmedJets"),
+    electronInput=cms.InputTag("slimmedElectrons"),
+    muonInput=cms.InputTag("slimmedMuons"),
     HLTInput=cms.InputTag('TriggerResults', '', 'HLT'),
 
     # Lepton cuts
@@ -38,9 +38,8 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
 
     #flags
     debug=cms.untracked.bool(False),
-    taggingMode=cms.untracked.bool(False),
-    useMETFilters = cms.bool(True),
-    useEEBadScFilter = cms.bool(False),
+    taggingMode=cms.bool(False),
+
     tagAndProbeStudies = cms.bool(False),
     dropTriggerSelection = cms.bool(False),
     bSelectionInTaggingMode = cms.bool(False),

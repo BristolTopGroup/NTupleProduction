@@ -10,7 +10,3 @@
 <use name="BristolAnalysis/NTupleTools"/>
 <use name="SimDataFormats/GeneratorProducts"/>
 <use name="root"/>
-
-<library file="*.cc" name="BristolAnalysisNTupleToolsPlugins">
-  <flags EDM_PLUGIN="1"/>
-</library>

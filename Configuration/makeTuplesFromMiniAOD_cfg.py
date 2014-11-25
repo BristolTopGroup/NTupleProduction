@@ -12,11 +12,16 @@ process.source = cms.Source("PoolSource",
 # Use to skip events e.g. to reach a problematic event quickly
 # process.source.skipEvents = cms.untracked.uint32(40960)
 
-process.load( 'TopQuarkAnalysis.TopKinFitter.TtSemiLepKinFitProducer_Electrons_cfi' )
-process.kinFitTtSemiLepEvent.jets = cms.InputTag('slimmedJets')
-process.kinFitTtSemiLepEvent.leps = cms.InputTag('slimmedElectrons')
-process.kinFitTtSemiLepEvent.mets = cms.InputTag('slimmedMETs')
+# Load the selection filters and the selection analyzers
+# process.load( 'BristolAnalysis.NTupleTools.SelectionAnalyser_cfi' )
+# process.load( 'BristolAnalysis.NTupleTools.TopPairMuonPlusJetsSelectionFilter_cfi' )
+process.load( 'BristolAnalysis.NTupleTools.muonSelection_cff')
+process.load( 'BristolAnalysis.NTupleTools.electronSelection_cff')
 
+# process.load( 'TopQuarkAnalysis.TopKinFitter.TtSemiLepKinFitProducer_Electrons_cfi' )
+# process.kinFitTtSemiLepEvent.jets = cms.InputTag('slimmedJets')
+# process.kinFitTtSemiLepEvent.leps = cms.InputTag('slimmedElectrons')
+# process.kinFitTtSemiLepEvent.mets = cms.InputTag('slimmedMETs')
 # process.load( 'TopQuarkAnalysis.TopKinFitter.TtSemiLepKinFitProducer_Muons_cfi' )
 
 ## Maximum Number of Events
@@ -48,6 +53,15 @@ if not options.isTTbarMC:
 else:
   process.nTupleGenEventInfo.isTTbarMC = cms.bool( True )
 
+
 process.TFileService = cms.Service("TFileService",
                            fileName=cms.string('ntuple.root')
                            )
+
+# process.out = cms.OutputModule("PoolOutputModule",
+#                 fileName = cms.untracked.string("testOutput.root")
+#         )
+
+# process.outpath = cms.EndPath(process.out)
+
+
