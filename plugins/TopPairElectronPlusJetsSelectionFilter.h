@@ -99,7 +99,11 @@ private:
 	edm::InputTag jetInput_, electronInput_, muonInput_, hltInputTag_;
 
 	double minSignalElectronPt_, maxSignalElectronEta_;
+	std::string signalElectronIDCriteria_;
+	double minSignalElectronID_;
 	double minLooseMuonPt_, maxLooseMuonEta_, minLooseElectronPt_, maxLooseElectronEta_;
+	std::string looseElectronIDCriteria_;
+	double minLooseElectronID_;
 	double min1JetPt_, min2JetPt_, min3JetPt_, min4JetPt_;
 
 	double cleaningDeltaR_;

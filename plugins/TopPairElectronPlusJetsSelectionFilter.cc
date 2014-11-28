@@ -27,10 +27,14 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		// Selection criteria
 		minSignalElectronPt_(iConfig.getParameter<double>("minSignalElectronPt")), //
 		maxSignalElectronEta_(iConfig.getParameter<double>("maxSignalElectronEta")), //
+		signalElectronIDCriteria_(iConfig.getParameter<std::string>("signalElectronIDCriteria")), //
+		minSignalElectronID_(iConfig.getParameter<double>("minSignalElectronID")), //
 		minLooseMuonPt_(iConfig.getParameter<double>("minLooseMuonPt")), //
 		maxLooseMuonEta_(iConfig.getParameter<double>("maxLooseMuonEta")), //
 		minLooseElectronPt_(iConfig.getParameter<double>("minLooseElectronPt")), //
 		maxLooseElectronEta_(iConfig.getParameter<double>("maxLooseElectronEta")), //
+		looseElectronIDCriteria_(iConfig.getParameter<std::string>("looseElectronIDCriteria")), //
+		minLooseElectronID_(iConfig.getParameter<double>("minLooseElectronID")), //
 
 		min1JetPt_(iConfig.getParameter<double>("min1JetPt")), //
 		min2JetPt_(iConfig.getParameter<double>("min2JetPt")), //
@@ -86,10 +90,14 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 
 	desc.add<double>("minSignalElectronPt",0.);
 	desc.add<double>("maxSignalElectronEta",10.);
+	desc.add<std::string>("signalElectronIDCriteria","idCriteria");
+	desc.add<double>("minSignalElectronID",0);
 	desc.add<double>("minLooseMuonPt",0.);
 	desc.add<double>("maxLooseMuonEta",10.);
 	desc.add<double>("minLooseElectronPt",0.);
 	desc.add<double>("maxLooseElectronEta",10.);
+	desc.add<std::string>("looseElectronIDCriteria","idCriteria");
+	desc.add<double>("minLooseElectronID",0);
 
 	desc.add<double>("min1JetPt", 30.0);
 	desc.add<double>("min2JetPt", 30.0);
@@ -250,7 +258,7 @@ bool TopPairElectronPlusJetsSelectionFilter::isLooseElectron(const pat::Electron
 	// bool passesID = electron.electronID("mvaTrigV0") > 0.5;
 	// bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrectionsForElectrons_,
 	// 		useRhoActiveAreaCorrections_) < looseElectronIso_;
-	bool passesID = true;
+	bool passesID = electron.electronID(looseElectronIDCriteria_) > minLooseElectronID_;
 	bool passesIso = true;
 	return passesPtAndEta && passesID && passesIso;
 }
@@ -299,7 +307,7 @@ bool TopPairElectronPlusJetsSelectionFilter::isGoodElectron(const pat::Electron&
 	//2D impact w.r.t primary vertex
 	// bool passesD0 = fabs(electron.dB(pat::Electron::PV2D)) < 0.02; //cm
 	// bool passesID = electron.electronID("mvaTrigV0") > 0.5;
-	bool passesID = true;
+	bool passesID = electron.electronID(signalElectronIDCriteria_) > minSignalElectronID_;
 	bool passesD0 = true;
 	return passesPtAndEta && notInCrack && passesD0 && passesID;
 }
@@ -485,13 +493,9 @@ bool TopPairElectronPlusJetsSelectionFilter::passesLooseElectronVeto() const {
 bool TopPairElectronPlusJetsSelectionFilter::passesConversionVeto() const {
 	if (!hasExactlyOneSignalElectron())
 		return false;
-
-	bool passVeto = signalElectron_.passConversionVeto()
-				&& signalElectron_.gsfTrack()->trackerExpectedHitsInner().numberOfHits() < 1; // left in the trackerExpectedHitsInner <1, although it is not there in the AnalysisTools, because it seems to make no difference
-	if ( invertedConversionSelection_ )
-		return !passVeto;
-	else
-		return passVeto;
+	return signalElectron_.passConversionVeto();
+				// Not sure if this is accessible from miniAOD, plus more or less applied in passConversionVeto
+				// && signalElectron_.gsfTrack()->numberOfLostTrackerHits(HitPattern::MISSING_INNER_HITS) < 1; // left in the trackerExpectedHitsInner <1, although it is not there in the AnalysisTools, because it seems to make no difference
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastOneGoodJet() const {
