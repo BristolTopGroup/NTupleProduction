@@ -115,7 +115,7 @@ private:
 
 	std::string prefix_, MCSampleTag_;
 
-	bool debug_, taggingMode_, bSelectionInTaggingMode_;
+	bool debug_, taggingMode_, jetSelectionInTaggingMode_, bSelectionInTaggingMode_;
 
 	// Control region selections
 	bool nonIsolatedElectronSelection_;

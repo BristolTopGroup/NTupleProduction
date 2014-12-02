@@ -8,22 +8,32 @@ process.GlobalTag.globaltag = cms.string('PHYS14_25_V3::All')
 ## Source
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring('file:/storage/ec6821/NTupleProd/CMSSW_7_3_0/src/TT_pythia8_PHYS14.root')
+    # fileNames = cms.untracked.vstring('file:/storage/ec6821/NTupleProd/CMSSW_7_2_3/src/TT_madgraph_PHYS14.root')
+    # fileNames = cms.untracked.vstring('file:/home/ec6821/CMSSW_7_2_2/src/WJetsPhys14.root')
 )
 # Use to skip events e.g. to reach a problematic event quickly
 # process.source.skipEvents = cms.untracked.uint32(40960)
 
+process.load("FWCore.MessageLogger.MessageLogger_cfi")
+process.MessageLogger.cerr.threshold = 'INFO'
+process.MessageLogger.cerr.FwkReport.reportEvery = 5000
+
+# Get options from command line
+from FWCore.ParameterSet.VarParsing import VarParsing
+options = VarParsing ('python')
+from BristolAnalysis.NTupleTools.NTupleOptions_cff import *
+getOptions( options )
+
 # Load the selection filters and the selection analyzers
-# process.load( 'BristolAnalysis.NTupleTools.SelectionAnalyser_cfi' )
-# process.load( 'BristolAnalysis.NTupleTools.TopPairMuonPlusJetsSelectionFilter_cfi' )
 process.load( 'BristolAnalysis.NTupleTools.muonSelection_cff')
 process.load( 'BristolAnalysis.NTupleTools.electronSelection_cff')
 
-# process.load( 'TopQuarkAnalysis.TopKinFitter.TtSemiLepKinFitProducer_Electrons_cfi' )
-# process.kinFitTtSemiLepEvent.jets = cms.InputTag('slimmedJets')
-# process.kinFitTtSemiLepEvent.leps = cms.InputTag('slimmedElectrons')
-# process.kinFitTtSemiLepEvent.mets = cms.InputTag('slimmedMETs')
-# process.load( 'TopQuarkAnalysis.TopKinFitter.TtSemiLepKinFitProducer_Muons_cfi' )
-
+if options.tagAndProbe:
+  process.topPairEPlusJetsSelection.tagAndProbeStudies = cms.bool( True )
+  process.topPairEPlusJetsSelectionTagging.tagAndProbeStudies = cms.bool( True )
+  process.topPairEPlusJetsSelection.jetSelectionInTaggingMode = cms.bool( True )
+  process.topPairEPlusJetsSelectionTagging.jetSelectionInTaggingMode = cms.bool( True )
+  
 ## Maximum Number of Events
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
@@ -61,7 +71,6 @@ process.TFileService = cms.Service("TFileService",
 # process.out = cms.OutputModule("PoolOutputModule",
 #                 fileName = cms.untracked.string("testOutput.root")
 #         )
-
 # process.outpath = cms.EndPath(process.out)
 
 

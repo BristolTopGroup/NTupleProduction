@@ -52,6 +52,7 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		MCSampleTag_(iConfig.getParameter < std::string > ("MCSampleTag")), //
 		debug_(iConfig.getUntrackedParameter<bool>("debug")), //
 		taggingMode_(iConfig.getParameter<bool>("taggingMode")), //
+		jetSelectionInTaggingMode_(iConfig.getParameter<bool>("jetSelectionInTaggingMode")), //
 		bSelectionInTaggingMode_(iConfig.getParameter<bool>("bSelectionInTaggingMode")), //
 		nonIsolatedElectronSelection_(iConfig.getParameter<bool>("nonIsolatedElectronSelection")), //
 		invertedConversionSelection_(iConfig.getParameter<bool>("invertedConversionSelection")), //
@@ -116,8 +117,7 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 	desc.addUntracked<bool>("debug", false);
 	desc.add<bool>("taggingMode", false);
 	desc.add<bool>("bSelectionInTaggingMode", false);
-	desc.add<bool>("nonIsolatedElectronSelection", false);
-	desc.add<bool>("invertedConversionSelection", false);
+	desc.add<bool>("jetSelectionInTaggingMode", false);
 	descriptions.add("applyTopPairElectronPlusJetsSelection", desc);
 }
 
@@ -136,12 +136,13 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 	std::auto_ptr < pat::JetCollection > jetoutput(new pat::JetCollection());
 
 	bool passesSelection(true);
+	bool passesSelectionExceptJetRequirements(true);
 	bool passesSelectionExceptBtagging(true);
 
 	for (unsigned int step = 0; step < TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
 		if (debug_)
 			cout << "Doing selection step: " << TTbarEPlusJetsReferenceSelection::StringSteps[step] << endl;
-		TTbarEPlusJetsReferenceSelection::Step stepName = TTbarEPlusJetsReferenceSelection::Step(step);
+
 		bool passesStep(passesSelectionStep(iEvent, step));
 
 		// Require exactly zero b jets for QCD control region
@@ -154,6 +155,9 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 
 		passesSelection = passesSelection && passesStep;
 		passes_.at(step) = passesStep;
+
+		if ( step < TTbarEPlusJetsReferenceSelection::AtLeastOneGoodJet )
+			passesSelectionExceptJetRequirements = passesSelectionExceptJetRequirements && passesStep;
 
 		if ( step < TTbarEPlusJetsReferenceSelection::AtLeastOneBtag )
 			passesSelectionExceptBtagging = passesSelectionExceptBtagging && passesStep;
@@ -174,10 +178,13 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(signalElectronIndex_)),prefix_ + "signalElectronIndex");
 
-	if ( !bSelectionInTaggingMode_ )
-		return taggingMode_ || passesSelection;
-	else
+	if ( bSelectionInTaggingMode_ )
 		return taggingMode_ || passesSelectionExceptBtagging;
+	else if ( jetSelectionInTaggingMode_ )
+		return taggingMode_ || passesSelectionExceptJetRequirements;
+	else
+		return taggingMode_ || passesSelection;
+
 }
 
 void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent) {
