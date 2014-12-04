@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-rootTupleGenEventInfo = cms.EDProducer("BristolNTuple_GenEventInfo",
+nTupleGenEventInfo = cms.EDProducer("BristolNTuple_GenEventInfo",
     GenEventInfoInputTag = cms.InputTag('generator'),
     StorePDFWeights      = cms.bool(True),
     PUWeightsInputTag    = cms.InputTag('eventWeightPU'),
@@ -20,5 +20,5 @@ rootTupleGenEventInfo = cms.EDProducer("BristolNTuple_GenEventInfo",
                                          cms.InputTag( 'ttFullLeptonicEMuFilter' ),
                                          cms.InputTag( 'ttFullLeptonicMuTauFilter' ),
                 ),
-    isTTbarMC = cms.bool(False),
+    isTTbarMC = cms.bool(True),
 )

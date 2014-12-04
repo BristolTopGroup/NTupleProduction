@@ -16,13 +16,21 @@ process.source = cms.Source("PoolSource",
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger.cerr.threshold = 'INFO'
-process.MessageLogger.cerr.FwkReport.reportEvery = 5000
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 # Get options from command line
 from FWCore.ParameterSet.VarParsing import VarParsing
 options = VarParsing ('python')
 from BristolAnalysis.NTupleTools.NTupleOptions_cff import *
 getOptions( options )
+
+# TT Gen Event configuration
+from BristolAnalysis.NTupleTools.ttGenConfig_cff import *
+setupTTGenEvent( process, cms )
+
+# Hit fit
+from BristolAnalysis.NTupleTools.hitFit_cff import *
+setupHitFit( process, cms )
 
 # Load the selection filters and the selection analyzers
 process.load( 'BristolAnalysis.NTupleTools.muonSelection_cff')

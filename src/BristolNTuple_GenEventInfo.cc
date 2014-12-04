@@ -24,7 +24,6 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 	produces < std::vector<int> > (prefix_ + "PileUpInteractions" + suffix_);
 	produces < std::vector<int> > (prefix_ + "NumberOfTrueInteractions" + suffix_);
 	produces < std::vector<int> > (prefix_ + "PileUpOriginBX" + suffix_);
-	produces<unsigned int>(prefix_ + "FlavourHistory" + suffix_);
 	produces<unsigned int>(prefix_ + "TtbarDecay" + suffix_);
 }
 
@@ -38,13 +37,11 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 
 	std::auto_ptr < std::vector<int> > NumberOfTrueInteractions(new std::vector<int>());
 	std::auto_ptr < std::vector<int> > OriginBX(new std::vector<int>());
-	std::auto_ptr<unsigned int> flavourHistory(new unsigned int());
 	std::auto_ptr<unsigned int> ttbarDecay(new unsigned int());
 
 	*processID.get() = 0;
 	*ptHat.get() = 0.;
 	*PUWeight.get() = 0.;
-	*flavourHistory.get() = 0;
 	*ttbarDecay.get() = 0;
 
 	//-----------------------------------------------------------------
@@ -53,10 +50,7 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 		edm::Handle < GenEventInfoProduct > genEvtInfoProduct;
 		iEvent.getByLabel(genEvtInfoInputTag, genEvtInfoProduct);
 
-		edm::Handle<unsigned int> historyProduct;
-		iEvent.getByLabel("flavorHistoryFilter", historyProduct);
 
-		*flavourHistory.get() = *historyProduct;
 
 		if (genEvtInfoProduct.isValid()) {
 			edm::LogInfo("BristolNTuple_GenEventInfoInfo") << "Successfully obtained " << genEvtInfoInputTag;
@@ -68,48 +62,48 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 			edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product " << genEvtInfoInputTag;
 		}
 
-		// PU Weights Part
-		edm::Handle<double> puWeightsHandle;
-		iEvent.getByLabel(puWeightsInputTag_, puWeightsHandle);
+		// // PU Weights Part
+		// edm::Handle<double> puWeightsHandle;
+		// iEvent.getByLabel(puWeightsInputTag_, puWeightsHandle);
 
-		if (puWeightsHandle.isValid()) {
-			edm::LogInfo("BristolNTuple_GenEventInfoInfo") << "Successfully obtained " << puWeightsInputTag_;
+		// if (puWeightsHandle.isValid()) {
+		// 	edm::LogInfo("BristolNTuple_GenEventInfoInfo") << "Successfully obtained " << puWeightsInputTag_;
 
-			*PUWeight.get() = *puWeightsHandle;
+		// 	*PUWeight.get() = *puWeightsHandle;
 
-		} else {
-			edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product " << puWeightsInputTag_;
-		}
+		// } else {
+		// 	edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product " << puWeightsInputTag_;
+		// }
 
-		// PDF Weights Part
-		if (storePDFWeights_) {
-			edm::Handle < std::vector<double> > pdfWeightsHandle;
-			iEvent.getByLabel(pdfWeightsInputTag_, pdfWeightsHandle);
+		// // PDF Weights Part
+		// if (storePDFWeights_) {
+		// 	edm::Handle < std::vector<double> > pdfWeightsHandle;
+		// 	iEvent.getByLabel(pdfWeightsInputTag_, pdfWeightsHandle);
 
-			if (pdfWeightsHandle.isValid()) {
-				edm::LogInfo("BristolNTuple_GenEventInfoInfo") << "Successfully obtained " << pdfWeightsInputTag_;
+		// 	if (pdfWeightsHandle.isValid()) {
+		// 		edm::LogInfo("BristolNTuple_GenEventInfoInfo") << "Successfully obtained " << pdfWeightsInputTag_;
 
-				*pdfWeights.get() = *pdfWeightsHandle;
+		// 		*pdfWeights.get() = *pdfWeightsHandle;
 
-			} else {
-				edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product "
-						<< pdfWeightsInputTag_;
-			}
-		}
-		// PileupSummary Part
-		edm::Handle < std::vector<PileupSummaryInfo> > puInfo;
-		iEvent.getByLabel(pileupInfoSrc_, puInfo);
+		// 	} else {
+		// 		edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product "
+		// 				<< pdfWeightsInputTag_;
+		// 	}
+		// }
+		// // PileupSummary Part
+		// edm::Handle < std::vector<PileupSummaryInfo> > puInfo;
+		// iEvent.getByLabel(pileupInfoSrc_, puInfo);
 
-		if (puInfo.isValid()) {
+		// if (puInfo.isValid()) {
 
-			for (std::vector<PileupSummaryInfo>::const_iterator it = puInfo->begin(); it != puInfo->end(); ++it) {
-				Number_interactions->push_back(it->getPU_NumInteractions());
-				OriginBX->push_back(it->getBunchCrossing());
-				NumberOfTrueInteractions->push_back(it->getTrueNumInteractions());
-			}
-		} else {
-			edm::LogError("BristolNTuple_PileUpError") << "Error! Can't get the product " << pileupInfoSrc_;
-		}
+		// 	for (std::vector<PileupSummaryInfo>::const_iterator it = puInfo->begin(); it != puInfo->end(); ++it) {
+		// 		Number_interactions->push_back(it->getPU_NumInteractions());
+		// 		OriginBX->push_back(it->getBunchCrossing());
+		// 		NumberOfTrueInteractions->push_back(it->getTrueNumInteractions());
+		// 	}
+		// } else {
+		// 	edm::LogError("BristolNTuple_PileUpError") << "Error! Can't get the product " << pileupInfoSrc_;
+		// }
 
 		//identify ttbar decay mode
 		if (isTTbarMC_) {
@@ -127,6 +121,7 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 				}
 			}
 			if (numberOfIdentifiedModes > 1) {
+				std::cout << "PANIC" << std::endl;
 				edm::LogError("BristolNTuple_GenEventError") << "Error! Found more than one compatible decay mode:"
 						<< numberOfIdentifiedModes;
 			}
@@ -141,7 +136,6 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	iEvent.put(Number_interactions, prefix_ + "PileUpInteractions" + suffix_);
 	iEvent.put(NumberOfTrueInteractions, prefix_ + "NumberOfTrueInteractions" + suffix_);
 	iEvent.put(OriginBX, prefix_ + "PileUpOriginBX" + suffix_);
-	iEvent.put(flavourHistory, prefix_ + "FlavourHistory" + suffix_);
 	iEvent.put(ttbarDecay, prefix_ + "TtbarDecay" + suffix_);
 
 }
