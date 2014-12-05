@@ -61,6 +61,7 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		signalElectronIndex_(999), //
 		isRealData_(false), //
 		hasSignalElectron_(false), //
+		cleanedJetIndex_(),
 		jets_(), //,
 		cleanedJets_(), //
 		cleanedBJets_(), //
@@ -77,8 +78,10 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		produces<bool>(prefix_ + TTbarEPlusJetsReferenceSelection::StringSteps[step]);
 	}
 	produces<bool>(prefix_ + "FullSelection");
+	produces<unsigned int>(prefix_ + "NumberOfJets");
 	produces<unsigned int>(prefix_ + "NumberOfBtags");
-	produces < pat::JetCollection > (prefix_ + "cleanedJets");
+	produces<std::vector<unsigned int> >(prefix_ + "cleanedJetIndex");
+	// produces < pat::JetCollection > (prefix_ + "cleanedJets");
 	produces<unsigned int>(prefix_ + "signalElectronIndex");
 }
 
@@ -131,9 +134,16 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 	// Including selecting a signal electron, loose leptons, jets and bjets
 	setupEventContent(iEvent);
 	
+	// Store number of cleaned jets in events
+	unsigned int numberOfJets(cleanedJets_.size());
+	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfJets)), prefix_ + "NumberOfJets");
+
+	// Store indices of cleaned jets in event
+	iEvent.put(std::auto_ptr<std::vector<unsigned int> >(new std::vector<unsigned int>(cleanedJetIndex_)), prefix_ + "cleanedJetIndex");
+	
 	unsigned int numberOfBtags(cleanedBJets_.size());
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfBtags)), prefix_ + "NumberOfBtags");
-	std::auto_ptr < pat::JetCollection > jetoutput(new pat::JetCollection());
+	// std::auto_ptr < pat::JetCollection > jetoutput(new pat::JetCollection());
 
 	bool passesSelection(true);
 	bool passesSelectionExceptJetRequirements(true);
@@ -172,9 +182,9 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 	}
 	iEvent.put(std::auto_ptr<bool>(new bool(passesSelection)), prefix_ + "FullSelection");
 
-	for (unsigned int index = 0; index < cleanedJets_.size(); ++index)
-		jetoutput->push_back(cleanedJets_.at(index));
-	iEvent.put(jetoutput, prefix_ + "cleanedJets");
+	// for (unsigned int index = 0; index < cleanedJets_.size(); ++index)
+		// jetoutput->push_back(cleanedJets_.at(index));
+	// iEvent.put(jetoutput, prefix_ + "cleanedJets");
 
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(signalElectronIndex_)),prefix_ + "signalElectronIndex");
 
@@ -321,6 +331,7 @@ bool TopPairElectronPlusJetsSelectionFilter::isGoodElectron(const pat::Electron&
 
 void TopPairElectronPlusJetsSelectionFilter::cleanedJets() {
 	cleanedJets_.clear();
+	cleanedJetIndex_.clear();
 
 	// Loop over jets
 	for (unsigned index = 0; index < jets_.size(); ++index) {
@@ -348,8 +359,10 @@ void TopPairElectronPlusJetsSelectionFilter::cleanedJets() {
 		}
 
 		// Keep jet if it doesn't overlap with the signal electron
-		if (!overlaps)
+		if (!overlaps){
 			cleanedJets_.push_back(jet);
+			cleanedJetIndex_.push_back(index);
+		}
 	}
 }
 

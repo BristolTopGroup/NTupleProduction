@@ -102,6 +102,8 @@ private:
 	std::string bJetDiscriminator_;
 	double minBJetDiscriminator_;
 
+	double tightMuonIso_, controlMuonIso_;
+
 	bool tagAndProbeStudies_, dropTriggerSelection_;
 
 	std::string prefix_, MCSampleTag_;
@@ -115,6 +117,7 @@ private:
 	boost::array<bool, TTbarMuPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS> passes_;
 	unsigned int runNumber_, signalMuonIndex_;
 	bool isRealData_, hasSignalMuon_, hasGoodPV_;
+	std::vector< unsigned int> cleanedJetIndex_;
 	pat::JetCollection jets_, cleanedJets_, cleanedBJets_;
 	pat::ElectronCollection electrons_, looseElectrons_;
 	pat::MuonCollection muons_, goodIsolatedMuons_, looseMuons_;

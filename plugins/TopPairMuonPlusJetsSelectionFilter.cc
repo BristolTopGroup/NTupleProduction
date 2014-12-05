@@ -44,6 +44,9 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 		bJetDiscriminator_(iConfig.getParameter<std::string>("bJetDiscriminator")), //
 		minBJetDiscriminator_(iConfig.getParameter<double>("minBJetDiscriminator")), //
 
+		tightMuonIso_(iConfig.getParameter<double>("tightMuonIsolation")), //
+        controlMuonIso_(iConfig.getParameter<double>("controlMuonIsolation")), //
+
 		// Flags and labels
 		tagAndProbeStudies_(iConfig.getParameter<bool>("tagAndProbeStudies")), //
 		dropTriggerSelection_(iConfig.getParameter<bool>("dropTriggerSelection")), //
@@ -59,6 +62,7 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 		isRealData_(false), //
 		hasSignalMuon_(false), //
 		hasGoodPV_(false), //
+		cleanedJetIndex_(),
 		jets_(), //,
 		cleanedJets_(), //
 		cleanedBJets_(), //
@@ -77,7 +81,9 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 	}
 	produces<bool>(prefix_ + "FullSelection");
 	produces<unsigned int>(prefix_ + "NumberOfBtags");
-	produces < pat::JetCollection > (prefix_ + "cleanedJets");
+	produces<unsigned int>(prefix_ + "NumberOfJets");
+	produces<std::vector<unsigned int> >(prefix_ + "cleanedJetIndex");
+	// produces < pat::JetCollection > (prefix_ + "cleanedJets");
 	produces<unsigned int>(prefix_ + "signalMuonIndex");
 }
 
@@ -105,6 +111,8 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 	desc.add < std::string > ("bJetDiscriminator", "combinedSecondaryVertexBJetTags");
 	desc.add<double>("minBJetDiscriminator", 0.679 );
 
+	desc.add<double>("tightMuonIsolation", 0.12);
+	desc.add<double>("controlMuonIsolation", 0.3);
 	desc.add<bool>("tagAndProbeStudies", false);
 	desc.add<bool>("dropTriggerSelection", false);
 
@@ -122,17 +130,24 @@ TopPairMuonPlusJetsSelectionFilter::~TopPairMuonPlusJetsSelectionFilter() {
 }
 
 bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
-	
+
 	// Get content from event
 	// Including selecting a signal muon, loose leptons, jets and bjets
 	setupEventContent(iEvent);
+
+	// Store number of cleaned jets in event
+	unsigned int numberOfJets(cleanedJets_.size());
+	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfJets)), prefix_ + "NumberOfJets");
+
+	// Store indices of cleaned jets in event
+	iEvent.put(std::auto_ptr<std::vector<unsigned int> >(new std::vector<unsigned int>(cleanedJetIndex_)), prefix_ + "cleanedJetIndex");
 
 	// Store number of b tags in event
 	unsigned int numberOfBtags(cleanedBJets_.size());
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfBtags)), prefix_ + "NumberOfBtags");
 
 	// Prepare output of cleaned jets
-	std::auto_ptr < pat::JetCollection > jetoutput(new pat::JetCollection());
+	// std::auto_ptr < pat::JetCollection > jetoutput(new pat::JetCollection());
 
 
 	// Loop through each selection step in order and check if event satisfies each criterion
@@ -177,9 +192,9 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 	iEvent.put(std::auto_ptr<bool>(new bool(passesSelection)), prefix_ + "FullSelection");
 
 	// Put cleaned jets in event
-	for (unsigned int index = 0; index < cleanedJets_.size(); ++index)
-		jetoutput->push_back(cleanedJets_.at(index));
-	iEvent.put(jetoutput, prefix_ + "cleanedJets");
+	// for (unsigned int index = 0; index < cleanedJets_.size(); ++index)
+		// jetoutput->push_back(cleanedJets_.at(index));
+	// iEvent.put(jetoutput, prefix_ + "cleanedJets");
 
 	// Store index of signal muon
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(signalMuonIndex_)),prefix_ + "signalMuonIndex");
@@ -314,18 +329,38 @@ void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
 	goodIsolatedMuons_.clear();
 
 	// Get muons that pass the full selection
+	unsigned int indexToStore = 0;
 	for (unsigned index = 0; index < muons_.size(); ++index) {
 		const pat::Muon muon = muons_.at(index);
 
+		// Only these muons are stored in the ntuple
+		// Due to info on tracks not being available for SA muons
+		// This is part of tight muon ID
+		// But still have to do this (and faff with indexToStore) to get index of 
+		// muon out of those that get stored in the ntuple (all but SA muons)
+		if (!( muon.isGlobalMuon() || muon.isTrackerMuon() ) )
+			continue;
+
 		// bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < tightMuonIso_;
+<<<<<<< HEAD
 		bool passesIso = true;
+=======
+		bool passesIso = false;
+
+        if ( nonIsolatedMuonSelection_ ) {
+        	passesIso = getRelativeIsolation(muon, 0.4, true) > controlMuonIso_;
+		}
+	   	else
+           	passesIso = getRelativeIsolation(muon, 0.4, true) < tightMuonIso_;
+>>>>>>> 54cbc61... Fix bug in storing signal lepton index.
 
 		if (isGoodMuon(muon) && passesIso) {
 			goodIsolatedMuons_.push_back(muon);
 
 			//Check if this is the first, and therefore the signal, muon
-			if ( goodIsolatedMuons_.size()==1 ) signalMuonIndex_ = index;
+			if ( goodIsolatedMuons_.size()==1 ) signalMuonIndex_ = indexToStore;
 		}
+		++indexToStore;
 	}
 }
 
@@ -345,6 +380,7 @@ bool TopPairMuonPlusJetsSelectionFilter::isGoodMuon(const pat::Muon& muon) const
 
 void TopPairMuonPlusJetsSelectionFilter::cleanedJets() {
 	cleanedJets_.clear();
+	cleanedJetIndex_.clear();
 
 	// Loop over jets
 	for (unsigned index = 0; index < jets_.size(); ++index) {
@@ -371,8 +407,10 @@ void TopPairMuonPlusJetsSelectionFilter::cleanedJets() {
 			}
 		}
 		// Keep jet if it doesn't overlap with the signal muon
-		if (!overlaps)
+		if (!overlaps){
 			cleanedJets_.push_back(jet);
+			cleanedJetIndex_.push_back(index);
+		}
 	}
 }
 

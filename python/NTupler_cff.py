@@ -29,13 +29,15 @@ def setup_ntupler(process, cms):
                'keep *_nTupleMET_*_*',
                # Gen Event
                'keep *_nTupleGenEventInfo_*_*',
-               
+
                # 'keep *_hitFitTtSemiLepEvent_MT_*',
             )
         )
 
     process.nTupleTreeMuon = process.nTupleTree.clone( treeName = cms.string('muonTree') )
+    process.nTupleTreeMuon.outputCommands.append( 'keep uint*_topPairMuPlusJetsSelection_*_*' )
     process.nTupleTreeElectron = process.nTupleTree.clone( treeName = cms.string('electronTree') )
+    process.nTupleTreeElectron.outputCommands.append( 'keep uint*_topPairEPlusJetsSelection_*_*' )
 
     process.nTuples = cms.Sequence(
         # Event
