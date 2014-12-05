@@ -29,8 +29,8 @@ from BristolAnalysis.NTupleTools.ttGenConfig_cff import *
 setupTTGenEvent( process, cms )
 
 # Hit fit
-from BristolAnalysis.NTupleTools.hitFit_cff import *
-setupHitFit( process, cms )
+# from BristolAnalysis.NTupleTools.hitFit_cff import *
+# setupHitFit( process, cms )
 
 # Load the selection filters and the selection analyzers
 process.load( 'BristolAnalysis.NTupleTools.muonSelection_cff')
@@ -41,7 +41,8 @@ if options.tagAndProbe:
   process.topPairEPlusJetsSelectionTagging.tagAndProbeStudies = cms.bool( True )
   process.topPairEPlusJetsSelection.jetSelectionInTaggingMode = cms.bool( True )
   process.topPairEPlusJetsSelectionTagging.jetSelectionInTaggingMode = cms.bool( True )
-  
+
+ 
 ## Maximum Number of Events
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
@@ -70,7 +71,6 @@ if not options.isTTbarMC:
   process.makingNTuples.remove( process.ttGenEvent )
 else:
   process.nTupleGenEventInfo.isTTbarMC = cms.bool( True )
-
 
 process.TFileService = cms.Service("TFileService",
                            fileName=cms.string('ntuple.root')

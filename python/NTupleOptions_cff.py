@@ -14,6 +14,18 @@ def getOptions( options ):
                         VarParsing.varType.bool,
                         "Apply jet selection requirements (last 6 selection steps) in tagging mode")
 
+      options.register ('isTTbarMC',
+                        False,
+                        VarParsing.multiplicity.singleton,
+                        VarParsing.varType.bool,
+                        "Is this ttbar MC")
+
+      options.register('selectionInTaggingMode',
+                        False,
+                        VarParsing.multiplicity.singleton,
+                        VarParsing.varType.bool,
+                        "Apply full selection in tagging mode")
+
       options.parseArguments()
 
       if options.tagAndProbe and not options.jetSelectionInTaggingMode:
