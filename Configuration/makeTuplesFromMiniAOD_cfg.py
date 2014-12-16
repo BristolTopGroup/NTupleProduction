@@ -10,6 +10,11 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring('file:/storage/ec6821/NTupleProd/CMSSW_7_3_0/src/TT_pythia8_PHYS14.root')
     # fileNames = cms.untracked.vstring('file:/storage/ec6821/NTupleProd/CMSSW_7_2_3/src/TT_madgraph_PHYS14.root')
     # fileNames = cms.untracked.vstring('file:/home/ec6821/CMSSW_7_2_2/src/WJetsPhys14.root')
+<<<<<<< HEAD
+=======
+    # fileNames = cms.untracked.vstring('file:/storage/ec6821/NTupleProd/CMSSW_7_3_0/src/DY_PHYS14.root')
+    # fileNames = cms.untracked.vstring('file:/storage/ec6821/NTupleProd/CMSSW_7_3_0/src/pickevents_1_1_yG6.root')
+>>>>>>> b49b225... Add missing selection info to output.
 )
 # Use to skip events e.g. to reach a problematic event quickly
 # process.source.skipEvents = cms.untracked.uint32(40960)
@@ -35,6 +40,7 @@ setupTTGenEvent( process, cms )
 # Load the selection filters and the selection analyzers
 process.load( 'BristolAnalysis.NTupleTools.muonSelection_cff')
 process.load( 'BristolAnalysis.NTupleTools.electronSelection_cff')
+process.load( 'BristolAnalysis.NTupleTools.SelectionCriteriaAnalyzer_cfi')
 
 if options.tagAndProbe:
   process.topPairEPlusJetsSelection.tagAndProbeStudies = cms.bool( True )
@@ -60,12 +66,14 @@ process.makingNTuples = cms.Path(
 
 process.nTupleTree.outputCommands.append( 'keep uint*_topPairMuPlusJetsSelectionTagging_*_*' )
 process.nTupleTree.outputCommands.append( 'keep uint*_topPairEPlusJetsSelectionTagging_*_*' )
-process.nTupleTree.outputCommands.append( 'keep bool_topPairMuPlusJetsSelectionTagging_*_*' )
-process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsSelectionTagging_*_*' )
+process.nTupleTree.outputCommands.append( 'keep uint*_topPairEPlusJetsQCDSelectionTagging_*_*' )
+process.nTupleTree.outputCommands.append( 'keep uint*_topPairEPlusJetsConversionSelectionTagging_*_*' )
 
-
-if options.selectionInTaggingMode:
-  process.makingNTuples.remove( process.topPairMuPlusJetsSelection )
+process.nTupleTree.outputCommands.append( 'keep bool_topPairMuPlusJetsSelectionTagging_*FullSelection*_*' )
+process.nTupleTree.outputCommands.append( 'keep bool_topPairMuPlusJetsQCDSelectionTagging_*FullSelection*_*' )
+process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsSelectionTagging_*FullSelection*_*' )
+process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsQCDSelectionTagging_*FullSelection*_*' )
+process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsConversionSelectionTagging_*FullSelection*_*' )
 
 if not options.isTTbarMC:
   process.makingNTuples.remove( process.ttGenEvent )

@@ -31,6 +31,8 @@ def setup_ntupler(process, cms):
                'keep *_nTupleGenEventInfo_*_*',
 
                # 'keep *_hitFitTtSemiLepEvent_MT_*',
+
+               'keep *_selectionCriteriaAnalyzer_*_*'
             )
         )
 
