@@ -62,6 +62,7 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		isRealData_(false), //
 		hasSignalElectron_(false), //
 		cleanedJetIndex_(),
+		cleanedBJetIndex_(),
 		jets_(), //,
 		cleanedJets_(), //
 		cleanedBJets_(), //
@@ -81,6 +82,7 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 	produces<unsigned int>(prefix_ + "NumberOfJets");
 	produces<unsigned int>(prefix_ + "NumberOfBtags");
 	produces<std::vector<unsigned int> >(prefix_ + "cleanedJetIndex");
+	produces<std::vector<unsigned int> >(prefix_ + "cleanedBJetIndex");
 	// produces < pat::JetCollection > (prefix_ + "cleanedJets");
 	produces<unsigned int>(prefix_ + "signalElectronIndex");
 }
@@ -143,6 +145,8 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 	
 	unsigned int numberOfBtags(cleanedBJets_.size());
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfBtags)), prefix_ + "NumberOfBtags");
+	iEvent.put(std::auto_ptr<std::vector<unsigned int> >(new std::vector<unsigned int>(cleanedBJetIndex_)), prefix_ + "cleanedBJetIndex");
+
 	// std::auto_ptr < pat::JetCollection > jetoutput(new pat::JetCollection());
 
 	bool passesSelection(true);
@@ -368,6 +372,8 @@ void TopPairElectronPlusJetsSelectionFilter::cleanedJets() {
 
 void TopPairElectronPlusJetsSelectionFilter::cleanedBJets() {
 	cleanedBJets_.clear();
+	cleanedBJetIndex_.clear();
+
 	// Loop over cleaned jets
 	for (unsigned index = 0; index < cleanedJets_.size(); ++index) {
 		const pat::Jet jet = cleanedJets_.at(index);
@@ -376,6 +382,7 @@ void TopPairElectronPlusJetsSelectionFilter::cleanedBJets() {
 		if (jet.bDiscriminator(bJetDiscriminator_) > minBJetDiscriminator_) {
 			// Keep if it does
 			cleanedBJets_.push_back(jet);
+			cleanedBJetIndex_.push_back(index);
 		}
 	}
 }
