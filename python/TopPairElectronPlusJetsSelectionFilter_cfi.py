@@ -31,8 +31,10 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     # B Jet Selection
     # Working points taken from https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
     bJetDiscriminator=cms.string('combinedInclusiveSecondaryVertexV2BJetTags'),
-    minBJetDiscriminator=cms.double(0.814),  
+    minBJetDiscriminator=cms.double(0.814),
 
+    controlElectronIsolation=cms.double(0.2),
+   
     prefix=cms.untracked.string('TopPairElectronPlusJetsSelection.'),
     MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12 or Summer11Leg
 

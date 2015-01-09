@@ -87,8 +87,8 @@ public:
 	virtual bool hasAtLeastTwoGoodJets() const;
 	virtual bool hasAtLeastThreeGoodJets() const;
 	virtual bool hasAtLeastFourGoodJets() const;
-	virtual bool hasExactlyZeroGoodBJet() const;
-	virtual bool hasExactlyOneGoodBJet() const;
+    virtual bool hasExactlyZeroGoodBJet() const;
+    virtual bool hasExactlyOneGoodBJet() const;
 	virtual bool hasAtLeastOneGoodBJet() const;
 	virtual bool hasAtLeastTwoGoodBJets() const;
 
@@ -110,6 +110,8 @@ private:
 
 	std::string bJetDiscriminator_;
 	double minBJetDiscriminator_;
+
+	double controlElectronIso_;
 
 	bool tagAndProbeStudies_, dropTriggerSelection_;
 

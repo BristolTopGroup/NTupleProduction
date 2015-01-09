@@ -182,6 +182,18 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 		if ( step < TTbarMuPlusJetsReferenceSelection::AtLeastOneBtag )
 			passesSelectionExceptBtagging = passesSelectionExceptBtagging && passesStep;
 
+		// Remove at least 4 jet selection for QCD control region (only need at least 3)
+       	// Also require exactly zero b jets
+       	// Or exactly one b jet, as e.g. angle(b,l) only makes sense if there is at least one b jet
+		if ( nonIsolatedMuonSelection_ ) {
+			if ( step == TTbarMuPlusJetsReferenceSelection::AtLeastFourGoodJets )
+			       passesStep = true;
+	
+			if ( step == TTbarMuPlusJetsReferenceSelection::AtLeastOneBtag || step == TTbarMuPlusJetsReferenceSelection::AtLeastTwoBtags ) {
+			       passesStep = hasExactlyZeroGoodBJet() || hasExactlyOneGoodBJet() ;
+			}
+		}
+
 		// if doesn't pass selection and not in tagging mode, stop here to save CPU time
 		if ( !(taggingMode_ || passesSelection) )
 			break;
@@ -345,9 +357,6 @@ void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
 			continue;
 
 		// bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < tightMuonIso_;
-<<<<<<< HEAD
-		bool passesIso = true;
-=======
 		bool passesIso = false;
 
         if ( nonIsolatedMuonSelection_ ) {
@@ -355,7 +364,7 @@ void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
 		}
 	   	else
            	passesIso = getRelativeIsolation(muon, 0.4, true) < tightMuonIso_;
->>>>>>> 54cbc61... Fix bug in storing signal lepton index.
+
 
 		if (isGoodMuon(muon) && passesIso) {
 			goodIsolatedMuons_.push_back(muon);
@@ -582,11 +591,11 @@ bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastFourGoodJets() const {
 }
 
 bool TopPairMuonPlusJetsSelectionFilter::hasExactlyZeroGoodBJet() const {
-	return cleanedBJets_.size() == 0;
+       return cleanedBJets_.size() == 0;
 }
 
 bool TopPairMuonPlusJetsSelectionFilter::hasExactlyOneGoodBJet() const {
-	return cleanedBJets_.size() == 1;
+       return cleanedBJets_.size() == 1;
 }
 
 bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastOneGoodBJet() const {

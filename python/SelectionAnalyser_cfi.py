@@ -23,6 +23,54 @@ topPairEPlusJetsSelectionAnalyser = cms.EDAnalyzer("SelectionAnalyser",
     selectionNames=cms.vstring(selectionCuts),
 )
 
+selectionPrefix = 'TopPairElectronPlusJetsQCDSelection.'
+selectionName = 'topPairEPlusJetsQCDSelectionTagging'
+selectionCuts = [
+                "AllEvents",
+                "EventCleaningAndTrigger",
+                "ExactlyOneSignalElectron",
+                "LooseMuonVeto",
+                "LooseElectronVeto",
+                "ConversionVeto",
+                "AtLeastOneGoodJet",
+                "AtLeastTwoGoodJets",
+                "AtLeastThreeGoodJets",
+                "AtLeastFourGoodJets",
+                "AtLeastOneBtag",
+                "AtLeastTwoBtags" 
+                         ]
+selectionProducts = [cms.InputTag(selectionName, selectionPrefix + cut, 'Ntuples') for cut in selectionCuts]
+
+topPairEPlusJetsQCDSelectionAnalyser = cms.EDAnalyzer("SelectionAnalyser",
+    # PUWeightInput=cms.InputTag('eventWeightPU'),
+    selectionFlags=cms.VInputTag(selectionProducts),
+    selectionNames=cms.vstring(selectionCuts),
+)
+
+selectionPrefix = 'TopPairElectronPlusJetsConversionSelection.'
+selectionName = 'topPairEPlusJetsConversionSelectionTagging'
+selectionCuts = [
+                "AllEvents",
+                "EventCleaningAndTrigger",
+                "ExactlyOneSignalElectron",
+                "LooseMuonVeto",
+                "LooseElectronVeto",
+                "ConversionVeto",
+                "AtLeastOneGoodJet",
+                "AtLeastTwoGoodJets",
+                "AtLeastThreeGoodJets",
+                "AtLeastFourGoodJets",
+                "AtLeastOneBtag",
+                "AtLeastTwoBtags" 
+                         ]
+selectionProducts = [cms.InputTag(selectionName, selectionPrefix + cut, 'Ntuples') for cut in selectionCuts]
+
+topPairEPlusJetsConversionSelectionAnalyser = cms.EDAnalyzer("SelectionAnalyser",
+    # PUWeightInput=cms.InputTag('eventWeightPU'),
+    selectionFlags=cms.VInputTag(selectionProducts),
+    selectionNames=cms.vstring(selectionCuts),
+)
+
 selectionPrefix = 'TopPairMuonPlusJetsSelection.'
 selectionName = 'topPairMuPlusJetsSelectionTagging'
 selectionCuts = [
@@ -41,6 +89,29 @@ selectionCuts = [
 selectionProducts = [cms.InputTag(selectionName, selectionPrefix + cut, 'Ntuples') for cut in selectionCuts]
 
 topPairMuPlusJetsSelectionAnalyser = cms.EDAnalyzer("SelectionAnalyser",
+    # PUWeightInput=cms.InputTag('eventWeightPU'),
+    selectionFlags=cms.VInputTag(selectionProducts),
+    selectionNames=cms.vstring(selectionCuts),
+)
+
+selectionPrefix = 'TopPairMuonPlusJetsQCDSelection.'
+selectionName = 'topPairMuPlusJetsQCDSelectionTagging'
+selectionCuts = [
+               "AllEvents", 
+                "EventCleaningAndTrigger", 
+                "ExactlyOneSignalMuon", 
+                "LooseMuonVeto", 
+                "LooseElectronVeto", 
+                "AtLeastOneGoodJet", 
+                "AtLeastTwoGoodJets", 
+                "AtLeastThreeGoodJets", 
+                "AtLeastFourGoodJets", 
+                "AtLeastOneBtag", 
+                "AtLeastTwoBtags" 
+                         ]
+selectionProducts = [cms.InputTag(selectionName, selectionPrefix + cut, 'Ntuples') for cut in selectionCuts]
+
+topPairMuPlusJetsQCDSelectionAnalyser = cms.EDAnalyzer("SelectionAnalyser",
     # PUWeightInput=cms.InputTag('eventWeightPU'),
     selectionFlags=cms.VInputTag(selectionProducts),
     selectionNames=cms.vstring(selectionCuts),

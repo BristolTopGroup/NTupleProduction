@@ -11,6 +11,7 @@
 #include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "DataFormats/METReco/interface/BeamHaloSummary.h"
+#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 
 using namespace edm;
 using namespace std;
@@ -46,6 +47,8 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		bJetDiscriminator_(iConfig.getParameter<std::string>("bJetDiscriminator")), //
 		minBJetDiscriminator_(iConfig.getParameter<double>("minBJetDiscriminator")), //
 
+		controlElectronIso_(iConfig.getParameter<double>("controlElectronIsolation")), //
+
 		tagAndProbeStudies_(iConfig.getParameter<bool>("tagAndProbeStudies")), //
 		dropTriggerSelection_(iConfig.getParameter<bool>("dropTriggerSelection")), //
 		prefix_(iConfig.getUntrackedParameter < std::string > ("prefix")), //
@@ -54,8 +57,13 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		taggingMode_(iConfig.getParameter<bool>("taggingMode")), //
 		jetSelectionInTaggingMode_(iConfig.getParameter<bool>("jetSelectionInTaggingMode")), //
 		bSelectionInTaggingMode_(iConfig.getParameter<bool>("bSelectionInTaggingMode")), //
+<<<<<<< HEAD
 		nonIsolatedElectronSelection_(iConfig.getParameter<bool>("nonIsolatedElectronSelection")), //
 		invertedConversionSelection_(iConfig.getParameter<bool>("invertedConversionSelection")), //
+=======
+       	nonIsolatedElectronSelection_(iConfig.getParameter<bool>("nonIsolatedElectronSelection")), //
+       	invertedConversionSelection_(iConfig.getParameter<bool>("invertedConversionSelection")), //
+>>>>>>> Add qcd control regions to ntuples.
 		passes_(), //
 		runNumber_(0), //
 		signalElectronIndex_(999), //
@@ -113,6 +121,8 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 	desc.add<double>("cleaningDeltaR", 0.3 );
 	desc.add < std::string > ("bJetDiscriminator", "combinedSecondaryVertexBJetTags");
 	desc.add<double>("minBJetDiscriminator", 0.679 );
+
+	desc.add<double>("controlElectronIsolation", 0.3);
 	
 	desc.add<bool>("tagAndProbeStudies", false);
 	desc.add<bool>("dropTriggerSelection", false);
@@ -123,6 +133,8 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 	desc.add<bool>("taggingMode", false);
 	desc.add<bool>("bSelectionInTaggingMode", false);
 	desc.add<bool>("jetSelectionInTaggingMode", false);
+   	desc.add<bool>("nonIsolatedElectronSelection", false);
+   	desc.add<bool>("invertedConversionSelection", false);
 	descriptions.add("applyTopPairElectronPlusJetsSelection", desc);
 }
 
@@ -175,6 +187,14 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 
 		if ( step < TTbarEPlusJetsReferenceSelection::AtLeastOneBtag )
 			passesSelectionExceptBtagging = passesSelectionExceptBtagging && passesStep;
+
+       // Require exactly zero b jets for QCD control region
+       // Or exactly one b jet, as e.g. angle(b,l) only makes sense if there is at least one b jet
+       if ( nonIsolatedElectronSelection_ || invertedConversionSelection_ ) {
+            if ( step == TTbarEPlusJetsReferenceSelection::AtLeastOneBtag || step == TTbarEPlusJetsReferenceSelection::AtLeastTwoBtags ) {
+                passesStep = hasExactlyZeroGoodBJet() || hasExactlyOneGoodBJet() ;
+            }
+       }
 
 		// if doesn't pass selection and not in tagging mode, stop here to save CPU time
 		if ( !(taggingMode_ || passesSelection) )
@@ -313,7 +333,19 @@ void TopPairElectronPlusJetsSelectionFilter::goodIsolatedElectrons() {
 
 		// bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrectionsForElectrons_,
 				// useRhoActiveAreaCorrections_) < tightElectronIso_;
-		bool passesIso = true;
+		bool passesIso = false;
+
+		if ( nonIsolatedElectronSelection_ ) {
+			reco::GsfElectron::PflowIsolationVariables pfIso = electron.pfIsolationVariables();
+			// Compute isolation with delta beta correction for PU
+			float absiso = pfIso.sumChargedHadronPt 
+			  + std::max(0.0 , pfIso.sumNeutralHadronEt + pfIso.sumPhotonEt - 0.5 * pfIso.sumPUPt );
+			double relIsoWithDBeta = absiso/electron.pt();
+			passesIso = relIsoWithDBeta > controlElectronIso_ ? true : false;
+		}
+      	else
+  	        passesIso = true;
+
 		if (isGoodElectron(electron) && passesIso) {
 			goodIsolatedElectrons_.push_back(electron);
 			//Check if this is the first, and therefore the signal, electron
@@ -483,8 +515,9 @@ bool TopPairElectronPlusJetsSelectionFilter::passesTriggerSelection() const {
 bool TopPairElectronPlusJetsSelectionFilter::hasExactlyOneSignalElectron() const {
 	if (tagAndProbeStudies_)
 		return goodIsolatedElectrons_.size() >= 1;
-	else
+	else {
 		return goodIsolatedElectrons_.size() == 1;
+	}
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::passesLooseMuonVeto() const {
@@ -520,9 +553,12 @@ bool TopPairElectronPlusJetsSelectionFilter::passesLooseElectronVeto() const {
 bool TopPairElectronPlusJetsSelectionFilter::passesConversionVeto() const {
 	if (!hasExactlyOneSignalElectron())
 		return false;
-	return signalElectron_.passConversionVeto();
-				// Not sure if this is accessible from miniAOD, plus more or less applied in passConversionVeto
-				// && signalElectron_.gsfTrack()->numberOfLostTrackerHits(HitPattern::MISSING_INNER_HITS) < 1; // left in the trackerExpectedHitsInner <1, although it is not there in the AnalysisTools, because it seems to make no difference
+
+	bool passVeto = signalElectron_.passConversionVeto();
+   if ( invertedConversionSelection_ )
+           return !passVeto;
+   else
+           return passVeto;
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastOneGoodJet() const {
@@ -555,11 +591,11 @@ bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastFourGoodJets() const {
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::hasExactlyZeroGoodBJet() const {
-	return cleanedBJets_.size() == 0;
+       return cleanedBJets_.size() == 0;
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::hasExactlyOneGoodBJet() const {
-	return cleanedBJets_.size() == 1;
+       return cleanedBJets_.size() == 1;
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastOneGoodBJet() const {
