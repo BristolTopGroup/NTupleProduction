@@ -8,5 +8,5 @@ nTupleMuons = cms.EDProducer("BristolNTuple_Muons",
     MuonID = cms.string('GlobalMuonPromptTight'),
     BeamSpotCorr = cms.bool(True),
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices'),
-    storePFIsolation = cms.bool(False)
+    storePFIsolation = cms.bool(True)
 )
