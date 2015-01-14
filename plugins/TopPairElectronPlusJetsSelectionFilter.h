@@ -105,6 +105,8 @@ private:
 	std::string looseElectronIDCriteria_;
 	double minLooseElectronID_;
 	double min1JetPt_, min2JetPt_, min3JetPt_, min4JetPt_;
+	double minBJetPt_;
+	double minJetPtInNtuples_;
 
 	double cleaningDeltaR_;
 

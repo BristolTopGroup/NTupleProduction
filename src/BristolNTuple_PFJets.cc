@@ -16,6 +16,7 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //
 		suffix(iConfig.getParameter < std::string > ("Suffix")), //
 		maxSize(iConfig.getParameter<unsigned int>("MaxSize")), //
+		minJetPtToStore(iConfig.getParameter<double>("minJetPtToStore")), //
 		jecUncPath(iConfig.getParameter < std::string > ("JECUncertainty")), //
 		readJECuncertainty(iConfig.getParameter<bool>("ReadJECuncertainty")), //
 		doVertexAssociation(iConfig.getParameter<bool>("DoVertexAssociation")), //
@@ -190,6 +191,10 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			// exit from loop when you reach the required number of jets
 			if (px->size() >= maxSize)
 				break;
+
+			// Only consider jets above minimum pt
+			if ( it->pt() <= minJetPtToStore )
+				continue;
 
 			retpf.set(false);
 			int passjetLoose = 0;
