@@ -186,16 +186,16 @@ if options.CMSSW == "53X" and options.centreOfMassEnergy == 8:
     #Monte Carlo Global Tag
     GLOBALTAG_MC = 'START53_V27::All' #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Winter13_2012_A_B_C_D_datasets_r
     FILETAG = '53X'
-    TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/SingleElectron_Run2012B_13Jul2012_ReReco_AOD.root'
-    TEST_MC_FILE = 'file:///storage/TopQuarkGroup/mc/8TeV/SynchEx/Summer12_DR53X_TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_AODSIM_PU_S10_START53_V7A-v1.root'
+    TEST_DATA_FILE = 'file:///hdfs/TopQuarkGroup/test/SingleElectron_Run2012C_24Aug2012_ReReco_AOD.root'
+    TEST_MC_FILE = 'file:///hdfs/TopQuarkGroup/test/Summer12_DR53X_TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_AODSIM_PU_S10_START53_V7A-v1.root'
 elif options.CMSSW == "53X" and options.centreOfMassEnergy == 7:
     #Data Global Tag
     GLOBALTAG_DATA = 'FT_53_LV5_AN1::All' #2011 7TeV 53X legacy data re-reco: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#2011AB_Legacy_re_reco_CMSSW_5_3
     #Monte Carlo Global Tag
     GLOBALTAG_MC = 'START53_LV6A1::All' #2011 7TeV 53X legaco MC: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#7_TeV_MC_Legacy_reprocessing_in
     FILETAG = '53X'
-    TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/ElectronHad_Run2011A-12Oct2013-v1_AOD.root' #test file for 2011 7TeV 53X RunA Oct2013 re-reco
-    TEST_MC_FILE = 'file:///storage/TopQuarkGroup/test/TTJets_MSDecays_central_TuneZ2_7TeV-madgraph-tauola_Summer11LegDR-PU_S13_START53_LV6-v1_AODSIM.root' #test file for 2011 7TeV 53X TTJets Monte Carlo
+    TEST_DATA_FILE = 'file:///storage/TopQuarkGroup/test/ElectronHad_Run2011A-12Oct2013-v1_AOD.root' #test file for 2011 7TeV 53X RunA Oct2013 re-reco - DOES NOT EXIST CURRENTLY
+    TEST_MC_FILE = 'file:///hdfs/TopQuarkGroup/test/TTJets_MSDecays_central_TuneZ2_7TeV-madgraph-tauola_Summer11LegDR-PU_S13_START53_LV6-v1_AODSIM.root' #test file for 2011 7TeV 53X TTJets Monte Carlo
 elif options.CMSSW == '44X':
     GLOBALTAG_DATA = 'GR_R_44_V15::All'
     GLOBALTAG_MC = 'START44_V13::All'
@@ -393,6 +393,7 @@ else :
 
 # reduce verbosity
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(100)
+# process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(False))
 
 #----------------------------------------------------------------------------------------------------
 # The ECAL laser correction filter (ecalLaserCorrFilter) occasionally 

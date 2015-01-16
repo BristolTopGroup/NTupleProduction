@@ -300,9 +300,9 @@ void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
 		bool passesIso = false;
 
 		if ( nonIsolatedMuonSelection_ )
-			passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) > tightMuonIso_;
+			passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) > controlMuonIso_;
 		else
-			passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < controlMuonIso_;
+			passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < tightMuonIso_;
 
 		if (isGoodMuon(muon) && passesIso) {
 			goodIsolatedMuons_.push_back(muon);
