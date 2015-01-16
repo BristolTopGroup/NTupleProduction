@@ -5,6 +5,7 @@
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Framework/interface/Event.h"
+#include "FWCore/ParameterSet/interface/FileInPath.h"
 
 #include <boost/scoped_ptr.hpp>
 #include <TH1F.h>
@@ -22,6 +23,10 @@ private:
 	const edm::InputTag jetInput_;
 	const std::string prefix_, MCSampleTag_;
 	const int Systematic_;
+
+	edm::FileInPath electronIDScaleFactorsFile_;
+	edm::FileInPath electronTriggerEfficiencyFile_;
+	edm::FileInPath hadronLegEfficiencyFileName_;
 
 	boost::shared_ptr<TH1F> hadronLegEfficiencyHistogram_;
 	boost::shared_ptr<TEfficiency> hadronLegEfficiencyHistogram_1_;

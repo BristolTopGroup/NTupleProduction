@@ -21,6 +21,7 @@ private:
 	const std::string prefix_, MCSampleTag_;
 	const int Systematic_;
 
+	edm::FileInPath muonScaleFactorsFile_;
 	boost::shared_ptr<TH2F> muonIdIsoScaleFactorsHistogram_;
 	boost::shared_ptr<TH3F> muonTriggerScaleFactorsHistogram_;
 

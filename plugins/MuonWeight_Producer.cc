@@ -15,16 +15,16 @@ MuonWeight_Producer::MuonWeight_Producer(const edm::ParameterSet& iConfig) :
 		muonInput_(iConfig.getParameter < InputTag > ("muonInput")), //
 		prefix_(iConfig.getParameter < string > ("prefix")), //
 		MCSampleTag_(iConfig.getParameter < std::string > ("MCSampleTag")) , //
-		Systematic_(iConfig.getParameter<int>("MuonSystematic")) {
+		Systematic_(iConfig.getParameter<int>("MuonSystematic")),
+		muonScaleFactorsFile_(iConfig.getParameter < edm::FileInPath > ("muonScaleFactorsFile")) {
 	produces<std::vector<double> >();
 
-	std::string muonScaleFactorsFile("MuonEfficiencies_SF_2011_53X_DataMC.root");
-	if (!boost::filesystem::exists(muonScaleFactorsFile)) {
-	cerr << "ConfigFile::getMuonIdIsoScaleFactorsHistogram(" << muonScaleFactorsFile << "): could not find file" << endl;
-	throw "Could not find muon ID & iso scale factors histogram file in " + muonScaleFactorsFile;
+	if (!boost::filesystem::exists(muonScaleFactorsFile_.fullPath())) {
+		cerr << "ConfigFile::getMuonIdIsoScaleFactorsHistogram(" << muonScaleFactorsFile_ << "): could not find file" << endl;
+	throw "Could not find muon ID & iso scale factors histogram file in " + muonScaleFactorsFile_.fullPath();
 	}
 
-	boost::scoped_ptr<TFile> file(TFile::Open(muonScaleFactorsFile.c_str()));
+	boost::scoped_ptr<TFile> file(TFile::Open(muonScaleFactorsFile_.fullPath().c_str()));
 	muonIdIsoScaleFactorsHistogram_ = (boost::shared_ptr<TH2F>) (TH2F*) file->Get("SF_2011_TIGHT_ISO_PT25_PtrgL_eta_pt_PLOT")->Clone() ;
 	muonTriggerScaleFactorsHistogram_ = (boost::shared_ptr<TH3F>) (TH3F*) file->Get("SF_2011_HLT_TisoMu24eta2p1_IsoMu24_eta2p1_charge_eta_pt_PLOT")->Clone() ;
 	file->Close();
@@ -52,6 +52,7 @@ void MuonWeight_Producer::fillDescriptions(edm::ConfigurationDescriptions & desc
 	desc.add < string > ("prefix", "MuonWeight_Producer");
 	desc.add < string > ("MCSampleTag");
 	desc.add<int>("MuonSystematic", 0);
+	desc.add < edm::FileInPath > ("muonScaleFactorsFile");
 
 	descriptions.add("MuonWeight_Producer", desc);
 }

@@ -99,6 +99,10 @@ process.eventWeightBtagMuPlusJets = process.eventWeightBtagEPlusJets.clone(
             numberOfTagsInput = cms.InputTag( "topPairMuPlusJetsSelection", muonselectionPrefix + 'NumberOfBtags', 'PAT' )  ,
             jetInput = cms.InputTag( "topPairMuPlusJetsSelection", muonselectionPrefix + 'cleanedJets', 'PAT' ),
                                                               )
+process.eventWeightElectrons.electronIDScaleFactorsFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/ScaleFactors/scaleFactors_electron_id_iso.root")
+process.eventWeightElectrons.electronTriggerEfficiencyFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/ScaleFactors/scaleFactors_electron_trigger.root")
+process.eventWeightElectrons.hadronLegEfficiencyFileName = cms.FileInPath("BristolAnalysis/NTupleTools/data/ScaleFactors/hadronLegEfficiencies_electron.root")
+process.eventWeightMuons.muonScaleFactorsFile = cms.FileInPath("BristolAnalysis/NTupleTools/data/ScaleFactors/MuonEfficiencies_SF_2011_53X_DataMC.root")
 
 if options.CMSSW == '53X' and options.centreOfMassEnergy == 8:
   process.eventWeightElectrons.MCSampleTag = cms.string( 'Summer12' )
