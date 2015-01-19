@@ -375,8 +375,9 @@ void TopPairMuonPlusJetsSelectionFilter::cleanedBJets() {
 	cleanedBJets_.clear();
 	for (unsigned index = 0; index < cleanedJets_.size(); ++index) {
 		const pat::Jet jet = cleanedJets_.at(index);
-		if (jet.bDiscriminator("combinedSecondaryVertexBJetTags") > 0.679)
+		if (jet.bDiscriminator("combinedSecondaryVertexBJetTags") > 0.679 && jet.pt() > 30 ) {
 			cleanedBJets_.push_back(jet);
+		}
 	}
 }
 
