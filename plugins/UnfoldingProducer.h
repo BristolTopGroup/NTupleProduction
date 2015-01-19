@@ -28,11 +28,13 @@ private:
 
 	//non-global event weights (global = i.e. lumi-weight)
 	edm::InputTag pu_weight_input_, b_tag_weight_input, pdfWeightsInputTag_;
+	edm::InputTag leptonWeightsInputTag_;
 	//distributions	
 	edm::InputTag gen_part_input_;
 	edm::InputTag gen_MET_input_, reco_MET_input_;
 	edm::InputTag gen_jet_input_, reco_jet_input_;
 	edm::InputTag electron_input_, muon_input_;
+	edm::InputTag electronIndex_input_, muonIndex_input_;
 	edm::InputTag vertex_input_, gen_event_input_;
 	edm::InputTag selection_flag_input_;
 	edm::InputTag is_fully_hadronic_ttbar_flag_, is_dileptonic_ttbar_flag_;

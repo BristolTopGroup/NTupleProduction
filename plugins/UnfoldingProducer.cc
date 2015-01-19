@@ -19,6 +19,7 @@ UnfoldingProducer::UnfoldingProducer(const edm::ParameterSet& iConfig) :
 		pu_weight_input_(iConfig.getParameter < edm::InputTag > ("pu_weight_input")), //
 		b_tag_weight_input(iConfig.getParameter < edm::InputTag > ("b_tag_weight_input")), //
 		pdfWeightsInputTag_(iConfig.getParameter < edm::InputTag > ("PDFWeightsInputTag")), //
+		leptonWeightsInputTag_(iConfig.getParameter < edm::InputTag > ("leptonWeightsInputTag")), //
 		gen_part_input_(iConfig.getParameter < edm::InputTag > ("gen_part_input")), //
 		gen_MET_input_(iConfig.getParameter < edm::InputTag > ("gen_MET_input")), //
 		reco_MET_input_(iConfig.getParameter < edm::InputTag > ("reco_MET_Input")), //	
@@ -26,6 +27,8 @@ UnfoldingProducer::UnfoldingProducer(const edm::ParameterSet& iConfig) :
 		reco_jet_input_(iConfig.getParameter < edm::InputTag > ("reco_jet_input")), //
 		electron_input_(iConfig.getParameter < edm::InputTag > ("electron_input")), //
 		muon_input_(iConfig.getParameter < edm::InputTag > ("muon_input")), //
+		electronIndex_input_(iConfig.getParameter < edm::InputTag > ("electronIndex_input")), //
+		muonIndex_input_(iConfig.getParameter < edm::InputTag > ("muonIndex_input")), //
 		vertex_input_(iConfig.getParameter < edm::InputTag > ("vertex_input")), //
 		gen_event_input_(iConfig.getParameter < edm::InputTag > ("gen_event_input")), //
 		selection_flag_input_(iConfig.getParameter < edm::InputTag > ("selection_flag_input")), //
@@ -42,6 +45,7 @@ UnfoldingProducer::UnfoldingProducer(const edm::ParameterSet& iConfig) :
 	if ( storePDFWeights_ ) {
 		produces < std::vector<double> > (prefix + "PDFWeights" + suffix);
 	}
+	produces<double>(prefix+"leptonWeight"+suffix);
 	produces<double>(prefix+"leptonEta"+suffix);
 	produces<double>(prefix+"leptonPt"+suffix);
 	produces< std::vector<double> >(prefix+"jetPt"+suffix);
@@ -68,6 +72,7 @@ void UnfoldingProducer::fillDescriptions(edm::ConfigurationDescriptions & descri
 	desc.add < InputTag > ("pu_weight_input");
 	desc.add < InputTag > ("b_tag_weight_input");
 	desc.add < InputTag > ("PDFWeightsInputTag");
+	desc.add < InputTag > ("leptonWeightsInputTag");
 	desc.add < InputTag > ("gen_part_input");
 	desc.add < InputTag > ("gen_MET_input");
 	desc.add < InputTag > ("reco_MET_Input");
@@ -75,6 +80,8 @@ void UnfoldingProducer::fillDescriptions(edm::ConfigurationDescriptions & descri
 	desc.add < InputTag > ("reco_jet_input");
 	desc.add < InputTag > ("electron_input");
 	desc.add < InputTag > ("muon_input");
+	desc.add < InputTag > ("electronIndex_input");
+	desc.add < InputTag > ("muonIndex_input");
 	desc.add < InputTag > ("vertex_input");
 	desc.add < InputTag > ("gen_event_input");
 	desc.add < InputTag > ("selection_flag_input");
@@ -96,13 +103,11 @@ void UnfoldingProducer::produce( edm::Event& iEvent, const edm::EventSetup&) {
 		return;
 	}
 
-
 	edm::Handle<double> puWeightHandle;
 	iEvent.getByLabel(pu_weight_input_, puWeightHandle);
 
 	edm::Handle<double> btagWeightHandle;
 	iEvent.getByLabel(b_tag_weight_input, btagWeightHandle);
-
 
 	// Store pu and btag weights
 	std::auto_ptr<double> puWeight(new double(*puWeightHandle));
@@ -132,6 +137,23 @@ void UnfoldingProducer::produce( edm::Event& iEvent, const edm::EventSetup&) {
 	}
 	iEvent.put(leptonEta, prefix+"leptonEta"+suffix);
 	iEvent.put(leptonPt, prefix+"leptonPt"+suffix);
+
+	edm::Handle<std::vector<double> > leptonWeightHandle;
+	iEvent.getByLabel(leptonWeightsInputTag_, leptonWeightHandle);
+	edm::Handle<unsigned int> leptonIndexHandle;
+	if (do_electron_channel_) {
+		iEvent.getByLabel(muonIndex_input_, leptonIndexHandle);
+	}
+	else {
+		iEvent.getByLabel(electronIndex_input_, leptonIndexHandle);
+	}
+
+	std::auto_ptr<double> leptonWeight(new double(0));
+
+	if ( *leptonIndexHandle < leptonWeightHandle->size() ) {
+		*leptonWeight = leptonWeightHandle->at(*leptonIndexHandle);
+	}
+	iEvent.put(leptonWeight,prefix+"leptonWeight"+suffix);
 
 	// Store jet pt, eta and parton
 	// To allow different b tag scale factors to be applied
