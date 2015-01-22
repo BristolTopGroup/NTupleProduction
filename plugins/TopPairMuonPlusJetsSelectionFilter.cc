@@ -33,6 +33,8 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 		maxLooseMuonEta_(iConfig.getParameter<double>("maxLooseMuonEta")), //
 		minLooseElectronPt_(iConfig.getParameter<double>("minLooseElectronPt")), //
 		maxLooseElectronEta_(iConfig.getParameter<double>("maxLooseElectronEta")), //
+		looseElectronIDCriteria_(iConfig.getParameter<std::string>("looseElectronIDCriteria")), //
+		minLooseElectronID_(iConfig.getParameter<double>("minLooseElectronID")), //
 
 		min1JetPt_(iConfig.getParameter<double>("min1JetPt")), //
 		min2JetPt_(iConfig.getParameter<double>("min2JetPt")), //
@@ -105,6 +107,8 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 	desc.add<double>("maxLooseMuonEta",10.);
 	desc.add<double>("minLooseElectronPt",0.);
 	desc.add<double>("maxLooseElectronEta",10.);
+	desc.add<std::string>("looseElectronIDCriteria","idCriteria");
+	desc.add<double>("minLooseElectronID",0);
 
 	desc.add<double>("min1JetPt", 30.0);
 	desc.add<double>("min2JetPt", 30.0);
@@ -309,7 +313,8 @@ bool TopPairMuonPlusJetsSelectionFilter::isLooseElectron(const pat::Electron& el
 	bool passesPtAndEta = electron.pt() > minLooseElectronPt_ && fabs(electron.eta()) < maxLooseElectronEta_;
 	//		bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
 	// bool passesID = electron.electronID("mvaTrigV0") > 0.5;
-	bool passesID = true;
+
+	bool passesID = electron.electronID(looseElectronIDCriteria_) > minLooseElectronID_;
 	bool passesIso = true;
 
 	return passesPtAndEta && passesID && passesIso;

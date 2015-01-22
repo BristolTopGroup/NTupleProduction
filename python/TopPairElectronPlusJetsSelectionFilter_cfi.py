@@ -6,6 +6,7 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     electronInput=cms.InputTag("slimmedElectrons"),
     muonInput=cms.InputTag("slimmedMuons"),
     HLTInput=cms.InputTag('TriggerResults', '', 'HLT'),
+    VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices'),
 
     # Lepton cuts
     minSignalElectronPt=cms.double(30.),
@@ -35,7 +36,7 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     bJetDiscriminator=cms.string('combinedInclusiveSecondaryVertexV2BJetTags'),
     minBJetDiscriminator=cms.double(0.814),
 
-    controlElectronIsolation=cms.double(0.2),
+    controlElectronIsolation=cms.double(0.21), # endcap iso is <0.2075, so tightened this from >0.2 to >0.21
    
     prefix=cms.untracked.string('TopPairElectronPlusJetsSelection.'),
     MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12 or Summer11Leg

@@ -64,6 +64,8 @@ public:
 
 	virtual bool isGoodJet(const pat::Jet& jet) const;
 	virtual bool isGoodElectron(const pat::Electron& electron) const;
+	virtual bool passesElectronID(const pat::Electron& electron) const;
+	virtual double electronIsolation(const pat::Electron& electron) const;
 
 	//definitions of loose objects
 	virtual bool isLooseElectron(const pat::Electron& electron) const;
@@ -96,7 +98,7 @@ private:
 	virtual void setupEventContent(edm::Event& iEvent);
 
 	//config
-	edm::InputTag jetInput_, electronInput_, muonInput_, hltInputTag_;
+	edm::InputTag jetInput_, electronInput_, muonInput_, hltInputTag_, vertexInputTag_;
 
 	double minSignalElectronPt_, maxSignalElectronEta_;
 	std::string signalElectronIDCriteria_;
@@ -134,6 +136,7 @@ private:
 	pat::ElectronCollection electrons_, goodIsolatedElectrons_, looseElectrons_;
 	pat::MuonCollection muons_, looseMuons_;
 	pat::Electron signalElectron_;
+	reco::VertexCollection vertices_;
 	HLTConfigProvider hltConfig_;
 	edm::TriggerResults triggerResults_;
 

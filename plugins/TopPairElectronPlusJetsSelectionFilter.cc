@@ -24,6 +24,7 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		electronInput_(iConfig.getParameter < edm::InputTag > ("electronInput")), //
 		muonInput_(iConfig.getParameter < edm::InputTag > ("muonInput")), //
 		hltInputTag_(iConfig.getParameter < edm::InputTag > ("HLTInput")), //
+		vertexInputTag_(iConfig.getParameter < edm::InputTag > ("VertexInputTag")), //
 
 		// Selection criteria
 		minSignalElectronPt_(iConfig.getParameter<double>("minSignalElectronPt")), //
@@ -78,6 +79,7 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		muons_(), //
 		looseMuons_(), //
 		signalElectron_(), //
+		vertices_(), //
 		hltConfig_(), //
 		triggerResults_() {
 	for (unsigned int step = 0; step < TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
@@ -99,6 +101,7 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 	desc.add < InputTag > ("electronInput");
 	desc.add < InputTag > ("muonInput");
 	desc.add < InputTag > ("HLTInput");
+	desc.add < InputTag > ("VertexInputTag");
 
 	desc.add<double>("minSignalElectronPt",0.);
 	desc.add<double>("maxSignalElectronEta",10.);
@@ -212,12 +215,6 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(signalElectronIndex_)),prefix_ + "signalElectronIndex");
 
-
-	if ( nonIsolatedElectronSelection_ && passesSelection ) {
-		cout << "Electron pt, eta : " << signalElectron_.pt() << " " << signalElectron_.eta() << endl;
-		cout << "Pass conversion veto : " << signalElectron_.passConversionVeto() << endl;
-	}
-
 	if ( bSelectionInTaggingMode_ )
 		return taggingMode_ || passesSelectionExceptBtagging;
 	else if ( jetSelectionInTaggingMode_ )
@@ -235,6 +232,13 @@ void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEven
 	runNumber_ = iEvent.run();
 	isRealData_ = iEvent.isRealData();
 
+	// Vertices (for re calculating electron ID)
+	if ( nonIsolatedElectronSelection_ || invertedConversionSelection_ ) {
+		edm::Handle < reco::VertexCollection > verticesHandle;
+	   	iEvent.getByLabel(vertexInputTag_, verticesHandle);
+	   	vertices_ = *verticesHandle;
+	}
+	
 	// Trigger info
 	edm::Handle < edm::TriggerResults > triggerResults;
 	iEvent.getByLabel(hltInputTag_, triggerResults);
@@ -342,11 +346,7 @@ void TopPairElectronPlusJetsSelectionFilter::goodIsolatedElectrons() {
 		bool passesIso = false;
 
 		if ( nonIsolatedElectronSelection_ ) {
-			reco::GsfElectron::PflowIsolationVariables pfIso = electron.pfIsolationVariables();
-			// Compute isolation with delta beta correction for PU
-			float absiso = pfIso.sumChargedHadronPt 
-			  + std::max(0.0 , pfIso.sumNeutralHadronEt + pfIso.sumPhotonEt - 0.5 * pfIso.sumPUPt );
-			double relIsoWithDBeta = absiso/electron.pt();
+			double relIsoWithDBeta = electronIsolation(electron);
 			passesIso = relIsoWithDBeta > controlElectronIso_ ? true : false;
 		}
       	else
@@ -366,10 +366,129 @@ bool TopPairElectronPlusJetsSelectionFilter::isGoodElectron(const pat::Electron&
 	//2D impact w.r.t primary vertex
 	// bool passesD0 = fabs(electron.dB(pat::Electron::PV2D)) < 0.02; //cm
 	// bool passesID = electron.electronID("mvaTrigV0") > 0.5;
-	bool passesID = electron.electronID(signalElectronIDCriteria_) > minSignalElectronID_;
+	bool passesID = false;
+
+	if ( nonIsolatedElectronSelection_ || invertedConversionSelection_ ) {
+		passesID = passesElectronID( electron );
+	}
+	else {
+		passesID = electron.electronID(signalElectronIDCriteria_) > minSignalElectronID_;
+	}
+
 	bool passesD0 = true;
 	return passesPtAndEta && notInCrack && passesD0 && passesID;
 }
+
+bool TopPairElectronPlusJetsSelectionFilter::passesElectronID(const pat::Electron& electron) const {
+	// The selection for QCD control regions aren't available via electron.electronID(selectionCriteria)
+	// Have to apply them by hand
+	// Code based on https://github.com/lgray/cmssw/blob/common_isolation_selection_70X/TestElectronID/ElectronIDAnalyzer/plugins/ElectronIDAnalyzer.cc
+	// Selection criteria from https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2
+
+	// WARNING BAD CODING PRACTISES
+	
+	double dEtaIn = electron.deltaEtaSuperClusterTrackAtVtx();
+	double dPhiIn = electron.deltaPhiSuperClusterTrackAtVtx();
+	double hOverE = electron.hcalOverEcal();
+	double isolation = electronIsolation( electron );
+	// Note not using "full5x5" sigmaIetaIeta
+	// double full5x5_sigmaIetaIeta = (*full5x5sieie_)[electron];
+	double sigmaIetaIeta = electron.sigmaIetaIeta();
+
+	// double d0 = (-1) * electron.gsfTrack()->dxy(pv.position() );
+	double d0 = fabs(electron.dB(pat::Electron::PV2D)); //cm
+
+	double dz = 0;
+	if (vertices_.empty()) dz=1e30;
+	else {
+		const reco::Vertex &pv = vertices_.front();
+		dz = electron.gsfTrack()->dz( pv.position() );
+	}
+
+	double ooEmooP = 0;
+    if ( electron.ecalEnergy() == 0 || !std::isfinite(electron.ecalEnergy()) ) {
+		ooEmooP = 1e30;
+    }
+    else {
+		ooEmooP = fabs(1.0/electron.ecalEnergy() - electron.eSuperClusterOverP()/electron.ecalEnergy() );
+    }
+
+    unsigned int expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::HitCategory::MISSING_INNER_HITS);
+	bool passConversionVeto = electron.passConversionVeto();
+
+	// Now have all variables to apply electron ID
+	double electronSCEta = fabs( electron.superCluster()->eta() );
+	bool passesId = false;
+	if ( electronSCEta <= 1.479 ) {
+		// In barrel
+		bool passes_dEta = dEtaIn < 0.0091 ? 1 : 0 ;
+		bool passes_dPhi = dPhiIn < 0.031 ? 1 : 0 ;
+		bool passes_sigmaIetaIeta = sigmaIetaIeta < 0.0106 ? 1 : 0 ;
+		bool passes_hOverE = hOverE < 0.0532 ? 1 : 0 ;
+		bool passes_d0 = d0 < 0.0126 ? 1 : 0;
+		bool passes_dz = dz < 0.0116 ? 1 : 0 ;
+		bool passes_ooEmoop = ooEmooP < 0.0609 ? 1 : 0 ;
+
+		bool passesIso = false, passes_conversion = false;
+		if ( nonIsolatedElectronSelection_ ) {
+			passesIso = isolation > controlElectronIso_ ? 1 : 0;
+			passes_conversion = passConversionVeto && expectedMissingInnerHits <= 1 ;
+		}
+		else if ( invertedConversionSelection_ ) {
+			passesIso = isolation < 0.1649 ? 1 : 0;
+			passes_conversion = !passConversionVeto && !(expectedMissingInnerHits <= 1) ;
+		} else {
+			passesIso = isolation < 0.1649 ? 1 : 0;
+			passes_conversion = passConversionVeto && expectedMissingInnerHits <= 1 ;
+		}
+
+		if ( passes_dEta && passes_dPhi && passes_sigmaIetaIeta && passes_hOverE && passes_d0 && passes_dz && passes_ooEmoop && passesIso && passes_conversion ) {
+			passesId = true;
+		}
+
+	}
+	else if ( electronSCEta > 1.479 && electronSCEta < 2.5 ) {
+		// In endcap
+		bool passes_dEta = dEtaIn < 0.0106 ? 1 : 0 ;
+		bool passes_dPhi = dPhiIn < 0.0359 ? 1 : 0 ;
+		bool passes_sigmaIetaIeta = sigmaIetaIeta < 0.0305 ? 1 : 0 ;
+		bool passes_hOverE = hOverE < 0.0835 ? 1 : 0 ;
+		bool passes_d0 = d0 < 0.0163 ? 1 : 0;
+		bool passes_dz = dz < 0.5999 ? 1 : 0 ;
+		bool passes_ooEmoop = ooEmooP < 0.1126 ? 1 : 0 ;
+
+		bool passesIso = false, passes_conversion = false;
+		if ( nonIsolatedElectronSelection_ ) {
+			passesIso = isolation > controlElectronIso_ ? 1 : 0;
+			passes_conversion = passConversionVeto && expectedMissingInnerHits <= 1 ;
+		}
+		else if ( invertedConversionSelection_ ) {
+			passesIso = isolation < 0.2075 ? 1 : 0;
+			passes_conversion = !passConversionVeto && !(expectedMissingInnerHits <= 1) ;
+		} else {
+			passesIso = isolation < 0.2075 ? 1 : 0;
+			passes_conversion = passConversionVeto && expectedMissingInnerHits <= 1 ;
+		}
+		if ( passes_dEta && passes_dPhi && passes_sigmaIetaIeta && passes_hOverE && passes_d0 && passes_dz && passes_ooEmoop && passesIso && passes_conversion ) {
+			passesId = true;
+		}
+	}
+	else {
+		// Not interesting
+		passesId = false;
+	}
+
+	return passesId;
+}
+
+double TopPairElectronPlusJetsSelectionFilter::electronIsolation(const pat::Electron& electron) const {
+	reco::GsfElectron::PflowIsolationVariables pfIso = electron.pfIsolationVariables();
+	// Compute isolation with delta beta correction for PU
+	float absiso = pfIso.sumChargedHadronPt 
+	  + std::max(0.0 , pfIso.sumNeutralHadronEt + pfIso.sumPhotonEt - 0.5 * pfIso.sumPUPt );
+	return absiso/electron.pt();
+}
+
 
 void TopPairElectronPlusJetsSelectionFilter::cleanedJets() {
 	cleanedJets_.clear();
