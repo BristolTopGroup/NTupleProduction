@@ -1,5 +1,5 @@
 from WMCore.Configuration import Configuration
-from BristolAnalysis.NTupleTools.Configuration.BLT_unfold import input_files
+from BristolAnalysis.NTupleTools.BLT_unfold import input_files
 config = Configuration()
 config.section_('General')
 config.General.transferOutputs = True
