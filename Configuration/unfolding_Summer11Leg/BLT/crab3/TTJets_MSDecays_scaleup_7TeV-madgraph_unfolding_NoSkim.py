@@ -1,9 +1,9 @@
 from WMCore.Configuration import Configuration
-from BristolAnalysis.NTupleTools.Configuration.BLT_unfold import input_files
+from BristolAnalysis.NTupleTools.BLT_unfold import input_files
 config = Configuration()
 config.section_('General')
 config.General.transferOutputs = True
-config.General.requestName = 'TTJets_scaleup_7TeV_madgraph_BLTUnfold_NoSkim_TEST'
+config.General.requestName = 'TTJets_scaleup_7TeV_madgraph_BLTUnfold_NoSkim'
 config.General.transferLogs = True
 config.section_('JobType')
 config.JobType.psetName = 'BristolAnalysis/NTupleTools/test/unfoldingBLT_cfg.py'
