@@ -8,6 +8,7 @@
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 
 #include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TEfficiency.h>

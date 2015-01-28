@@ -151,24 +151,12 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 	// Including selecting a signal electron, loose leptons, jets and bjets
 	setupEventContent(iEvent);
 	
-	// Store number of cleaned jets in events
-	unsigned int numberOfJets(cleanedJets_.size());
-	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfJets)), prefix_ + "NumberOfJets");
-
-	// Store indices of cleaned jets in event
-	iEvent.put(std::auto_ptr<std::vector<unsigned int> >(new std::vector<unsigned int>(cleanedJetIndex_)), prefix_ + "cleanedJetIndex");
-	
-	unsigned int numberOfBtags(cleanedBJets_.size());
-	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfBtags)), prefix_ + "NumberOfBtags");
-	iEvent.put(std::auto_ptr<std::vector<unsigned int> >(new std::vector<unsigned int>(cleanedBJetIndex_)), prefix_ + "cleanedBJetIndex");
-
-	// std::auto_ptr < pat::JetCollection > jetoutput(new pat::JetCollection());
-
 	bool passesSelection(true);
 	bool passesSelectionExceptJetRequirements(true);
 	bool passesSelectionExceptBtagging(true);
 
 	for (unsigned int step = 0; step < TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
+		TTbarEPlusJetsReferenceSelection::Step stepName = TTbarEPlusJetsReferenceSelection::Step(step);
 		if (debug_)
 			cout << "Doing selection step: " << TTbarEPlusJetsReferenceSelection::StringSteps[step] << endl;
 
@@ -209,9 +197,16 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 	}
 	iEvent.put(std::auto_ptr<bool>(new bool(passesSelection)), prefix_ + "FullSelection");
 
-	// for (unsigned int index = 0; index < cleanedJets_.size(); ++index)
-		// jetoutput->push_back(cleanedJets_.at(index));
-	// iEvent.put(jetoutput, prefix_ + "cleanedJets");
+	// Store number of cleaned jets in events
+	unsigned int numberOfJets(cleanedJets_.size());
+	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfJets)), prefix_ + "NumberOfJets");
+
+	// Store indices of cleaned jets in event
+	iEvent.put(std::auto_ptr<std::vector<unsigned int> >(new std::vector<unsigned int>(cleanedJetIndex_)), prefix_ + "cleanedJetIndex");
+	
+	unsigned int numberOfBtags(cleanedBJets_.size());
+	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfBtags)), prefix_ + "NumberOfBtags");
+	iEvent.put(std::auto_ptr<std::vector<unsigned int> >(new std::vector<unsigned int>(cleanedBJetIndex_)), prefix_ + "cleanedBJetIndex");
 
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(signalElectronIndex_)),prefix_ + "signalElectronIndex");
 
