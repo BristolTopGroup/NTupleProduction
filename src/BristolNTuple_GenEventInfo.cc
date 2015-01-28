@@ -7,6 +7,13 @@
 
 #include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
 
+#include "AnalysisDataFormats/TopObjects/interface/TtGenEvent.h"
+
+
+#include <iostream>
+
+using namespace std;
+
 BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& iConfig) : //
 		genEvtInfoInputTag(iConfig.getParameter < edm::InputTag > ("GenEventInfoInputTag")), //
 		ttbarDecayFlags_(iConfig.getParameter < std::vector<edm::InputTag> > ("ttbarDecayFlags")), //
@@ -15,6 +22,7 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 		isTTbarMC_(iConfig.getParameter<bool>("isTTbarMC")), //
 		pdfWeightsInputTag_(iConfig.getParameter < edm::InputTag > ("PDFWeightsInputTag")), //
 		pileupInfoSrc_(iConfig.getParameter < edm::InputTag > ("pileupInfo")), //
+		tt_gen_event_input_(iConfig.getParameter < edm::InputTag > ("tt_gen_event_input")), //
 		prefix_(iConfig.getParameter < std::string > ("Prefix")), //
 		suffix_(iConfig.getParameter < std::string > ("Suffix")) {
 	produces<unsigned int>(prefix_ + "ProcessID" + suffix_);
@@ -25,6 +33,7 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 	produces < std::vector<int> > (prefix_ + "NumberOfTrueInteractions" + suffix_);
 	produces < std::vector<int> > (prefix_ + "PileUpOriginBX" + suffix_);
 	produces<unsigned int>(prefix_ + "TtbarDecay" + suffix_);
+	produces<double>(prefix_ + "leptonicTopPt" + suffix_ );
 }
 
 void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -38,11 +47,14 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	std::auto_ptr < std::vector<int> > NumberOfTrueInteractions(new std::vector<int>());
 	std::auto_ptr < std::vector<int> > OriginBX(new std::vector<int>());
 	std::auto_ptr<unsigned int> ttbarDecay(new unsigned int());
+	std::auto_ptr<double> leptonicTopPt(new double());
 
 	*processID.get() = 0;
 	*ptHat.get() = 0.;
 	*PUWeight.get() = 0.;
 	*ttbarDecay.get() = 0;
+
+	*leptonicTopPt.get() = 0;
 
 	//-----------------------------------------------------------------
 	if (!iEvent.isRealData()) {
@@ -125,6 +137,14 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 				edm::LogError("BristolNTuple_GenEventError") << "Error! Found more than one compatible decay mode:"
 						<< numberOfIdentifiedModes;
 			}
+
+			// Get parton info
+			edm::Handle < TtGenEvent > ttGenEvt;
+			iEvent.getByLabel(tt_gen_event_input_, ttGenEvt);
+
+			if ( ttGenEvt->isSemiLeptonic() ) {
+				*leptonicTopPt.get() = ttGenEvt->leptonicDecayTop()->pt();
+			}
 		}
 	}
 
@@ -137,5 +157,6 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	iEvent.put(NumberOfTrueInteractions, prefix_ + "NumberOfTrueInteractions" + suffix_);
 	iEvent.put(OriginBX, prefix_ + "PileUpOriginBX" + suffix_);
 	iEvent.put(ttbarDecay, prefix_ + "TtbarDecay" + suffix_);
+	iEvent.put(leptonicTopPt, prefix_ + "leptonicTopPt" + suffix_);
 
 }

@@ -21,4 +21,6 @@ nTupleGenEventInfo = cms.EDProducer("BristolNTuple_GenEventInfo",
                                          cms.InputTag( 'ttFullLeptonicMuTauFilter' ),
                 ),
     isTTbarMC = cms.bool(False),
+    tt_gen_event_input=cms.InputTag('genEvt'),
+
 )

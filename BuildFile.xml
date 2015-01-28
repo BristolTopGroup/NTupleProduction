@@ -15,6 +15,7 @@
 <use name="JetMETCorrections/Objects"/>
 <use name="PhysicsTools/Utilities"/>
 <use name="lhapdf"/>
+<use name="AnalysisDataFormats/TopObjects"/>
 
 <export>
    <lib   name="1"/>

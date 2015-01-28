@@ -6,6 +6,9 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include <boost/array.hpp>
 
+#include "AnalysisDataFormats/TopObjects/interface/TtGenEvent.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 namespace TTbarDecay {
 enum value {
 	NotTtbar,
@@ -36,6 +39,7 @@ private:
 	const bool storePDFWeights_, isTTbarMC_;
 	const edm::InputTag pdfWeightsInputTag_;
 	const edm::InputTag pileupInfoSrc_;
+	const edm::InputTag tt_gen_event_input_;
 	const std::string prefix_, suffix_;
 };
 
