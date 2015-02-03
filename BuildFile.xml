@@ -16,6 +16,7 @@
 <use name="PhysicsTools/Utilities"/>
 <use name="lhapdf"/>
 <use name="AnalysisDataFormats/TopObjects"/>
+<use name="TopQuarkAnalysis/TopTools"/>
 
 <export>
    <lib   name="1"/>

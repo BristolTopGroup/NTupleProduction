@@ -35,14 +35,9 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     controlMuonIsolation=cms.double(0.3),
 
     # B Jet Selection
-<<<<<<< HEAD
     # Working points taken from https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
     bJetDiscriminator=cms.string('combinedInclusiveSecondaryVertexV2BJetTags'),
     minBJetDiscriminator=cms.double(0.814),
-=======
-    bJetDiscriminator=cms.string('combinedSecondaryVertexBJetTags'),
-    minBJetDiscriminator=cms.double(0.679),
->>>>>>> 3a4a153... Update our selection filtersand add to paths.  Simplify by removing many events filters etc.
 
     prefix=cms.untracked.string('TopPairMuonPlusJetsSelection.'),
 

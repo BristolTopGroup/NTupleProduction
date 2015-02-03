@@ -2,6 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 nTupleGenEventInfo = cms.EDProducer("BristolNTuple_GenEventInfo",
     GenEventInfoInputTag = cms.InputTag('generator'),
+    GenJetsInputTag      = cms.InputTag('slimmedGenJets'),
     StorePDFWeights      = cms.bool(True),
     PUWeightsInputTag    = cms.InputTag('eventWeightPU'),
     PDFWeightsInputTag   = cms.InputTag('pdfWeights','cteq66'),
@@ -22,5 +23,8 @@ nTupleGenEventInfo = cms.EDProducer("BristolNTuple_GenEventInfo",
                 ),
     isTTbarMC = cms.bool(False),
     tt_gen_event_input=cms.InputTag('genEvt'),
+
+    minGenJetPt = cms.double(30.),
+    maxGenJetAbsoluteEta = cms.double(999.),
 
 )
