@@ -1,2 +1,3 @@
 /.pydevproject
 *.py[cod]
+python/__init__.py
