@@ -7,6 +7,7 @@
 #include "FWCore/Framework/interface/Event.h"
 
 #include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <TH2F.h>
 #include <TH3F.h>
 

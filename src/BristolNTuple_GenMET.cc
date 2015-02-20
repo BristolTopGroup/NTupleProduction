@@ -3,6 +3,7 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/METReco/interface/GenMET.h"
 #include "DataFormats/METReco/interface/GenMETFwd.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
 
 
 BristolNTuple_GenMET::BristolNTuple_GenMET(const edm::ParameterSet& iConfig) :
@@ -12,6 +13,9 @@ BristolNTuple_GenMET::BristolNTuple_GenMET(const edm::ParameterSet& iConfig) :
 {
     produces <double> ( prefix + "Ex" + suffix );
     produces <double> ( prefix + "Ey" + suffix );
+    produces <double> ( prefix + "ET" + suffix );
+    produces <double> ( prefix + "Phi" + suffix );
+
 }
 
 void BristolNTuple_GenMET::
@@ -19,30 +23,29 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     std::auto_ptr <double> px(new double());
     std::auto_ptr <double> py(new double());
+    std::auto_ptr <double> ET(new double());
+    std::auto_ptr <double> Phi(new double());
 
     //-----------------------------------------------------------------
     if (!iEvent.isRealData()) {
-        edm::Handle < reco::GenMETCollection > mets;
-        iEvent.getByLabel(inputTag, mets);
 
-        if (mets.isValid()) {
-            edm::LogInfo("BristolNTuple_GenMETExtraInfo") << "Total # GenMETs: " << mets->size();
-            reco::GenMET met(mets->at(0));
-            *px = met.px();
-            *py = met.py();
-//            for (reco::GenMETCollection::const_iterator it = mets->begin(); it != mets->end(); ++it) {
-//
-//                // fill in all the vectors
-//                px->push_back(it->px());
-//                py->push_back(it->py());
-//            }
-        } else {
-            edm::LogError("BristolNTuple_GenMETExtraError") << "Error! Can't get the product " << inputTag;
-        }
+        edm::Handle < std::vector<pat::MET> > mets;
+        iEvent.getByLabel(inputTag, mets);
+        const pat::MET patMET(mets->at(0));
+        const reco::GenMET* genMET(patMET.genMET());
+        // edm::Handle < reco::GenMETCollection > mets;
+        // iEvent.getByLabel(inputTag, mets);
+
+        *px = genMET->px();
+        *py = genMET->py();
+        *ET = genMET->pt();
+        *Phi = genMET->phi();
     }
 
     //-----------------------------------------------------------------
     // put vectors in the event
     iEvent.put( px, prefix + "Ex" + suffix );
     iEvent.put( py, prefix + "Ey" + suffix );
+    iEvent.put( ET, prefix + "ET" + suffix );
+    iEvent.put( Phi, prefix + "Phi" + suffix );
 }

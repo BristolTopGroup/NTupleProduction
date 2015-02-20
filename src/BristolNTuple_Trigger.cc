@@ -3,162 +3,99 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
+#include "FWCore/Common/interface/TriggerNames.h"
 #include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
-
-unsigned int NmaxL1AlgoBit = 128;
-unsigned int NmaxL1TechBit = 64;
 
 using namespace std;
 
-BristolNTuple_Trigger::BristolNTuple_Trigger(const edm::ParameterSet& iConfig) :
-		l1InputTag(iConfig.getParameter < edm::InputTag > ("L1InputTag")), //
-		hltInputTag(iConfig.getParameter < edm::InputTag > ("HLTInputTag")), //
-		hltPathsOfInterest(iConfig.getParameter < std::vector<std::string> > ("HLTPathsOfInterest_Signal")), //
-		hltPathsOfInterest_other(iConfig.getParameter < std::vector<std::string> > ("HLTPathsOfInterest_Other")), //
-		hltConfig(), //
-		prefix(iConfig.getParameter < std::string > ("Prefix")), //
-		suffix(iConfig.getParameter < std::string > ("Suffix")) {
+// Modifications to run on miniAOD based on
+// https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD#Trigger
 
-	produces < std::vector<int> > (prefix + "L1PhysBits" + suffix);
-	produces < std::vector<int> > (prefix + "L1TechBits" + suffix);
-	produces < std::vector<int> > (prefix + "HLTBits" + suffix);
-	produces < std::vector<int> > (prefix + "HLTResults" + suffix);
-	produces < std::vector<std::string> > (prefix + "HLTNames" + suffix);
-	produces < std::vector<int> > (prefix + "HLTPrescales" + suffix);
-	produces < std::vector<int> > (prefix + "HLTResultsOther" + suffix);
-	produces < std::vector<int> > (prefix + "HLTPrescalesOther" + suffix);
+BristolNTuple_Trigger::BristolNTuple_Trigger(const edm::ParameterSet& iConfig) :
+		hltInputTag_(iConfig.getParameter < edm::InputTag > ("HLTInputTag")), //
+		hltObjectsInputTag_(iConfig.getParameter < edm::InputTag > ("HLTObjectsInputTag")), //
+		pathOfInterest_(iConfig.getParameter <std::string> ("PathOfInterest")), //
+		prefix_(iConfig.getParameter <std::string> ("Prefix")), //
+		suffix_(iConfig.getParameter < std::string > ("Suffix")) {
+
+	produces < bool > (prefix_ + "Fired" + suffix_ );
+	// produces < unsigned short > (prefix_ + "Version" + suffix_ );
+	// produces < unsigned short > (prefix_ + "Prescale" + suffix_ );
+
+    produces <std::vector<double> > ( prefix_ + "toEnergy" + suffix_ );
+	produces <std::vector<float> > ( prefix_ + "toPt" + suffix_ );
+	produces <std::vector<float> > ( prefix_ + "toEta" + suffix_ );
+	produces <std::vector<float> > ( prefix_ + "toPhi" + suffix_ );
 }
 
 void BristolNTuple_Trigger::beginRun(edm::Run& iRun, const edm::EventSetup& iSetup) {
-
-	bool changed = true;
-	if (hltConfig.init(iRun, iSetup, hltInputTag.process(), changed)) {
-		// if init returns TRUE, initialisation has succeeded!
-		edm::LogInfo("BristolNTuple_TriggerInfo") << "HLT config with process name " << hltInputTag.process()
-				<< " successfully extracted";
-	} else {
-		// if init returns FALSE, initialisation has NOT succeeded, which indicates a problem
-		// with the file and/or code and needs to be investigated!
-		edm::LogError("BristolNTuple_TriggerError") << "Error! HLT config extraction with process name "
-				<< hltInputTag.process() << " failed";
-		// In this case, all access methods will return empty values!
-	}
 }
 
 void BristolNTuple_Trigger::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-	std::auto_ptr < std::vector<int> > l1physbits(new std::vector<int>());
-	std::auto_ptr < std::vector<int> > l1techbits(new std::vector<int>());
-	std::auto_ptr < std::vector<int> > hltbits(new std::vector<int>());
-	std::auto_ptr < std::vector<int> > hltresults(new std::vector<int>());
-	std::auto_ptr < std::vector<std::string> > hltnames(new std::vector<std::string>());
-	std::auto_ptr < std::vector<int> > hltprescales(new std::vector<int>());
-	std::auto_ptr < std::vector<int> > hltresults_other(new std::vector<int>());
-	std::auto_ptr < std::vector<int> > hltprescales_other(new std::vector<int>());
-
-	//-----------------------------------------------------------------
-	edm::Handle < L1GlobalTriggerReadoutRecord > l1GtReadoutRecord;
-	iEvent.getByLabel(l1InputTag, l1GtReadoutRecord);
-
-	if (l1GtReadoutRecord.isValid()) {
-		edm::LogInfo("BristolNTuple_TriggerInfo") << "Successfully obtained " << l1InputTag;
-
-		for (unsigned int i = 0; i < NmaxL1AlgoBit; ++i) {
-			l1physbits->push_back(l1GtReadoutRecord->decisionWord()[i] ? 1 : 0);
-		}
-		for (unsigned int i = 0; i < NmaxL1TechBit; ++i) {
-			l1techbits->push_back(l1GtReadoutRecord->technicalTriggerWord()[i] ? 1 : 0);
-		}
-	} else {
-		edm::LogError("BristolNTuple_TriggerError") << "Error! Can't get the product " << l1InputTag;
-	}
+	std::auto_ptr < bool > fired(new bool(false));
+	// std::auto_ptr < unsigned short > version(new unsigned short);
+	// std::auto_ptr < unsigned short > prescale(new unsigned short);
+	std::auto_ptr <std::vector<double>  > toEnergy(new std::vector<double>());
+	std::auto_ptr <std::vector<float>  > toPt(new std::vector<float>());
+	std::auto_ptr <std::vector<float>  > toEta(new std::vector<float>());
+	std::auto_ptr <std::vector<float>  > toPhi(new std::vector<float>());
 
 	edm::Handle < edm::TriggerResults > triggerResults;
-	iEvent.getByLabel(hltInputTag, triggerResults);
+	iEvent.getByLabel(hltInputTag_, triggerResults);
 
-	if (triggerResults.isValid()) {
-		edm::LogInfo("BristolNTuple_TriggerInfo") << "Successfully obtained " << hltInputTag;
-
-		for (unsigned int i = 0; i < triggerResults->size(); i++) {
-			hltbits->push_back(triggerResults->at(i).accept() ? 1 : 0);
-		}
-
-		for (std::vector<std::string>::const_iterator it = hltPathsOfInterest.begin(); it != hltPathsOfInterest.end();
-				++it) {
-			int fired = 0;
-			unsigned int index = findTrigger(*it, hltConfig);
-			string triggerName = *it + " not found";
-			if (index < triggerResults->size()) {
-				if (triggerResults->accept(index))
-					fired = 1;
-				triggerName = hltConfig.triggerName(index);
-			} else {
-				edm::LogInfo("BristolNTuple_TriggerInfo") << "Requested HLT path \"" << (*it) << "\" does not exist";
-			}
-			hltresults->push_back(fired);
-			hltnames->push_back(triggerName);
-
-			int prescale = -1;
-			if (hltConfig.prescaleSet(iEvent, iSetup) < 0) {
-				edm::LogError("BristolNTuple_TriggerError")
-						<< "Error! The prescale set index number could not be obtained";
-			} else {
-				prescale = hltConfig.prescaleValue(iEvent, iSetup, triggerName);
-			}
-			hltprescales->push_back(prescale);
-		}
-
-		for (std::vector<std::string>::const_iterator it = hltPathsOfInterest_other.begin();
-				it != hltPathsOfInterest_other.end(); ++it) {
-			int fired = 0;
-			unsigned int index = findTrigger(*it, hltConfig);
-			string triggerName = *it + " not found";
-			if (index < triggerResults->size()) {
-				if (triggerResults->accept(index))
-					fired = 1;
-				triggerName = hltConfig.triggerName(index);
-			} else {
-				edm::LogInfo("BristolNTuple_TriggerInfo") << "Requested HLT path \"" << (*it) << "\" does not exist";
-			}
-			hltresults_other->push_back(fired);
-
-			int prescale = -1;
-			if (hltConfig.prescaleSet(iEvent, iSetup) < 0) {
-				edm::LogError("BristolNTuple_TriggerError")
-						<< "Error! The prescale set index number could not be obtained";
-			} else {
-				prescale = hltConfig.prescaleValue(iEvent, iSetup, triggerName);
-			}
-			hltprescales_other->push_back(prescale);
-		}
-	} else {
-		edm::LogError("BristolNTuple_TriggerError") << "Error! Can't get the product " << hltInputTag;
+    const edm::TriggerNames &names = iEvent.triggerNames(*triggerResults);
+	unsigned int triggerIndex = 9999;
+	std::string triggerName="Trigger";
+    for (unsigned int i = 0, n = triggerResults->size(); i < n; ++i) {
+    	if ( names.triggerName(i).find(pathOfInterest_) != std::string::npos ) {
+    		triggerIndex = i;
+    		triggerName = names.triggerName(i);
+    	}
 	}
+
+	if ( triggerIndex < triggerResults->size() ) {
+		*fired = triggerResults->accept(triggerIndex);
+	}
+	else {
+		std::cout << "Looking for : " << pathOfInterest_ << " but failed" << std::endl;
+	}
+
+    edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
+	iEvent.getByLabel(hltObjectsInputTag_, triggerObjects);
+    for (pat::TriggerObjectStandAlone obj : *triggerObjects) {
+        
+        obj.unpackPathNames(names);
+
+        std::vector<std::string> pathNamesAll  = obj.pathNames(true);
+        std::vector<std::string> pathNamesLast  = obj.pathNames(false);
+
+        for ( unsigned int trigPath = 0 ; trigPath < pathNamesLast.size(); trigPath++ ) {
+        	// Check if this object is associated to this path and that it is associated to the last filter in that path
+        	if ( pathNamesLast[trigPath] == triggerName && obj.hasPathName( triggerName, true, true ) ) {
+
+        		toEnergy->push_back( obj.energy() );
+        		toPt->push_back( obj.pt() );
+        		toEta->push_back( obj.eta() );
+        		toPhi->push_back( obj.phi() );
+
+				// std::cout << "\tTrigger object:  pt " << obj.pt() << ", eta " << obj.eta() << ", phi " << obj.phi() << std::endl;
+				// std::cout << "\t   Collection: " << obj.collection() << std::endl;
+				// bool isLF   = obj.hasPathName( triggerName, true, true ); 
+				// std::cout << "Is last filter and succesful : " << isLF << std::endl;
+    		}
+        }
+    }
 
 	//-----------------------------------------------------------------
 	// put vectors in the event
-	iEvent.put(l1physbits, prefix + "L1PhysBits" + suffix);
-	iEvent.put(l1techbits, prefix + "L1TechBits" + suffix);
-	iEvent.put(hltbits, prefix + "HLTBits" + suffix);
-	iEvent.put(hltresults, prefix + "HLTResults" + suffix);
-	iEvent.put(hltnames, prefix + "HLTNames" + suffix);
-	iEvent.put(hltprescales, prefix + "HLTPrescales" + suffix);
-	iEvent.put(hltresults_other, prefix + "HLTResultsOther" + suffix);
-	iEvent.put(hltprescales_other, prefix + "HLTPrescalesOther" + suffix);
+
+	iEvent.put(fired, prefix_ + "Fired" + suffix_);
+	// iEvent.put(version, prefix_ + "Version" + suffix_ );
+	// iEvent.put(prescale, prefix_ + "Prescale" + suffix_ );
+	iEvent.put(toEnergy,prefix_ + "toEnergy" + suffix_);
+	iEvent.put(toPt,prefix_ + "toPt" + suffix_);
+	iEvent.put(toEta,prefix_ + "toEta" + suffix_);
+	iEvent.put(toPhi,prefix_ + "toPhi" + suffix_);
 }
-
-//unsigned int BristolNTuple_Trigger::findTrigger(const std::string& triggerWildCard) {
-//	const std::vector<std::string>& triggers = hltConfig.triggerNames();
-//	unsigned int found = 9999;
-//
-//	size_t length = triggerWildCard.size();
-//	for (unsigned int index = 0; index < triggers.size(); ++index) {
-//		if (length <= triggers[index].size() && triggerWildCard == triggers[index].substr(0, length)) {
-//			found = index;
-//			break;
-//		}
-//	}
-//
-//	return found;
-//}
-

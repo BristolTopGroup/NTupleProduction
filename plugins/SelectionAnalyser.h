@@ -20,12 +20,12 @@ public:
 
 private:
 	//non-global event weights (global = i.e. lumi-weight)
-	edm::InputTag PUWeightInput_;//, ZeroBtagWeightInput_, OneBtagWeightInput_, TwoBtagWeightInput_;
+	// edm::InputTag PUWeightInput_;//, ZeroBtagWeightInput_, OneBtagWeightInput_, TwoBtagWeightInput_;
 	std::vector<edm::InputTag> selectionFlags_;
 	std::vector<std::string> selectionNames_;
 	unsigned int numberOfCuts_;
 	//distributions
-	TH1F* consecutiveCuts_, *individualCuts_;
+	// TH1F* consecutiveCuts_, *individualCuts_;
 	TH1F* consecutiveCuts_unweighted_, *individualCuts_unweighted_;
 
 };

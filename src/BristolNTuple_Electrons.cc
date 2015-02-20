@@ -24,8 +24,7 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 		debugRelease_(iConfig.getParameter<bool>("debugRelease")), //
 		vtxInputTag(iConfig.getParameter < edm::InputTag > ("VertexInputTag")), //
 		beamSpotInputTag(iConfig.getParameter < edm::InputTag > ("BeamSpotInputTag")), //
-		conversionsInputTag(iConfig.getParameter < edm::InputTag > ("ConversionsInputTag")), //
-		likelihoodInputTag(iConfig.getParameter < edm::InputTag > ("LikelihoodInputTag")) //
+		conversionsInputTag(iConfig.getParameter < edm::InputTag > ("ConversionsInputTag")) //
 {
 
 	//kinematic variables
@@ -48,7 +47,6 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 	produces < std::vector<double> > (prefix + "SigmaIEtaIEta" + suffix);
 	produces < std::vector<double> > (prefix + "DeltaPhiTrkSC" + suffix);
 	produces < std::vector<double> > (prefix + "DeltaEtaTrkSC" + suffix);
-	produces < std::vector<double> > (prefix + "Likelihood" + suffix);
 	produces < std::vector<int> > (prefix + "NumberOfBrems" + suffix);
 	produces < std::vector<double> > (prefix + "mvaTrigV0" + suffix);
 	produces < std::vector<double> > (prefix + "mvaNonTrigV0" + suffix);
@@ -65,33 +63,22 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 
 	//electron PF isolation variables
 	if (storePFIsolation_) {
-		produces < std::vector<double> > (prefix + "PfChargedHadronIso03" + suffix);
-		produces < std::vector<double> > (prefix + "PfNeutralHadronIso03" + suffix);
-		produces < std::vector<double> > (prefix + "PFGammaIso03" + suffix);
 		produces < std::vector<double> > (prefix + "PFRelIso03" + suffix);
-		produces < std::vector<double> > (prefix + "PFRelIso03DeltaBeta" + suffix);
-		produces < std::vector<double> > (prefix + "PFRelIso03RhoEA" + suffix);
 
-		produces < std::vector<double> > (prefix + "PfChargedHadronIso04" + suffix);
-		produces < std::vector<double> > (prefix + "PfNeutralHadronIso04" + suffix);
-		produces < std::vector<double> > (prefix + "PFGammaIso04" + suffix);
 		produces < std::vector<double> > (prefix + "PFRelIso04" + suffix);
-
-		produces < std::vector<double> > (prefix + "PfChargedHadronIso05" + suffix);
-		produces < std::vector<double> > (prefix + "PfNeutralHadronIso05" + suffix);
-		produces < std::vector<double> > (prefix + "PFGammaIso05" + suffix);
-		produces < std::vector<double> > (prefix + "PFRelIso05" + suffix);
-		//directional isolation
-		produces < std::vector<double> > (prefix + "DirectionalPFIso02" + suffix);
-		produces < std::vector<double> > (prefix + "DirectionalPFIso02FallOff" + suffix);
-		produces < std::vector<double> > (prefix + "PfRelIso02FallOff" + suffix);
-		produces < std::vector<double> > (prefix + "DirectionalPFIso03" + suffix);
-		produces < std::vector<double> > (prefix + "DirectionalPFIso03FallOff" + suffix);
-		produces < std::vector<double> > (prefix + "PfRelIso03FallOff" + suffix);
-		//PU charged hadron isolation
-		produces < std::vector<double> > (prefix + "PfPUChargedHadronIso03" + suffix);
-		produces < std::vector<double> > (prefix + "PfPUChargedHadronIso04" + suffix);
-		produces < std::vector<double> > (prefix + "PfPUChargedHadronIso05" + suffix);
+		
+		//new variable for pf delta beta corrected reliso
+		produces < std::vector<double> > (prefix + "sumChargedHadronPt03" + suffix);
+		produces < std::vector<double> > (prefix + "sumChargedHadronPt04" + suffix);
+		produces < std::vector<double> > (prefix + "sumNeutralHadronPt03" + suffix);
+		produces < std::vector<double> > (prefix + "sumNeutralHadronPt04" + suffix);
+		produces < std::vector<double> > (prefix + "sumPhotonPt03" + suffix);
+		produces < std::vector<double> > (prefix + "sumPhotonPt04" + suffix);
+		produces < std::vector<double> > (prefix + "sumPUPt03" + suffix);
+		produces < std::vector<double> > (prefix + "sumPUPt04" + suffix);
+		
+		produces < std::vector<double> > (prefix + "PFRelIso03DeltaBeta" + suffix);
+		produces < std::vector<double> > (prefix + "PFRelIso04DeltaBeta" + suffix);
 	}
 
 	//high energy electron isolation variables
@@ -154,7 +141,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > sigmaIEtaIEta(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > deltaPhiTrkSC(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > deltaEtaTrkSC(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > likelihood(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > numberOfBrems(new std::vector<int>());
 	std::auto_ptr < std::vector<double> > mvaTrigV0(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > mvaNonTrigV0(new std::vector<double>());
@@ -170,34 +156,23 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > hcalIso03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > relIso03(new std::vector<double>());
 
-	//electron PF isolation variables
-	std::auto_ptr < std::vector<double> > PfChargedHadronIso03(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > PfNeutralHadronIso03(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > PFGammaIso03(new std::vector<double>());
+	
+	//muonn PF isolation variables
 	std::auto_ptr < std::vector<double> > PFRelIso03(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > PFRelIso03DeltaBeta(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > PFRelIso03RhoEA(new std::vector<double>());
-
-	std::auto_ptr < std::vector<double> > PfChargedHadronIso04(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > PfNeutralHadronIso04(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > PFGammaIso04(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PFRelIso04(new std::vector<double>());
-
-	std::auto_ptr < std::vector<double> > PfChargedHadronIso05(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > PfNeutralHadronIso05(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > PFGammaIso05(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > PFRelIso05(new std::vector<double>());
-
-	std::auto_ptr < std::vector<double> > DirectionalPFIso02(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > DirectionalPFIso02FallOff(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > PfRelIso02FallOff(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > DirectionalPFIso03(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > DirectionalPFIso03FallOff(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > PfRelIso03FallOff(new std::vector<double>());
-	//PU charged hadron isolation
-	std::auto_ptr < std::vector<double> > PfPUChargedHadronIso03(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > PfPUChargedHadronIso04(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > PfPUChargedHadronIso05(new std::vector<double>());
+	
+	//new iso vars
+	std::auto_ptr < std::vector<double> > sumChargedHadronPt03(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > sumChargedHadronPt04(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > sumNeutralHadronPt03(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > sumNeutralHadronPt04(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > sumPhotonPt03(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > sumPhotonPt04(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > sumPUPt03(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > sumPUPt04(new std::vector<double>());
+	
+	std::auto_ptr < std::vector<double> > PFRelIso03DeltaBeta(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > PFRelIso04DeltaBeta(new std::vector<double>());
 
 //    std::auto_ptr < std::vector<double> > dB(new std::vector<double>());
 
@@ -240,9 +215,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > primaryVertexDXYCorr(new std::vector<double>());
 
 	//-----------------------------------------------------------------
-	edm::Handle<double> rhoH;
-	iEvent.getByLabel(edm::InputTag("kt6PFJets", "rho"), rhoH);
-	double rho(*rhoH);
 
 	edm::Handle < std::vector<pat::Electron> > electrons;
 	iEvent.getByLabel(inputTag, electrons);
@@ -261,10 +233,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 	edm::Handle < reco::VertexCollection > primaryVertices;
 	iEvent.getByLabel(vtxInputTag, primaryVertices);
-
-	std::vector < edm::Handle<edm::ValueMap<float> > > eIDValueMap(1);
-	iEvent.getByLabel(likelihoodInputTag, eIDValueMap[0]);
-	const edm::ValueMap<float> & eIDmapLikelihood = *eIDValueMap[0];
 
 	edm::Handle < reco::PFCandidateCollection > pfCandidates;
 	iEvent.getByLabel("particleFlow", pfCandidates);
@@ -328,12 +296,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 				edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << vtxInputTag;
 			}
 
-			// Likelihood Based Ele ID ( https://twiki.cern.ch/twiki/bin/view/CMS/LikelihoodBasedEleID2011 )
-			double likelihood_ = -999.;
-			if (eIDValueMap[0].isValid()) {
-				likelihood_ = eIDmapLikelihood[it->originalObjectRef()];
-			}
-
 			//kinematic variables
 			px->push_back(it->px());
 			py->push_back(it->py());
@@ -353,10 +315,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			sigmaIEtaIEta->push_back(it->sigmaIetaIeta());
 			deltaPhiTrkSC->push_back(it->deltaPhiSuperClusterTrackAtVtx());
 			deltaEtaTrkSC->push_back(it->deltaEtaSuperClusterTrackAtVtx());
-			likelihood->push_back(likelihood_);
 			numberOfBrems->push_back(it->numberOfBrems());
-			mvaTrigV0->push_back(it->electronID("mvaTrigV0"));
-			mvaNonTrigV0->push_back(it->electronID("mvaNonTrigV0"));
 
 			//electron isolation variables
 			trkIso03->push_back(it->dr03TkSumPt());
@@ -370,81 +329,28 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 			//electron PF isolation variables
 			if (storePFIsolation_) {
-				pat::IsolationKeys isokeyPfChargedHadronIso = pat::IsolationKeys(4);
-				pat::IsolationKeys isokeyPfNeutralHadronIso = pat::IsolationKeys(5);
-				pat::IsolationKeys isokeyPFGammaIso = pat::IsolationKeys(6);
-				pat::IsolationKeys isokeyPfPUChargedHadronIso = pat::IsolationKeys(12);
 
-				double pfRelIso03(0), pfRelIso04(0), pfRelIso05(0);
-				double directionalPFIso02(0), directionalPFIso02FallOff(0), pfIso02FallOff(0);
-				double directionalPFIso03(0), directionalPFIso03FallOff(0), pfIso03FallOff(0);
+				reco::GsfElectron::PflowIsolationVariables pfIso = it->pfIsolationVariables();
 
-				const reco::IsoDeposit * PfChargedHadronIsolation = it->isoDeposit(isokeyPfChargedHadronIso);
-				const reco::IsoDeposit * PfNeutralHadronIsolation = it->isoDeposit(isokeyPfNeutralHadronIso);
-				const reco::IsoDeposit * PFGammaIsolation = it->isoDeposit(isokeyPFGammaIso);
-				const reco::IsoDeposit * PfPUChargedHadronIso = it->isoDeposit(isokeyPfPUChargedHadronIso);
+				sumChargedHadronPt03->push_back(pfIso.sumChargedHadronPt);
+				sumChargedHadronPt04->push_back(0);
+			
+				sumNeutralHadronPt03->push_back(pfIso.sumNeutralHadronEt);
+				sumNeutralHadronPt04->push_back(0);
 
-				directionalPFIso02 = customIsolation(*it, pfCandidates, 0.2, true, false, reco::PFCandidate::e);
-				directionalPFIso02FallOff = customIsolation(*it, pfCandidates, 0.2, true, true, reco::PFCandidate::e);
-				pfIso02FallOff = customIsolation(*it, pfCandidates, 0.2, false, true, reco::PFCandidate::e);
+				sumPhotonPt03->push_back(pfIso.sumPhotonEt);
+				sumPhotonPt04->push_back(0);
 
-				directionalPFIso03 = customIsolation(*it, pfCandidates, 0.3, true, false, reco::PFCandidate::e);
-				directionalPFIso03FallOff = customIsolation(*it, pfCandidates, 0.3, true, true, reco::PFCandidate::e);
-				pfIso03FallOff = customIsolation(*it, pfCandidates, 0.3, false, true, reco::PFCandidate::e);
+				sumPUPt03->push_back(pfIso.sumPUPt);
+				sumPUPt04->push_back(0);
+				
+				// 3rd and 4th arguments for rho isolation
+				PFRelIso03->push_back(( pfIso.sumChargedHadronPt + pfIso.sumNeutralHadronEt + pfIso.sumPhotonEt ) / it->pt());
+				PFRelIso04->push_back(0);
 
-				DirectionalPFIso02->push_back(directionalPFIso02);
-				DirectionalPFIso02FallOff->push_back(directionalPFIso02FallOff);
-				PfRelIso02FallOff->push_back(pfIso02FallOff);
-				DirectionalPFIso03->push_back(directionalPFIso03);
-				DirectionalPFIso03FallOff->push_back(directionalPFIso03FallOff);
-				PfRelIso03FallOff->push_back(pfIso03FallOff);
-
-				if (PfChargedHadronIsolation) {
-					PfChargedHadronIso03->push_back(PfChargedHadronIsolation->depositWithin(0.3));
-					PfChargedHadronIso04->push_back(PfChargedHadronIsolation->depositWithin(0.4));
-					PfChargedHadronIso05->push_back(PfChargedHadronIsolation->depositWithin(0.5));
-					pfRelIso03 += PfChargedHadronIsolation->depositWithin(0.3);
-					pfRelIso04 += PfChargedHadronIsolation->depositWithin(0.4);
-					pfRelIso05 += PfChargedHadronIsolation->depositWithin(0.5);
-
-				} else
-					edm::LogError("BristolNTuple_ElectronsExtraError") << "Error! Can't get the isolation deposit "
-							<< "PfChargedHadronIsolation";
-				if (PfNeutralHadronIsolation) {
-					PfNeutralHadronIso03->push_back(PfNeutralHadronIsolation->depositWithin(0.3));
-					PfNeutralHadronIso04->push_back(PfNeutralHadronIsolation->depositWithin(0.4));
-					PfNeutralHadronIso05->push_back(PfNeutralHadronIsolation->depositWithin(0.5));
-					pfRelIso03 += PfNeutralHadronIsolation->depositWithin(0.3);
-					pfRelIso04 += PfNeutralHadronIsolation->depositWithin(0.4);
-					pfRelIso05 += PfNeutralHadronIsolation->depositWithin(0.5);
-				}
-
-				else
-					edm::LogError("BristolNTuple_ElectronsExtraError") << "Error! Can't get the isolation deposit "
-							<< "PfNeutralHadronIsolation";
-				if (PFGammaIsolation) {
-					PFGammaIso03->push_back(PFGammaIsolation->depositWithin(0.3));
-					PFGammaIso04->push_back(PFGammaIsolation->depositWithin(0.4));
-					PFGammaIso05->push_back(PFGammaIsolation->depositWithin(0.5));
-					pfRelIso03 += PFGammaIsolation->depositWithin(0.3);
-					pfRelIso04 += PFGammaIsolation->depositWithin(0.4);
-					pfRelIso05 += PFGammaIsolation->depositWithin(0.5);
-				} else
-					edm::LogError("BristolNTuple_ElectronsExtraError") << "Error! Can't get the isolation deposit "
-							<< "PFGammaIsolation";
-				PFRelIso03->push_back(pfRelIso03 / it->et());
-				PFRelIso04->push_back(pfRelIso04 / it->et());
-				PFRelIso05->push_back(pfRelIso05 / it->et());
-				PFRelIso03DeltaBeta->push_back(getRelativeIsolation(*it, 0.3, rho, iEvent.isRealData(), true, false));
-				PFRelIso03RhoEA->push_back(getRelativeIsolation(*it, 0.3, rho, iEvent.isRealData(), false, true));
-
-				if (PfPUChargedHadronIso) {
-					PfPUChargedHadronIso03->push_back(PfPUChargedHadronIso->depositWithin(0.3));
-					PfPUChargedHadronIso04->push_back(PfPUChargedHadronIso->depositWithin(0.4));
-					PfPUChargedHadronIso05->push_back(PfPUChargedHadronIso->depositWithin(0.5));
-				} else
-					edm::LogError("BristolNTuple_ElectronsExtraError") << "Error! Can't get the isolation deposit "
-							<< "PfPUChargedHadronIso";
+				PFRelIso03DeltaBeta->push_back(( pfIso.sumChargedHadronPt 
+				  + std::max(0.0 , pfIso.sumNeutralHadronEt + pfIso.sumPhotonEt - 0.5 * pfIso.sumPUPt ) ) / it->pt());
+				PFRelIso04DeltaBeta->push_back(0);
 			}
 
 			// Iso variables (Heep)
@@ -459,7 +365,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			trkIsoHeep04->push_back(it->dr04TkSumPt());
 
 			// Conversion variables
-			missingHits->push_back(it->gsfTrack()->trackerExpectedHitsInner().numberOfHits());
+			// missingHits->push_back(it->gsfTrack()->numberOfLostTrackerHits(HitPattern::MISSING_INNER_HITS));
+			missingHits->push_back(0);
 			dist_vec->push_back(it->convDist());
 			dCotTheta->push_back(it->convDcot());
 			conversionRadius->push_back(it->convRadius());
@@ -512,7 +419,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	iEvent.put(sigmaIEtaIEta, prefix + "SigmaIEtaIEta" + suffix);
 	iEvent.put(deltaPhiTrkSC, prefix + "DeltaPhiTrkSC" + suffix);
 	iEvent.put(deltaEtaTrkSC, prefix + "DeltaEtaTrkSC" + suffix);
-	iEvent.put(likelihood, prefix + "Likelihood" + suffix);
 	iEvent.put(numberOfBrems, prefix + "NumberOfBrems" + suffix);
 	iEvent.put(mvaTrigV0, prefix + "mvaTrigV0" + suffix);
 	iEvent.put(mvaNonTrigV0, prefix + "mvaNonTrigV0" + suffix);
@@ -530,33 +436,20 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 	//electron PF isolation variables
 	if (storePFIsolation_) {
-		iEvent.put(PfChargedHadronIso03, prefix + "PfChargedHadronIso03" + suffix);
-		iEvent.put(PfNeutralHadronIso03, prefix + "PfNeutralHadronIso03" + suffix);
-		iEvent.put(PFGammaIso03, prefix + "PFGammaIso03" + suffix);
 		iEvent.put(PFRelIso03, prefix + "PFRelIso03" + suffix);
-		iEvent.put(PFRelIso03DeltaBeta, prefix + "PFRelIso03DeltaBeta" + suffix);
-		iEvent.put(PFRelIso03RhoEA, prefix + "PFRelIso03RhoEA" + suffix);
-
-		iEvent.put(PfChargedHadronIso04, prefix + "PfChargedHadronIso04" + suffix);
-		iEvent.put(PfNeutralHadronIso04, prefix + "PfNeutralHadronIso04" + suffix);
-		iEvent.put(PFGammaIso04, prefix + "PFGammaIso04" + suffix);
 		iEvent.put(PFRelIso04, prefix + "PFRelIso04" + suffix);
-
-		iEvent.put(PfChargedHadronIso05, prefix + "PfChargedHadronIso05" + suffix);
-		iEvent.put(PfNeutralHadronIso05, prefix + "PfNeutralHadronIso05" + suffix);
-		iEvent.put(PFGammaIso05, prefix + "PFGammaIso05" + suffix);
-		iEvent.put(PFRelIso05, prefix + "PFRelIso05" + suffix);
-
-		iEvent.put(DirectionalPFIso02, prefix + "DirectionalPFIso02" + suffix);
-		iEvent.put(DirectionalPFIso02FallOff, prefix + "DirectionalPFIso02FallOff" + suffix);
-		iEvent.put(PfRelIso02FallOff, prefix + "PfRelIso02FallOff" + suffix);
-		iEvent.put(DirectionalPFIso03, prefix + "DirectionalPFIso03" + suffix);
-		iEvent.put(DirectionalPFIso03FallOff, prefix + "DirectionalPFIso03FallOff" + suffix);
-		iEvent.put(PfRelIso03FallOff, prefix + "PfRelIso03FallOff" + suffix);
-		iEvent.put(PfPUChargedHadronIso03, prefix + "PfPUChargedHadronIso03" + suffix);
-		iEvent.put(PfPUChargedHadronIso04, prefix + "PfPUChargedHadronIso04" + suffix);
-		iEvent.put(PfPUChargedHadronIso05, prefix + "PfPUChargedHadronIso05" + suffix);
-
+		
+		iEvent.put(sumChargedHadronPt03, prefix + "sumChargedHadronPt03" + suffix);
+		iEvent.put(sumChargedHadronPt04, prefix + "sumChargedHadronPt04" + suffix);
+		iEvent.put(sumNeutralHadronPt03, prefix + "sumNeutralHadronPt03" + suffix);
+		iEvent.put(sumNeutralHadronPt04, prefix + "sumNeutralHadronPt04" + suffix);
+		iEvent.put(sumPhotonPt03, prefix + "sumPhotonPt03" + suffix);
+		iEvent.put(sumPhotonPt04, prefix + "sumPhotonPt04" + suffix);
+		iEvent.put(sumPUPt03, prefix + "sumPUPt03" + suffix);
+		iEvent.put(sumPUPt04, prefix + "sumPUPt04" + suffix);
+		
+		iEvent.put(PFRelIso03DeltaBeta, prefix + "PFRelIso03DeltaBeta" + suffix);
+		iEvent.put(PFRelIso04DeltaBeta, prefix + "PFRelIso04DeltaBeta" + suffix);
 	}
 
 	//high energy electron isolation variables
