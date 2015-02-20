@@ -34,8 +34,6 @@ def setup_ntupler(process, cms):
                # Gen MET
                'keep *_nTupleGenMET_*_*',
 
-               # 'keep *_hitFitTtSemiLepEvent_MT_*',
-
                'keep *_selectionCriteriaAnalyzer_*_*'
             )
         )

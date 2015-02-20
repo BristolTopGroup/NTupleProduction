@@ -10,6 +10,7 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring('file:/storage/ec6821/NTupleProd/CMSSW_7_3_0/src/TT_pythia8_PHYS14.root')
     # fileNames = cms.untracked.vstring('file:/storage/ec6821/NTupleProd/CMSSW_7_2_3/src/TT_madgraph_PHYS14.root')
     # fileNames = cms.untracked.vstring('file:/home/ec6821/CMSSW_7_2_2/src/WJetsPhys14.root')
+
 )
 # Use to skip events e.g. to reach a problematic event quickly
 # process.source.skipEvents = cms.untracked.uint32(40960)
@@ -27,10 +28,6 @@ getOptions( options )
 # TT Gen Event configuration
 from BristolAnalysis.NTupleTools.ttGenConfig_cff import *
 setupTTGenEvent( process, cms )
-
-# Hit fit
-# from BristolAnalysis.NTupleTools.hitFit_cff import *
-# setupHitFit( process, cms )
 
 # Load the selection filters and the selection analyzers
 process.load( 'BristolAnalysis.NTupleTools.muonSelection_cff')
