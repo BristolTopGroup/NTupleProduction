@@ -6,7 +6,7 @@ config.General.transferOutputs = True
 config.General.requestName = 'TT_8TeV_mcatnlo_BLTUnfold_NoSkim'
 config.General.transferLogs = True
 config.section_('JobType')
-config.JobType.psetName = 'BristolAnalysis/NTupleTools/test/unfoldingBLT_cfg.py_2'
+config.JobType.psetName = 'BristolAnalysis/NTupleTools/test/unfoldingBLT_cfg.py'
 config.JobType.pluginName = 'Analysis'
 config.JobType.inputFiles = input_files
 
