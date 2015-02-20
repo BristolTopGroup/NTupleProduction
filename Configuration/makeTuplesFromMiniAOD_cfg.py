@@ -3,7 +3,11 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("Ntuples")
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = cms.string('PHYS14_25_V3::All')
+# Most recent JEC not available in V3
+# process.GlobalTag.globaltag = cms.string('PHYS14_25_V3::All')
+process.GlobalTag.globaltag = cms.string('PHYS14_25_V2::All')
+
+process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 
 ## Source
 process.source = cms.Source("PoolSource",
