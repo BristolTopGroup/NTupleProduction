@@ -32,6 +32,10 @@ setupTTGenEvent( process, cms )
 # from BristolAnalysis.NTupleTools.hitFit_cff import *
 # setupHitFit( process, cms )
 
+# Particle level definitions
+from BristolAnalysis.NTupleTools.pseudoTopConfig_cff import *
+setupPseudoTop( process, cms )
+
 # Load the selection filters and the selection analyzers
 process.load( 'BristolAnalysis.NTupleTools.muonSelection_cff')
 process.load( 'BristolAnalysis.NTupleTools.qcdMuonSelection_cff')
@@ -59,6 +63,7 @@ process.makingNTuples = cms.Path(
   process.qcdElectronSelectionAnalyzerSequence *
   process.selectionCriteriaAnalyzer *
   process.ttGenEvent *
+  process.makePseudoTop *
   process.nTuples *
   process.nTupleTree
   )
