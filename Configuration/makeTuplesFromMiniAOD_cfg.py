@@ -34,6 +34,8 @@ setupTTGenEvent( process, cms )
 
 # Load the selection filters and the selection analyzers
 process.load( 'BristolAnalysis.NTupleTools.muonSelection_cff')
+process.load( 'BristolAnalysis.NTupleTools.qcdMuonSelection_cff')
+process.load( 'BristolAnalysis.NTupleTools.qcdElectronSelection_cff')
 process.load( 'BristolAnalysis.NTupleTools.electronSelection_cff')
 process.load( 'BristolAnalysis.NTupleTools.SelectionCriteriaAnalyzer_cfi')
 
@@ -53,6 +55,8 @@ setup_ntupler(process, cms )
 process.makingNTuples = cms.Path(
   process.electronSelectionAnalyzerSequence *
   process.muonSelectionAnalyzerSequence *  
+  process.qcdMuonSelectionAnalyzerSequence *
+  process.qcdElectronSelectionAnalyzerSequence *
   process.selectionCriteriaAnalyzer *
   process.ttGenEvent *
   process.nTuples *
@@ -60,6 +64,7 @@ process.makingNTuples = cms.Path(
   )
 
 process.nTupleTree.outputCommands.append( 'keep uint*_topPairMuPlusJetsSelectionTagging_*_*' )
+process.nTupleTree.outputCommands.append( 'keep uint*_topPairMuPlusJetsQCDSelectionTagging_*_*' )
 process.nTupleTree.outputCommands.append( 'keep uint*_topPairEPlusJetsSelectionTagging_*_*' )
 process.nTupleTree.outputCommands.append( 'keep uint*_topPairEPlusJetsQCDSelectionTagging_*_*' )
 process.nTupleTree.outputCommands.append( 'keep uint*_topPairEPlusJetsConversionSelectionTagging_*_*' )

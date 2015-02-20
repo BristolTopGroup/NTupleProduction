@@ -2,7 +2,7 @@ NTupleProduction
 ================
 
 ## Brief Description
-Software for nTuples production (v11) from AOD files for ttbar+X differential cross section analysis
+Software for nTuples production from miniAOD files for ttbar+X differential cross section analysis
 
 ## General Recipe
 
@@ -15,49 +15,44 @@ git config --global user.github $GITHUBUSERNAME
 #on soolin:
 export CMSSW_GIT_REFERENCE=/storage/.cmsgit-cache
 
-#change CMSSW installation paths
-export SCRAM_ARCH=slc5_amd64_gcc462
-scram p -n CMSSW_5_3_20_nTuple_v11 CMSSW_5_3_20
-cd CMSSW_5_3_20_nTuple_v11/src/
+
+# Set up the CMSSW release
+export SCRAM_ARCH=slc6_amd64_gcc491
+cmsrel CMSSW_7_4_0_pre7
+cd CMSSW_7_4_0_pre7/src/
 cmsenv
 
-# Latest PAT recipe
-# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X#Add_new_jet_flavour_CMSSW_5_3_20
+# Do merge-topics and addpkgs first
+# Add new particle level definitions (not yet in CMSSW)
+git cms-merge-topic jhgoh:TQAFPseudoTop
+# Add TopEventProducers as we need to modify one file later on 
+git cms-addpkg TopQuarkAnalysis/TopEventProducers/
 
-git cms-addpkg PhysicsTools/PatAlgos
-
-git cms-addpkg EgammaAnalysis/ElectronTools
-
-# ElectroWeakAnalysis needed for full LHAPDF libraries to work
-git cms-addpkg ElectroWeakAnalysis/Utilities
-
-#Bristol Tools
+# Clone our main ntuple producing software and checkout run2 branch
 git clone git@github.com:BristolTopGroup/NTupleProduction.git BristolAnalysis/NTupleTools
-#TopSkimming
+cd BristolAnalysis/NTupleTools
+git remote rename origin upstream
+git remote add origin git@github.com:EmyrClement/NTupleProduction.git
+git fetch --all
+git checkout -b CMSSW_7_3_X origin/CMSSW_7_3_X
+cd ../../
+
+# Clone our version of the TopSkimming software and checkout run2 branch
 git clone git@github.com:BristolTopGroup/TopSkimming.git TopQuarkAnalysis/TopSkimming
+cd TopQuarkAnalysis/TopSkimming
+git remote rename origin upstream
+git checkout -b CMSSW_7_3_X upstream/CMSSW_7_3_X
+cd ../../
 
-#setup full version of LHAPDF (faster AND prevents crashes!)
-#https://github.com/cms-sw/cmssw/tree/CMSSW_7_0_X/ElectroWeakAnalysis/Utilities
-scram setup lhapdffull
-touch $CMSSW_BASE/src/ElectroWeakAnalysis/Utilities/BuildFile.xml
-scram b -j8
+#### In TopQuarkAnalysis/TopEventProducers/python/producers/TopDecaySubset_cfi.py
+#### Set runMode to Run2
 
-#get XML files for electron MVA
-cd EgammaAnalysis/ElectronTools/data/
-cat download.url | xargs wget 
-cd -
+# Compile
+scramv1 b -j 8
+
 
 #test release
-#make nTuples
-nohup cmsRun BristolAnalysis/NTupleTools/test/makeTuples_cfg.py CMSSW=53X centreOfMassEnergy=8 useData=1 maxEvents=100 dataType=Test skim=NoSkim >&test_data.log &
-nohup cmsRun BristolAnalysis/NTupleTools/test/makeTuples_cfg.py CMSSW=53X centreOfMassEnergy=8 useData=0 maxEvents=100 dataType=Test skim=NoSkim >&test_mc.log &
-#unfolding
-nohup cmsRun BristolAnalysis/NTupleTools/test/unfoldingAndCutflow_cfg.py CMSSW=53X centreOfMassEnergy=8 useData=0 maxEvents=100 dataType=TestUnfold skim=NoSkim >&test_unfolding.log &
-# BLT/LGBT
-nohup cmsRun BristolAnalysis/NTupleTools/test/makeBLT_cfg.py CMSSW=53X centreOfMassEnergy=8 useData=0 maxEvents=100 dataType=TestBLT skim=NoSkim >& testBLT_mc.log &
-nohup cmsRun BristolAnalysis/NTupleTools/test/makeBLT_cfg.py CMSSW=53X centreOfMassEnergy=8 useData=1 maxEvents=100 dataType=TestBLT skim=NoSkim >& testBLT_data.log &
-
-#wait until tasks finish
+### Not yet available
 ```
 
 

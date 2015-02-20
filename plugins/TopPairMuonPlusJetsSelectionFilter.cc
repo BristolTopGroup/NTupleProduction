@@ -123,6 +123,7 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 
 	desc.add<double>("tightMuonIsolation", 0.12);
 	desc.add<double>("controlMuonIsolation", 0.3);
+
 	desc.add<bool>("tagAndProbeStudies", false);
 	desc.add<bool>("dropTriggerSelection", false);
 
@@ -364,7 +365,6 @@ void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
 		}
 	   	else
            	passesIso = getRelativeIsolation(muon, 0.4, true) < tightMuonIso_;
-
 
 		if (isGoodMuon(muon) && passesIso) {
 			goodIsolatedMuons_.push_back(muon);
