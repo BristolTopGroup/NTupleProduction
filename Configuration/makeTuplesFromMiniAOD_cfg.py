@@ -7,8 +7,9 @@ process.GlobalTag.globaltag = cms.string('PHYS14_25_V3::All')
 
 ## Source
 process.source = cms.Source("PoolSource",
-    # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_pythia8_PHYS14.root')
-    fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_madgraph_PHYS14.root')
+    fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_pythia8_PHYS14.root')
+    # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_madgraph_PHYS14.root')
+    # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/WJets_PHYS14.root')
 )
 # Use to skip events e.g. to reach a problematic event quickly
 # process.source.skipEvents = cms.untracked.uint32(40960)
@@ -81,6 +82,7 @@ process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsConversionS
 
 if not options.isTTbarMC:
   process.makingNTuples.remove( process.ttGenEvent )
+  process.selectionCriteriaAnalyzer.genSelectionCriteriaInput = cms.VInputTag()
 else:
   process.nTupleGenEventInfo.isTTbarMC = cms.bool( True )
 
