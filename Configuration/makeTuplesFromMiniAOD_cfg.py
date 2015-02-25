@@ -7,9 +7,8 @@ process.GlobalTag.globaltag = cms.string('PHYS14_25_V3::All')
 
 ## Source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/storage/ec6821/NTupleProd/CMSSW_7_3_0/src/TT_pythia8_PHYS14.root')
-    # fileNames = cms.untracked.vstring('file:/storage/ec6821/NTupleProd/CMSSW_7_2_3/src/TT_madgraph_PHYS14.root')
-    # fileNames = cms.untracked.vstring('file:/home/ec6821/CMSSW_7_2_2/src/WJetsPhys14.root')
+    # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_pythia8_PHYS14.root')
+    fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_madgraph_PHYS14.root')
 )
 # Use to skip events e.g. to reach a problematic event quickly
 # process.source.skipEvents = cms.untracked.uint32(40960)
@@ -61,8 +60,8 @@ process.makingNTuples = cms.Path(
   process.muonSelectionAnalyzerSequence *  
   process.qcdMuonSelectionAnalyzerSequence *
   process.qcdElectronSelectionAnalyzerSequence *
-  process.selectionCriteriaAnalyzer *
   process.ttGenEvent *
+  process.selectionCriteriaAnalyzer *
   process.makePseudoTop *
   process.nTuples *
   process.nTupleTree

@@ -13,9 +13,12 @@ using namespace std;
 
 SelectionCriteriaAnalyzer::SelectionCriteriaAnalyzer(const edm::ParameterSet& iConfig) :
 		// Input tags
-		selectionCriteriaInput_(iConfig.getParameter < std::vector<edm::InputTag> > ("selectionCriteriaInput")) //
+		offlineSelectionCriteriaInput_(iConfig.getParameter < std::vector<edm::InputTag> > ("offlineSelectionCriteriaInput")), //
+		genSelectionCriteriaInput_(iConfig.getParameter < std::vector<edm::InputTag> > ("genSelectionCriteriaInput")) //
+
 {
-	produces< vector<unsigned int> >("passesSelection");
+	produces< vector<unsigned int> >("passesOfflineSelection");
+	produces< vector<unsigned int> >("passesGenSelection");	
 }
 
 void SelectionCriteriaAnalyzer::fillDescriptions(edm::ConfigurationDescriptions & descriptions) {
@@ -27,20 +30,30 @@ SelectionCriteriaAnalyzer::~SelectionCriteriaAnalyzer() {
 
 bool SelectionCriteriaAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	
-	std::auto_ptr< vector<unsigned int> > passesSelection(new vector<unsigned int>());
+	std::auto_ptr< vector<unsigned int> > passesOfflineSelection(new vector<unsigned int>());
+	std::auto_ptr< vector<unsigned int> > passesGenSelection(new vector<unsigned int>());
 
 
 	bool passesAtLeastOneSelection = false;
 
-	for (unsigned short selectionIndex = 0; selectionIndex < selectionCriteriaInput_.size(); ++selectionIndex) {
-		bool passesThisSelection = passesFilter(iEvent, selectionCriteriaInput_.at(selectionIndex ));
-		passesAtLeastOneSelection = passesAtLeastOneSelection || passesThisSelection;
-		if ( passesThisSelection ) {
-			passesSelection->push_back(selectionIndex+1);
+	for (unsigned short selectionIndex = 0; selectionIndex < offlineSelectionCriteriaInput_.size(); ++selectionIndex) {
+		bool passesSelection = passesFilter(iEvent, offlineSelectionCriteriaInput_.at(selectionIndex ));
+		passesAtLeastOneSelection = passesAtLeastOneSelection || passesSelection;
+		if ( passesSelection ) {
+			passesOfflineSelection->push_back(selectionIndex+1);
 		}
 	}
 
-	iEvent.put(passesSelection, "passesSelection");
+	for (unsigned short selectionIndex = 0; selectionIndex < genSelectionCriteriaInput_.size(); ++selectionIndex) {
+		bool passesSelection = passesFilter(iEvent, genSelectionCriteriaInput_.at(selectionIndex ));
+		passesAtLeastOneSelection = passesAtLeastOneSelection || passesSelection;
+		if ( passesSelection ) {
+			passesGenSelection->push_back(selectionIndex+1);
+		}
+	}
+
+	iEvent.put(passesOfflineSelection, "passesOfflineSelection");
+	iEvent.put(passesGenSelection, "passesGenSelection");
 
 	return passesAtLeastOneSelection;
 }
