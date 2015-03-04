@@ -47,6 +47,10 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 
 		cleaningDeltaR_(iConfig.getParameter<double>("cleaningDeltaR")), //
 
+		applyJEC_(iConfig.getParameter < bool > ("applyJEC")), //
+		jetCorrectionService_(iConfig.getParameter<std::string> ("JetCorrectionService")), //
+		corrector_(0), //
+
 		bJetDiscriminator_(iConfig.getParameter<std::string>("bJetDiscriminator")), //
 		minBJetDiscriminator_(iConfig.getParameter<double>("minBJetDiscriminator")), //
 
@@ -122,6 +126,10 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 	desc.add<double>("minJetPtInNtuples", 30.0);
 
 	desc.add<double>("cleaningDeltaR", 0.3 );
+
+	desc.add<bool>("applyJEC", false);
+	desc.add<std::string>("JetCorrectionService", "");
+
 	desc.add < std::string > ("bJetDiscriminator", "combinedSecondaryVertexBJetTags");
 	desc.add<double>("minBJetDiscriminator", 0.679 );
 
@@ -149,7 +157,7 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 
 	// Get content from event
 	// Including selecting a signal electron, loose leptons, jets and bjets
-	setupEventContent(iEvent);
+	setupEventContent(iEvent, iSetup);
 	
 	bool passesSelection(true);
 	bool passesSelectionExceptJetRequirements(true);
@@ -219,7 +227,7 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 
 }
 
-void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent) {
+void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	if (debug_)
 		cout << "Setting up the event content" << endl;
 
@@ -243,6 +251,11 @@ void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEven
 	edm::Handle < pat::JetCollection > jets;
 	iEvent.getByLabel(jetInput_, jets);
 	jets_ = *jets;
+
+	if ( applyJEC_ ) {
+		corrector_ = JetCorrector::getJetCorrector (jetCorrectionService_, iSetup);
+		jets_ = applyNewJec( jets_, iEvent, iSetup );
+	}
 
 	// Electrons
 	edm::Handle < pat::ElectronCollection > electrons;
@@ -533,6 +546,24 @@ void TopPairElectronPlusJetsSelectionFilter::cleanedJets() {
 	}
 }
 
+pat::JetCollection TopPairElectronPlusJetsSelectionFilter::applyNewJec( pat::JetCollection jets, edm::Event& iEvent, const edm::EventSetup& iSetup ) {
+	pat::JetCollection newJets;
+
+	for (unsigned index = 0; index < jets.size(); ++index) {
+		const pat::Jet jet = jets.at(index);
+		float JEC = getJECForJet( jet, iEvent, iSetup);
+		pat::Jet newJet( jet );
+		newJet.setP4( jet.p4() * JEC );
+		newJets.push_back( newJet );
+	}
+
+	return newJets;
+}
+
+float TopPairElectronPlusJetsSelectionFilter::getJECForJet(const pat::Jet jet, edm::Event& iEvent, const edm::EventSetup& iSetup ) {
+	return corrector_->correction( jet.correctedJet("Uncorrected"), iEvent, iSetup );
+}
+
 void TopPairElectronPlusJetsSelectionFilter::cleanedBJets() {
 	cleanedBJets_.clear();
 	cleanedBJetIndex_.clear();
@@ -542,7 +573,7 @@ void TopPairElectronPlusJetsSelectionFilter::cleanedBJets() {
 		const pat::Jet jet = cleanedJets_.at(index);
 
 		// Check b jet passes pt requirement (probably same as min jet pt unless assymmetric)
-		if ( jet.pt() <= minBJetPt_ ) continue;
+		if ( jet.pt()<= minBJetPt_ ) continue;
 
 		// Does jet pass b tag selection
 		if (jet.bDiscriminator(bJetDiscriminator_) > minBJetDiscriminator_) {
@@ -557,6 +588,7 @@ bool TopPairElectronPlusJetsSelectionFilter::isGoodJet(const pat::Jet& jet) cons
 	//both cuts are done at PAT config level (selectedPATJets) this is just for safety
 	// double smearFactor = getSmearedJetPtScale(jet, 0);
 	// bool passesPtAndEta(smearFactor*jet.pt() > 20. && fabs(jet.eta()) < 2.5);
+
 	bool passesPtAndEta(jet.pt() > minJetPtInNtuples_ && fabs(jet.eta()) < 2.5);
 	bool passesJetID(false);
 	bool passNOD = jet.numberOfDaughters() > 1;

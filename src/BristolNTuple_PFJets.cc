@@ -223,9 +223,10 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				jecUnc->setJetPt(it->pt()); // the uncertainty is a function of the corrected pt
 			}
 
+			double JEC = 1;
 			if ( readJEC ) {
-				double scale = corrector->correction( it->correctedJet("Uncorrected"), iEvent, iSetup );
-				jec_vec->push_back(scale);
+				JEC = corrector->correction( it->correctedJet("Uncorrected"), iEvent, iSetup );
+				jec_vec->push_back(JEC);
  			}
 
 			if (!iEvent.isRealData()) {
@@ -360,10 +361,19 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
 			// fill in all the vectors
 			//kinematic variables
-			px->push_back(it->px());
-			py->push_back(it->py());
-			pz->push_back(it->pz());
-			energy->push_back(it->energy());
+			if ( readJEC ) {
+				px->push_back(it->correctedJet("Uncorrected").px() * JEC );
+				py->push_back(it->correctedJet("Uncorrected").py() * JEC );
+				pz->push_back(it->correctedJet("Uncorrected").pz() * JEC );
+				energy->push_back(it->correctedJet("Uncorrected").energy() * JEC);
+			}
+			else {
+				px->push_back(it->px());
+				py->push_back(it->py());
+				pz->push_back(it->pz());
+				energy->push_back(it->energy());
+			}
+
 			//kinematic variables before corrections
 			px_raw->push_back(it->correctedJet("Uncorrected").px());
 			py_raw->push_back(it->correctedJet("Uncorrected").py());
