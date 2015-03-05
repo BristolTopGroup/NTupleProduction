@@ -10,6 +10,7 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
@@ -70,6 +71,8 @@ public:
 	virtual void goodIsolatedMuons();
 	virtual void cleanedJets();
 	virtual void cleanedBJets();
+	virtual pat::JetCollection applyNewJec( pat::JetCollection jets, edm::Event& iEvent, const edm::EventSetup& iSetup );
+	virtual float getJECForJet(const pat::Jet jet, edm::Event& iEvent, const edm::EventSetup& iSetup );
 
 	virtual bool passesSelectionStep(edm::Event& iEvent, unsigned int selectionStep) const;
 
@@ -88,7 +91,7 @@ public:
 	virtual bool hasAtLeastTwoGoodBJets() const;
 
 private:
-	virtual void setupEventContent(edm::Event& iEvent);
+	virtual void setupEventContent(edm::Event& iEvent, const edm::EventSetup& iSetup);
 
 	//config
 	edm::InputTag jetInput_, electronInput_, muonInput_, hltInputTag_, VertexInput_;
@@ -103,6 +106,10 @@ private:
 
 	double cleaningDeltaR_;
 
+	const bool applyJEC_;
+	const std::string jetCorrectionService_;
+	const JetCorrector* corrector_;
+	
 	std::string bJetDiscriminator_;
 	double minBJetDiscriminator_;
 

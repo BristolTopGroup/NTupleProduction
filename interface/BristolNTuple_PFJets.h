@@ -16,6 +16,8 @@ class BristolNTuple_PFJets : public edm::EDProducer {
   const unsigned int    maxSize;
   const double 			minJetPtToStore;
   const std::string jecUncPath;
+  const bool readJEC;
+  const std::string jetCorrectionService;
   const bool readJECuncertainty, doVertexAssociation;
   const edm::InputTag   vtxInputTag;
   const bool isRealData;
