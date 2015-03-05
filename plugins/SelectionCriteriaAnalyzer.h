@@ -23,8 +23,8 @@ public:
 	static void fillDescriptions(edm::ConfigurationDescriptions & descriptions);
 private:
 	//config
-	std::vector<edm::InputTag> selectionCriteriaInput_;
-
+	std::vector<edm::InputTag> offlineSelectionCriteriaInput_;
+	std::vector<edm::InputTag> genSelectionCriteriaInput_;
 };
 
 #endif

@@ -7,10 +7,9 @@ process.GlobalTag.globaltag = cms.string('PHYS14_25_V3::All')
 
 ## Source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/storage/ec6821/NTupleProd/CMSSW_7_3_0/src/TT_pythia8_PHYS14.root')
-    # fileNames = cms.untracked.vstring('file:/storage/ec6821/NTupleProd/CMSSW_7_2_3/src/TT_madgraph_PHYS14.root')
-    # fileNames = cms.untracked.vstring('file:/home/ec6821/CMSSW_7_2_2/src/WJetsPhys14.root')
-
+    fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_pythia8_PHYS14.root')
+    # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_madgraph_PHYS14.root')
+    # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/WJets_PHYS14.root')
 )
 # Use to skip events e.g. to reach a problematic event quickly
 # process.source.skipEvents = cms.untracked.uint32(40960)
@@ -28,6 +27,10 @@ getOptions( options )
 # TT Gen Event configuration
 from BristolAnalysis.NTupleTools.ttGenConfig_cff import *
 setupTTGenEvent( process, cms )
+
+# Particle level definitions
+from BristolAnalysis.NTupleTools.pseudoTopConfig_cff import *
+setupPseudoTop( process, cms )
 
 # Load the selection filters and the selection analyzers
 process.load( 'BristolAnalysis.NTupleTools.muonSelection_cff')
@@ -54,8 +57,9 @@ process.makingNTuples = cms.Path(
   process.muonSelectionAnalyzerSequence *  
   process.qcdMuonSelectionAnalyzerSequence *
   process.qcdElectronSelectionAnalyzerSequence *
-  process.selectionCriteriaAnalyzer *
   process.ttGenEvent *
+  process.selectionCriteriaAnalyzer *
+  process.makePseudoTop *
   process.nTuples *
   process.nTupleTree
   )
@@ -74,6 +78,7 @@ process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsConversionS
 
 if not options.isTTbarMC:
   process.makingNTuples.remove( process.ttGenEvent )
+  process.selectionCriteriaAnalyzer.genSelectionCriteriaInput = cms.VInputTag()
 else:
   process.nTupleGenEventInfo.isTTbarMC = cms.bool( True )
 
