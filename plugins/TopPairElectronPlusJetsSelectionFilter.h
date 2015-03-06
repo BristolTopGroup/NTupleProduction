@@ -77,9 +77,6 @@ public:
 	virtual void goodIsolatedElectrons();
 	virtual void cleanedJets();
 	virtual void cleanedBJets();
-	virtual pat::JetCollection applyNewJec( pat::JetCollection jets, edm::Event& iEvent, const edm::EventSetup& iSetup );
-	virtual float getJECForJet(const pat::Jet jet, edm::Event& iEvent, const edm::EventSetup& iSetup );
-
 
 	virtual bool passesSelectionStep(edm::Event& iEvent, unsigned int selectionStep) const;
 

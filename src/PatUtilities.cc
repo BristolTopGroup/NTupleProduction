@@ -252,5 +252,23 @@ double getSmearedJetPtScale(const pat::Jet& jet, int jet_smearing_systematic) {
 
 }
 
+pat::JetCollection applyNewJec( pat::JetCollection jets, const JetCorrector* corrector, edm::Event& iEvent, const edm::EventSetup& iSetup ) {
+	pat::JetCollection newJets;
+
+	for (unsigned index = 0; index < jets.size(); ++index) {
+		const pat::Jet jet = jets.at(index);
+		float JEC = getJECForJet( jet, corrector, iEvent, iSetup);
+		pat::Jet newJet( jet );
+		newJet.setP4( jet.correctedJet("Uncorrected").p4() * JEC );
+		newJets.push_back( newJet );
+	}
+
+	return newJets;
+}
+
+float getJECForJet(const pat::Jet jet, const JetCorrector* corrector, edm::Event& iEvent, const edm::EventSetup& iSetup ) {
+	return corrector->correction( jet.correctedJet("Uncorrected"), iEvent, iSetup );
+}
+
 
 

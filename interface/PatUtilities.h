@@ -7,6 +7,7 @@
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
@@ -28,5 +29,9 @@ double getRelativeIsolation(const pat::Electron& electron, double cone, double r
 double getRelativeIsolation(const pat::Muon& muon, double cone, bool useDeltaBetaCorrections);
 
 double getSmearedJetPtScale(const pat::Jet& jet, int jet_smearing_systematic);
+
+pat::JetCollection applyNewJec( pat::JetCollection jets, const JetCorrector* corrector, edm::Event& iEvent, const edm::EventSetup& iSetup );
+
+float getJECForJet(const pat::Jet jet, const JetCorrector* corrector, edm::Event& iEvent, const edm::EventSetup& iSetup );
 
 #endif 

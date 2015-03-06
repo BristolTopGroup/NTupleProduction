@@ -254,7 +254,7 @@ void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEven
 
 	if ( applyJEC_ ) {
 		corrector_ = JetCorrector::getJetCorrector (jetCorrectionService_, iSetup);
-		jets_ = applyNewJec( jets_, iEvent, iSetup );
+		jets_ = applyNewJec( jets_, corrector_, iEvent, iSetup );
 	}
 
 	// Electrons
@@ -544,24 +544,6 @@ void TopPairElectronPlusJetsSelectionFilter::cleanedJets() {
 		}
 		indexInNtuple++;
 	}
-}
-
-pat::JetCollection TopPairElectronPlusJetsSelectionFilter::applyNewJec( pat::JetCollection jets, edm::Event& iEvent, const edm::EventSetup& iSetup ) {
-	pat::JetCollection newJets;
-
-	for (unsigned index = 0; index < jets.size(); ++index) {
-		const pat::Jet jet = jets.at(index);
-		float JEC = getJECForJet( jet, iEvent, iSetup);
-		pat::Jet newJet( jet );
-		newJet.setP4( jet.p4() * JEC );
-		newJets.push_back( newJet );
-	}
-
-	return newJets;
-}
-
-float TopPairElectronPlusJetsSelectionFilter::getJECForJet(const pat::Jet jet, edm::Event& iEvent, const edm::EventSetup& iSetup ) {
-	return corrector_->correction( jet.correctedJet("Uncorrected"), iEvent, iSetup );
 }
 
 void TopPairElectronPlusJetsSelectionFilter::cleanedBJets() {
