@@ -45,6 +45,10 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 
 		cleaningDeltaR_(iConfig.getParameter<double>("cleaningDeltaR")), //
 
+		applyJEC_(iConfig.getParameter < bool > ("applyJEC")), //
+		jetCorrectionService_(iConfig.getParameter<std::string> ("JetCorrectionService")), //
+		corrector_(0), //
+
 		bJetDiscriminator_(iConfig.getParameter<std::string>("bJetDiscriminator")), //
 		minBJetDiscriminator_(iConfig.getParameter<double>("minBJetDiscriminator")), //
 
@@ -118,6 +122,10 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 	desc.add<double>("minJetPtInNtuples", 30.0);
 
 	desc.add<double>("cleaningDeltaR", 0.3 );
+
+	desc.add<bool>("applyJEC", false);
+	desc.add<std::string>("JetCorrectionService", "");
+
 	desc.add < std::string > ("bJetDiscriminator", "combinedSecondaryVertexBJetTags");
 	desc.add<double>("minBJetDiscriminator", 0.679 );
 
@@ -144,7 +152,7 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 
 	// Get content from event
 	// Including selecting a signal muon, loose leptons, jets and bjets
-	setupEventContent(iEvent);
+	setupEventContent(iEvent, iSetup);
 
 	// Loop through each selection step in order and check if event satisfies each criterion
 	bool passesSelection(true);
@@ -220,7 +228,7 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 		return taggingMode_ || passesSelectionExceptBtagging;
 }
 
-void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent) {
+void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	
 	if (debug_)
 		cout << "Setting up the event content" << endl;
@@ -250,6 +258,11 @@ void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent) {
 	edm::Handle < pat::JetCollection > jets;
 	iEvent.getByLabel(jetInput_, jets);
 	jets_ = *jets;
+
+	if ( applyJEC_ ) {
+		corrector_ = JetCorrector::getJetCorrector (jetCorrectionService_, iSetup);
+		jets_ = applyNewJec( jets_, corrector_, iEvent, iSetup );
+	}
 
 	// Electrons (for veto)
 	edm::Handle < pat::ElectronCollection > electrons;

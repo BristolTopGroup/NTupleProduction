@@ -15,3 +15,5 @@ from BristolAnalysis.NTupleTools.BristolNTuple_GenParticles_cfi import *
 from BristolAnalysis.NTupleTools.BristolNTuple_GenJets_cfi import *
 from BristolAnalysis.NTupleTools.BristolNTuple_GenMET_cfi import *
 from BristolAnalysis.NTupleTools.BristolNTuple_GlobalEventVars_cfi import *
+
+from BristolAnalysis.NTupleTools.BristolNTuple_PseudoTop_cfi import *

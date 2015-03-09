@@ -28,34 +28,12 @@ def setupTTGenEvent( process, cms ):
 		filter.src = cms.InputTag("genEvt")
 		filter.useTtGenEvent = cms.bool(True)
 
-	# process.ttFullHadronicFilter.taggingMode = cms.bool( True )
-
-	# process.ttFullLeptonicFilter.taggingMode = cms.bool( True )
-
-	# process.ttSemiLeptonicElectronFilter.taggingMode = cms.bool( True )
-
-	# process.ttSemiLeptonicMuonFilter.taggingMode = cms.bool( True )
-
-	# process.ttSemiLeptonicTauFilter.taggingMode = cms.bool( True )
-
-	# process.ttFullLeptonicEEFilter.taggingMode = cms.bool( True )
-
-	# process.ttFullLeptonicMuMuFilter.taggingMode = cms.bool( True )
-
-	# process.ttFullLeptonicTauTauFilter.taggingMode = cms.bool( True )
-
-	# process.ttFullLeptonicETauFilter.taggingMode = cms.bool( True )
-
-	# process.ttFullLeptonicEMuFilter.taggingMode = cms.bool( True )
-
-	# process.ttFullLeptonicMuTauFilter.taggingMode = cms.bool( True )
-
 	process.ttGenEvent = cms.Sequence( process.makeGenEvt *
 										process.ttFullHadronicFilter * 
 										process.ttFullLeptonicFilter * 
 										process.ttSemiLeptonicElectronFilter * 
 										process.ttSemiLeptonicMuonFilter * 
-										process.ttSemiLeptonicTauFilter * 
+										process.ttSemiLeptonicTauFilter *
 										process.ttFullLeptonicEEFilter * 
 										process.ttFullLeptonicMuMuFilter * 
 										process.ttFullLeptonicTauTauFilter * 
