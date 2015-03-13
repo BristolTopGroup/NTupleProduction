@@ -204,8 +204,13 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			if (px->size() >= maxSize)
 				break;
 
+			double JEC = 1;
+			if ( readJEC ) {
+				JEC = corrector->correction( it->correctedJet("Uncorrected"), iEvent, iSetup );
+ 			}
+
 			// Only consider jets above minimum pt
-			if ( it->pt() <= minJetPtToStore )
+			if ( it->correctedJet("Uncorrected").pt() * JEC <= minJetPtToStore )
 				continue;
 
 			retpf.set(false);
@@ -222,12 +227,6 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				jecUnc->setJetEta(it->eta());
 				jecUnc->setJetPt(it->pt()); // the uncertainty is a function of the corrected pt
 			}
-
-			double JEC = 1;
-			if ( readJEC ) {
-				JEC = corrector->correction( it->correctedJet("Uncorrected"), iEvent, iSetup );
-				jec_vec->push_back(JEC);
- 			}
 
 			if (!iEvent.isRealData()) {
 				// Store generated jet resolutions for monte carlo
@@ -366,6 +365,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				py->push_back(it->correctedJet("Uncorrected").py() * JEC );
 				pz->push_back(it->correctedJet("Uncorrected").pz() * JEC );
 				energy->push_back(it->correctedJet("Uncorrected").energy() * JEC);
+				jec_vec->push_back(JEC);
 			}
 			else {
 				px->push_back(it->px());
