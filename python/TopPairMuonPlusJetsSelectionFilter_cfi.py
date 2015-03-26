@@ -24,7 +24,7 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     min3JetPt=cms.double(30.),
     min4JetPt=cms.double(30.),
     minBJetPt=cms.double(30.),
-    minJetPtInNtuples=cms.double(30.),
+    minJetPtInNtuples=cms.double(25.),
 
     # Jet cleaning delta R
     cleaningDeltaR=cms.double(0.3),
