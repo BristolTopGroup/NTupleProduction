@@ -32,7 +32,7 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     # Maximum isolation for signal region
     tightMuonIsolation=cms.double(0.12),
     # Minimum isolation for control region
-    controlMuonIsolation=cms.double(0.3),
+    controlMuonIsolation=cms.double(0.),
 
     # Apply different JEC
     applyJEC = cms.bool(True),

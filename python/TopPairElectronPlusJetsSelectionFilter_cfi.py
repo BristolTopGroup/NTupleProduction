@@ -40,7 +40,10 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     bJetDiscriminator=cms.string('combinedInclusiveSecondaryVertexV2BJetTags'),
     minBJetDiscriminator=cms.double(0.814),
 
-    controlElectronIsolation=cms.double(0.21), # endcap iso is <0.2075, so tightened this from >0.2 to >0.21
+    tightElectronIsolation_EB=cms.double(0.14),
+    tightElectronIsolation_EE=cms.double(0.1649),
+
+    controlElectronIsolation=cms.double(0.),
    
     prefix=cms.untracked.string('TopPairElectronPlusJetsSelection.'),
     MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12 or Summer11Leg
