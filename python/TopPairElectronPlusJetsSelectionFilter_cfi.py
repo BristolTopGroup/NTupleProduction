@@ -9,7 +9,7 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices'),
 
     # Lepton cuts
-    minSignalElectronPt=cms.double(30.),
+    minSignalElectronPt=cms.double(34.),
     maxSignalElectronEta=cms.double(2.5),
     signalElectronIDCriteria=cms.string('cutBasedElectronID-CSA14-PU20bx25-V0-standalone-tight'),
     minSignalElectronID=cms.double(0),

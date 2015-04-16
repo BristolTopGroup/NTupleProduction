@@ -9,7 +9,7 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     VertexInput=cms.InputTag('offlineSlimmedPrimaryVertices'),
 
     # Signal muon cuts
-    minSignalMuonPt=cms.double(30.),
+    minSignalMuonPt=cms.double(26.),
     maxSignalMuonEta=cms.double(2.1),
     minLooseMuonPt=cms.double(10.),
     maxLooseMuonEta=cms.double(2.5),
@@ -36,7 +36,7 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
 
     # Apply different JEC
     applyJEC = cms.bool(True),
-    JetCorrectionService = cms.string('ak4PFCHSL1FastL2L3'),  
+    JetCorrectionService = cms.string('ak4PFCHSL1FastL2L3'),
 
     # B Jet Selection
     # Working points taken from https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
