@@ -32,7 +32,7 @@ cd BristolAnalysis/NTupleTools
 git remote rename origin upstream
 git remote add origin git@github.com:<Your Git name with forked repo>/NTupleProduction.git
 git fetch --all
-git checkout -b CMSSW_7_3_X origin/CMSSW_7_3_X
+git checkout -b CMSSW_7_3_X upstream/CMSSW_7_3_X
 cd ../../
 
 # Clone our version of the TopSkimming software and checkout run2 branch
