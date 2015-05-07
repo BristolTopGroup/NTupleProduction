@@ -120,7 +120,7 @@ private:
 	std::string bJetDiscriminator_;
 	double minBJetDiscriminator_;
 
-	double controlElectronIso_;
+	double tightElectronIso_EB_, tightElectronIso_EE_, controlElectronIso_;
 
 	bool tagAndProbeStudies_, dropTriggerSelection_;
 

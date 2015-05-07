@@ -9,7 +9,7 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     VertexInput=cms.InputTag('offlineSlimmedPrimaryVertices'),
 
     # Signal muon cuts
-    minSignalMuonPt=cms.double(30.),
+    minSignalMuonPt=cms.double(26.),
     maxSignalMuonEta=cms.double(2.1),
     minLooseMuonPt=cms.double(10.),
     maxLooseMuonEta=cms.double(2.5),
@@ -19,12 +19,12 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     minLooseElectronID=cms.double(0),
 
     #jet cuts
-    min1JetPt=cms.double(30.),
-    min2JetPt=cms.double(30.),
-    min3JetPt=cms.double(30.),
-    min4JetPt=cms.double(30.),
-    minBJetPt=cms.double(30.),
-    minJetPtInNtuples=cms.double(30.),
+    min1JetPt=cms.double(25.),
+    min2JetPt=cms.double(25.),
+    min3JetPt=cms.double(25.),
+    min4JetPt=cms.double(25.),
+    minBJetPt=cms.double(25.),
+    minJetPtInNtuples=cms.double(25.),
 
     # Jet cleaning delta R
     cleaningDeltaR=cms.double(0.3),
@@ -32,11 +32,11 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     # Maximum isolation for signal region
     tightMuonIsolation=cms.double(0.12),
     # Minimum isolation for control region
-    controlMuonIsolation=cms.double(0.3),
+    controlMuonIsolation=cms.double(0.),
 
     # Apply different JEC
     applyJEC = cms.bool(True),
-    JetCorrectionService = cms.string('ak4PFCHSL1FastL2L3'),  
+    JetCorrectionService = cms.string('ak4PFCHSL1FastL2L3'),
 
     # B Jet Selection
     # Working points taken from https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating

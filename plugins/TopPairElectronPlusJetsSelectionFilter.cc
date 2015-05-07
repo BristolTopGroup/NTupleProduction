@@ -54,6 +54,8 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		bJetDiscriminator_(iConfig.getParameter<std::string>("bJetDiscriminator")), //
 		minBJetDiscriminator_(iConfig.getParameter<double>("minBJetDiscriminator")), //
 
+		tightElectronIso_EB_(iConfig.getParameter<double>("tightElectronIsolation_EB")), //
+		tightElectronIso_EE_(iConfig.getParameter<double>("tightElectronIsolation_EE")), //
 		controlElectronIso_(iConfig.getParameter<double>("controlElectronIsolation")), //
 
 		tagAndProbeStudies_(iConfig.getParameter<bool>("tagAndProbeStudies")), //
@@ -132,6 +134,9 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 
 	desc.add < std::string > ("bJetDiscriminator", "combinedSecondaryVertexBJetTags");
 	desc.add<double>("minBJetDiscriminator", 0.679 );
+
+	desc.add<double>("tightElectronIsolation_EB", 0.14);
+	desc.add<double>("tightElectronIsolation_EE", 0.1649);
 
 	desc.add<double>("controlElectronIsolation", 0.3);
 	
@@ -353,12 +358,19 @@ void TopPairElectronPlusJetsSelectionFilter::goodIsolatedElectrons() {
 				// useRhoActiveAreaCorrections_) < tightElectronIso_;
 		bool passesIso = false;
 
+		double relIsoWithDBeta = electronIsolation(electron);
 		if ( nonIsolatedElectronSelection_ ) {
-			double relIsoWithDBeta = electronIsolation(electron);
 			passesIso = relIsoWithDBeta > controlElectronIso_ ? true : false;
 		}
-      	else
-  	        passesIso = true;
+      	else {
+      		double electronSCEta = electron.superCluster()->eta();
+      		if ( electronSCEta <= 1.479 ) {
+				passesIso = relIsoWithDBeta < tightElectronIso_EB_ ? true : false;      			
+      		}
+      		else if ( electronSCEta > 1.479 && electronSCEta < 2.5 ) {
+				passesIso = relIsoWithDBeta < tightElectronIso_EE_ ? true : false;      			
+      		}
+      	}
 
 		if (isGoodElectron(electron) && passesIso) {
 			goodIsolatedElectrons_.push_back(electron);

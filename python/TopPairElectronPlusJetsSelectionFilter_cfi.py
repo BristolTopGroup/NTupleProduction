@@ -9,7 +9,7 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices'),
 
     # Lepton cuts
-    minSignalElectronPt=cms.double(30.),
+    minSignalElectronPt=cms.double(34.),
     maxSignalElectronEta=cms.double(2.5),
     signalElectronIDCriteria=cms.string('cutBasedElectronID-CSA14-PU20bx25-V0-standalone-tight'),
     minSignalElectronID=cms.double(0),
@@ -21,12 +21,12 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     minLooseElectronID=cms.double(0),
 
     #jet cuts
-    min1JetPt=cms.double(30.),
-    min2JetPt=cms.double(30.),
-    min3JetPt=cms.double(30.),
-    min4JetPt=cms.double(30.),
-    minBJetPt=cms.double(30.),
-    minJetPtInNtuples=cms.double(30.),
+    min1JetPt=cms.double(25.),
+    min2JetPt=cms.double(25.),
+    min3JetPt=cms.double(25.),
+    min4JetPt=cms.double(25.),
+    minBJetPt=cms.double(25.),
+    minJetPtInNtuples=cms.double(25.),
     
     # Jet cleaning delta R
     cleaningDeltaR=cms.double(0.3),
@@ -40,7 +40,10 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     bJetDiscriminator=cms.string('combinedInclusiveSecondaryVertexV2BJetTags'),
     minBJetDiscriminator=cms.double(0.814),
 
-    controlElectronIsolation=cms.double(0.21), # endcap iso is <0.2075, so tightened this from >0.2 to >0.21
+    tightElectronIsolation_EB=cms.double(0.14),
+    tightElectronIsolation_EE=cms.double(0.1649),
+
+    controlElectronIsolation=cms.double(0.),
    
     prefix=cms.untracked.string('TopPairElectronPlusJetsSelection.'),
     MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12 or Summer11Leg
