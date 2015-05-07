@@ -1,0 +1,10 @@
+# cvmfs default.local file installed with puppet.
+# this files overrides and extends the values contained
+# within the default.conf file.
+
+CVMFS_QUOTA_LIMIT='10000'
+CVMFS_HTTP_PROXY='http://lcgsq2.phy.bris.ac.uk:3128'
+CVMFS_CACHE_BASE='/var/cache/cvmfs2'
+CVMFS_SERVER_URL='http://cernvmfs.gridpp.rl.ac.uk:8000/opt/@org@;http://cvmfs-stratum-one.cern.ch:8000/opt/@org@; http://cvmfs.racf.bnl.gov:8000/opt/@org@'
+CVMFS_FORCE_SIGNING='yes'
+CVMFS_REPOSITORIES=cms.cern.ch
