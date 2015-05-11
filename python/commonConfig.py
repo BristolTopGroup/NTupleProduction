@@ -3,7 +3,7 @@ config = Configuration()
 
 config.section_("General")
 # config.General.requestName = 'TTJets_Madgraph_PU20bx25'
-config.General.workArea = 'workdirCrab/test/2015-01-22'
+config.General.workArea = 'workdirCrab/v18/2015-05-11'
 config.General.transferOutputs = True
 
 config.section_("JobType")
@@ -16,7 +16,7 @@ config.section_("Data")
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
 # config.Data.unitsPerJob = 10
-config.Data.outLFN = '/store/user/ejclemen/'
+config.Data.outLFNDirBase = '/store/user/ejclemen/'
 config.Data.publication = True
 # config.Data.publishDataName = 'TTJets_Madgraph_PU20bx25'
 
