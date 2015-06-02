@@ -90,8 +90,8 @@ def readMergeLog(mergeLog):
     
 if __name__ == "__main__":
     parser = OptionParser()
-    parser.add_option("-s", "--size", dest="sizePerFile", default=1024 * 5,
-                  help="Set maximum size of output files in MB. Default 5 GB (5124 MB)")
+    parser.add_option("-s", "--size", dest="sizePerFile", default=1024 * 2,
+                  help="Set maximum size of output files in MB. Default 2 GB (5124 MB)")
     parser.add_option("-t", "--time", dest="timeCut", default='01 01 2000',
                       help="Cut on creation time. Only consider files for merging after a certain date. Format: DD MM YYYY. Default: 01 Jan 2000")
     parser.add_option("-c", "--continue",
