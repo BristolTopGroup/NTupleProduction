@@ -433,8 +433,8 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
 			//b-tagging information
 			//names are changing between major software releases
-			combinedInclusiveSecondaryVertexV2BJetTags->push_back(it->bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags"));
-			passesMediumCSV->push_back(it->bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags") > 0.814 );
+			combinedInclusiveSecondaryVertexV2BJetTags->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
+			passesMediumCSV->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.814 );
 
 			//jet-vertex association
 			if (doVertexAssociation) {

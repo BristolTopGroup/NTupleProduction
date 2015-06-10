@@ -37,7 +37,7 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
 
     # B Jet Selection
     # Working points taken from https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
-    bJetDiscriminator=cms.string('combinedInclusiveSecondaryVertexV2BJetTags'),
+    bJetDiscriminator=cms.string('pfCombinedInclusiveSecondaryVertexV2BJetTags'),
     minBJetDiscriminator=cms.double(0.814),
 
     tightElectronIsolation_EB=cms.double(0.14),

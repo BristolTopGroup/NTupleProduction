@@ -37,13 +37,11 @@ void BristolNTuple_MET::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	std::auto_ptr<std::vector<unsigned int > > METUncertaintyTypes(new std::vector<unsigned int>() );
 	std::auto_ptr<std::vector<double> > METUncertaintiesPt(new std::vector<double>() );
 
-	cout << "MET : " << patMET.pt() << endl;
 	// Loop over MET uncertainties and store
 	if ( storeMETUncertainties_ ) {
 		for ( unsigned int unc = 0; unc < nMETUncertainties_; ++unc ) {
 			METUncertaintyTypes->push_back( unc );
 			METUncertaintiesPt->push_back( patMET.shiftedPt(pat::MET::METUncertainty(unc) ) );
-			cout << "MET for uncertainty " << unc << " : " << patMET.shiftedPt(pat::MET::METUncertainty(unc) ) << endl;
 		}
 		iEvent.put( METUncertaintyTypes, prefix + "METUncertaintyTypes" + suffix );		
 		iEvent.put( METUncertaintiesPt, prefix + "METUncertaintiesPt" + suffix );
