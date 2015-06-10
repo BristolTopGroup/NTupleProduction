@@ -330,13 +330,8 @@ bool TopPairElectronPlusJetsSelectionFilter::isLooseElectron(const edm::Ptr<pat:
 	// bool passesID = electron.electronID("mvaTrigV0") > 0.5;
 	// bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrectionsForElectrons_,
 	// 		useRhoActiveAreaCorrections_) < looseElectronIso_;
-	// bool passesID = electron.electronID(looseElectronIDCriteria_) > minLooseElectronID_;
-
-	// edm::Handle < edm::View<pat::Electron> > electrons;
-	// const edm::Ptr<pat::Electron> elePtr(electrons, electron);
-	// const auto el = &electron;
 	bool passesID = looseElectronIDDecisions_[electron];
-	bool passesIso = true;
+	bool passesIso = true; // FIXME Iso already applied in ID (check in AT)
 	return passesPtAndEta && passesID && passesIso;
 }
 
@@ -402,7 +397,6 @@ bool TopPairElectronPlusJetsSelectionFilter::isGoodElectron(const edm::Ptr<pat::
 		passesID = passesElectronID( *electron );
 	}
 	else {
-		// passesID = electron.electronID(signalElectronIDCriteria_) > minSignalElectronID_;
 		passesID = signalElectronIDDecisions_[electron];
 	}
 
