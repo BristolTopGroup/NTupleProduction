@@ -4,44 +4,66 @@ from shutil import move
 from os import remove
 import os
 
-version = '16'
+version = '20'
 crabWorkArea = 'workdirCrab/v'+version+'/'+str(date.today())
 print 'Using workdir ',crabWorkArea
 miniAodDir = 'BristolAnalysis/NTupleTools/Configuration/crab3Configurations/'
 jobConfigs = [
- miniAodDir+'TTJets_Madgraph_PU20bx25.py',
- miniAodDir+'TTJets_Madgraph_PU30bx50.py',
- # miniAodDir+'TTJets_Madgraph_PU4bx50.py',
- miniAodDir+'TT_Pythia8_PU20bx25.py',
- miniAodDir+'TT_Pythia8_PU20bx25_mass1755.py',
- miniAodDir+'TT_Pythia8_PU20bx25_scaleup.py',
- miniAodDir+'TT_Pythia8_PU30bx50.py',
- miniAodDir+'TT_Pythia8_PU40bx25.py',
+### 74X MC
+ miniAodDir+'TTJets_amcatnloFXFX.py'
+ # miniAodDir+'DYJetsToLL_M50.py',
+ # miniAodDir+'QCD_EMEnriched_120to170.py',
+ # miniAodDir+'QCD_EMEnriched_170to300.py',
+ # miniAodDir+'QCD_EMEnriched_20to30.py',
+ # miniAodDir+'QCD_EMEnriched_30to50.py',
+ # miniAodDir+'QCD_EMEnriched_50to80.py',
+ # miniAodDir+'QCD_EMEnriched_80to120.py',
+ # miniAodDir+'QCD_MuEnriched_15to20.py',
+ # miniAodDir+'QCD_MuEnriched_20to30.py',
+ # miniAodDir+'QCD_MuEnriched_30to50.py',
+ # miniAodDir+'QCD_MuEnriched_470to600.py',
+ # miniAodDir+'QCD_MuEnriched_50to80.py',
+ # miniAodDir+'QCD_MuEnriched_80to120.py',
+ # miniAodDir+'QCD_bcToE_170to250.py',
+ # miniAodDir+'TToLeptons_t.py',
+ # miniAodDir+'T_tW.py',
+ # miniAodDir+'Tbar_tW.py',
+ # miniAodDir+'WJetsToLNu.py',
 
- miniAodDir+'TBarToLeptons_s_PU20bx25.py',
- miniAodDir+'TBarToLeptons_t_PU20bx25.py',
- miniAodDir+'TToLeptons_s_PU20bx25.py',
- miniAodDir+'TToLeptons_t_PU20bx25.py',
- miniAodDir+'T_tW_PU20bx25.py',
- miniAodDir+'Tbar_tW_PU20bx25.py',
- miniAodDir+'WJets_PU20bx25.py',
- miniAodDir+'DYJetsToLL_M50_PU20bx25.py',
+### PHYS14
+ # miniAodDir+'TTJets_Madgraph_PU20bx25.py',
+ # miniAodDir+'TTJets_Madgraph_PU30bx50.py',
+ # # miniAodDir+'TTJets_Madgraph_PU4bx50.py',
+ # miniAodDir+'TT_Pythia8_PU20bx25.py',
+ # miniAodDir+'TT_Pythia8_PU20bx25_mass1755.py',
+ # miniAodDir+'TT_Pythia8_PU20bx25_scaleup.py',
+ # miniAodDir+'TT_Pythia8_PU30bx50.py',
+ # miniAodDir+'TT_Pythia8_PU40bx25.py',
 
- miniAodDir+'GJets_100to200_PU20bx25.py',
- miniAodDir+'GJets_200to400_PU20bx25.py',
- miniAodDir+'GJets_400to600_PU20bx25.py',
- miniAodDir+'GJets_600toInf_PU20bx25.py',
- miniAodDir+'QCD_EMEnriched_20to30_PU20bx25.py',
- miniAodDir+'QCD_EMEnriched_30to80_PU20bx25.py',
- miniAodDir+'QCD_EMEnriched_80to170_PU20bx25.py',
- miniAodDir+'QCD_bcToE_170toInf_PU20bx25.py',
- miniAodDir+'QCD_bcToE_80to170_PU20bx25.py',
- miniAodDir+'QCD_bcToE_30to80_PU20bx25.py',
- miniAodDir+'QCD_bcToE_20to30_PU20bx25.py',
- miniAodDir+'QCD_MuEnriched_20toInf_PU20bx25.py',
- miniAodDir+'QCD_MuEnriched_30to50_PU20bx25.py',
- miniAodDir+'QCD_MuEnriched_50to80_PU20bx25.py',
- miniAodDir+'QCD_MuEnriched_80to120_PU20bx25.py',
+ # miniAodDir+'TBarToLeptons_s_PU20bx25.py',
+ # miniAodDir+'TBarToLeptons_t_PU20bx25.py',
+ # miniAodDir+'TToLeptons_s_PU20bx25.py',
+ # miniAodDir+'TToLeptons_t_PU20bx25.py',
+ # miniAodDir+'T_tW_PU20bx25.py',
+ # miniAodDir+'Tbar_tW_PU20bx25.py',
+ # miniAodDir+'WJets_PU20bx25.py',
+ # miniAodDir+'DYJetsToLL_M50_PU20bx25.py',
+
+ # miniAodDir+'GJets_100to200_PU20bx25.py',
+ # miniAodDir+'GJets_200to400_PU20bx25.py',
+ # miniAodDir+'GJets_400to600_PU20bx25.py',
+ # miniAodDir+'GJets_600toInf_PU20bx25.py',
+ # miniAodDir+'QCD_EMEnriched_20to30_PU20bx25.py',
+ # miniAodDir+'QCD_EMEnriched_30to80_PU20bx25.py',
+ # miniAodDir+'QCD_EMEnriched_80to170_PU20bx25.py',
+ # miniAodDir+'QCD_bcToE_170toInf_PU20bx25.py',
+ # miniAodDir+'QCD_bcToE_80to170_PU20bx25.py',
+ # miniAodDir+'QCD_bcToE_30to80_PU20bx25.py',
+ # miniAodDir+'QCD_bcToE_20to30_PU20bx25.py',
+ # miniAodDir+'QCD_MuEnriched_20toInf_PU20bx25.py',
+ # miniAodDir+'QCD_MuEnriched_30to50_PU20bx25.py',
+ # miniAodDir+'QCD_MuEnriched_50to80_PU20bx25.py',
+ # miniAodDir+'QCD_MuEnriched_80to120_PU20bx25.py',
 ]
 
 # Replace workArea name in commonConfig.py
