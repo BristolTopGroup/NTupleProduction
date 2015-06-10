@@ -2,3 +2,6 @@
 *.py[cod]
 python/__init__.py
 python/commonConfig.py
+python/submissionScripts/condor/*.out
+python/submissionScripts/condor/*.log
+python/submissionScripts/condor/*.err
