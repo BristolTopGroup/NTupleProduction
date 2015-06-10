@@ -3,13 +3,14 @@ config = Configuration()
 
 config.section_("General")
 # config.General.requestName = 'TTJets_Madgraph_PU20bx25'
-config.General.workArea = 'workdirCrab/v18/2015-05-11'
+config.General.workArea = 'workdirCrab/v20/2015-06-09'
 config.General.transferOutputs = True
 
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'BristolAnalysis/NTupleTools/Configuration/makeTuplesFromMiniAOD_cfg.py'
 # config.JobType.pyCfgParams = ['isTTbarMC=1']
+config.JobType.allowUndistributedCMSSW = True
 
 config.section_("Data")
 # config.Data.inputDataset = '/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
