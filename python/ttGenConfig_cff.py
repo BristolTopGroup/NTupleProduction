@@ -2,7 +2,7 @@ def setupTTGenEvent( process, cms ):
 	process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff" )
 	process.initSubset.src = cms.InputTag('prunedGenParticles')
 	process.decaySubset.src = cms.InputTag('prunedGenParticles')
-	process.decaySubset. runMode = cms.string('Run2')
+	process.decaySubset.runMode = cms.string('Run2')
 
 	process.load( 'TopQuarkAnalysis.TopSkimming.TtFullyHadronicFilter_cfi' )
 	process.load( 'TopQuarkAnalysis.TopSkimming.TtFullyLeptonicFilter_cfi' )
