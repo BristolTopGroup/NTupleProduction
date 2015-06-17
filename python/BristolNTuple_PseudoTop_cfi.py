@@ -4,7 +4,7 @@ nTuplePseudoTopJets = cms.EDProducer("BristolNTuple_GenJets",
     InputTag = cms.InputTag('pseudoTop','jets','Ntuples'),
     Prefix = cms.string('PseudoTopJets.'),
     Suffix = cms.string(''),
-    minPt = cms.double(30),
+    minPt = cms.double(20),
     maxAbsoluteEta = cms.double(999),
     MaxSize = cms.uint32(99)
 )
