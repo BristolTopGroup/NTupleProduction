@@ -9,7 +9,7 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     VertexInput=cms.InputTag('offlineSlimmedPrimaryVertices'),
 
     # Signal muon cuts
-    minSignalMuonPt=cms.double(26.),
+    minSignalMuonPt=cms.double(23.),
     maxSignalMuonEta=cms.double(2.1),
     minLooseMuonPt=cms.double(10.),
     maxLooseMuonEta=cms.double(2.5),
@@ -19,12 +19,12 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     minLooseElectronID=cms.double(0),
 
     #jet cuts
-    min1JetPt=cms.double(25.),
-    min2JetPt=cms.double(25.),
-    min3JetPt=cms.double(25.),
-    min4JetPt=cms.double(25.),
-    minBJetPt=cms.double(25.),
-    minJetPtInNtuples=cms.double(25.),
+    min1JetPt=cms.double(20.),
+    min2JetPt=cms.double(20.),
+    min3JetPt=cms.double(20.),
+    min4JetPt=cms.double(20.),
+    minBJetPt=cms.double(20.),
+    minJetPtInNtuples=cms.double(20.),
 
     # Jet cleaning delta R
     cleaningDeltaR=cms.double(0.3),
@@ -35,7 +35,7 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     controlMuonIsolation=cms.double(0.),
 
     # Apply different JEC
-    applyJEC = cms.bool(True),
+    applyJEC = cms.bool(False),
     JetCorrectionService = cms.string('ak4PFCHSL1FastL2L3'),
 
     # B Jet Selection

@@ -9,7 +9,7 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices'),
 
     # Lepton cuts
-    minSignalElectronPt=cms.double(34.),
+    minSignalElectronPt=cms.double(25.),
     maxSignalElectronEta=cms.double(2.5),
     signalElectronIDMap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-tight'),
     minSignalElectronID=cms.double(0),
@@ -21,18 +21,18 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     minLooseElectronID=cms.double(0),
 
     #jet cuts
-    min1JetPt=cms.double(25.),
-    min2JetPt=cms.double(25.),
-    min3JetPt=cms.double(25.),
-    min4JetPt=cms.double(25.),
-    minBJetPt=cms.double(25.),
-    minJetPtInNtuples=cms.double(25.),
+    min1JetPt=cms.double(20.),
+    min2JetPt=cms.double(20.),
+    min3JetPt=cms.double(20.),
+    min4JetPt=cms.double(20.),
+    minBJetPt=cms.double(20.),
+    minJetPtInNtuples=cms.double(20.),
     
     # Jet cleaning delta R
     cleaningDeltaR=cms.double(0.3),
 
     # Apply different JEC
-    applyJEC = cms.bool(True),
+    applyJEC = cms.bool(False),
     JetCorrectionService = cms.string('ak4PFCHSL1FastL2L3'),  
 
     # B Jet Selection
