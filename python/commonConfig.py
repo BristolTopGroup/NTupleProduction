@@ -3,7 +3,7 @@ config = Configuration()
 
 config.section_("General")
 # config.General.requestName = 'TTJets_Madgraph_PU20bx25'
-config.General.workArea = 'workdirCrab/v20/2015-06-09'
+config.General.workArea = 'workdirCrab/v20/2015-06-11'
 config.General.transferOutputs = True
 
 config.section_("JobType")
@@ -20,6 +20,7 @@ config.Data.splitting = 'FileBased'
 config.Data.outLFNDirBase = '/store/user/ejclemen/'
 config.Data.publication = True
 # config.Data.publishDataName = 'TTJets_Madgraph_PU20bx25'
+config.Data.ignoreLocality = True
 
 config.section_("Site")
 config.Site.storageSite = 'T2_UK_SGrid_Bristol'
