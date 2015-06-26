@@ -30,6 +30,7 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		minSignalElectronPt_(iConfig.getParameter<double>("minSignalElectronPt")), //
 		maxSignalElectronEta_(iConfig.getParameter<double>("maxSignalElectronEta")), //
   		signalElectronIDMapToken_(consumes<ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("signalElectronIDMap"))),
+  		signalElectronIDMapToken_bitmap_(consumes<ValueMap<unsigned int> >(iConfig.getParameter<edm::InputTag>("signalElectronIDMap_bitmap"))),
 		minSignalElectronID_(iConfig.getParameter<double>("minSignalElectronID")), //
 		minLooseMuonPt_(iConfig.getParameter<double>("minLooseMuonPt")), //
 		maxLooseMuonEta_(iConfig.getParameter<double>("maxLooseMuonEta")), //
@@ -114,6 +115,7 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 	desc.add<double>("maxSignalElectronEta",10.);
 	desc.add<double>("minSignalElectronID",0);
 	desc.add < InputTag > ("signalElectronIDMap");
+	desc.add < InputTag > ("signalElectronIDMap_bitmap");
 	desc.add < InputTag > ("looseElectronIDMap");
 	desc.add<double>("minLooseMuonPt",0.);
 	desc.add<double>("maxLooseMuonEta",10.);
@@ -230,7 +232,6 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 		return taggingMode_ || passesSelectionExceptJetRequirements;
 	else
 		return taggingMode_ || passesSelection;
-
 }
 
 void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -270,6 +271,10 @@ void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEven
 	Handle<edm::ValueMap<bool> > tight_id_decisions;
 	iEvent.getByToken(signalElectronIDMapToken_,tight_id_decisions);
 	signalElectronIDDecisions_ = *tight_id_decisions;
+
+	Handle<edm::ValueMap<unsigned int> > tight_id_decisions_bitmap;
+	iEvent.getByToken(signalElectronIDMapToken_bitmap_,tight_id_decisions_bitmap);
+	signalElectronIDDecisions_bitmap_ = *tight_id_decisions_bitmap;
 
 	Handle<edm::ValueMap<bool> > loose_id_decisions;
 	iEvent.getByToken(looseElectronIDMapToken_,loose_id_decisions);
@@ -350,7 +355,7 @@ bool TopPairElectronPlusJetsSelectionFilter::isLooseMuon(const pat::Muon& muon) 
 	bool passesPtAndEta = muon.pt() > minLooseMuonPt_ && fabs(muon.eta()) < maxLooseMuonEta_;
 	bool passesID = muon.isLooseMuon();
 	// bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < looseMuonIso_;
-	bool passesIso = true;
+	bool passesIso = muon.trackIso() / muon.pt() < 0.1;;
 
 	return passesPtAndEta && passesID && passesIso;
 }
@@ -364,7 +369,6 @@ void TopPairElectronPlusJetsSelectionFilter::goodIsolatedElectrons() {
 
 		// const pat::Electron electron = electrons_.at(index);
 		const auto electron = electrons_->ptrAt(index);
-
 		// bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrectionsForElectrons_,
 				// useRhoActiveAreaCorrections_) < tightElectronIso_;
 		bool passesIso = false;
@@ -388,6 +392,8 @@ void TopPairElectronPlusJetsSelectionFilter::goodIsolatedElectrons() {
 bool TopPairElectronPlusJetsSelectionFilter::isGoodElectron(const edm::Ptr<pat::Electron>& electron) const {
 	bool passesPtAndEta = electron->pt() > minSignalElectronPt_ && fabs(electron->eta()) < maxSignalElectronEta_;
 	bool notInCrack = fabs(electron->superCluster()->eta()) < 1.4442 || fabs(electron->superCluster()->eta()) > 1.5660;
+	bool inECAL = fabs(electron->superCluster()->eta()) < 2.5;
+
 	//2D impact w.r.t primary vertex
 	// bool passesD0 = fabs(electron.dB(pat::Electron::PV2D)) < 0.02; //cm
 	// bool passesID = electron.electronID("mvaTrigV0") > 0.5;
@@ -401,7 +407,7 @@ bool TopPairElectronPlusJetsSelectionFilter::isGoodElectron(const edm::Ptr<pat::
 	}
 
 	bool passesD0 = true;
-	return passesPtAndEta && notInCrack && passesD0 && passesID;
+	return passesPtAndEta && notInCrack && inECAL && passesD0 && passesID;
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::passesElectronID(const pat::Electron& electron) const {
@@ -588,10 +594,10 @@ bool TopPairElectronPlusJetsSelectionFilter::isGoodJet(const pat::Jet& jet) cons
 	// double smearFactor = getSmearedJetPtScale(jet, 0);
 	// bool passesPtAndEta(smearFactor*jet.pt() > 20. && fabs(jet.eta()) < 2.5);
 
-	bool passesPtAndEta(jet.pt() > minJetPtInNtuples_ && fabs(jet.eta()) < 2.5);
+	bool passesPtAndEta(jet.pt() > minJetPtInNtuples_ && fabs(jet.eta()) < 2.4);
 	bool passesJetID(false);
 	bool passNOD = jet.numberOfDaughters() > 1;
-	bool passNHF = jet.neutralHadronEnergyFraction() < 0.99;
+	bool passNHF = jet.neutralHadronEnergyFraction() + jet.HFHadronEnergyFraction() < 0.99;
 	bool passNEF = jet.neutralEmEnergyFraction() < 0.99;
 	bool passCHF = true;
 	bool passNCH = true;

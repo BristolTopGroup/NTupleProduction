@@ -352,7 +352,7 @@ bool TopPairMuonPlusJetsSelectionFilter::isLooseMuon(const pat::Muon& muon) cons
 	bool passesPtAndEta = muon.pt() > minLooseMuonPt_ && fabs(muon.eta()) < maxLooseMuonEta_;
 	bool passesID = muon.isLooseMuon();
 	// bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < looseMuonIso_;
-	bool passesIso = true;
+	bool passesIso = muon.trackIso() / muon.pt() < 0.1;;
 
 	return passesPtAndEta && passesID && passesIso;
 }
@@ -377,10 +377,14 @@ void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
 		bool passesIso = false;
 
         if ( nonIsolatedMuonSelection_ ) {
-        	passesIso = getRelativeIsolation(muon, 0.4, true) > controlMuonIso_;
+        	// passesIso = getRelativeIsolation(muon, 0.4, true) > controlMuonIso_;
+        	passesIso = muon.trackIso() / muon.pt() > controlMuonIso_;
 		}
-	   	else
-           	passesIso = getRelativeIsolation(muon, 0.4, true) < tightMuonIso_;
+	   	else {
+           	// passesIso = getRelativeIsolation(muon, 0.4, true) < tightMuonIso_;
+        	passesIso = muon.trackIso() / muon.pt() < tightMuonIso_;
+	   	}
+
 
 		if (isGoodMuon(muon) && passesIso) {
 			goodIsolatedMuons_.push_back(muon);
@@ -480,7 +484,7 @@ bool TopPairMuonPlusJetsSelectionFilter::isGoodJet(const pat::Jet& jet) const {
 	bool passesPtAndEta(jet.pt() > minJetPtInNtuples_ && fabs(jet.eta()) < 2.5);
 	bool passesJetID(false);
 	bool passNOD = jet.numberOfDaughters() > 1;
-	bool passNHF = jet.neutralHadronEnergyFraction() < 0.99;
+	bool passNHF = jet.neutralHadronEnergyFraction() + jet.HFHadronEnergyFraction()  < 0.99;
 	bool passNEF = jet.neutralEmEnergyFraction() < 0.99;
 	bool passCHF = true;
 	bool passNCH = true;

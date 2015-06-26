@@ -103,6 +103,7 @@ private:
 
 	double minSignalElectronPt_, maxSignalElectronEta_;
 	edm::EDGetTokenT<edm::ValueMap<bool> > signalElectronIDMapToken_;
+	edm::EDGetTokenT<edm::ValueMap<unsigned int> > signalElectronIDMapToken_bitmap_;
 	double minSignalElectronID_;
 	double minLooseMuonPt_, maxLooseMuonEta_, minLooseElectronPt_, maxLooseElectronEta_;
 	edm::EDGetTokenT<edm::ValueMap<bool> > looseElectronIDMapToken_;
@@ -143,6 +144,7 @@ private:
 	pat::MuonCollection muons_, looseMuons_;
 	pat::Electron signalElectron_;
 	edm::ValueMap<bool> signalElectronIDDecisions_, looseElectronIDDecisions_;
+	edm::ValueMap<unsigned int> signalElectronIDDecisions_bitmap_;
 	reco::VertexCollection vertices_;
 	HLTConfigProvider hltConfig_;
 	edm::TriggerResults triggerResults_;
