@@ -2,22 +2,20 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("Ntuples")
 
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+# If you would like to change the Global Tag e.g. for JEC
+# process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 # Most recent JEC not available in V3
 # process.GlobalTag.globaltag = cms.string('PHYS14_25_V3::All')
-process.GlobalTag.globaltag = cms.string('PHYS14_25_V2::All')
-
-process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
+# process.GlobalTag.globaltag = cms.string('PHYS14_25_V2::All')
+# process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 
 ## Source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root')  
-    # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_pythia8_PHYS14.root')
-    # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_madgraph_PHYS14.root')
-    # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/WJets_PHYS14.root')
+    # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root')
+    fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_PowhegPythia8_50ns.root')
 )
 # Use to skip events e.g. to reach a problematic event quickly
-# process.source.skipEvents = cms.untracked.uint32(40960)
+# process.source.skipEvents = cms.untracked.uint32(4099)
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger.cerr.threshold = 'INFO'
