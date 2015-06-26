@@ -27,11 +27,32 @@ def groupFilesToSize(files, finalSize=1024 * 1024 * 1024 * 2):# < 2 GB
         groups[groupIndex].append(file)
     return groups
 
-def fuseFiles(groupedFiles,outputDirectory):
-    group = startWithGroup
-    
-    for files in groupedFiles:
-        outputFile = outputDirectory + '/ntuple_merged_%03d' % group
+def fuseFiles(groupedFiles,outputDirectory,outputFileIndex):
+    if outputFileIndex == -1:
+        group = startWithGroup
+
+        for files in groupedFiles:
+            outputFile = outputDirectory + '/ntuple_merged_%03d' % group
+            outputFile += '.root'
+            command = 'hadd -f7 %s ' % outputFile
+            for file in files:
+                command += file + ' '
+            command.rstrip(' ')
+            print '=' * 100
+            print '*' * 100
+            if group > skipGroupsUntil:
+                print 'Executing:'
+            else:
+                print 'Skipping:'
+            print command
+            print '*' * 100
+            print '=' * 100
+            if group > skipGroupsUntil and not options.dryRun:
+                os.system(command)
+            group += 1
+    else :
+        files = groupedFiles[outputFileIndex]
+        outputFile = outputDirectory + '/ntuple_merged_%03d' % ( outputFileIndex + 1 )
         outputFile += '.root'
         command = 'hadd -f7 %s ' % outputFile
         for file in files:
@@ -39,16 +60,11 @@ def fuseFiles(groupedFiles,outputDirectory):
         command.rstrip(' ')
         print '=' * 100
         print '*' * 100
-        if group > skipGroupsUntil:
-            print 'Executing:'
-        else:
-            print 'Skipping:'
         print command
         print '*' * 100
         print '=' * 100
-        if group > skipGroupsUntil and not options.dryRun:
+        if not options.dryRun:
             os.system(command)
-        group += 1
 
 def getProcess(filepath):
     file = filepath.split('/')[-1]
@@ -87,11 +103,32 @@ def readMergeLog(mergeLog):
     global startWithGroup
     startWithGroup = lastOutputFileNumber + 1
     return usedFiles
-    
+
+def getGroupedFilesToUse( path, continueLastMerge=False ):
+    allButUsedFiles = []
+    groupedFiles = []
+
+    files = getROOTFiles(path)
+    #implement the timeCut here!
+    files = filterFilesByTime(files=files, filesNewerThan = timeCut)
+    uniqueFiles = getUniqueFiles(files)
+
+    if continueLastMerge:
+        continueLastMerge = True
+        usedFiles = readMergeLog(options.mergeLog)
+        allButUsedFiles = removeUsedFiles(uniqueFiles, usedFiles)
+        
+    if not continueLastMerge:
+        groupedFiles = groupFilesToSize(uniqueFiles, sizePerFile)
+    else:
+        groupedFiles = groupFilesToSize(allButUsedFiles, sizePerFile)
+
+    return files, uniqueFiles, allButUsedFiles, groupedFiles
+
 if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("-s", "--size", dest="sizePerFile", default=1024 * 2,
-                  help="Set maximum size of output files in MB. Default 2 GB (5124 MB)")
+                  help="Set maximum size of output files in MB. Default 2 GB (2048 MB)")
     parser.add_option("-t", "--time", dest="timeCut", default='01 01 2000',
                       help="Cut on creation time. Only consider files for merging after a certain date. Format: DD MM YYYY. Default: 01 Jan 2000")
     parser.add_option("-c", "--continue",
@@ -103,12 +140,15 @@ if __name__ == "__main__":
                       help="Do not merge any files.")
     parser.add_option("-o", dest="outputDir",default=".",
                       help="Output directory for merged files")
-                    
+    parser.add_option("-j", dest="outputFileNumber", default=-1,
+                    help="Index of output file")
+
     (options, args) = parser.parse_args()
     sizePerFile = 1024 * 1024 * float(options.sizePerFile)
     timeCut = time.mktime(time.strptime(options.timeCut, '%d %m %Y'))
-    
-    continueLastMerge = False
+    outputFileIndex = int(options.outputFileNumber)
+
+    continueLastMerge = options.continueMerge 
     allButUsedFiles = []
     groupedFiles = []
     
@@ -118,22 +158,11 @@ if __name__ == "__main__":
         sys.exit()
     
     path = sys.argv[1]
-    files = getROOTFiles(path)
-    #implement the timeCut here!
-    files = filterFilesByTime(files=files, filesNewerThan = timeCut)
-    uniqueFiles = getUniqueFiles(files)
+
+    files, uniqueFiles, allButUsedFiles, groupedFiles = getGroupedFilesToUse( path, continueLastMerge )
+    
     outputDirectory = options.outputDir
-    
-    if options.continueMerge:
-        continueLastMerge = True
-        usedFiles = readMergeLog(options.mergeLog)
-        allButUsedFiles = removeUsedFiles(uniqueFiles, usedFiles)
-        
-    if not continueLastMerge:
-        groupedFiles = groupFilesToSize(uniqueFiles, sizePerFile)
-    else:
-        groupedFiles = groupFilesToSize(allButUsedFiles, sizePerFile)
-    
+
     print 'Input dir : ',path
     print os.listdir(path)
     # print 'Process recognised:', getProcess(files[0])
@@ -147,5 +176,5 @@ if __name__ == "__main__":
     print 'Target size of output file', sizePerFile
     print 'Number of merged files to be produced:', len(groupedFiles)
     
-    fuseFiles(groupedFiles, outputDirectory)
+    fuseFiles(groupedFiles, outputDirectory, outputFileIndex)
 
