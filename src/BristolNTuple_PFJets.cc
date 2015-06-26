@@ -228,8 +228,15 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
  			}
 
 			// Only consider jets above minimum pt
-			if ( it->correctedJet("Uncorrected").pt() * JEC <= minJetPtToStore )
-				continue;
+			if ( readJEC ) {
+				if ( it->correctedJet("Uncorrected").pt() * JEC <= minJetPtToStore )
+					continue;
+			}
+			else {
+				if ( it->pt() <= minJetPtToStore )
+					continue;
+			}
+
 
 			retpf.set(false);
 			int passjetLoose = 0;
