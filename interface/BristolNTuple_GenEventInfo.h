@@ -10,6 +10,8 @@
 #include "TopQuarkAnalysis/TopTools/interface/JetPartonMatching.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 namespace TTbarDecay {
 enum value {
 	NotTtbar,

@@ -32,6 +32,9 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 	produces<double>(prefix_ + "PtHat" + suffix_);
 	produces<double>(prefix_ + "PUWeight" + suffix_);
 	produces<double>(prefix_ + "generatorWeight" + suffix_);
+	produces<double>(prefix_ + "centralLHEWeight" + suffix_);
+	produces <std::vector<double> > ( prefix_ + "systematicWeights" + suffix_ );
+
 	produces < std::vector<double> > (prefix_ + "PDFWeights" + suffix_);
 	produces < std::vector<int> > (prefix_ + "PileUpInteractions" + suffix_);
 	produces < std::vector<int> > (prefix_ + "NumberOfTrueInteractions" + suffix_);
@@ -110,6 +113,9 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	std::auto_ptr<double> ptHat(new double());
 	std::auto_ptr<double> PUWeight(new double());
 	std::auto_ptr<double> generatorWeight(new double());
+	std::auto_ptr<double> centralLHEWeight(new double());
+	std::auto_ptr<std::vector<double> > systematicWeights(new std::vector<double>());
+
 	std::auto_ptr < std::vector<double> > pdfWeights(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > Number_interactions(new std::vector<int>());
 
@@ -183,6 +189,7 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	*ptHat.get() = 0.;
 	*PUWeight.get() = 0.;
 	*generatorWeight.get() = 0.;
+	*centralLHEWeight.get() = 0;
 	*ttbarDecay.get() = 0;
 
 	*leptonicTopPt.get() = 0;
@@ -262,6 +269,19 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 
 			*generatorWeight.get() = genEvtInfoProduct->weight();
 
+			edm::Handle<LHEEventProduct> EvtHandle ;
+			iEvent.getByLabel( "externalLHEProducer" , EvtHandle ) ;
+
+			*centralLHEWeight.get() = EvtHandle->originalXWGTUP();
+
+			// int whichWeight = 1;
+			// cout << "Number of weights : " << EvtHandle->weights().size() << endl;
+			for ( unsigned int weightIndex = 0; weightIndex < EvtHandle->weights().size(); ++weightIndex ) {
+				systematicWeights->push_back( EvtHandle->weights()[weightIndex].wgt );
+				// cout << "Weight " << i << " " << EvtHandle->weights()[i].id << " : " << EvtHandle->weights()[i].wgt << " " << EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP() << endl;
+			}
+			// double theWeight = EvtHandle->weights()[whichWeight].wgt/EvtHandle->originalXWGTUP();
+			// cout << genEvtInfoProduct->weight() << " " << theWeight << endl;
 		} else {
 			edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product " << genEvtInfoInputTag;
 		}
@@ -444,6 +464,8 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	iEvent.put(ptHat, prefix_ + "PtHat" + suffix_);
 	iEvent.put(PUWeight, prefix_ + "PUWeight" + suffix_);
 	iEvent.put(generatorWeight, prefix_ + "generatorWeight" + suffix_);
+	iEvent.put(centralLHEWeight, prefix_ + "centralLHEWeight" + suffix_);
+	iEvent.put(systematicWeights, prefix_ + "systematicWeights" + suffix_);
 	iEvent.put(pdfWeights, prefix_ + "PDFWeights" + suffix_);
 	iEvent.put(Number_interactions, prefix_ + "PileUpInteractions" + suffix_);
 	iEvent.put(NumberOfTrueInteractions, prefix_ + "NumberOfTrueInteractions" + suffix_);
