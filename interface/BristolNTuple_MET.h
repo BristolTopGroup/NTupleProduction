@@ -12,6 +12,8 @@ class BristolNTuple_MET : public edm::EDProducer {
  private:
   void produce( edm::Event &, const edm::EventSetup & );
   const edm::InputTag   inputTag;
+  const bool storeMETUncertainties_;
+  const unsigned int nMETUncertainties_;
   const std::string     prefix,suffix;
 };
 

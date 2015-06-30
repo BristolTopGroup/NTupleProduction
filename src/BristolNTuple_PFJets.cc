@@ -42,15 +42,24 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "Mass" + suffix);
 	produces < std::vector<int> > (prefix + "PartonFlavour" + suffix);
 	//generated jet properties
-        if (!isRealData) {
-            produces < std::vector<double> > (prefix + "GenJet.Energy" + suffix);
+    if (!isRealData) {
+        produces < std::vector<double> > (prefix + "GenJet.Energy" + suffix);
 	    produces < std::vector<double> > (prefix + "GenJet.Pt" + suffix);
 	    produces < std::vector<double> > (prefix + "GenJet.Px" + suffix);
 	    produces < std::vector<double> > (prefix + "GenJet.Py" + suffix);
 	    produces < std::vector<double> > (prefix + "GenJet.Pz" + suffix);
 	    produces < std::vector<double> > (prefix + "GenJet.Eta" + suffix);
 	    produces < std::vector<double> > (prefix + "GenJet.Phi" + suffix);
-        }
+
+        produces < std::vector<double> > (prefix + "GenParton.Energy" + suffix);
+	    produces < std::vector<double> > (prefix + "GenParton.Pt" + suffix);
+	    produces < std::vector<double> > (prefix + "GenParton.Px" + suffix);
+	    produces < std::vector<double> > (prefix + "GenParton.Py" + suffix);
+	    produces < std::vector<double> > (prefix + "GenParton.Pz" + suffix);
+	    produces < std::vector<double> > (prefix + "GenParton.Eta" + suffix);
+	    produces < std::vector<double> > (prefix + "GenParton.Phi" + suffix);
+	    produces < std::vector<int> > (prefix + "GenParton.PdgId" + suffix);
+    }
 	//jet energy correction and uncertainties
     produces < std::vector<double> > (prefix + "JEC" + suffix);
 	produces < std::vector<double> > (prefix + "JECUnc" + suffix);
@@ -122,6 +131,15 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<double> > genJet_pz(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > genJet_eta(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > genJet_phi(new std::vector<double>());
+	//Matched parton properties
+	std::auto_ptr < std::vector<double> > genParton_energy(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > genParton_pt(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > genParton_px(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > genParton_py(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > genParton_pz(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > genParton_eta(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > genParton_phi(new std::vector<double>());	
+	std::auto_ptr < std::vector<int> > genParton_pdgId(new std::vector<int>());	
 	//jet energy correction and uncertainties
 	std::auto_ptr < std::vector<double> > jec_vec(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > jecUnc_vec(new std::vector<double>());
@@ -237,6 +255,15 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				double genjet_pz(0);
 				double genjet_eta(0);
 				double genjet_phi(0);
+
+				double genparton_energy(0);
+				double genparton_pt(0);
+				double genparton_px(0);
+				double genparton_py(0);
+				double genparton_pz(0);
+				double genparton_eta(0);
+				double genparton_phi(0);
+				double genparton_pdgId(0);				
 				// take only jets with corrected pt>10 according to: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiTopRefSyst#Jet_energy_resolution
 				if (it->pt() > 10) {
 					if (it->genJet()) { //matching (stop segmentation fault due to jet having no associated generator jet)
@@ -248,6 +275,17 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 						genjet_eta = it->genJet()->eta();
 						genjet_phi = it->genJet()->phi();						
 					}
+
+					if ( it->genParton() ) {
+						genparton_energy = it->genParton()->energy();
+						genparton_pt = it->genParton()->pt();
+						genparton_px = it->genParton()->px();
+						genparton_py = it->genParton()->py();
+						genparton_pz = it->genParton()->pz();
+						genparton_eta = it->genParton()->eta();
+						genparton_phi = it->genParton()->phi();
+						genparton_pdgId = it->genParton()->pdgId();
+					}
 				}
 				//generated jet properties
 				genJet_energy->push_back(genjet_energy);
@@ -257,6 +295,16 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				genJet_pz->push_back(genjet_pz);
 				genJet_eta->push_back(genjet_eta);
 				genJet_phi->push_back(genjet_phi);
+
+				// Matched parton properties
+				genParton_energy->push_back(genparton_energy);
+				genParton_pt->push_back(genparton_pt);
+				genParton_px->push_back(genparton_px);
+				genParton_py->push_back(genparton_py);
+				genParton_pz->push_back(genparton_pz);
+				genParton_eta->push_back(genparton_eta);
+				genParton_phi->push_back(genparton_phi);
+				genParton_pdgId->push_back(genparton_pdgId);
 			}
 
 			// Vertex association
@@ -433,8 +481,8 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
 			//b-tagging information
 			//names are changing between major software releases
-			combinedInclusiveSecondaryVertexV2BJetTags->push_back(it->bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags"));
-			passesMediumCSV->push_back(it->bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags") > 0.814 );
+			combinedInclusiveSecondaryVertexV2BJetTags->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
+			passesMediumCSV->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.814 );
 
 			//jet-vertex association
 			if (doVertexAssociation) {
@@ -469,7 +517,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(mass, prefix + "Mass" + suffix);
 	iEvent.put(partonFlavour, prefix + "PartonFlavour" + suffix);
 	//generated jet properties
-        if (!iEvent.isRealData()) {
+    if (!iEvent.isRealData()) {
 		iEvent.put(genJet_energy, prefix + "GenJet.Energy" + suffix);
 		iEvent.put(genJet_pt, prefix + "GenJet.Pt" + suffix);
 		iEvent.put(genJet_px, prefix + "GenJet.Px" + suffix);
@@ -477,7 +525,16 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 		iEvent.put(genJet_pz, prefix + "GenJet.Pz" + suffix);
 		iEvent.put(genJet_eta, prefix + "GenJet.Eta" + suffix);
 		iEvent.put(genJet_phi, prefix + "GenJet.Phi" + suffix);
-        }
+
+		iEvent.put(genParton_energy, prefix + "GenParton.Energy" + suffix);
+		iEvent.put(genParton_pt, prefix + "GenParton.Pt" + suffix);
+		iEvent.put(genParton_px, prefix + "GenParton.Px" + suffix);
+		iEvent.put(genParton_py, prefix + "GenParton.Py" + suffix);
+		iEvent.put(genParton_pz, prefix + "GenParton.Pz" + suffix);
+		iEvent.put(genParton_eta, prefix + "GenParton.Eta" + suffix);
+		iEvent.put(genParton_phi, prefix + "GenParton.Phi" + suffix);
+		iEvent.put(genParton_pdgId, prefix + "GenParton.PdgId" + suffix);
+    }
 	//jet energy correction and uncertainties
     iEvent.put(jec_vec, prefix + "JEC" + suffix);
 	iEvent.put(jecUnc_vec, prefix + "JECUnc" + suffix);

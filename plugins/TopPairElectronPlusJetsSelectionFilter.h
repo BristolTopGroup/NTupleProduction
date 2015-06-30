@@ -64,12 +64,12 @@ public:
 	static void fillDescriptions(edm::ConfigurationDescriptions & descriptions);
 
 	virtual bool isGoodJet(const pat::Jet& jet) const;
-	virtual bool isGoodElectron(const pat::Electron& electron) const;
+	virtual bool isGoodElectron(const edm::Ptr<pat::Electron>&) const;
 	virtual bool passesElectronID(const pat::Electron& electron) const;
 	virtual double electronIsolation(const pat::Electron& electron) const;
 
 	//definitions of loose objects
-	virtual bool isLooseElectron(const pat::Electron& electron) const;
+	virtual bool isLooseElectron(const edm::Ptr<pat::Electron>& electron) const;
 	virtual bool isLooseMuon(const pat::Muon& muon) const;
 	//isolation definitions
 	virtual void getLooseElectrons();
@@ -102,10 +102,10 @@ private:
 	edm::InputTag jetInput_, electronInput_, muonInput_, hltInputTag_, vertexInputTag_;
 
 	double minSignalElectronPt_, maxSignalElectronEta_;
-	std::string signalElectronIDCriteria_;
+	edm::EDGetTokenT<edm::ValueMap<bool> > signalElectronIDMapToken_;
 	double minSignalElectronID_;
 	double minLooseMuonPt_, maxLooseMuonEta_, minLooseElectronPt_, maxLooseElectronEta_;
-	std::string looseElectronIDCriteria_;
+	edm::EDGetTokenT<edm::ValueMap<bool> > looseElectronIDMapToken_;
 	double minLooseElectronID_;
 	double min1JetPt_, min2JetPt_, min3JetPt_, min4JetPt_;
 	double minBJetPt_;
@@ -138,9 +138,11 @@ private:
 	bool isRealData_, hasSignalElectron_;
 	std::vector< unsigned int> cleanedJetIndex_, cleanedBJetIndex_;
 	pat::JetCollection jets_, cleanedJets_, cleanedBJets_;
-	pat::ElectronCollection electrons_, goodIsolatedElectrons_, looseElectrons_;
+	edm::Handle <edm::View<pat::Electron> > electrons_;
+	pat::ElectronCollection goodIsolatedElectrons_, looseElectrons_;
 	pat::MuonCollection muons_, looseMuons_;
 	pat::Electron signalElectron_;
+	edm::ValueMap<bool> signalElectronIDDecisions_, looseElectronIDDecisions_;
 	reco::VertexCollection vertices_;
 	HLTConfigProvider hltConfig_;
 	edm::TriggerResults triggerResults_;

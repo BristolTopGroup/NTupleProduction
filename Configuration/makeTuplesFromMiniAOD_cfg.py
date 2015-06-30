@@ -11,7 +11,8 @@ process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 
 ## Source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_pythia8_PHYS14.root')
+    fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root')  
+    # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_pythia8_PHYS14.root')
     # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_madgraph_PHYS14.root')
     # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/WJets_PHYS14.root')
 )
@@ -36,6 +37,10 @@ setupTTGenEvent( process, cms )
 from BristolAnalysis.NTupleTools.pseudoTopConfig_cff import *
 setupPseudoTop( process, cms )
 
+# Electron VID
+from BristolAnalysis.NTupleTools.ElectronID_cff import *
+setup_electronID( process, cms )
+
 # Load the selection filters and the selection analyzers
 process.load( 'BristolAnalysis.NTupleTools.muonSelection_cff')
 process.load( 'BristolAnalysis.NTupleTools.qcdMuonSelection_cff')
@@ -57,6 +62,7 @@ from BristolAnalysis.NTupleTools.NTupler_cff import *
 setup_ntupler(process, cms )
 
 process.makingNTuples = cms.Path(
+  process.egmGsfElectronIDSequence *
   process.electronSelectionAnalyzerSequence *
   process.muonSelectionAnalyzerSequence *  
   process.qcdMuonSelectionAnalyzerSequence *

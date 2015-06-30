@@ -18,11 +18,26 @@ nTupleTriggerEle32eta2p1WP85GsfTriCentralPFJet605035 = nTupleTrigger.clone( Pref
 
 nTupleTriggerIsoMu24eta2p1IterTrk02 = nTupleTrigger.clone( Prefix='HLTIsoMu24eta2p1IterTrk02.', PathOfInterest='IsoMu24_eta2p1_IterTrk02')
 
+# Top 74X MC Triggers
+
+nTupleTriggerEle32eta2p1WP75Gsf = nTupleTrigger.clone( Prefix='HLTEle32eta2p1WP75Gsf.', PathOfInterest='HLT_Ele32_eta2p1_WP75_Gsf_v')
+nTupleTriggerEle27eta2p1WP85GsfHT200 = nTupleTrigger.clone( Prefix='HLTEle27eta2p1WP85GsfHT200.', PathOfInterest='HLT_Ele27_eta2p1_WP85_Gsf_HT200_v')
+nTupleTriggerEle27eta2p1WP75GsfTriCentralPFJet30 = nTupleTrigger.clone( Prefix='HLTEle27eta2p1WP75GsfTriCentralPFJet30.', PathOfInterest='HLT_Ele27_eta2p1_WP75_Gsf_TriCentralPFJet30_v')
+nTupleTriggerEle27eta2p1WP75GsfTriCentralPFJet504030 = nTupleTrigger.clone( Prefix='HLTEle27eta2p1WP75GsfTriCentralPFJet504030.', PathOfInterest='HLT_Ele27_eta2p1_WP75_Gsf_TriCentralPFJet50_40_30_v')
+
+
+nTupleTriggerIsoMu24eta2p1 = nTupleTrigger.clone( Prefix='HLTIsoMu24eta2p1.', PathOfInterest='IsoMu24_eta2p1_v1')
 
 triggerSequence = cms.Sequence(
-    nTupleTriggerEle32eta2p1WP85Gsf *
-    nTupleTriggerEle32eta2p1WP85GsfCentralPFJet30BTagCSV *
-    nTupleTriggerEle32eta2p1WP85GsfTriCentralPFJet40 *
-    nTupleTriggerEle32eta2p1WP85GsfTriCentralPFJet605035 *
-    nTupleTriggerIsoMu24eta2p1IterTrk02 
+    # nTupleTriggerEle32eta2p1WP85Gsf *
+    # nTupleTriggerEle32eta2p1WP85GsfCentralPFJet30BTagCSV *
+    # nTupleTriggerEle32eta2p1WP85GsfTriCentralPFJet40 *
+    # nTupleTriggerEle32eta2p1WP85GsfTriCentralPFJet605035 *
+    # nTupleTriggerIsoMu24eta2p1IterTrk02 *
+
+    nTupleTriggerEle32eta2p1WP75Gsf *
+    nTupleTriggerEle27eta2p1WP85GsfHT200 *
+    nTupleTriggerEle27eta2p1WP75GsfTriCentralPFJet30 *
+    nTupleTriggerEle27eta2p1WP75GsfTriCentralPFJet504030 *
+    nTupleTriggerIsoMu24eta2p1
 )

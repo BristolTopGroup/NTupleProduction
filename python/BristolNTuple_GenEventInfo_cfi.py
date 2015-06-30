@@ -24,7 +24,7 @@ nTupleGenEventInfo = cms.EDProducer("BristolNTuple_GenEventInfo",
     isTTbarMC = cms.bool(False),
     tt_gen_event_input=cms.InputTag('genEvt'),
 
-    minGenJetPt = cms.double(30.),
+    minGenJetPt = cms.double(20.),
     maxGenJetAbsoluteEta = cms.double(999.),
 
 )

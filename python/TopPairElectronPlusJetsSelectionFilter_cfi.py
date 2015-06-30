@@ -11,13 +11,13 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     # Lepton cuts
     minSignalElectronPt=cms.double(34.),
     maxSignalElectronEta=cms.double(2.5),
-    signalElectronIDCriteria=cms.string('cutBasedElectronID-CSA14-PU20bx25-V0-standalone-tight'),
+    signalElectronIDMap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-tight'),
     minSignalElectronID=cms.double(0),
     minLooseMuonPt=cms.double(10.),
     maxLooseMuonEta=cms.double(2.5),
     minLooseElectronPt=cms.double(20.),
     maxLooseElectronEta=cms.double(2.5),
-    looseElectronIDCriteria=cms.string('cutBasedElectronID-CSA14-PU20bx25-V0-standalone-veto'),
+    looseElectronIDMap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-veto'),
     minLooseElectronID=cms.double(0),
 
     #jet cuts
@@ -37,7 +37,7 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
 
     # B Jet Selection
     # Working points taken from https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
-    bJetDiscriminator=cms.string('combinedInclusiveSecondaryVertexV2BJetTags'),
+    bJetDiscriminator=cms.string('pfCombinedInclusiveSecondaryVertexV2BJetTags'),
     minBJetDiscriminator=cms.double(0.814),
 
     tightElectronIsolation_EB=cms.double(0.14),

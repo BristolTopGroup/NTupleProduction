@@ -33,7 +33,7 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 		maxLooseMuonEta_(iConfig.getParameter<double>("maxLooseMuonEta")), //
 		minLooseElectronPt_(iConfig.getParameter<double>("minLooseElectronPt")), //
 		maxLooseElectronEta_(iConfig.getParameter<double>("maxLooseElectronEta")), //
-		looseElectronIDCriteria_(iConfig.getParameter<std::string>("looseElectronIDCriteria")), //
+		looseElectronIDMapToken_(consumes<ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("looseElectronIDMap"))),
 		minLooseElectronID_(iConfig.getParameter<double>("minLooseElectronID")), //
 
 		min1JetPt_(iConfig.getParameter<double>("min1JetPt")), //
@@ -111,7 +111,7 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 	desc.add<double>("maxLooseMuonEta",10.);
 	desc.add<double>("minLooseElectronPt",0.);
 	desc.add<double>("maxLooseElectronEta",10.);
-	desc.add<std::string>("looseElectronIDCriteria","idCriteria");
+	desc.add < InputTag > ("looseElectronIDMap");
 	desc.add<double>("minLooseElectronID",0);
 
 	desc.add<double>("min1JetPt", 30.0);
@@ -265,9 +265,12 @@ void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent, c
 	}
 
 	// Electrons (for veto)
-	edm::Handle < pat::ElectronCollection > electrons;
-	iEvent.getByLabel(electronInput_, electrons);
-	electrons_ = *electrons;
+	iEvent.getByLabel(electronInput_, electrons_);
+
+	// Electron VID Decisions
+	Handle<edm::ValueMap<bool> > loose_id_decisions;
+	iEvent.getByToken(looseElectronIDMapToken_,loose_id_decisions);
+	looseElectronIDDecisions_ = *loose_id_decisions;
 
 	// Muons
 	edm::Handle < pat::MuonCollection > muons;
@@ -316,19 +319,19 @@ void TopPairMuonPlusJetsSelectionFilter::getLooseElectrons() {
 	looseElectrons_.clear();
 
 	// Loop through electrons and store those that pass a loose selection
-	for (unsigned index = 0; index < electrons_.size(); ++index) {
-		const pat::Electron electron = electrons_.at(index);
+	for (size_t index = 0; index < electrons_->size(); ++index){
+		const auto electron = electrons_->ptrAt(index);		
 		if (isLooseElectron(electron))
-			looseElectrons_.push_back(electron);
+			looseElectrons_.push_back(*electron);
 	}
 }
 
-bool TopPairMuonPlusJetsSelectionFilter::isLooseElectron(const pat::Electron& electron) const {
-	bool passesPtAndEta = electron.pt() > minLooseElectronPt_ && fabs(electron.eta()) < maxLooseElectronEta_;
+bool TopPairMuonPlusJetsSelectionFilter::isLooseElectron(const edm::Ptr<pat::Electron>& electron) const {
+	bool passesPtAndEta = electron->pt() > minLooseElectronPt_ && fabs(electron->eta()) < maxLooseElectronEta_;
 	//		bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
 	// bool passesID = electron.electronID("mvaTrigV0") > 0.5;
 
-	bool passesID = electron.electronID(looseElectronIDCriteria_) > minLooseElectronID_;
+	bool passesID = looseElectronIDDecisions_[electron];
 	bool passesIso = true;
 
 	return passesPtAndEta && passesID && passesIso;

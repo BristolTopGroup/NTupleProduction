@@ -29,13 +29,14 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		// Selection criteria
 		minSignalElectronPt_(iConfig.getParameter<double>("minSignalElectronPt")), //
 		maxSignalElectronEta_(iConfig.getParameter<double>("maxSignalElectronEta")), //
-		signalElectronIDCriteria_(iConfig.getParameter<std::string>("signalElectronIDCriteria")), //
+  		signalElectronIDMapToken_(consumes<ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("signalElectronIDMap"))),
 		minSignalElectronID_(iConfig.getParameter<double>("minSignalElectronID")), //
 		minLooseMuonPt_(iConfig.getParameter<double>("minLooseMuonPt")), //
 		maxLooseMuonEta_(iConfig.getParameter<double>("maxLooseMuonEta")), //
 		minLooseElectronPt_(iConfig.getParameter<double>("minLooseElectronPt")), //
 		maxLooseElectronEta_(iConfig.getParameter<double>("maxLooseElectronEta")), //
-		looseElectronIDCriteria_(iConfig.getParameter<std::string>("looseElectronIDCriteria")), //
+  		looseElectronIDMapToken_(consumes<ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("looseElectronIDMap"))),
+
 		minLooseElectronID_(iConfig.getParameter<double>("minLooseElectronID")), //
 
 		min1JetPt_(iConfig.getParameter<double>("min1JetPt")), //
@@ -111,13 +112,13 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 
 	desc.add<double>("minSignalElectronPt",0.);
 	desc.add<double>("maxSignalElectronEta",10.);
-	desc.add<std::string>("signalElectronIDCriteria","idCriteria");
 	desc.add<double>("minSignalElectronID",0);
+	desc.add < InputTag > ("signalElectronIDMap");
+	desc.add < InputTag > ("looseElectronIDMap");
 	desc.add<double>("minLooseMuonPt",0.);
 	desc.add<double>("maxLooseMuonEta",10.);
 	desc.add<double>("minLooseElectronPt",0.);
 	desc.add<double>("maxLooseElectronEta",10.);
-	desc.add<std::string>("looseElectronIDCriteria","idCriteria");
 	desc.add<double>("minLooseElectronID",0);
 
 	desc.add<double>("min1JetPt", 30.0);
@@ -263,9 +264,16 @@ void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEven
 	}
 
 	// Electrons
-	edm::Handle < pat::ElectronCollection > electrons;
-	iEvent.getByLabel(electronInput_, electrons);
-	electrons_ = *electrons;
+	iEvent.getByLabel(electronInput_, electrons_);
+
+	// Electron VID Decisions
+	Handle<edm::ValueMap<bool> > tight_id_decisions;
+	iEvent.getByToken(signalElectronIDMapToken_,tight_id_decisions);
+	signalElectronIDDecisions_ = *tight_id_decisions;
+
+	Handle<edm::ValueMap<bool> > loose_id_decisions;
+	iEvent.getByToken(looseElectronIDMapToken_,loose_id_decisions);
+	looseElectronIDDecisions_ = *loose_id_decisions;
 
 	// Muons (for veto)
 	edm::Handle < pat::MuonCollection > muons;
@@ -309,21 +317,21 @@ void TopPairElectronPlusJetsSelectionFilter::getLooseElectrons() {
 	looseElectrons_.clear();
 
 	// Loop through electrons and store those that pass a loose selection
-	for (unsigned index = 0; index < electrons_.size(); ++index) {
-		const pat::Electron electron = electrons_.at(index);
+	for (size_t index = 0; index < electrons_->size(); ++index){
+		const auto electron = electrons_->ptrAt(index);		
 		if (isLooseElectron(electron))
-			looseElectrons_.push_back(electron);
+			looseElectrons_.push_back(*electron);
 	}
 }
 
-bool TopPairElectronPlusJetsSelectionFilter::isLooseElectron(const pat::Electron& electron) const {
-	bool passesPtAndEta = electron.pt() > minLooseElectronPt_ && fabs(electron.eta()) < maxLooseElectronEta_;
+bool TopPairElectronPlusJetsSelectionFilter::isLooseElectron(const edm::Ptr<pat::Electron>& electron) const {
+	bool passesPtAndEta = electron->pt() > minLooseElectronPt_ && fabs(electron->eta()) < maxLooseElectronEta_;
 	//		bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
 	// bool passesID = electron.electronID("mvaTrigV0") > 0.5;
 	// bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrectionsForElectrons_,
 	// 		useRhoActiveAreaCorrections_) < looseElectronIso_;
-	bool passesID = electron.electronID(looseElectronIDCriteria_) > minLooseElectronID_;
-	bool passesIso = true;
+	bool passesID = looseElectronIDDecisions_[electron];
+	bool passesIso = true; // FIXME Iso already applied in ID (check in AT)
 	return passesPtAndEta && passesID && passesIso;
 }
 
@@ -351,48 +359,45 @@ void TopPairElectronPlusJetsSelectionFilter::goodIsolatedElectrons() {
 	goodIsolatedElectrons_.clear();
 
 	// Loop over electrons and select those that satisfy full selection
-	for (unsigned index = 0; index < electrons_.size(); ++index) {
-		const pat::Electron electron = electrons_.at(index);
+	// for (unsigned index = 0; index < electrons_.size(); ++index) {
+	for (size_t index = 0; index < electrons_->size(); ++index){
+
+		// const pat::Electron electron = electrons_.at(index);
+		const auto electron = electrons_->ptrAt(index);
 
 		// bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrectionsForElectrons_,
 				// useRhoActiveAreaCorrections_) < tightElectronIso_;
 		bool passesIso = false;
 
-		double relIsoWithDBeta = electronIsolation(electron);
+		double relIsoWithDBeta = electronIsolation(*electron);
 		if ( nonIsolatedElectronSelection_ ) {
 			passesIso = relIsoWithDBeta > controlElectronIso_ ? true : false;
 		}
       	else {
-      		double electronSCEta = electron.superCluster()->eta();
-      		if ( electronSCEta <= 1.479 ) {
-				passesIso = relIsoWithDBeta < tightElectronIso_EB_ ? true : false;      			
-      		}
-      		else if ( electronSCEta > 1.479 && electronSCEta < 2.5 ) {
-				passesIso = relIsoWithDBeta < tightElectronIso_EE_ ? true : false;      			
-      		}
+      		passesIso = true;
       	}
 
 		if (isGoodElectron(electron) && passesIso) {
-			goodIsolatedElectrons_.push_back(electron);
+			goodIsolatedElectrons_.push_back(*electron);
 			//Check if this is the first, and therefore the signal, electron
 			if ( goodIsolatedElectrons_.size()==1 ) signalElectronIndex_ = index;
 		}
 	}
 }
 
-bool TopPairElectronPlusJetsSelectionFilter::isGoodElectron(const pat::Electron& electron) const {
-	bool passesPtAndEta = electron.pt() > minSignalElectronPt_ && fabs(electron.eta()) < maxSignalElectronEta_;
-	bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
+bool TopPairElectronPlusJetsSelectionFilter::isGoodElectron(const edm::Ptr<pat::Electron>& electron) const {
+	bool passesPtAndEta = electron->pt() > minSignalElectronPt_ && fabs(electron->eta()) < maxSignalElectronEta_;
+	bool notInCrack = fabs(electron->superCluster()->eta()) < 1.4442 || fabs(electron->superCluster()->eta()) > 1.5660;
 	//2D impact w.r.t primary vertex
 	// bool passesD0 = fabs(electron.dB(pat::Electron::PV2D)) < 0.02; //cm
 	// bool passesID = electron.electronID("mvaTrigV0") > 0.5;
 	bool passesID = false;
 
 	if ( nonIsolatedElectronSelection_ || invertedConversionSelection_ ) {
-		passesID = passesElectronID( electron );
+		passesID = passesElectronID( *electron );
 	}
 	else {
-		passesID = electron.electronID(signalElectronIDCriteria_) > minSignalElectronID_;
+		passesID = signalElectronIDDecisions_[electron];
 	}
 
 	bool passesD0 = true;
@@ -692,8 +697,8 @@ bool TopPairElectronPlusJetsSelectionFilter::passesLooseElectronVeto() const {
 
 	if (tagAndProbeStudies_) {
 		if ( (looseElectrons_.size() >= 1) && hasSignalElectron_ ) {
-			for (unsigned int index = 0; index < electrons_.size(); ++index) {
-				const pat::Electron probeElectron_ = electrons_.at(index);
+			for (unsigned int index = 0; index < electrons_->size(); ++index) {
+				const pat::Electron probeElectron_ = electrons_->at(index);
 				// skip the tag electron itself
 				if (probeElectron_.p4() == signalElectron_.p4())
 					continue;

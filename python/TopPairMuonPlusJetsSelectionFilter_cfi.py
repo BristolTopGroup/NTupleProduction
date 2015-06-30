@@ -15,7 +15,7 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     maxLooseMuonEta=cms.double(2.5),
     minLooseElectronPt=cms.double(20.),
     maxLooseElectronEta=cms.double(2.5),
-    looseElectronIDCriteria=cms.string('cutBasedElectronID-CSA14-PU20bx25-V0-standalone-veto'),
+    looseElectronIDMap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-veto'),
     minLooseElectronID=cms.double(0),
 
     #jet cuts
@@ -40,7 +40,7 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
 
     # B Jet Selection
     # Working points taken from https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
-    bJetDiscriminator=cms.string('combinedInclusiveSecondaryVertexV2BJetTags'),
+    bJetDiscriminator=cms.string('pfCombinedInclusiveSecondaryVertexV2BJetTags'),
     minBJetDiscriminator=cms.double(0.814),
 
     prefix=cms.untracked.string('TopPairMuonPlusJetsSelection.'),

@@ -1,24 +1,22 @@
 def setup_electronID(process, cms):
     print '=' * 60
-    print "Setting up electron ID"
+    print "Setting up electron ID (VID framework"
     print '=' * 60
     ###############################
     ###### Electron ID ############
     ###############################
-    print 'Including Electron MVA ID'
-    process.load('EgammaAnalysis.ElectronTools.electronIdMVAProducer_cfi') 
 
-    process.eidMVASequence = cms.Sequence(  process.mvaTrigV0 + process.mvaNonTrigV0 )
+    from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
+    # turn on VID producer, indicate data format  to be
+    # DataFormat.AOD or DataFormat.MiniAOD, as appropriate 
+    dataFormat = DataFormat.MiniAOD
 
-    for iele in [ process.patElectrons,
-                  process.patElectronsPFlow,
-                  process.patElectronsLoosePFlow ] :
-            iele.electronIDSources = cms.PSet(
-                mvaTrigV0    = cms.InputTag("mvaTrigV0"),
-                mvaNonTrigV0 = cms.InputTag("mvaNonTrigV0")     
-                )
-            
-    # LikelihoodEle
-    print 'Including EGammaID likelihood'
-    process.load('RecoEgamma.ElectronIdentification.electronIdLikelihoodExt_cfi')
-    process.egammaIDLikelihood = process.eidLikelihoodExt.clone()
+    switchOnVIDElectronIdProducer(process, dataFormat)
+
+    # define which IDs we want to produce
+    my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V2_cff',
+                     'RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV51_cff']
+
+    #add them to the VID producer
+    for idmod in my_id_modules:
+        setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
