@@ -269,19 +269,6 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 
 			*generatorWeight.get() = genEvtInfoProduct->weight();
 
-			edm::Handle<LHEEventProduct> EvtHandle ;
-			iEvent.getByLabel( "externalLHEProducer" , EvtHandle ) ;
-
-			*centralLHEWeight.get() = EvtHandle->originalXWGTUP();
-
-			// int whichWeight = 1;
-			// cout << "Number of weights : " << EvtHandle->weights().size() << endl;
-			for ( unsigned int weightIndex = 0; weightIndex < EvtHandle->weights().size(); ++weightIndex ) {
-				systematicWeights->push_back( EvtHandle->weights()[weightIndex].wgt );
-				// cout << "Weight " << i << " " << EvtHandle->weights()[i].id << " : " << EvtHandle->weights()[i].wgt << " " << EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP() << endl;
-			}
-			// double theWeight = EvtHandle->weights()[whichWeight].wgt/EvtHandle->originalXWGTUP();
-			// cout << genEvtInfoProduct->weight() << " " << theWeight << endl;
 		} else {
 			edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product " << genEvtInfoInputTag;
 		}
@@ -349,6 +336,19 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 				std::cout << "PANIC" << std::endl;
 				edm::LogError("BristolNTuple_GenEventError") << "Error! Found more than one compatible decay mode:"
 						<< numberOfIdentifiedModes;
+			}
+
+			// Store weights from LHE
+			// For pdf and generator systematics
+			edm::Handle<LHEEventProduct> EvtHandle ;
+			iEvent.getByLabel( "externalLHEProducer" , EvtHandle ) ;
+
+			*centralLHEWeight.get() = EvtHandle->originalXWGTUP();
+
+			// int whichWeight = 1;
+			// cout << "Number of weights : " << EvtHandle->weights().size() << endl;
+			for ( unsigned int weightIndex = 0; weightIndex < EvtHandle->weights().size(); ++weightIndex ) {
+				systematicWeights->push_back( EvtHandle->weights()[weightIndex].wgt );
 			}
 
 			// Only get top parton info if ttbar decay chain has been identified
