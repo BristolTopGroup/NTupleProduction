@@ -13,6 +13,7 @@ process = cms.Process("Ntuples")
 process.source = cms.Source("PoolSource",
     # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root')
     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_PowhegPythia8_50ns.root')
+    # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/SingleMuon.root')
 )
 # Use to skip events e.g. to reach a problematic event quickly
 # process.source.skipEvents = cms.untracked.uint32(4099)
@@ -87,6 +88,8 @@ process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsConversionS
 if not options.isTTbarMC:
   process.makingNTuples.remove( process.ttGenEvent )
   process.selectionCriteriaAnalyzer.genSelectionCriteriaInput = cms.VInputTag()
+  process.makingNTuples.remove( process.makePseudoTop )
+  process.nTupleTree.outputCommands.append('drop *_nTuplePFJets_*Gen*_*')
 else:
   process.nTupleGenEventInfo.isTTbarMC = cms.bool( True )
 
