@@ -12,8 +12,8 @@ process = cms.Process("Ntuples")
 ## Source
 process.source = cms.Source("PoolSource",
     # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root')
-    fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_PowhegPythia8_50ns.root')
-    # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/SingleMuon.root')
+    # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_PowhegPythia8_50ns.root')
+    fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/SingleMuon.root')
 )
 # Use to skip events e.g. to reach a problematic event quickly
 # process.source.skipEvents = cms.untracked.uint32(4099)
@@ -85,11 +85,16 @@ process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsSelectionTa
 process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsQCDSelectionTagging_*FullSelection*_*' )
 process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsConversionSelectionTagging_*FullSelection*_*' )
 
+if not options.isData:
+  process.makingNTuples.remove( process.triggerSequence )
+else :
+  process.makingNTuples.remove( process.makePseudoTop )
+  process.nTuples.remove( process.pseudoTopSequence )
+  process.nTupleTree.outputCommands.append('drop *_nTuplePFJets_*Gen*_*')
+  
 if not options.isTTbarMC:
   process.makingNTuples.remove( process.ttGenEvent )
-  process.selectionCriteriaAnalyzer.genSelectionCriteriaInput = cms.VInputTag()
-  process.makingNTuples.remove( process.makePseudoTop )
-  process.nTupleTree.outputCommands.append('drop *_nTuplePFJets_*Gen*_*')
+  process.selectionCriteriaAnalyzer.genSelectionCriteriaInput = cms.VInputTag()  
 else:
   process.nTupleGenEventInfo.isTTbarMC = cms.bool( True )
 
