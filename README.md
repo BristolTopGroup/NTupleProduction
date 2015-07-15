@@ -24,9 +24,7 @@ cmsrel CMSSW_7_4_2
 cd CMSSW_7_4_2/src/
 cmsenv
 git cms-init
-# Do merge-topics and addpkgs first
-# Add TopEventProducers as we need to modify one file later on 
-git cms-addpkg TopQuarkAnalysis/TopEventProducers/
+# Do merge-topics and addpkgs first if needed
 
 # Clone our main ntuple producing software and checkout run2 branch
 git clone git@github.com:BristolTopGroup/NTupleProduction.git BristolAnalysis/NTupleTools
@@ -41,9 +39,6 @@ git clone git@github.com:BristolTopGroup/TopSkimming.git TopQuarkAnalysis/TopSki
 cd TopQuarkAnalysis/TopSkimming
 git remote rename origin upstream
 cd ../../
-
-#### In TopQuarkAnalysis/TopEventProducers/python/producers/TopDecaySubset_cfi.py
-#### Set runMode to Run2
 
 # Compile
 scramv1 b -j 8
