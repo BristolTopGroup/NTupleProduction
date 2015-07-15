@@ -10,7 +10,7 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-pathOfCrabWorkdirs = '/storage/ec6821/NTupleProd/CMSSW_7_4_0_pre7/src/workdirCrab/v16/2015-03-31/'
+pathOfCrabWorkdirs = '/storage/ec6821/NTupleProd/CMSSW_7_4_4_patch2/src/workdirCrab/v21/2015-07-13/'
 
 for crabWorkdir in os.listdir(pathOfCrabWorkdirs):
 	# if crabWorkdir != 'crab_TTJets_Madgraph_PU4bx50' : continue
@@ -18,6 +18,7 @@ for crabWorkdir in os.listdir(pathOfCrabWorkdirs):
 	unkownOrFailed = True
 	finished = False
 	failedToSubmit = False
+	someJobsFailed = False
 	numberOfAttempts = 0
 	while unkownOrFailed:
 		if numberOfAttempts > 0 : 'Trying again'
@@ -32,6 +33,9 @@ for crabWorkdir in os.listdir(pathOfCrabWorkdirs):
 			elif line.find('Task status')>=0 and line.find('FAILED')>=0:
 				failedToSubmit = True
 				break
+			elif line.find('failed')>=0:
+				someJobsFailed = True
+				break
 
 		numberOfAttempts += 1
 		# Limit number of attempts of checking status of particular job
@@ -42,4 +46,12 @@ for crabWorkdir in os.listdir(pathOfCrabWorkdirs):
 		print crabWorkdir + ' ' + bcolors.FAIL + 'FAILED TO SUBMIT' + bcolors.ENDC #+ '...' + bcolors.OKBLUE + 'RESUBMITTING' + bcolors.ENDC
 		# p = subprocess.Popen(['crab', 'status',pathOfCrabWorkdirs+crabWorkdir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		# out, err = p.communicate()
+		# p = subprocess.Popen(['crab', 'resubmit',pathOfCrabWorkdirs+crabWorkdir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		# out, err = p.communicate() 
+		print out
+	elif someJobsFailed:
+		print crabWorkdir + ' ' + bcolors.FAIL + 'SOME JOBS FAILED' + bcolors.ENDC #+ '...' + bcolors.OKBLUE + 'RESUBMITTING' + bcolors.ENDC
+		# p = subprocess.Popen(['crab', 'resubmit',pathOfCrabWorkdirs+crabWorkdir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		# out, err = p.communicate() 
+		# print out
 	else: print crabWorkdir + ' ' + bcolors.WARNING + 'INCOMPLETE' + bcolors.ENDC + '\n' + out

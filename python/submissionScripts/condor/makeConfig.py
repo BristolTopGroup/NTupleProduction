@@ -2,11 +2,11 @@ import os
 import glob
 from mergeROOTFilesWithCompression import getGroupedFilesToUse
 
-pathOfCrabWorkdirs = '/storage/ec6821/NTupleProd/CMSSW_7_4_4_patch2/src/workdirCrab/v20/2015-06-11/'
+pathOfCrabWorkdirs = '/storage/ec6821/NTupleProd/CMSSW_7_4_4_patch2/src/workdirCrab/v21/2015-07-13/'
 
 version = pathOfCrabWorkdirs.split('/')[-3]
 
-ntupleBaseDir = '/gpfs_phys/storm/cms/user/ejclemen/'
+ntupleBaseDir = '/hdfs/dpm/phy.bris.ac.uk/home/cms/store/user/ejclemen/'
 
 outputBaseDir = '/hdfs/TopQuarkGroup/run2/ntuples/'
 outputDirHdfs = outputBaseDir + version + '/'
