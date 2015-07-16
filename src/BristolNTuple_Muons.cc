@@ -40,6 +40,7 @@ BristolNTuple_Muons::BristolNTuple_Muons(const edm::ParameterSet& iConfig) :
 
 	//default
 	produces < std::vector<double> > (prefix + "TrkIso03" + suffix);
+	produces < std::vector<double> > (prefix + "RelTrkIso03" + suffix);
 	produces < std::vector<double> > (prefix + "EcalIso03" + suffix);
 	produces < std::vector<double> > (prefix + "HcalIso03" + suffix);
 	produces < std::vector<double> > (prefix + "HOIso03" + suffix);
@@ -114,6 +115,7 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	//muon isolation variables
 	//default
 	std::auto_ptr < std::vector<double> > trkIso03(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > relTrkIso03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > ecalIso03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > hcalIso03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > hoIso03(new std::vector<double>());
@@ -252,6 +254,7 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 			//muon isolation variables
 			//default
 			trkIso03->push_back(it->isolationR03().sumPt);
+			relTrkIso03->push_back(it->isolationR03().sumPt / it->pt());
 			ecalIso03->push_back(it->isolationR03().emEt);
 			hcalIso03->push_back(it->isolationR03().hadEt);
 			hoIso03->push_back(it->isolationR03().hoEt);
@@ -338,6 +341,7 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	//muon isolation variables
 	//default
 	iEvent.put(trkIso03, prefix + "TrkIso03" + suffix);
+	iEvent.put(relTrkIso03, prefix + "RelTrkIso03" + suffix);
 	iEvent.put(ecalIso03, prefix + "EcalIso03" + suffix);
 	iEvent.put(hcalIso03, prefix + "HcalIso03" + suffix);
 	iEvent.put(hoIso03, prefix + "HOIso03" + suffix);
