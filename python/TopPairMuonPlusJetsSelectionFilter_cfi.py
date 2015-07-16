@@ -30,18 +30,18 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     cleaningDeltaR=cms.double(0.4),
 
     # Maximum isolation for signal region
-    tightMuonIsolation=cms.double(0.12),
+    tightMuonIsolation=cms.double(0.05),
     # Minimum isolation for control region
-    controlMuonIsolation=cms.double(0.),
+    controlMuonIsolation=cms.double(0.05),
 
     # Apply different JEC
     applyJEC = cms.bool(False),
     JetCorrectionService = cms.string('ak4PFCHSL1FastL2L3'),
 
     # B Jet Selection
-    # Working points taken from https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
+    # Working points taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation74X50ns
     bJetDiscriminator=cms.string('pfCombinedInclusiveSecondaryVertexV2BJetTags'),
-    minBJetDiscriminator=cms.double(0.814),
+    minBJetDiscriminator=cms.double(0.890),
 
     prefix=cms.untracked.string('TopPairMuonPlusJetsSelection.'),
 

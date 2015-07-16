@@ -12,7 +12,7 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     minSignalElectronPt=cms.double(25.),
     maxSignalElectronEta=cms.double(2.1),
     signalElectronIDMap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-medium'),
-    signalElectronIDMap_bitmap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-medium-bitmap'),
+    signalElectronIDMap_bitmap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-mediumBitmap'),
     minSignalElectronID=cms.double(0),
     minLooseMuonPt=cms.double(15.),
     maxLooseMuonEta=cms.double(2.1),
@@ -34,12 +34,12 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
 
     # Apply different JEC
     applyJEC = cms.bool(False),
-    JetCorrectionService = cms.string('ak4PFCHSL1FastL2L3'),  
+    JetCorrectionService = cms.string('ak4PFCHSL1FastL2L3'),
 
     # B Jet Selection
-    # Working points taken from https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
+    # Working points taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation74X50ns
     bJetDiscriminator=cms.string('pfCombinedInclusiveSecondaryVertexV2BJetTags'),
-    minBJetDiscriminator=cms.double(0.814),
+    minBJetDiscriminator=cms.double(0.890),
 
     tightElectronIsolation_EB=cms.double(0.14),
     tightElectronIsolation_EE=cms.double(0.1649),
