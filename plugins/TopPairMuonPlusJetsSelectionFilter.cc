@@ -183,18 +183,6 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 		if ( step < TTbarMuPlusJetsReferenceSelection::AtLeastOneBtag )
 			passesSelectionExceptBtagging = passesSelectionExceptBtagging && passesStep;
 
-		// Remove at least 4 jet selection for QCD control region (only need at least 3)
-       	// Also require exactly zero b jets
-       	// Or exactly one b jet, as e.g. angle(b,l) only makes sense if there is at least one b jet
-		if ( nonIsolatedMuonSelection_ ) {
-			if ( step == TTbarMuPlusJetsReferenceSelection::AtLeastFourGoodJets )
-			       passesStep = true;
-	
-			if ( step == TTbarMuPlusJetsReferenceSelection::AtLeastOneBtag || step == TTbarMuPlusJetsReferenceSelection::AtLeastTwoBtags ) {
-			       passesStep = hasExactlyZeroGoodBJet() || hasExactlyOneGoodBJet() ;
-			}
-		}
-
 		// if doesn't pass selection and not in tagging mode, stop here to save CPU time
 		if ( !(taggingMode_ || passesSelection) )
 			break;
