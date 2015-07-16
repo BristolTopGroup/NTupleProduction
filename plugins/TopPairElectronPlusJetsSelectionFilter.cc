@@ -195,14 +195,6 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 		if ( step < TTbarEPlusJetsReferenceSelection::AtLeastOneBtag )
 			passesSelectionExceptBtagging = passesSelectionExceptBtagging && passesStep;
 
-       // Require exactly zero b jets for QCD control region
-       // Or exactly one b jet, as e.g. angle(b,l) only makes sense if there is at least one b jet
-       if ( nonIsolatedElectronSelection_ || invertedConversionSelection_ ) {
-            if ( step == TTbarEPlusJetsReferenceSelection::AtLeastOneBtag || step == TTbarEPlusJetsReferenceSelection::AtLeastTwoBtags ) {
-                passesStep = hasExactlyZeroGoodBJet() || hasExactlyOneGoodBJet() ;
-            }
-       }
-
 		// if doesn't pass selection and not in tagging mode, stop here to save CPU time
 		if ( !(taggingMode_ || passesSelection) )
 			break;
@@ -399,117 +391,35 @@ bool TopPairElectronPlusJetsSelectionFilter::isGoodElectron(const edm::Ptr<pat::
 	// bool passesID = electron.electronID("mvaTrigV0") > 0.5;
 	bool passesID = false;
 
-	if ( nonIsolatedElectronSelection_ || invertedConversionSelection_ ) {
-		passesID = passesElectronID( *electron );
+	if ( nonIsolatedElectronSelection_ ) {
+		std::bitset<15> x(signalElectronIDDecisions_bitmap_[electron]);
+		if ( signalElectronIDDecisions_bitmap_[electron] == 3327 || signalElectronIDDecisions_bitmap_[electron] == 3583 || signalElectronIDDecisions_bitmap_[electron] == 3839) {
+			passesID = true;
+		}
+	}
+	else if ( invertedConversionSelection_ ) {
+		if ( signalElectronIDDecisions_bitmap_[electron] == 1023 || signalElectronIDDecisions_bitmap_[electron] == 2047 || signalElectronIDDecisions_bitmap_[electron] == 3071) {
+			passesID = true;
+		}
 	}
 	else {
 		passesID = signalElectronIDDecisions_[electron];
+		
+		// if (passesID) {
+		// 	// cout << x << endl;
+		// }
+		// else if ( signalElectronIDDecisions_bitmap_[electron] == 1023 || signalElectronIDDecisions_bitmap_[electron] == 2047 || signalElectronIDDecisions_bitmap_[electron] == 3071) {
+		// 	cout << "Fails conversion veto : " << x << endl;
+		// 	cout << electron->passConversionVeto() << endl;
+		// 	cout << electron->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::HitCategory::MISSING_INNER_HITS) << endl;
+		// }
+		// else if ( signalElectronIDDecisions_bitmap_[electron] == 3327 || signalElectronIDDecisions_bitmap_[electron] == 3583 || signalElectronIDDecisions_bitmap_[electron] == 3839) {
+		// 	cout << "Fails isolation : " << x << endl;
+		// 	cout << electronIsolation( *electron ) << endl;
+		// }
 	}
 
-	bool passesD0 = true;
-	return passesPtAndEta && notInCrack && inECAL && passesD0 && passesID;
-}
-
-bool TopPairElectronPlusJetsSelectionFilter::passesElectronID(const pat::Electron& electron) const {
-	// The selection for QCD control regions aren't available via electron.electronID(selectionCriteria)
-	// Have to apply them by hand
-	// Code based on https://github.com/lgray/cmssw/blob/common_isolation_selection_70X/TestElectronID/ElectronIDAnalyzer/plugins/ElectronIDAnalyzer.cc
-	// Selection criteria from https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2
-
-	// WARNING BAD CODING PRACTISES
-	
-	double dEtaIn = electron.deltaEtaSuperClusterTrackAtVtx();
-	double dPhiIn = electron.deltaPhiSuperClusterTrackAtVtx();
-	double hOverE = electron.hcalOverEcal();
-	double isolation = electronIsolation( electron );
-	// Note not using "full5x5" sigmaIetaIeta
-	// double full5x5_sigmaIetaIeta = (*full5x5sieie_)[electron];
-	double sigmaIetaIeta = electron.sigmaIetaIeta();
-
-	// double d0 = (-1) * electron.gsfTrack()->dxy(pv.position() );
-	double d0 = fabs(electron.dB(pat::Electron::PV2D)); //cm
-
-	double dz = 0;
-	if (vertices_.empty()) dz=1e30;
-	else {
-		const reco::Vertex &pv = vertices_.front();
-		dz = electron.gsfTrack()->dz( pv.position() );
-	}
-
-	double ooEmooP = 0;
-    if ( electron.ecalEnergy() == 0 || !std::isfinite(electron.ecalEnergy()) ) {
-		ooEmooP = 1e30;
-    }
-    else {
-		ooEmooP = fabs(1.0/electron.ecalEnergy() - electron.eSuperClusterOverP()/electron.ecalEnergy() );
-    }
-
-    unsigned int expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::HitCategory::MISSING_INNER_HITS);
-	bool passConversionVeto = electron.passConversionVeto();
-
-	// Now have all variables to apply electron ID
-	double electronSCEta = fabs( electron.superCluster()->eta() );
-	bool passesId = false;
-	if ( electronSCEta <= 1.479 ) {
-		// In barrel
-		bool passes_dEta = dEtaIn < 0.0091 ? 1 : 0 ;
-		bool passes_dPhi = dPhiIn < 0.031 ? 1 : 0 ;
-		bool passes_sigmaIetaIeta = sigmaIetaIeta < 0.0106 ? 1 : 0 ;
-		bool passes_hOverE = hOverE < 0.0532 ? 1 : 0 ;
-		bool passes_d0 = d0 < 0.0126 ? 1 : 0;
-		bool passes_dz = dz < 0.0116 ? 1 : 0 ;
-		bool passes_ooEmoop = ooEmooP < 0.0609 ? 1 : 0 ;
-
-		bool passesIso = false, passes_conversion = false;
-		if ( nonIsolatedElectronSelection_ ) {
-			passesIso = isolation > controlElectronIso_ ? 1 : 0;
-			passes_conversion = passConversionVeto && expectedMissingInnerHits <= 1 ;
-		}
-		else if ( invertedConversionSelection_ ) {
-			passesIso = isolation < 0.1649 ? 1 : 0;
-			passes_conversion = !passConversionVeto && !(expectedMissingInnerHits <= 1) ;
-		} else {
-			passesIso = isolation < 0.1649 ? 1 : 0;
-			passes_conversion = passConversionVeto && expectedMissingInnerHits <= 1 ;
-		}
-
-		if ( passes_dEta && passes_dPhi && passes_sigmaIetaIeta && passes_hOverE && passes_d0 && passes_dz && passes_ooEmoop && passesIso && passes_conversion ) {
-			passesId = true;
-		}
-
-	}
-	else if ( electronSCEta > 1.479 && electronSCEta < 2.5 ) {
-		// In endcap
-		bool passes_dEta = dEtaIn < 0.0106 ? 1 : 0 ;
-		bool passes_dPhi = dPhiIn < 0.0359 ? 1 : 0 ;
-		bool passes_sigmaIetaIeta = sigmaIetaIeta < 0.0305 ? 1 : 0 ;
-		bool passes_hOverE = hOverE < 0.0835 ? 1 : 0 ;
-		bool passes_d0 = d0 < 0.0163 ? 1 : 0;
-		bool passes_dz = dz < 0.5999 ? 1 : 0 ;
-		bool passes_ooEmoop = ooEmooP < 0.1126 ? 1 : 0 ;
-
-		bool passesIso = false, passes_conversion = false;
-		if ( nonIsolatedElectronSelection_ ) {
-			passesIso = isolation > controlElectronIso_ ? 1 : 0;
-			passes_conversion = passConversionVeto && expectedMissingInnerHits <= 1 ;
-		}
-		else if ( invertedConversionSelection_ ) {
-			passesIso = isolation < 0.2075 ? 1 : 0;
-			passes_conversion = !passConversionVeto && !(expectedMissingInnerHits <= 1) ;
-		} else {
-			passesIso = isolation < 0.2075 ? 1 : 0;
-			passes_conversion = passConversionVeto && expectedMissingInnerHits <= 1 ;
-		}
-		if ( passes_dEta && passes_dPhi && passes_sigmaIetaIeta && passes_hOverE && passes_d0 && passes_dz && passes_ooEmoop && passesIso && passes_conversion ) {
-			passesId = true;
-		}
-	}
-	else {
-		// Not interesting
-		passesId = false;
-	}
-
-	return passesId;
+	return passesPtAndEta && notInCrack && inECAL && passesID;
 }
 
 double TopPairElectronPlusJetsSelectionFilter::electronIsolation(const pat::Electron& electron) const {

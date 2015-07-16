@@ -65,7 +65,6 @@ public:
 
 	virtual bool isGoodJet(const pat::Jet& jet) const;
 	virtual bool isGoodElectron(const edm::Ptr<pat::Electron>&) const;
-	virtual bool passesElectronID(const pat::Electron& electron) const;
 	virtual double electronIsolation(const pat::Electron& electron) const;
 
 	//definitions of loose objects
