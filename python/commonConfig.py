@@ -3,7 +3,7 @@ config = Configuration()
 
 config.section_("General")
 # config.General.requestName = 'TTJets_Madgraph_PU20bx25'
-config.General.workArea = 'workdirCrab/v20/2015-06-11'
+config.General.workArea = 'workdirCrab/v21/2015-07-16'
 config.General.transferOutputs = True
 
 config.section_("JobType")
@@ -15,7 +15,7 @@ config.JobType.allowUndistributedCMSSW = True
 config.section_("Data")
 # config.Data.inputDataset = '/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 config.Data.inputDBS = 'global'
-config.Data.splitting = 'FileBased'
+# config.Data.splitting = 'FileBased'
 # config.Data.unitsPerJob = 10
 config.Data.outLFNDirBase = '/store/user/ejclemen/'
 config.Data.publication = True
