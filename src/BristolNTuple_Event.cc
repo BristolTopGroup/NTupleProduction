@@ -3,9 +3,14 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "FWCore/Common/interface/TriggerNames.h"
+
+using namespace std;
 
 BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig) :
 		recoVertexInputTag_(iConfig.getParameter < edm::InputTag > ("recoVertexInputTag")), //
+		metFiltersInputTag_(iConfig.getParameter < edm::InputTag > ("metFiltersInputTag")), //
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //
 		suffix(iConfig.getParameter < std::string > ("Suffix")) {
 	produces<unsigned int>(prefix + "Run" + suffix);
@@ -14,6 +19,7 @@ BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig) :
 	produces<unsigned int>(prefix + "LumiSection" + suffix);
 	produces<double>(prefix + "Time" + suffix);
 	produces<bool>(prefix + "isData" + suffix);
+	produces<std::vector<bool> >(prefix + "metFilters" + suffix);
 	produces<unsigned int>(prefix + "NRecoVertices" + suffix);
 }
 
@@ -34,6 +40,19 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	std::auto_ptr<bool> isdata(new bool(iEvent.isRealData()));
 	std::auto_ptr<unsigned int> nv(new unsigned int(primaryVertices->size()));
 
+	// MET Filters
+	std::auto_ptr<std::vector<bool> > metFilters(new std::vector<bool>() );
+
+	if ( iEvent.isRealData() ) {
+		edm::Handle < edm::TriggerResults > metFiltersResults;
+		iEvent.getByLabel(metFiltersInputTag_, metFiltersResults);
+
+		const edm::TriggerNames &names = iEvent.triggerNames(*metFiltersResults);
+		for ( unsigned int i = 0; i < metFiltersResults->size(); ++i) {
+			metFilters->push_back( metFiltersResults->accept( i ) );
+		}
+	}
+
 
 	//-----------------------------------------------------------------
 	iEvent.put(run, prefix + "Run" + suffix);
@@ -43,5 +62,5 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	iEvent.put(time, prefix + "Time" + suffix);
 	iEvent.put(isdata, prefix + "isData" + suffix);
 	iEvent.put(nv, prefix + "NRecoVertices" + suffix);
-
+	iEvent.put( metFilters, prefix + "metFilters" + suffix);
 }
