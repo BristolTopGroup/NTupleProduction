@@ -301,20 +301,20 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 		// 				<< pdfWeightsInputTag_;
 		// 	}
 		// }
-		// // PileupSummary Part
-		// edm::Handle < std::vector<PileupSummaryInfo> > puInfo;
-		// iEvent.getByLabel(pileupInfoSrc_, puInfo);
+		// PileupSummary Part
+		edm::Handle < std::vector<PileupSummaryInfo> > puInfo;
+		iEvent.getByLabel(pileupInfoSrc_, puInfo);
 
-		// if (puInfo.isValid()) {
+		if (puInfo.isValid()) {
 
-		// 	for (std::vector<PileupSummaryInfo>::const_iterator it = puInfo->begin(); it != puInfo->end(); ++it) {
-		// 		Number_interactions->push_back(it->getPU_NumInteractions());
-		// 		OriginBX->push_back(it->getBunchCrossing());
-		// 		NumberOfTrueInteractions->push_back(it->getTrueNumInteractions());
-		// 	}
-		// } else {
-		// 	edm::LogError("BristolNTuple_PileUpError") << "Error! Can't get the product " << pileupInfoSrc_;
-		// }
+			for (std::vector<PileupSummaryInfo>::const_iterator it = puInfo->begin(); it != puInfo->end(); ++it) {
+				Number_interactions->push_back(it->getPU_NumInteractions());
+				OriginBX->push_back(it->getBunchCrossing());
+				NumberOfTrueInteractions->push_back(it->getTrueNumInteractions());
+			}
+		} else {
+			edm::LogError("BristolNTuple_PileUpError") << "Error! Can't get the product " << pileupInfoSrc_;
+		}
 
 		//identify ttbar decay mode
 		if (isTTbarMC_) {
