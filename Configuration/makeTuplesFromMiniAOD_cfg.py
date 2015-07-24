@@ -211,9 +211,11 @@ else :
 
 if not options.isTTbarMC:
   process.makingNTuples.remove( process.ttGenEvent )
-  process.selectionCriteriaAnalyzer.genSelectionCriteriaInput = cms.VInputTag()  
+  process.selectionCriteriaAnalyzer.genSelectionCriteriaInput = cms.VInputTag()
 else:
   process.nTupleGenEventInfo.isTTbarMC = cms.bool( True )
+  process.topPairEPlusJetsSelectionTagging.bSelectionInTaggingMode = cms.bool( True )
+  process.topPairMuPlusJetsSelectionTagging.bSelectionInTaggingMode = cms.bool( True )
 
 process.TFileService = cms.Service("TFileService",
                            fileName=cms.string('ntuple.root')
