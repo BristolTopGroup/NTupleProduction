@@ -17,6 +17,7 @@
 <use name="lhapdf"/>
 <use name="AnalysisDataFormats/TopObjects"/>
 <use name="TopQuarkAnalysis/TopTools"/>
+<use name="CondFormats/BTauObjects"/>
 
 <export>
    <lib   name="1"/>
