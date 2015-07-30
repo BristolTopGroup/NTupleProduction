@@ -201,12 +201,15 @@ process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsConversionS
 
 if not options.isData:
   process.triggerSequence.remove( process.nTupleTriggerIsoMu24eta2p1 )
+  process.triggerSequence.remove( process.nTupleTriggerIsoMu20eta2p1 )
   process.triggerSequence.remove( process.nTupleTriggerEle27WPTightGsf )
+  process.triggerSequence.remove( process.nTupleTriggerEle27WPLooseGsf )
 else :
   process.makingNTuples.remove( process.makePseudoTop )
   process.nTuples.remove( process.pseudoTopSequence )
   process.nTupleTree.outputCommands.append('drop *_nTuplePFJets_*Gen*_*')
   process.triggerSequence.remove( process.nTupleTriggerIsoMu24eta2p1MC )
+  process.triggerSequence.remove( process.nTupleTriggerIsoMu20eta2p1MC )
   process.triggerSequence.remove( process.nTupleTriggerEle27WP75GsfMC )
 
 if not options.isTTbarMC:
