@@ -45,6 +45,8 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     tightElectronIsolation_EE=cms.double(0.1649),
 
     controlElectronIsolation=cms.double(0.),
+
+    looseMuonIsolation=cms.double(0.2),
    
     prefix=cms.untracked.string('TopPairElectronPlusJetsSelection.'),
     MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12 or Summer11Leg

@@ -54,6 +54,7 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 
 		tightMuonIso_(iConfig.getParameter<double>("tightMuonIsolation")), //
         controlMuonIso_(iConfig.getParameter<double>("controlMuonIsolation")), //
+        looseMuonIso_(iConfig.getParameter<double>("looseMuonIsolation")), //
 
 		// Flags and labels
 		tagAndProbeStudies_(iConfig.getParameter<bool>("tagAndProbeStudies")), //
@@ -131,6 +132,7 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 
 	desc.add<double>("tightMuonIsolation", 0.12);
 	desc.add<double>("controlMuonIsolation", 0.3);
+	desc.add<double>("looseMuonIsolation", 0.2);
 
 	desc.add<bool>("tagAndProbeStudies", false);
 	desc.add<bool>("dropTriggerSelection", false);
@@ -339,8 +341,8 @@ void TopPairMuonPlusJetsSelectionFilter::getLooseMuons() {
 bool TopPairMuonPlusJetsSelectionFilter::isLooseMuon(const pat::Muon& muon) const {
 	bool passesPtAndEta = muon.pt() > minLooseMuonPt_ && fabs(muon.eta()) < maxLooseMuonEta_;
 	bool passesID = muon.isLooseMuon();
-	// bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < looseMuonIso_;
-	bool passesIso = muon.trackIso() / muon.pt() < 0.1;;
+	bool passesIso = getRelativeIsolation(muon, 0.4, true) < looseMuonIso_;
+	// bool passesIso = muon.trackIso() / muon.pt() < 0.1;;
 
 	return passesPtAndEta && passesID && passesIso;
 }
@@ -365,12 +367,12 @@ void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
 		bool passesIso = false;
 
         if ( nonIsolatedMuonSelection_ ) {
-        	// passesIso = getRelativeIsolation(muon, 0.4, true) > controlMuonIso_;
-        	passesIso = muon.trackIso() / muon.pt() > controlMuonIso_;
+        	passesIso = getRelativeIsolation(muon, 0.4, true) > controlMuonIso_;
+        	// passesIso = muon.trackIso() / muon.pt() > controlMuonIso_;
 		}
 	   	else {
-           	// passesIso = getRelativeIsolation(muon, 0.4, true) < tightMuonIso_;
-        	passesIso = muon.trackIso() / muon.pt() < tightMuonIso_;
+           	passesIso = getRelativeIsolation(muon, 0.4, true) < tightMuonIso_;
+        	// passesIso = muon.trackIso() / muon.pt() < tightMuonIso_;
 	   	}
 
 

@@ -60,6 +60,8 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		tightElectronIso_EE_(iConfig.getParameter<double>("tightElectronIsolation_EE")), //
 		controlElectronIso_(iConfig.getParameter<double>("controlElectronIsolation")), //
 
+        looseMuonIso_(iConfig.getParameter<double>("looseMuonIsolation")), //
+
 		tagAndProbeStudies_(iConfig.getParameter<bool>("tagAndProbeStudies")), //
 		dropTriggerSelection_(iConfig.getParameter<bool>("dropTriggerSelection")), //
 		prefix_(iConfig.getUntrackedParameter < std::string > ("prefix")), //
@@ -142,7 +144,9 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 	desc.add<double>("tightElectronIsolation_EE", 0.1649);
 
 	desc.add<double>("controlElectronIsolation", 0.3);
-	
+
+	desc.add<double>("looseMuonIsolation", 0.2);
+
 	desc.add<bool>("tagAndProbeStudies", false);
 	desc.add<bool>("dropTriggerSelection", false);
 
@@ -346,8 +350,8 @@ void TopPairElectronPlusJetsSelectionFilter::getLooseMuons() {
 bool TopPairElectronPlusJetsSelectionFilter::isLooseMuon(const pat::Muon& muon) const {
 	bool passesPtAndEta = muon.pt() > minLooseMuonPt_ && fabs(muon.eta()) < maxLooseMuonEta_;
 	bool passesID = muon.isLooseMuon();
-	// bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < looseMuonIso_;
-	bool passesIso = muon.trackIso() / muon.pt() < 0.1;;
+	bool passesIso = getRelativeIsolation(muon, 0.4, true) < looseMuonIso_;
+	// bool passesIso = muon.trackIso() / muon.pt() < 0.1;;
 
 	return passesPtAndEta && passesID && passesIso;
 }

@@ -122,6 +122,8 @@ private:
 
 	double tightElectronIso_EB_, tightElectronIso_EE_, controlElectronIso_;
 
+	double looseMuonIso_;
+
 	bool tagAndProbeStudies_, dropTriggerSelection_;
 
 	std::string prefix_, MCSampleTag_;
