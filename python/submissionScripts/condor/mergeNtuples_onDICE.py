@@ -22,18 +22,24 @@ if jobNumber > len(jobs) :
 jobToRun = jobs[jobNumber]
 sampleName = jobToRun[0]
 ntupleDir = jobToRun[1]
+outptutFileNumber = jobToRun[2]
+
 print "Running merge for :"
 print sampleName
 print ntupleDir
+print outptutFileNumber
 
 if not os.path.exists(sampleName):
 	os.mkdir(sampleName)
 
-command = 'python mergeROOTFilesWithCompression.py ' + ntupleDir + '/*/ -o ' + sampleName
+command = 'python mergeROOTFilesWithCompression.py ' + ntupleDir + '/*/ -o ' + sampleName + ' -j ' + str(outptutFileNumber)
 p = subprocess.Popen(command, shell=True)
 p.wait()
 
 # os.system(command)
 
 # print 'mv ' + sampleName + ' ' + outputDir + '/'
-os.system('mv ' + sampleName + ' ' + outputDir + '/')
+if os.path.exists( outputDir + '/' + sampleName):
+	os.system('mv ' + sampleName + '/*.root ' + outputDir + '/' + sampleName)
+else :
+	os.system('mv ' + sampleName + ' ' + outputDir + '/')

@@ -1,11 +1,12 @@
 import os
 import glob
+from mergeROOTFilesWithCompression import getGroupedFilesToUse
 
-pathOfCrabWorkdirs = '/storage/ec6821/NTupleProd/CMSSW_7_4_0_pre7/src/workdirCrab/v16/2015-03-31/'
+pathOfCrabWorkdirs = '/storage/ec6821/NTupleProd/CMSSW_7_4_4_patch2/src/workdirCrab/v21/2015-07-13/'
 
 version = pathOfCrabWorkdirs.split('/')[-3]
 
-ntupleBaseDir = '/gpfs_phys/storm/cms/user/ejclemen/'
+ntupleBaseDir = '/hdfs/dpm/phy.bris.ac.uk/home/cms/store/user/ejclemen/'
 
 outputBaseDir = '/hdfs/TopQuarkGroup/run2/ntuples/'
 outputDirHdfs = outputBaseDir + version + '/'
@@ -18,7 +19,8 @@ configFile.write('jobs = [\n')
 if not os.path.exists(outputDirHdfs):
 	os.mkdir(outputDirHdfs)
 
-print "There are ",len(os.listdir(pathOfCrabWorkdirs))," jobs"
+print "There are ",len(os.listdir(pathOfCrabWorkdirs))," samples"
+nJobs = 0
 for crabWorkdir in os.listdir(pathOfCrabWorkdirs):
 
 	crabLogFile = open(pathOfCrabWorkdirs+'/'+crabWorkdir+'/crab.log','r')
@@ -58,31 +60,17 @@ for crabWorkdir in os.listdir(pathOfCrabWorkdirs):
 
 	ntupleDir = ntupleBaseDir + '/' + inputDataset + '/' + requestName + '/' + taskName
 
-	filesToMerge = glob.glob(ntupleDir+'/*/*.root')
+	files, uniqueFiles, allButUsedFiles, groupedFiles = getGroupedFilesToUse( ntupleDir + '/*/' )
 
-	# print outputDirHdfs + '/' + requestName
-	# print ntupleDir
-
-	configFile.write('\t["'+requestName + '",\t"' + ntupleDir + '/"],\n')
-
-	# Merge to storage first
-
-	# command = 'hadd -f7 ' + pathOfCrabWorkdirs + '/' + crabWorkdir + '/' + requestName + '.root '
-	# for file in filesToMerge:
-	# 	command += file + ' '
-
-	# mergeDir = pathOfCrabWorkdirs + '/' + crabWorkdir + '/' + requestName +'/'
-	# if not os.path.exists(mergeDir):
-	# 	os.mkdir(mergeDir)
-	# command = 'python myTools/mergeROOTFilesWithCompression.py ' + ntupleDir + '/*/ -o ' + mergeDir
-
-	# # print command
-	# os.system(command)
-
-	# # Move to hdfs
-	# # print 'mv ' + mergeDir + ' ' + outputDirHdfs + '/'
-	# os.system('mv ' + mergeDir + ' ' + outputDirHdfs + '/')
+	if len(groupedFiles) <= 5:
+		configFile.write('\t["'+requestName + '",\t"' + ntupleDir + '/",\t-1\t],\n')
+		nJobs += 1
+	else :
+		for job in range(0,len(groupedFiles)):
+			configFile.write('\t["'+requestName + '",\t"' + ntupleDir + '/",\t'+str(job)+'\t],\n')
+			nJobs += 1
 
 configFile.write(']\n')
 configFile.close()
 
+print 'There are %s jobs' % nJobs

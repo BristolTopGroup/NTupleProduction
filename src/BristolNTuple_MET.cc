@@ -18,6 +18,8 @@ BristolNTuple_MET::BristolNTuple_MET(const edm::ParameterSet& iConfig) :
 	produces<double>(prefix + "Significance" + suffix);
 	produces< std::vector<unsigned int> >(prefix + "METUncertaintyTypes" + suffix );
 	produces< std::vector<double> >(prefix + "METUncertaintiesPt" + suffix );
+	produces< std::vector<double> >(prefix + "METUncertaintiesPx" + suffix );
+	produces< std::vector<double> >(prefix + "METUncertaintiesPy" + suffix );
 }
 
 void BristolNTuple_MET::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -36,15 +38,21 @@ void BristolNTuple_MET::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	std::auto_ptr<double> significance(new double(patMET.significance()));
 	std::auto_ptr<std::vector<unsigned int > > METUncertaintyTypes(new std::vector<unsigned int>() );
 	std::auto_ptr<std::vector<double> > METUncertaintiesPt(new std::vector<double>() );
+	std::auto_ptr<std::vector<double> > METUncertaintiesPx(new std::vector<double>() );
+	std::auto_ptr<std::vector<double> > METUncertaintiesPy(new std::vector<double>() );
 
 	// Loop over MET uncertainties and store
 	if ( storeMETUncertainties_ ) {
 		for ( unsigned int unc = 0; unc < nMETUncertainties_; ++unc ) {
 			METUncertaintyTypes->push_back( unc );
 			METUncertaintiesPt->push_back( patMET.shiftedPt(pat::MET::METUncertainty(unc) ) );
+			METUncertaintiesPx->push_back( patMET.shiftedPx(pat::MET::METUncertainty(unc) ) );
+			METUncertaintiesPy->push_back( patMET.shiftedPy(pat::MET::METUncertainty(unc) ) );
 		}
 		iEvent.put( METUncertaintyTypes, prefix + "METUncertaintyTypes" + suffix );		
 		iEvent.put( METUncertaintiesPt, prefix + "METUncertaintiesPt" + suffix );
+		iEvent.put( METUncertaintiesPx, prefix + "METUncertaintiesPx" + suffix );
+		iEvent.put( METUncertaintiesPy, prefix + "METUncertaintiesPy" + suffix );
 	}
 
 	iEvent.put(px, prefix + "Ex" + suffix);

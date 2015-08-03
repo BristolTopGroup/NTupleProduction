@@ -31,6 +31,10 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 	produces<unsigned int>(prefix_ + "ProcessID" + suffix_);
 	produces<double>(prefix_ + "PtHat" + suffix_);
 	produces<double>(prefix_ + "PUWeight" + suffix_);
+	produces<double>(prefix_ + "generatorWeight" + suffix_);
+	produces<double>(prefix_ + "centralLHEWeight" + suffix_);
+	produces <std::vector<double> > ( prefix_ + "systematicWeights" + suffix_ );
+
 	produces < std::vector<double> > (prefix_ + "PDFWeights" + suffix_);
 	produces < std::vector<int> > (prefix_ + "PileUpInteractions" + suffix_);
 	produces < std::vector<int> > (prefix_ + "NumberOfTrueInteractions" + suffix_);
@@ -108,6 +112,10 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	std::auto_ptr<unsigned int> processID(new unsigned int());
 	std::auto_ptr<double> ptHat(new double());
 	std::auto_ptr<double> PUWeight(new double());
+	std::auto_ptr<double> generatorWeight(new double());
+	std::auto_ptr<double> centralLHEWeight(new double());
+	std::auto_ptr<std::vector<double> > systematicWeights(new std::vector<double>());
+
 	std::auto_ptr < std::vector<double> > pdfWeights(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > Number_interactions(new std::vector<int>());
 
@@ -180,6 +188,8 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	*processID.get() = 0;
 	*ptHat.get() = 0.;
 	*PUWeight.get() = 0.;
+	*generatorWeight.get() = 0.;
+	*centralLHEWeight.get() = 0;
 	*ttbarDecay.get() = 0;
 
 	*leptonicTopPt.get() = 0;
@@ -257,6 +267,8 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 			*processID.get() = genEvtInfoProduct->signalProcessID();
 			*ptHat.get() = (genEvtInfoProduct->hasBinningValues() ? genEvtInfoProduct->binningValues()[0] : 0.);
 
+			*generatorWeight.get() = genEvtInfoProduct->weight();
+
 		} else {
 			edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product " << genEvtInfoInputTag;
 		}
@@ -289,20 +301,20 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 		// 				<< pdfWeightsInputTag_;
 		// 	}
 		// }
-		// // PileupSummary Part
-		// edm::Handle < std::vector<PileupSummaryInfo> > puInfo;
-		// iEvent.getByLabel(pileupInfoSrc_, puInfo);
+		// PileupSummary Part
+		edm::Handle < std::vector<PileupSummaryInfo> > puInfo;
+		iEvent.getByLabel(pileupInfoSrc_, puInfo);
 
-		// if (puInfo.isValid()) {
+		if (puInfo.isValid()) {
 
-		// 	for (std::vector<PileupSummaryInfo>::const_iterator it = puInfo->begin(); it != puInfo->end(); ++it) {
-		// 		Number_interactions->push_back(it->getPU_NumInteractions());
-		// 		OriginBX->push_back(it->getBunchCrossing());
-		// 		NumberOfTrueInteractions->push_back(it->getTrueNumInteractions());
-		// 	}
-		// } else {
-		// 	edm::LogError("BristolNTuple_PileUpError") << "Error! Can't get the product " << pileupInfoSrc_;
-		// }
+			for (std::vector<PileupSummaryInfo>::const_iterator it = puInfo->begin(); it != puInfo->end(); ++it) {
+				Number_interactions->push_back(it->getPU_NumInteractions());
+				OriginBX->push_back(it->getBunchCrossing());
+				NumberOfTrueInteractions->push_back(it->getTrueNumInteractions());
+			}
+		} else {
+			edm::LogError("BristolNTuple_PileUpError") << "Error! Can't get the product " << pileupInfoSrc_;
+		}
 
 		//identify ttbar decay mode
 		if (isTTbarMC_) {
@@ -324,6 +336,19 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 				std::cout << "PANIC" << std::endl;
 				edm::LogError("BristolNTuple_GenEventError") << "Error! Found more than one compatible decay mode:"
 						<< numberOfIdentifiedModes;
+			}
+
+			// Store weights from LHE
+			// For pdf and generator systematics
+			edm::Handle<LHEEventProduct> EvtHandle ;
+			iEvent.getByLabel( "externalLHEProducer" , EvtHandle ) ;
+
+			*centralLHEWeight.get() = EvtHandle->originalXWGTUP();
+
+			// int whichWeight = 1;
+			// cout << "Number of weights : " << EvtHandle->weights().size() << endl;
+			for ( unsigned int weightIndex = 0; weightIndex < EvtHandle->weights().size(); ++weightIndex ) {
+				systematicWeights->push_back( EvtHandle->weights()[weightIndex].wgt );
 			}
 
 			// Only get top parton info if ttbar decay chain has been identified
@@ -438,6 +463,9 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	iEvent.put(processID, prefix_ + "ProcessID" + suffix_);
 	iEvent.put(ptHat, prefix_ + "PtHat" + suffix_);
 	iEvent.put(PUWeight, prefix_ + "PUWeight" + suffix_);
+	iEvent.put(generatorWeight, prefix_ + "generatorWeight" + suffix_);
+	iEvent.put(centralLHEWeight, prefix_ + "centralLHEWeight" + suffix_);
+	iEvent.put(systematicWeights, prefix_ + "systematicWeights" + suffix_);
 	iEvent.put(pdfWeights, prefix_ + "PDFWeights" + suffix_);
 	iEvent.put(Number_interactions, prefix_ + "PileUpInteractions" + suffix_);
 	iEvent.put(NumberOfTrueInteractions, prefix_ + "NumberOfTrueInteractions" + suffix_);

@@ -20,6 +20,12 @@ def getOptions( options ):
                         VarParsing.varType.bool,
                         "Is this ttbar MC")
 
+      options.register ('isData',
+                        False,
+                        VarParsing.multiplicity.singleton,
+                        VarParsing.varType.bool,
+                        "Is this data")
+
       options.register('selectionInTaggingMode',
                         False,
                         VarParsing.multiplicity.singleton,

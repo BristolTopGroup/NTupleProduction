@@ -65,7 +65,6 @@ public:
 
 	virtual bool isGoodJet(const pat::Jet& jet) const;
 	virtual bool isGoodElectron(const edm::Ptr<pat::Electron>&) const;
-	virtual bool passesElectronID(const pat::Electron& electron) const;
 	virtual double electronIsolation(const pat::Electron& electron) const;
 
 	//definitions of loose objects
@@ -103,6 +102,7 @@ private:
 
 	double minSignalElectronPt_, maxSignalElectronEta_;
 	edm::EDGetTokenT<edm::ValueMap<bool> > signalElectronIDMapToken_;
+	edm::EDGetTokenT<edm::ValueMap<unsigned int> > signalElectronIDMapToken_bitmap_;
 	double minSignalElectronID_;
 	double minLooseMuonPt_, maxLooseMuonEta_, minLooseElectronPt_, maxLooseElectronEta_;
 	edm::EDGetTokenT<edm::ValueMap<bool> > looseElectronIDMapToken_;
@@ -121,6 +121,8 @@ private:
 	double minBJetDiscriminator_;
 
 	double tightElectronIso_EB_, tightElectronIso_EE_, controlElectronIso_;
+
+	double looseMuonIso_;
 
 	bool tagAndProbeStudies_, dropTriggerSelection_;
 
@@ -143,6 +145,7 @@ private:
 	pat::MuonCollection muons_, looseMuons_;
 	pat::Electron signalElectron_;
 	edm::ValueMap<bool> signalElectronIDDecisions_, looseElectronIDDecisions_;
+	edm::ValueMap<unsigned int> signalElectronIDDecisions_bitmap_;
 	reco::VertexCollection vertices_;
 	HLTConfigProvider hltConfig_;
 	edm::TriggerResults triggerResults_;

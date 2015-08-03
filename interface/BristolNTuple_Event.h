@@ -12,6 +12,7 @@ public:
 private:
 	void produce(edm::Event &, const edm::EventSetup &);
 	edm::InputTag recoVertexInputTag_;
+	edm::InputTag metFiltersInputTag_;
 
 	const std::string prefix, suffix;
 

@@ -26,7 +26,17 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		readJECuncertainty(iConfig.getParameter<bool>("ReadJECuncertainty")), //
 		doVertexAssociation(iConfig.getParameter<bool>("DoVertexAssociation")), //
 		vtxInputTag(iConfig.getParameter < edm::InputTag > ("VertexInputTag")), // 
-		isRealData(iConfig.getParameter<bool>("isRealData")) {
+		isRealData(iConfig.getParameter<bool>("isRealData")),
+
+		calib("csvv1", "CSVV1.csv"),
+		reader(		&calib,               // calibration instance
+					BTagEntry::OP_MEDIUM,  // operating point
+					"comb",               // measurement type
+					"central"),           // systematics type
+		reader_up(&calib, BTagEntry::OP_MEDIUM, "comb", "up"),  // sys up
+		reader_down(&calib, BTagEntry::OP_MEDIUM, "comb", "down")  // sys down
+
+		 {
 	//kinematic variables
 	produces < std::vector<double> > (prefix + "Px" + suffix);
 	produces < std::vector<double> > (prefix + "Py" + suffix);
@@ -93,6 +103,9 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	//b-tagging information
 	produces < std::vector<double> > (prefix + "combinedInclusiveSecondaryVertexV2BJetTags" + suffix);
 	produces < std::vector<bool> > (prefix + "passesMediumCSV" + suffix);
+	produces < std::vector<double> > (prefix + "btagSF" + suffix);
+	produces < std::vector<double> > (prefix + "btagSFUp" + suffix);
+	produces < std::vector<double> > (prefix + "btagSFDown" + suffix);
 
 	//jet-vertex association
 	if (doVertexAssociation) {
@@ -173,6 +186,9 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	//b-tagging information
 	std::auto_ptr < std::vector<double> > combinedInclusiveSecondaryVertexV2BJetTags(new std::vector<double>());
 	std::auto_ptr < std::vector<bool> > passesMediumCSV(new std::vector<bool>());
+	std::auto_ptr < std::vector<double> > btagSF(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > btagSF_up(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > btagSF_down(new std::vector<double>());
 
 	//jet-vertex association
 	std::auto_ptr < std::vector<double> > bestVertexTrackAssociationFactor(new std::vector<double>());
@@ -228,8 +244,15 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
  			}
 
 			// Only consider jets above minimum pt
-			if ( it->correctedJet("Uncorrected").pt() * JEC <= minJetPtToStore )
-				continue;
+			if ( readJEC ) {
+				if ( it->correctedJet("Uncorrected").pt() * JEC <= minJetPtToStore )
+					continue;
+			}
+			else {
+				if ( it->pt() <= minJetPtToStore )
+					continue;
+			}
+
 
 			retpf.set(false);
 			int passjetLoose = 0;
@@ -484,6 +507,33 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			combinedInclusiveSecondaryVertexV2BJetTags->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
 			passesMediumCSV->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.814 );
 
+			// Read and store b tagging scale factors for MC
+			if (!iEvent.isRealData()) {
+				unsigned int bTagEntryJetFlavour = 999;
+				if ( fabs( it->partonFlavour() ) == 5 ) {
+					bTagEntryJetFlavour = 0;
+				}
+				else if ( fabs( it->partonFlavour() ) == 4 ) {
+					bTagEntryJetFlavour = 1;
+				}
+				else if ( fabs( it->partonFlavour() ) == 21 || ( fabs( it->partonFlavour() ) <= 3 && fabs( it->partonFlavour() ) >= 0 ) ) {
+					bTagEntryJetFlavour = 2;
+				}
+				double jet_weight = reader.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
+	                                      it->eta(), 
+	                                      it->pt());
+				double jet_weight_up = reader_up.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
+	                                      it->eta(), 
+	                                      it->pt());
+				double jet_weight_down = reader_down.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
+	                                      it->eta(), 
+	                                      it->pt());
+
+				btagSF->push_back( jet_weight );
+				btagSF_up->push_back( jet_weight_up );
+				btagSF_down->push_back( jet_weight_down );
+			}
+
 			//jet-vertex association
 			if (doVertexAssociation) {
 				bestVertexTrackAssociationFactor->push_back(maxTrackAssocRatio);
@@ -569,6 +619,10 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	//b-tagging information
 	iEvent.put(combinedInclusiveSecondaryVertexV2BJetTags, prefix + "combinedInclusiveSecondaryVertexV2BJetTags" + suffix);
 	iEvent.put(passesMediumCSV, prefix + "passesMediumCSV" + suffix);
+	
+	iEvent.put(btagSF, prefix + "btagSF" + suffix);
+	iEvent.put(btagSF_up, prefix + "btagSFUp" + suffix);
+	iEvent.put(btagSF_down, prefix + "btagSFDown" + suffix);
 
 	//jet-vertex association
 	if (doVertexAssociation) {

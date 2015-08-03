@@ -5,6 +5,9 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 
+#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+#include "CondFormats/BTauObjects/interface/BTagCalibrationReader.h"
+
 class BristolNTuple_PFJets : public edm::EDProducer {
  public:
   explicit BristolNTuple_PFJets(const edm::ParameterSet&);
@@ -21,6 +24,11 @@ class BristolNTuple_PFJets : public edm::EDProducer {
   const bool readJECuncertainty, doVertexAssociation;
   const edm::InputTag   vtxInputTag;
   const bool isRealData;
+
+  BTagCalibration calib;
+  BTagCalibrationReader reader;
+  BTagCalibrationReader reader_up;
+  BTagCalibrationReader reader_down;
 };
 
 #endif

@@ -19,6 +19,8 @@ BristolNTuple_GenJets::BristolNTuple_GenJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "Charge" + suffix);
 	produces < std::vector<double> > (prefix + "Mass" + suffix);
 
+	produces < std::vector<int> > (prefix + "pdgId" + suffix);
+
 	produces < std::vector<double> > (prefix + "EMF" + suffix);
 	produces < std::vector<double> > (prefix + "HADF" + suffix);
 }
@@ -31,6 +33,8 @@ void BristolNTuple_GenJets::produce(edm::Event& iEvent, const edm::EventSetup& i
 	std::auto_ptr < std::vector<double> > energy(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > charge(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > mass(new std::vector<double>());
+
+	std::auto_ptr < std::vector<int> > pdgId(new std::vector<int>());
 
 	std::auto_ptr < std::vector<double> > emf(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > hadf(new std::vector<double>());
@@ -59,6 +63,8 @@ void BristolNTuple_GenJets::produce(edm::Event& iEvent, const edm::EventSetup& i
 				charge->push_back(it->charge());
 				mass->push_back(it->mass());
 
+				pdgId->push_back(it->pdgId());
+
 				emf->push_back(it->emEnergy() / it->energy());
 				hadf->push_back(it->hadEnergy() / it->energy());
 			}
@@ -75,6 +81,8 @@ void BristolNTuple_GenJets::produce(edm::Event& iEvent, const edm::EventSetup& i
 	iEvent.put(energy, prefix + "Energy" + suffix);
 	iEvent.put(charge, prefix + "Charge" + suffix);
 	iEvent.put(mass, prefix + "Mass" + suffix);
+
+	iEvent.put(pdgId, prefix + "pdgId" + suffix);
 
 	iEvent.put(emf, prefix + "EMF" + suffix);
 	iEvent.put(hadf, prefix + "HADF" + suffix);

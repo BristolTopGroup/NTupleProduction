@@ -111,7 +111,7 @@ private:
 	std::string bJetDiscriminator_;
 	double minBJetDiscriminator_;
 
-	double tightMuonIso_, controlMuonIso_;
+	double tightMuonIso_, controlMuonIso_, looseMuonIso_;
 
 	bool tagAndProbeStudies_, dropTriggerSelection_;
 

@@ -54,6 +54,7 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 
 		tightMuonIso_(iConfig.getParameter<double>("tightMuonIsolation")), //
         controlMuonIso_(iConfig.getParameter<double>("controlMuonIsolation")), //
+        looseMuonIso_(iConfig.getParameter<double>("looseMuonIsolation")), //
 
 		// Flags and labels
 		tagAndProbeStudies_(iConfig.getParameter<bool>("tagAndProbeStudies")), //
@@ -131,6 +132,7 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 
 	desc.add<double>("tightMuonIsolation", 0.12);
 	desc.add<double>("controlMuonIsolation", 0.3);
+	desc.add<double>("looseMuonIsolation", 0.2);
 
 	desc.add<bool>("tagAndProbeStudies", false);
 	desc.add<bool>("dropTriggerSelection", false);
@@ -182,18 +184,6 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 		// Note if event passes all but bjet selection steps
 		if ( step < TTbarMuPlusJetsReferenceSelection::AtLeastOneBtag )
 			passesSelectionExceptBtagging = passesSelectionExceptBtagging && passesStep;
-
-		// Remove at least 4 jet selection for QCD control region (only need at least 3)
-       	// Also require exactly zero b jets
-       	// Or exactly one b jet, as e.g. angle(b,l) only makes sense if there is at least one b jet
-		if ( nonIsolatedMuonSelection_ ) {
-			if ( step == TTbarMuPlusJetsReferenceSelection::AtLeastFourGoodJets )
-			       passesStep = true;
-	
-			if ( step == TTbarMuPlusJetsReferenceSelection::AtLeastOneBtag || step == TTbarMuPlusJetsReferenceSelection::AtLeastTwoBtags ) {
-			       passesStep = hasExactlyZeroGoodBJet() || hasExactlyOneGoodBJet() ;
-			}
-		}
 
 		// if doesn't pass selection and not in tagging mode, stop here to save CPU time
 		if ( !(taggingMode_ || passesSelection) )
@@ -351,8 +341,8 @@ void TopPairMuonPlusJetsSelectionFilter::getLooseMuons() {
 bool TopPairMuonPlusJetsSelectionFilter::isLooseMuon(const pat::Muon& muon) const {
 	bool passesPtAndEta = muon.pt() > minLooseMuonPt_ && fabs(muon.eta()) < maxLooseMuonEta_;
 	bool passesID = muon.isLooseMuon();
-	// bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < looseMuonIso_;
-	bool passesIso = true;
+	bool passesIso = getRelativeIsolation(muon, 0.4, true) < looseMuonIso_;
+	// bool passesIso = muon.trackIso() / muon.pt() < 0.1;;
 
 	return passesPtAndEta && passesID && passesIso;
 }
@@ -378,9 +368,13 @@ void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
 
         if ( nonIsolatedMuonSelection_ ) {
         	passesIso = getRelativeIsolation(muon, 0.4, true) > controlMuonIso_;
+        	// passesIso = muon.trackIso() / muon.pt() > controlMuonIso_;
 		}
-	   	else
+	   	else {
            	passesIso = getRelativeIsolation(muon, 0.4, true) < tightMuonIso_;
+        	// passesIso = muon.trackIso() / muon.pt() < tightMuonIso_;
+	   	}
+
 
 		if (isGoodMuon(muon) && passesIso) {
 			goodIsolatedMuons_.push_back(muon);
@@ -480,7 +474,7 @@ bool TopPairMuonPlusJetsSelectionFilter::isGoodJet(const pat::Jet& jet) const {
 	bool passesPtAndEta(jet.pt() > minJetPtInNtuples_ && fabs(jet.eta()) < 2.5);
 	bool passesJetID(false);
 	bool passNOD = jet.numberOfDaughters() > 1;
-	bool passNHF = jet.neutralHadronEnergyFraction() < 0.99;
+	bool passNHF = jet.neutralHadronEnergyFraction() + jet.HFHadronEnergyFraction()  < 0.99;
 	bool passNEF = jet.neutralEmEnergyFraction() < 0.99;
 	bool passCHF = true;
 	bool passNCH = true;

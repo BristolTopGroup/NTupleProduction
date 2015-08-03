@@ -9,39 +9,41 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     VertexInput=cms.InputTag('offlineSlimmedPrimaryVertices'),
 
     # Signal muon cuts
-    minSignalMuonPt=cms.double(26.),
+    minSignalMuonPt=cms.double(23.),
     maxSignalMuonEta=cms.double(2.1),
-    minLooseMuonPt=cms.double(10.),
-    maxLooseMuonEta=cms.double(2.5),
-    minLooseElectronPt=cms.double(20.),
-    maxLooseElectronEta=cms.double(2.5),
-    looseElectronIDMap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-veto'),
+    minLooseMuonPt=cms.double(15.),
+    maxLooseMuonEta=cms.double(2.1),
+    minLooseElectronPt=cms.double(15.),
+    maxLooseElectronEta=cms.double(2.1),
+    looseElectronIDMap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-loose'),
     minLooseElectronID=cms.double(0),
 
     #jet cuts
-    min1JetPt=cms.double(25.),
-    min2JetPt=cms.double(25.),
-    min3JetPt=cms.double(25.),
-    min4JetPt=cms.double(25.),
-    minBJetPt=cms.double(25.),
-    minJetPtInNtuples=cms.double(25.),
+    min1JetPt=cms.double(20.),
+    min2JetPt=cms.double(20.),
+    min3JetPt=cms.double(20.),
+    min4JetPt=cms.double(20.),
+    minBJetPt=cms.double(20.),
+    minJetPtInNtuples=cms.double(20.),
 
     # Jet cleaning delta R
-    cleaningDeltaR=cms.double(0.3),
+    cleaningDeltaR=cms.double(0.4),
 
     # Maximum isolation for signal region
     tightMuonIsolation=cms.double(0.12),
     # Minimum isolation for control region
-    controlMuonIsolation=cms.double(0.),
+    controlMuonIsolation=cms.double(0.12),
+
+    looseMuonIsolation=cms.double(0.2),
 
     # Apply different JEC
-    applyJEC = cms.bool(True),
+    applyJEC = cms.bool(False),
     JetCorrectionService = cms.string('ak4PFCHSL1FastL2L3'),
 
     # B Jet Selection
-    # Working points taken from https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagging#Preliminary_working_or_operating
+    # Working points taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation74X50ns
     bJetDiscriminator=cms.string('pfCombinedInclusiveSecondaryVertexV2BJetTags'),
-    minBJetDiscriminator=cms.double(0.814),
+    minBJetDiscriminator=cms.double(0.890),
 
     prefix=cms.untracked.string('TopPairMuonPlusJetsSelection.'),
 
