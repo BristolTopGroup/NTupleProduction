@@ -34,6 +34,7 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 	produces<double>(prefix_ + "generatorWeight" + suffix_);
 	produces<double>(prefix_ + "centralLHEWeight" + suffix_);
 	produces <std::vector<double> > ( prefix_ + "systematicWeights" + suffix_ );
+	produces <std::vector<int> > ( prefix_ + "systematicWeightIDs" + suffix_ );
 
 	produces < std::vector<double> > (prefix_ + "PDFWeights" + suffix_);
 	produces < std::vector<int> > (prefix_ + "PileUpInteractions" + suffix_);
@@ -106,6 +107,24 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 
 }
 
+void BristolNTuple_GenEventInfo::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup) {
+	// uncomment to produce list shown in data/lheweights.txt
+//	edm::Handle < LHERunInfoProduct > run;
+//	typedef std::vector<LHERunInfoProduct::Header>::const_iterator headers_const_iterator;
+//
+//	iRun.getByLabel("externalLHEProducer", run);
+//	LHERunInfoProduct myLHERunInfoProduct = *(run.product());
+//
+//	for (headers_const_iterator iter = myLHERunInfoProduct.headers_begin(); iter != myLHERunInfoProduct.headers_end();
+//			iter++) {
+//		std::cout << iter->tag() << std::endl;
+//		std::vector < std::string > lines = iter->lines();
+//		for (unsigned int iLine = 0; iLine < lines.size(); iLine++) {
+//			std::cout << lines.at(iLine);
+//		}
+//	}
+}
+
 void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
 
@@ -115,6 +134,7 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	std::auto_ptr<double> generatorWeight(new double());
 	std::auto_ptr<double> centralLHEWeight(new double());
 	std::auto_ptr<std::vector<double> > systematicWeights(new std::vector<double>());
+	std::auto_ptr<std::vector<int> > systematicWeightIDs(new std::vector<int>());
 
 	std::auto_ptr < std::vector<double> > pdfWeights(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > Number_interactions(new std::vector<int>());
@@ -349,6 +369,8 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 			// cout << "Number of weights : " << EvtHandle->weights().size() << endl;
 			for ( unsigned int weightIndex = 0; weightIndex < EvtHandle->weights().size(); ++weightIndex ) {
 				systematicWeights->push_back( EvtHandle->weights()[weightIndex].wgt );
+				systematicWeightIDs->push_back( EvtHandle->weights()[weightIndex].id );
+//				std::cout << weightIndex << " " << EvtHandle->weights()[weightIndex].id << " " << EvtHandle->weights()[weightIndex].wgt << std::endl;
 			}
 
 			// Only get top parton info if ttbar decay chain has been identified
@@ -466,6 +488,7 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	iEvent.put(generatorWeight, prefix_ + "generatorWeight" + suffix_);
 	iEvent.put(centralLHEWeight, prefix_ + "centralLHEWeight" + suffix_);
 	iEvent.put(systematicWeights, prefix_ + "systematicWeights" + suffix_);
+	iEvent.put(systematicWeightIDs, prefix_ + "systematicWeightIDs" + suffix_);
 	iEvent.put(pdfWeights, prefix_ + "PDFWeights" + suffix_);
 	iEvent.put(Number_interactions, prefix_ + "PileUpInteractions" + suffix_);
 	iEvent.put(NumberOfTrueInteractions, prefix_ + "NumberOfTrueInteractions" + suffix_);

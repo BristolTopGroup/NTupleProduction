@@ -40,7 +40,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "/hdfs", "/hdfs"
-  config.vm.synced_folder ".", "/home/vagrant/CMSSW_7_0_9_patch2/src/NTupleProduction"
+  config.vm.synced_folder ".", "/home/vagrant/CMSSW_7_0_9_patch2/src/BristolAnalysis/NTupleTools"
+  config.vm.synced_folder ".", "/home/vagrant/CMSSW_7_5_0_pre5/src/BristolAnalysis/NTupleTools"
+  config.vm.synced_folder ".", "/home/vagrant/CMSSW_7_4_7/src/BristolAnalysis/NTupleTools"
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
