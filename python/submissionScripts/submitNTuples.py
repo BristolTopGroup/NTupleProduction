@@ -10,8 +10,11 @@ print 'Using workdir ',crabWorkArea
 miniAodDir = 'BristolAnalysis/NTupleTools/Configuration/crab3Configurations/50ns/'
 jobConfigs = [
 
-miniAodDir+'SingleMuon.py',
-miniAodDir+'SingleElectron.py',
+miniAodDir+'SingleMuon_PromptReco.py',
+miniAodDir+'SingleMuon_ReReco.py',
+miniAodDir+'SingleElectron_PromptReco.py',
+miniAodDir+'SingleElectron_ReReco.py',
+
 
 # miniAodDir + 'TTJets_PowhegPythia8.py',
 

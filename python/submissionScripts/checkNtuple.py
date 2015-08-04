@@ -20,16 +20,21 @@ for crabWorkdir in os.listdir(pathOfCrabWorkdirs):
 	failedToSubmit = False
 	someJobsFailed = False
 	numberOfAttempts = 0
+	percentDone = '0'
 	while unkownOrFailed:
 		if numberOfAttempts > 0 : 'Trying again'
 		p = subprocess.Popen(['crab', 'status',pathOfCrabWorkdirs+crabWorkdir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		out, err = p.communicate()
 
 		for line in out.split('\n'):
-			if line.find('finished')>=0 and line.find('100')>=0:
-				finished = True
-				unkownOrFailed = False
-				break
+			if line.find('finished')>=0 :
+				if line.find('100')>=0:
+					percentDone = '100'
+					finished = True
+					unkownOrFailed = False
+					break
+				else :
+					percentDone = line.split('finished')[-1].split('%').strip()
 			elif line.find('Task status')>=0 and line.find('FAILED')>=0:
 				failedToSubmit = True
 				break
@@ -45,13 +50,13 @@ for crabWorkdir in os.listdir(pathOfCrabWorkdirs):
 	elif failedToSubmit:
 		print crabWorkdir + ' ' + bcolors.FAIL + 'FAILED TO SUBMIT' + bcolors.ENDC #+ '...' + bcolors.OKBLUE + 'RESUBMITTING' + bcolors.ENDC
 		p = subprocess.Popen(['crab', 'status',pathOfCrabWorkdirs+crabWorkdir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-		out, err = p.communicate()
+		# out, err = p.communicate()
 		p = subprocess.Popen(['crab', 'resubmit',pathOfCrabWorkdirs+crabWorkdir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-		out, err = p.communicate() 
-		print out
+		# out, err = p.communicate() 
+		# print out
 	elif someJobsFailed:
-		print crabWorkdir + ' ' + bcolors.FAIL + 'SOME JOBS FAILED' + bcolors.ENDC #+ '...' + bcolors.OKBLUE + 'RESUBMITTING' + bcolors.ENDC
+		print crabWorkdir + ' ' + bcolors.FAIL + 'SOME JOBS FAILED' + bcolors.ENDC + '...' + bcolors.OKBLUE + percentDone + '%' + bcolors.ENDC + '...' + bcolors.OKBLUE + 'RESUBMITTING' + bcolors.ENDC
 		p = subprocess.Popen(['crab', 'resubmit',pathOfCrabWorkdirs+crabWorkdir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-		out, err = p.communicate() 
-		print out
-	else: print crabWorkdir + ' ' + bcolors.WARNING + 'INCOMPLETE' + bcolors.ENDC + '\n' + out
+		# out, err = p.communicate() 
+		# print out
+	else: print crabWorkdir + ' ' + bcolors.WARNING + 'INCOMPLETE' + bcolors.ENDC + '...' + bcolors.OKBLUE + percentDone + '%' + bcolors.ENDC + '\n' + out

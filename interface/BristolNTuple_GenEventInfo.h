@@ -33,7 +33,7 @@ class BristolNTuple_GenEventInfo: public edm::EDProducer {
 public:
 	explicit BristolNTuple_GenEventInfo(const edm::ParameterSet&);
 private:
-	virtual void beginRun(Run const& /* iR */, EventSetup const& /* iE */)
+	virtual void beginRun(edm::Run const& /* iR */, edm::EventSetup const& /* iE */);
 
 private:
 	void initLumiWeights();
