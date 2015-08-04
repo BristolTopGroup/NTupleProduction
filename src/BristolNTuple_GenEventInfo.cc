@@ -369,7 +369,7 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 			// cout << "Number of weights : " << EvtHandle->weights().size() << endl;
 			for ( unsigned int weightIndex = 0; weightIndex < EvtHandle->weights().size(); ++weightIndex ) {
 				systematicWeights->push_back( EvtHandle->weights()[weightIndex].wgt );
-				systematicWeightIDs->push_back( EvtHandle->weights()[weightIndex].id );
+				systematicWeightIDs->push_back( atoi(EvtHandle->weights()[weightIndex].id.c_str()) );
 //				std::cout << weightIndex << " " << EvtHandle->weights()[weightIndex].id << " " << EvtHandle->weights()[weightIndex].wgt << std::endl;
 			}
 
