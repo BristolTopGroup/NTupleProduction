@@ -1,6 +1,6 @@
 from BristolAnalysis.NTupleTools.commonConfig import config
 
-config.General.requestName = 'SingleElectron'
+config.General.requestName = 'SingleElectron_PromptReco'
 config.JobType.pyCfgParams = ['isData=1']
 config.Data.inputDataset = '/SingleElectron/Run2015B-PromptReco-v1/MINIAOD'
 config.Data.splitting = 'EventAwareLumiBased'

@@ -1,6 +1,6 @@
 from BristolAnalysis.NTupleTools.commonConfig import config
 
-config.General.requestName = 'SingleMuon'
+config.General.requestName = 'SingleMuon_PromptReco'
 config.JobType.pyCfgParams = ['isData=1']
 config.Data.inputDataset = '/SingleMuon/Run2015B-PromptReco-v1/MINIAOD'
 config.Data.splitting = 'EventAwareLumiBased'
