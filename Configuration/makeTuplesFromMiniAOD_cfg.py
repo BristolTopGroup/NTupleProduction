@@ -83,6 +83,10 @@ setupMETFilters( process, cms )
 from BristolAnalysis.NTupleTools.Jets_Setup_cff import setup_jets
 setup_jets(process, cms, options)
 
+# Rerun MET
+from BristolAnalysis.NTupleTools.MET_Setup_cff import setup_MET
+setup_MET(process, cms, options)
+
 # Load the selection filters and the selection analyzers
 process.load( 'BristolAnalysis.NTupleTools.muonSelection_cff')
 process.load( 'BristolAnalysis.NTupleTools.qcdMuonSelection_cff')
