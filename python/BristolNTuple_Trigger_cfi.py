@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 nTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
     HLTInputTag = cms.InputTag('TriggerResults','','HLT'),
     HLTObjectsInputTag = cms.InputTag('selectedPatTrigger'),
-    Prefix=cms.string('HLTIsoMu20eta2p1.'),
+    Prefix=cms.string('nTupleTrigger.'),
     Suffix=cms.string(''),
 
     PathOfInterest = cms.string('HLT_IsoMu20_eta2p1_v')

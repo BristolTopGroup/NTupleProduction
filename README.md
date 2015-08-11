@@ -20,11 +20,13 @@ export CMSSW_GIT_REFERENCE=/storage/.cmsgit-cache
 
 # Set up the CMSSW release
 export SCRAM_ARCH=slc6_amd64_gcc491
-cmsrel CMSSW_7_4_2
-cd CMSSW_7_4_2/src/
+
+cmsrel CMSSW_7_4_8_patch1
+cd CMSSW_7_4_8_patch1/src/
 cmsenv
 git cms-init
 # Do merge-topics and addpkgs first if needed
+git cms-merge-topic -u cms-met:METCorUnc74X
 
 # Clone our main ntuple producing software and checkout run2 branch
 git clone git@github.com:BristolTopGroup/NTupleProduction.git BristolAnalysis/NTupleTools

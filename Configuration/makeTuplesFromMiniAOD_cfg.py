@@ -1,8 +1,31 @@
 import FWCore.ParameterSet.Config as cms
 
+# Define the CMSSW process
 process = cms.Process("Ntuples")
 
+# Load the standard set of configuration modules
+process.load('Configuration.StandardSequences.Services_cff')
+process.load('Configuration.StandardSequences.GeometryDB_cff')
+process.load('Configuration.StandardSequences.MagneticField_38T_cff')
+#process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+
+# Message Logger settings
+process.load("FWCore.MessageService.MessageLogger_cfi")
+process.MessageLogger.destinations = ['cout', 'cerr']
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
+
+# Set the process options -- Display summary at the end, enable unscheduled execution
+process.options = cms.untracked.PSet(
+    allowUnscheduled = cms.untracked.bool(True),
+    wantSummary = cms.untracked.bool(False),
+)
+
+# print event content
+process.printEventContent = cms.EDAnalyzer("EventContentAnalyzer")
+
+
 # If you would like to change the Global Tag e.g. for JEC
+
 # process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 # Most recent JEC not available in V3
 # process.GlobalTag.globaltag = cms.string('PHYS14_25_V3::All')
@@ -34,10 +57,6 @@ process.source = cms.Source("PoolSource",
 # Use to skip events e.g. to reach a problematic event quickly
 # process.source.skipEvents = cms.untracked.uint32(4099)
 
-process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.MessageLogger.cerr.threshold = 'INFO'
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
-
 # Get options from command line
 from FWCore.ParameterSet.VarParsing import VarParsing
 options = VarParsing ('python')
@@ -60,6 +79,14 @@ setup_electronID( process, cms )
 from BristolAnalysis.NTupleTools.metFilters_cfi import *
 setupMETFilters( process, cms )
 
+# Custom JEC
+from BristolAnalysis.NTupleTools.Jets_Setup_cff import setup_jets
+setup_jets(process, cms, options)
+
+# Rerun MET
+from BristolAnalysis.NTupleTools.MET_Setup_cff import setup_MET
+setup_MET(process, cms, options)
+
 # Load the selection filters and the selection analyzers
 process.load( 'BristolAnalysis.NTupleTools.muonSelection_cff')
 process.load( 'BristolAnalysis.NTupleTools.qcdMuonSelection_cff')
@@ -75,7 +102,7 @@ if options.tagAndProbe:
 
  
 ## Maximum Number of Events
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 from BristolAnalysis.NTupleTools.NTupler_cff import *
 setup_ntupler(process, cms )
@@ -90,6 +117,7 @@ process.makingNTuples = cms.Path(
   process.ttGenEvent *
   process.selectionCriteriaAnalyzer *
   process.makePseudoTop *
+  process.printEventContent *
   process.nTuples *
   process.nTupleTree
   )
@@ -114,6 +142,9 @@ if not options.isData:
 else :
   process.makingNTuples.remove( process.makePseudoTop )
   process.nTuples.remove( process.pseudoTopSequence )
+  process.nTuples.remove( process.nTupleGenMET )
+  process.nTuples.remove( process.nTupleGenJets )
+  process.nTuples.remove( process.nTupleGenEventInfo )
   process.nTupleTree.outputCommands.append('drop *_nTuplePFJets_*Gen*_*')
   process.triggerSequence.remove( process.nTupleTriggerIsoMu24eta2p1MC )
   process.triggerSequence.remove( process.nTupleTriggerIsoMu20eta2p1MC )
@@ -129,6 +160,9 @@ else:
   process.nTupleGenEventInfo.isTTbarMC = cms.bool( True )
   process.topPairEPlusJetsSelectionTagging.bSelectionInTaggingMode = cms.bool( True )
   process.topPairMuPlusJetsSelectionTagging.bSelectionInTaggingMode = cms.bool( True )
+
+if not options.printEventContent:
+    process.makingNTuples.remove(process.printEventContent)
 
 process.TFileService = cms.Service("TFileService",
                            fileName=cms.string('ntuple.root')
