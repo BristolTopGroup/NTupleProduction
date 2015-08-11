@@ -37,6 +37,26 @@ def getOptions( options ):
                         VarParsing.multiplicity.singleton,
                         VarParsing.varType.bool,
                         "Apply full selection in tagging mode")
+      
+      options.register('useJECFromFile',
+                        True,
+                        VarParsing.multiplicity.singleton,
+                        VarParsing.varType.bool,
+                        "Apply Jet Energy Corrections from SQLite file.")
+      
+      options.register('applyResiduals',
+                        True,
+                        VarParsing.multiplicity.singleton,
+                        VarParsing.varType.bool,
+                        'Application of residual corrections. Have to be set' +
+                        ' to True once the 13 TeV residual corrections are ' +
+                        'available. False to be kept meanwhile.')
+      
+      options.register('printEventContent',
+                        False,
+                        VarParsing.multiplicity.singleton,
+                        VarParsing.varType.bool,
+                        "Print the event content just before ntuple.")
 
       options.parseArguments()
 
