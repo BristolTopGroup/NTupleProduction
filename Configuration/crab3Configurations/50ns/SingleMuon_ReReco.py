@@ -1,6 +1,6 @@
 from BristolAnalysis.NTupleTools.commonConfig import config
 
-config.General.requestName = 'SingleMuon'
+config.General.requestName = 'SingleMuon_Rereco'
 config.JobType.pyCfgParams = ['isData=1','isRereco=1']
 config.Data.inputDataset = '/SingleMuon/Run2015B-17Jul2015-v1/MINIAOD'
 config.Data.splitting = 'EventAwareLumiBased'
