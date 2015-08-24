@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter',
     # Specify input collections
-    jetInput=cms.InputTag("slimmedJets"),
+    jetInput=cms.InputTag("patJetsReapplyJEC"),
     electronInput=cms.InputTag("slimmedElectrons"),
     muonInput=cms.InputTag("slimmedMuons"),
     HLTInput=cms.InputTag('TriggerResults', '', 'HLT'),
