@@ -264,13 +264,13 @@ void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEven
 	iEvent.getByLabel(electronInput_, electrons_);
 
 	// Electron VID Decisions
-	Handle<edm::ValueMap<bool> > tight_id_decisions;
-	iEvent.getByToken(signalElectronIDMapToken_,tight_id_decisions);
-	signalElectronIDDecisions_ = *tight_id_decisions;
+	Handle<edm::ValueMap<bool> > medium_id_decisions;
+	iEvent.getByToken(signalElectronIDMapToken_,medium_id_decisions);
+	signalElectronIDDecisions_ = *medium_id_decisions;
 
-	Handle<edm::ValueMap<unsigned int> > tight_id_decisions_bitmap;
-	iEvent.getByToken(signalElectronIDMapToken_bitmap_,tight_id_decisions_bitmap);
-	signalElectronIDDecisions_bitmap_ = *tight_id_decisions_bitmap;
+	Handle<edm::ValueMap<unsigned int> > medium_id_decisions_bitmap;
+	iEvent.getByToken(signalElectronIDMapToken_bitmap_,medium_id_decisions_bitmap);
+	signalElectronIDDecisions_bitmap_ = *medium_id_decisions_bitmap;
 
 	Handle<edm::ValueMap<bool> > loose_id_decisions;
 	iEvent.getByToken(looseElectronIDMapToken_,loose_id_decisions);
@@ -396,7 +396,6 @@ bool TopPairElectronPlusJetsSelectionFilter::isGoodElectron(const edm::Ptr<pat::
 	bool passesID = false;
 
 	if ( nonIsolatedElectronSelection_ ) {
-		std::bitset<15> x(signalElectronIDDecisions_bitmap_[electron]);
 		if ( signalElectronIDDecisions_bitmap_[electron] == 3327 || signalElectronIDDecisions_bitmap_[electron] == 3583 || signalElectronIDDecisions_bitmap_[electron] == 3839) {
 			passesID = true;
 		}
