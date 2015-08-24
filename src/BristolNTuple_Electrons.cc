@@ -24,7 +24,9 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 		debugRelease_(iConfig.getParameter<bool>("debugRelease")), //
 		vtxInputTag(iConfig.getParameter < edm::InputTag > ("VertexInputTag")), //
 		beamSpotInputTag(iConfig.getParameter < edm::InputTag > ("BeamSpotInputTag")), //
-		conversionsInputTag(iConfig.getParameter < edm::InputTag > ("ConversionsInputTag")) //
+		conversionsInputTag(iConfig.getParameter < edm::InputTag > ("ConversionsInputTag")), //
+  		tightElectronIDMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("tightElectronIDMap"))), //
+  		tightElectronIDMapToken_bitmap_(consumes<edm::ValueMap<unsigned int> >(iConfig.getParameter<edm::InputTag>("tightElectronIDMap_bitmap"))) //
 {
 
 	//kinematic variables
@@ -90,6 +92,10 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 	produces < std::vector<double> > (prefix + "HcalIsoD1Heep04" + suffix);
 	produces < std::vector<double> > (prefix + "HcalIsoD2Heep04" + suffix);
 	produces < std::vector<double> > (prefix + "TrkIsoHeep04" + suffix);
+
+	produces < std::vector<bool> > (prefix + "isTightElectron" + suffix);
+	produces < std::vector<bool> > (prefix + "isTightNonIsoElectron" + suffix);
+	produces < std::vector<bool> > (prefix + "isTightConversionElectron" + suffix);
 
 	//electron conversion identification variables
 	produces < std::vector<double> > (prefix + "Dist" + suffix);
@@ -176,6 +182,11 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 //    std::auto_ptr < std::vector<double> > dB(new std::vector<double>());
 
+	// Electron ID variables
+	std::auto_ptr < std::vector<bool> > isTightElectron(new std::vector<bool>());
+	std::auto_ptr < std::vector<bool> > isTightConversionElectron(new std::vector<bool>());
+	std::auto_ptr < std::vector<bool> > isTightNonIsoElectron(new std::vector<bool>());
+
 	//high energy electron isolation variables
 	std::auto_ptr < std::vector<double> > ecalIsoHeep03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > hcalIsoD1Heep03(new std::vector<double>());
@@ -216,7 +227,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 	//-----------------------------------------------------------------
 
-	edm::Handle < std::vector<pat::Electron> > electrons;
+	edm::Handle <edm::View<pat::Electron> > electrons;
 	iEvent.getByLabel(inputTag, electrons);
 
 	edm::Handle < reco::BeamSpot > bsHandle;
@@ -237,12 +248,41 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	edm::Handle < reco::PFCandidateCollection > pfCandidates;
 	iEvent.getByLabel("particleFlow", pfCandidates);
 
+	edm::Handle<edm::ValueMap<bool> > tight_id_decisions;
+	iEvent.getByToken(tightElectronIDMapToken_,tight_id_decisions);
+	tightElectronIDDecisions_ = *tight_id_decisions;
+
+	edm::Handle<edm::ValueMap<unsigned int> > tight_id_decisions_bitmap;
+	iEvent.getByToken(tightElectronIDMapToken_bitmap_,tight_id_decisions_bitmap);
+	tightElectronIDDecisions_bitmap_ = *tight_id_decisions_bitmap;
+
 	if (electrons.isValid()) {
 		edm::LogInfo("BristolNTuple_ElectronsExtraInfo") << "Total # Electrons: " << electrons->size();
-		for (std::vector<pat::Electron>::const_iterator it = electrons->begin(); it != electrons->end(); ++it) {
+		for (size_t index = 0; index < electrons->size(); ++index){
+			const auto it = electrons->ptrAt(index);
+
+		// for (std::vector<pat::Electron>::const_iterator it = electrons->begin(); it != electrons->end(); ++it) {
 			// exit from loop when you reach the required number of electrons
 			if (px->size() >= maxSize)
 				break;
+
+
+			// Check ID
+			// edm::View<pat::Electron> > el = *it;
+			isTightElectron->push_back( tightElectronIDDecisions_[it] );
+			if ( tightElectronIDDecisions_bitmap_[it] == 3327 || tightElectronIDDecisions_bitmap_[it] == 3583 || tightElectronIDDecisions_bitmap_[it] == 3839) {
+				isTightNonIsoElectron->push_back( true );
+			}
+			else {
+				isTightNonIsoElectron->push_back( false );
+			}
+
+			if ( tightElectronIDDecisions_bitmap_[it] == 1023 || tightElectronIDDecisions_bitmap_[it] == 2047 || tightElectronIDDecisions_bitmap_[it] == 3071) {
+				isTightConversionElectron->push_back( true );
+			}
+			else {
+				isTightConversionElectron->push_back( false );
+			}
 
 			/* Conversion (fit)
 			 * See https://indico.cern.ch/getFile.py/access?contribId=12&sessionId=0&resId=0&materialId=slides&confId=133587
@@ -462,6 +502,10 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	iEvent.put(hcalIsoD1Heep04, prefix + "HcalIsoD1Heep04" + suffix);
 	iEvent.put(hcalIsoD2Heep04, prefix + "HcalIsoD2Heep04" + suffix);
 	iEvent.put(trkIsoHeep04, prefix + "TrkIsoHeep04" + suffix);
+
+	iEvent.put(isTightElectron, prefix + "isTightElectron" + suffix);
+	iEvent.put(isTightNonIsoElectron, prefix + "isTightNonIsoElectron" + suffix);
+	iEvent.put(isTightConversionElectron, prefix + "isTightConversionElectron" + suffix);
 
 	//electron conversion identification variables
 	iEvent.put(missingHits, prefix + "MissingHits" + suffix);
