@@ -38,6 +38,7 @@ UnfoldingProducer::UnfoldingProducer(const edm::ParameterSet& iConfig) :
 		is_semileptonic_(false), //
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //
 		suffix(iConfig.getParameter < std::string > ("Suffix")), //
+		MCSampleTag_(iConfig.getParameter < std::string > ("MCSampleTag")), //
 		storePDFWeights_(iConfig.getParameter < bool > ("storePDFWeights")) //
 		{
 	produces<double>(prefix+"puWeight"+suffix);
@@ -90,7 +91,8 @@ void UnfoldingProducer::fillDescriptions(edm::ConfigurationDescriptions & descri
 	desc.addUntracked<bool>("do_electron_channel", false);
 	desc.add < string > ("Prefix");
 	desc.add < string > ("Suffix");
-	desc.add< bool > ("storePDFWeights");
+	desc.add < bool > ("storePDFWeights");
+	desc.add < std::string > ("MCSampleTag", "Summer12");
 
 	descriptions.add("UnfoldingProducer", desc);
 }
@@ -227,11 +229,11 @@ void UnfoldingProducer::produce( edm::Event& iEvent, const edm::EventSetup&) {
 	iEvent.put(recoMET, prefix+"recoMET"+suffix);
 
 	// ST
-	std::auto_ptr<double> recoST(new double(get_reco_st(iEvent)));
+	std::auto_ptr<double> recoST(new double(get_reco_st(iEvent, MCSampleTag_)));
 	iEvent.put(recoST, prefix+"recoST"+suffix);
 
 	//HT
-	std::auto_ptr<double> recoHT(new double(get_reco_ht(iEvent)));
+	std::auto_ptr<double> recoHT(new double(get_reco_ht(iEvent, MCSampleTag_)));
 	iEvent.put(recoHT, prefix+"recoHT"+suffix);
 
 	//WPT
@@ -339,7 +341,7 @@ float UnfoldingProducer::get_reco_met(const edm::Event& iEvent) const {
 	return recoMETObject.pt();
 }
 
-float UnfoldingProducer::get_reco_ht(const edm::Event& iEvent) const {
+float UnfoldingProducer::get_reco_ht(const edm::Event& iEvent, std::string MCSampleTag_) const {
 	edm::Handle < pat::JetCollection > jets;
 	iEvent.getByLabel(reco_jet_input_, jets);
 	float ht(0.);
@@ -347,14 +349,14 @@ float UnfoldingProducer::get_reco_ht(const edm::Event& iEvent) const {
 	//Take ALL the jets!
 	for (unsigned int index = 0; index < jets->size(); ++index) {
 		const pat::Jet jet = jets->at(index);
-		ht += getSmearedJetPtScale(jets->at(index), 0)*jets->at(index).pt();
+		ht += getSmearedJetPtScale(jets->at(index), 0, MCSampleTag_)*jets->at(index).pt();
 	}
 	return ht;
 }
 
-float UnfoldingProducer::get_reco_st(const edm::Event& iEvent) const {
+float UnfoldingProducer::get_reco_st(const edm::Event& iEvent, std::string MCSampleTag_) const {
 	// ST = HT + MET + lepton pt
-	float ht = get_reco_ht(iEvent);
+	float ht = get_reco_ht(iEvent, MCSampleTag_);
 	float met = get_reco_met(iEvent);
 	//get lepton
 	const reco::Candidate* lepton = get_reco_lepton(iEvent);

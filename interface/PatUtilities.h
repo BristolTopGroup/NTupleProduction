@@ -52,6 +52,6 @@ double getRelativeIsolation(const pat::Electron& electron, double cone, double r
 		bool useDeltaBetaCorrections, bool useRhoActiveAreaCorrections);
 double getRelativeIsolation(const pat::Muon& muon, double cone, bool useDeltaBetaCorrections);
 
-double getSmearedJetPtScale(const pat::Jet& jet, int jet_smearing_systematic);
+double getSmearedJetPtScale(const pat::Jet& jet, int jet_smearing_systematic, std::string MCSampleTag);
 
 #endif 

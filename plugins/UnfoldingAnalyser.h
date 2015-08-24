@@ -38,7 +38,7 @@ private:
 	edm::InputTag is_fully_hadronic_ttbar_flag_, is_dileptonic_ttbar_flag_;
 	edm::InputTag is_semileptonic_tau_flag_, is_semileptonic_electron_flag_, is_semileptonic_muon_flag_;
 	bool do_electron_channel_; //if false do muon channel
-	std::string variable_under_analysis_;
+	std::string variable_under_analysis_, MCSampleTag_;
 	double variable_min_;
 	double variable_max_;
 	unsigned int variable_n_bins_;
@@ -65,7 +65,7 @@ private:
 
 	//functions
 	float get_gen_variable(const edm::Event& iEvent) const;
-	float get_reco_variable(const edm::Event& iEvent) const;
+	float get_reco_variable(const edm::Event& iEvent, std::string MCSampleTag_) const;
 
 	float get_gen_met(const edm::Event& iEvent) const;
 	float get_reco_met(const edm::Event& iEvent) const;
@@ -73,13 +73,13 @@ private:
 	float get_gen_met_nu(const edm::Event& iEvent) const;
 
 	float get_gen_ht(const edm::Event& iEvent) const;
-	float get_reco_ht(const edm::Event& iEvent) const;
+	float get_reco_ht(const edm::Event& iEvent, std::string MCSampleTag_) const;
 
 	float get_gen_ht_nocuts(const edm::Event& iEvent) const;
 	float get_gen_ht_parton(const edm::Event& iEvent) const;
 	
 	float get_gen_st(const edm::Event& iEvent) const;
-	float get_reco_st(const edm::Event& iEvent) const;
+	float get_reco_st(const edm::Event& iEvent, std::string MCSampleTag_) const;
 
 	float get_gen_st_nocuts(const edm::Event& iEvent) const;
 	float get_gen_st_parton(const edm::Event& iEvent) const;

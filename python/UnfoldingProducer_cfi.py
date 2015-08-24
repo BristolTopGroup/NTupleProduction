@@ -23,6 +23,8 @@ unfoldingProducerElectron = cms.EDProducer("UnfoldingProducer",
     do_electron_channel=cms.untracked.bool(True),
     Prefix = cms.string('unfolding.'),
     Suffix = cms.string(''),
+    MCSampleTag = cms.string('Summer12'), #Fall11 or Summer12 or Summer11Leg
+
 )
 
 unfoldingProducerMuon = unfoldingProducerElectron.clone( 
