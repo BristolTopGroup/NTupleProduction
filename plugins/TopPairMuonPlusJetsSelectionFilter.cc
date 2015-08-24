@@ -133,7 +133,7 @@ TopPairMuonPlusJetsSelectionFilter::~TopPairMuonPlusJetsSelectionFilter() {
 }
 
 bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
-	setupEventContent(iEvent);
+	setupEventContent(iEvent, MCSampleTag_);
 	unsigned int numberOfBtags(cleanedBJets_.size());
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfBtags)), prefix_ + "NumberOfBtags");
 	std::auto_ptr < pat::JetCollection > jetoutput(new pat::JetCollection());
@@ -144,9 +144,9 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 	for (unsigned int step = 0; step < TTbarMuPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
 		TTbarMuPlusJetsReferenceSelection::Step stepName = TTbarMuPlusJetsReferenceSelection::Step(step);
 		if (debug_)
-			cout << "Doing selection step: " << TTbarMuPlusJetsReferenceSelection::StringSteps[stepName] << " " << passesSelectionStep(iEvent, step) << endl;
+			cout << "Doing selection step: " << TTbarMuPlusJetsReferenceSelection::StringSteps[stepName] << " " << passesSelectionStep(iEvent, step, MCSampleTag_) << endl;
 
-		bool passesStep(passesSelectionStep(iEvent, step));
+		bool passesStep(passesSelectionStep(iEvent, step, MCSampleTag_));
 
 		// Remove at least 4 jet selection for QCD control region (only need at least 3)
 		// Also require exactly zero b jets
@@ -191,7 +191,7 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 		return taggingMode_ || passesSelectionExceptBtagging;
 }
 
-void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent) {
+void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent, std::string MCSampleTag_) {
 	
 	if (debug_)
 		cout << "Setting up the event content" << endl;
@@ -248,7 +248,7 @@ void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent) {
 	}
 	if (debug_)
 		cout << "Getting clean jets" << endl;
-	cleanedJets();
+	cleanedJets(MCSampleTag_);
 	if (debug_)
 		cout << "Getting clean B jets" << endl;
 	cleanedBJets();
@@ -346,11 +346,11 @@ bool TopPairMuonPlusJetsSelectionFilter::isGoodMuon(const pat::Muon& muon) const
 	return passesPtAndEta && passesD0 && passesID && trackQuality;
 }
 
-void TopPairMuonPlusJetsSelectionFilter::cleanedJets() {
+void TopPairMuonPlusJetsSelectionFilter::cleanedJets(std::string MCSampleTag_) {
 	cleanedJets_.clear();
 	for (unsigned index = 0; index < jets_.size(); ++index) {
 		const pat::Jet jet = jets_.at(index);
-		if (!isGoodJet(jet))
+		if (!isGoodJet(jet, MCSampleTag_))
 			continue;
 		bool overlaps(false);
 		if (tagAndProbeStudies_) {
@@ -381,9 +381,9 @@ void TopPairMuonPlusJetsSelectionFilter::cleanedBJets() {
 	}
 }
 
-bool TopPairMuonPlusJetsSelectionFilter::isGoodJet(const pat::Jet& jet) const {
+bool TopPairMuonPlusJetsSelectionFilter::isGoodJet(const pat::Jet& jet, std::string MCSampleTag_) const {
 	//both cuts are done at PAT config level (selectedPATJets) this is just for safety
-	double smearFactor = getSmearedJetPtScale(jet, 0);
+	double smearFactor = getSmearedJetPtScale(jet, 0, MCSampleTag_);
 	bool passesPtAndEta(smearFactor*jet.pt() > 20. && fabs(jet.eta()) < 2.5);
 	bool passesJetID(false);
 	bool passNOD = jet.numberOfDaughters() > 1;
@@ -402,7 +402,7 @@ bool TopPairMuonPlusJetsSelectionFilter::isGoodJet(const pat::Jet& jet) const {
 	return passesPtAndEta && passesJetID;
 }
 
-bool TopPairMuonPlusJetsSelectionFilter::passesSelectionStep(edm::Event& iEvent, unsigned int selectionStep) const {
+bool TopPairMuonPlusJetsSelectionFilter::passesSelectionStep(edm::Event& iEvent, unsigned int selectionStep, std::string MCSampleTag_) const {
 	TTbarMuPlusJetsReferenceSelection::Step step = TTbarMuPlusJetsReferenceSelection::Step(selectionStep);
 	switch (step) {
 	case TTbarMuPlusJetsReferenceSelection::AllEvents:
@@ -416,13 +416,13 @@ bool TopPairMuonPlusJetsSelectionFilter::passesSelectionStep(edm::Event& iEvent,
 	case TTbarMuPlusJetsReferenceSelection::LooseElectronVeto:
 		return passesLooseElectronVeto();
 	case TTbarMuPlusJetsReferenceSelection::AtLeastOneGoodJet:
-		return hasAtLeastOneGoodJet();
+		return hasAtLeastOneGoodJet(MCSampleTag_);
 	case TTbarMuPlusJetsReferenceSelection::AtLeastTwoGoodJets:
-		return hasAtLeastTwoGoodJets();
+		return hasAtLeastTwoGoodJets(MCSampleTag_);
 	case TTbarMuPlusJetsReferenceSelection::AtLeastThreeGoodJets:
-		return hasAtLeastThreeGoodJets();
+		return hasAtLeastThreeGoodJets(MCSampleTag_);
 	case TTbarMuPlusJetsReferenceSelection::AtLeastFourGoodJets:
-		return hasAtLeastFourGoodJets();
+		return hasAtLeastFourGoodJets(MCSampleTag_);
 	case TTbarMuPlusJetsReferenceSelection::AtLeastOneBtag:
 		return hasAtLeastOneGoodBJet();
 	case TTbarMuPlusJetsReferenceSelection::AtLeastTwoBtags:
@@ -572,28 +572,28 @@ bool TopPairMuonPlusJetsSelectionFilter::passesLooseMuonVeto() const {
 		return looseMuons_.size() < 2;
 }
 
-bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastOneGoodJet() const {
-	if (cleanedJets_.size() > 0)		
-		return getSmearedJetPtScale(cleanedJets_.at(0), 0)*cleanedJets_.at(0).pt() > min1JetPt_;
+bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastOneGoodJet(std::string MCSampleTag_) const {
+	if (cleanedJets_.size() > 0)
+		return getSmearedJetPtScale(cleanedJets_.at(0), 0, MCSampleTag_)*cleanedJets_.at(0).pt() > min1JetPt_;
 	return false;
 
 }
 
-bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastTwoGoodJets() const {
+bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastTwoGoodJets(std::string MCSampleTag_) const {
 	if (cleanedJets_.size() > 1)
-		return getSmearedJetPtScale(cleanedJets_.at(1), 0)*cleanedJets_.at(1).pt() > min2JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(1), 0, MCSampleTag_)*cleanedJets_.at(1).pt() > min2JetPt_;
 	return false;
 }
 
-bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastThreeGoodJets() const {
+bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastThreeGoodJets(std::string MCSampleTag_) const {
 	if (cleanedJets_.size() > 2)
-		return getSmearedJetPtScale(cleanedJets_.at(2), 0)*cleanedJets_.at(2).pt() > min3JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(2), 0, MCSampleTag_)*cleanedJets_.at(2).pt() > min3JetPt_;
 	return false;
 }
 
-bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastFourGoodJets() const {
+bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastFourGoodJets(std::string MCSampleTag_) const {
 	if (cleanedJets_.size() > 3)
-		return getSmearedJetPtScale(cleanedJets_.at(3), 0)*cleanedJets_.at(3).pt() > min4JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(3), 0, MCSampleTag_)*cleanedJets_.at(3).pt() > min4JetPt_;
 	return false;
 }
 

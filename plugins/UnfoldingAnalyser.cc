@@ -89,6 +89,7 @@ void UnfoldingAnalyser::fillDescriptions(edm::ConfigurationDescriptions & descri
 	desc.add < vector<double> > ("bin_edges");
 	desc.addUntracked<bool>("do_electron_channel", false);
 	desc.add<double>("centre_of_mass_energy");
+	desc.add < std::string > ("MCSampleTag", "Summer12");
 
 	descriptions.add("UnfoldingAnalyser", desc);
 }
@@ -220,7 +221,7 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 		double electronCorrection = get_electron_correction(iEvent, centre_of_mass_energy_);
 
 		if (passes_selection) {
-			float reco_variable(get_reco_variable(iEvent));
+			float reco_variable(get_reco_variable(iEvent, MCSampleTag_));
 
 			weight *= electronCorrection;
 
@@ -256,7 +257,7 @@ void UnfoldingAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&
 		double muonCorrection = get_muon_correction(iEvent, centre_of_mass_energy_);
 
 		if (passes_selection) {
-			float reco_variable(get_reco_variable(iEvent));
+			float reco_variable(get_reco_variable(iEvent, MCSampleTag_));
 
 			weight *= muonCorrection;
 			
@@ -513,13 +514,13 @@ float UnfoldingAnalyser::get_gen_wpt_nu(const edm::Event& iEvent) const {
 	return genEvt->leptonicDecayW()->pt();
 }
 
-float UnfoldingAnalyser::get_reco_variable(const edm::Event& iEvent) const {
+float UnfoldingAnalyser::get_reco_variable(const edm::Event& iEvent, std::string MCSampleTag_) const {
 	if (variable_under_analysis_ == "MET" || variable_under_analysis_ == "MET_nu")
 		return get_reco_met(iEvent);
 	else if (variable_under_analysis_ == "HT" || variable_under_analysis_ == "HT_nocuts" || variable_under_analysis_ == "HT_parton")
-		return get_reco_ht(iEvent);
+		return get_reco_ht(iEvent, MCSampleTag_);
 	else if (variable_under_analysis_ == "ST" || variable_under_analysis_ == "ST_nocuts" || variable_under_analysis_== "ST_parton")
-		return get_reco_st(iEvent);
+		return get_reco_st(iEvent, MCSampleTag_);
 	else if (variable_under_analysis_ == "MT" || variable_under_analysis_ == "MT_nu")
 		return get_reco_mt(iEvent);
 	else if (variable_under_analysis_ == "WPT" || variable_under_analysis_ == "WPT_nu")
@@ -539,7 +540,7 @@ float UnfoldingAnalyser::get_reco_met(const edm::Event& iEvent) const {
 	return recoMETObject.pt();
 }
 
-float UnfoldingAnalyser::get_reco_ht(const edm::Event& iEvent) const {
+float UnfoldingAnalyser::get_reco_ht(const edm::Event& iEvent, std::string MCSampleTag_) const {
 	edm::Handle < pat::JetCollection > jets;
 	iEvent.getByLabel(reco_jet_input_, jets);
 	float ht(0.);
@@ -547,14 +548,14 @@ float UnfoldingAnalyser::get_reco_ht(const edm::Event& iEvent) const {
 	//Take ALL the jets!
 	for (unsigned int index = 0; index < jets->size(); ++index) {
 		const pat::Jet jet = jets->at(index);
-		ht += getSmearedJetPtScale(jets->at(index), 0)*jets->at(index).pt();
+		ht += getSmearedJetPtScale(jets->at(index), 0, MCSampleTag_)*jets->at(index).pt();
 	}
 	return ht;
 }
 
-float UnfoldingAnalyser::get_reco_st(const edm::Event& iEvent) const {
+float UnfoldingAnalyser::get_reco_st(const edm::Event& iEvent, std::string MCSampleTag_) const {
 	// ST = HT + MET + lepton pt
-	float ht = get_reco_ht(iEvent);
+	float ht = get_reco_ht(iEvent, MCSampleTag_);
 	float met = get_reco_met(iEvent);
 	//get lepton
 	const reco::Candidate* lepton = get_reco_lepton(iEvent);

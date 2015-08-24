@@ -133,7 +133,7 @@ TopPairElectronPlusJetsSelectionFilter::~TopPairElectronPlusJetsSelectionFilter(
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
-	setupEventContent(iEvent);
+	setupEventContent(iEvent, MCSampleTag_);
 	unsigned int numberOfBtags(cleanedBJets_.size());
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfBtags)), prefix_ + "NumberOfBtags");
 	std::auto_ptr < pat::JetCollection > jetoutput(new pat::JetCollection());
@@ -145,7 +145,7 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 		if (debug_)
 			cout << "Doing selection step: " << TTbarEPlusJetsReferenceSelection::StringSteps[step] << endl;
 		TTbarEPlusJetsReferenceSelection::Step stepName = TTbarEPlusJetsReferenceSelection::Step(step);
-		bool passesStep(passesSelectionStep(iEvent, step));
+		bool passesStep(passesSelectionStep(iEvent, step, MCSampleTag_));
 
 		// Require exactly zero b jets for QCD control region
 		// Or exactly one b jet, as e.g. angle(b,l) only makes sense if there is at least one b jet
@@ -187,7 +187,7 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 		return taggingMode_ || passesSelectionExceptBtagging;
 }
 
-void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent) {
+void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent, std::string MCSampleTag_) {
 	if (debug_)
 		cout << "Setting up the event content" << endl;
 	runNumber_ = iEvent.run();
@@ -228,7 +228,7 @@ void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEven
 		signalElectron_ = goodIsolatedElectrons_.front();
 	if (debug_)
 		cout << "Getting clean jets" << endl;
-	cleanedJets();
+	cleanedJets(MCSampleTag_);
 	if (debug_)
 		cout << "Getting clean B jets" << endl;
 	cleanedBJets();
@@ -309,11 +309,11 @@ bool TopPairElectronPlusJetsSelectionFilter::isGoodElectron(const pat::Electron&
 	return passesPtAndEta && notInCrack && passesD0 && passesID;
 }
 
-void TopPairElectronPlusJetsSelectionFilter::cleanedJets() {
+void TopPairElectronPlusJetsSelectionFilter::cleanedJets(std::string MCSampleTag_) {
 	cleanedJets_.clear();
 	for (unsigned index = 0; index < jets_.size(); ++index) {
 		const pat::Jet jet = jets_.at(index);
-		if (!isGoodJet(jet))
+		if (!isGoodJet(jet, MCSampleTag_))
 			continue;
 		bool overlaps(false);
 		if (tagAndProbeStudies_) {
@@ -344,9 +344,9 @@ void TopPairElectronPlusJetsSelectionFilter::cleanedBJets() {
 	}
 }
 
-bool TopPairElectronPlusJetsSelectionFilter::isGoodJet(const pat::Jet& jet) const {
+bool TopPairElectronPlusJetsSelectionFilter::isGoodJet(const pat::Jet& jet, std::string MCSampleTag_) const {
 	//both cuts are done at PAT config level (selectedPATJets) this is just for safety
-	double smearFactor = getSmearedJetPtScale(jet, 0);
+	double smearFactor = getSmearedJetPtScale(jet, 0, MCSampleTag_);
 	bool passesPtAndEta(smearFactor*jet.pt() > 20. && fabs(jet.eta()) < 2.5);
 	bool passesJetID(false);
 	bool passNOD = jet.numberOfDaughters() > 1;
@@ -366,7 +366,7 @@ bool TopPairElectronPlusJetsSelectionFilter::isGoodJet(const pat::Jet& jet) cons
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::passesSelectionStep(edm::Event& iEvent,
-		unsigned int selectionStep) const {
+		unsigned int selectionStep, std::string MCSampleTag_) const {
 	TTbarEPlusJetsReferenceSelection::Step step = TTbarEPlusJetsReferenceSelection::Step(selectionStep);
 	switch (step) {
 	case TTbarEPlusJetsReferenceSelection::AllEvents:
@@ -382,13 +382,13 @@ bool TopPairElectronPlusJetsSelectionFilter::passesSelectionStep(edm::Event& iEv
 	case TTbarEPlusJetsReferenceSelection::ConversionVeto:
 		return passesConversionVeto();
 	case TTbarEPlusJetsReferenceSelection::AtLeastOneGoodJet:
-		return hasAtLeastOneGoodJet();
+		return hasAtLeastOneGoodJet(MCSampleTag_);
 	case TTbarEPlusJetsReferenceSelection::AtLeastTwoGoodJets:
-		return hasAtLeastTwoGoodJets();
+		return hasAtLeastTwoGoodJets(MCSampleTag_);
 	case TTbarEPlusJetsReferenceSelection::AtLeastThreeGoodJets:
-		return hasAtLeastThreeGoodJets();
+		return hasAtLeastThreeGoodJets(MCSampleTag_);
 	case TTbarEPlusJetsReferenceSelection::AtLeastFourGoodJets:
-		return hasAtLeastFourGoodJets();
+		return hasAtLeastFourGoodJets(MCSampleTag_);
 	case TTbarEPlusJetsReferenceSelection::AtLeastOneBtag:
 		return hasAtLeastOneGoodBJet();
 	case TTbarEPlusJetsReferenceSelection::AtLeastTwoBtags:
@@ -560,31 +560,31 @@ bool TopPairElectronPlusJetsSelectionFilter::passesConversionVeto() const {
 		return passVeto;
 }
 
-bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastOneGoodJet() const {
+bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastOneGoodJet(std::string MCSampleTag_) const {
 	if (cleanedJets_.size() > 0)
-		return getSmearedJetPtScale(cleanedJets_.at(0), 0)*cleanedJets_.at(0).pt() > min1JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(0), 0, MCSampleTag_)*cleanedJets_.at(0).pt() > min1JetPt_;
 
 	return false;
 
 }
 
-bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastTwoGoodJets() const {
+bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastTwoGoodJets(std::string MCSampleTag_) const {
 	if (cleanedJets_.size() > 1)
-		return getSmearedJetPtScale(cleanedJets_.at(1), 0)*cleanedJets_.at(1).pt() > min2JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(1), 0, MCSampleTag_)*cleanedJets_.at(1).pt() > min2JetPt_;
 
 	return false;
 }
 
-bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastThreeGoodJets() const {
+bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastThreeGoodJets(std::string MCSampleTag_) const {
 	if (cleanedJets_.size() > 2)
-		return getSmearedJetPtScale(cleanedJets_.at(2), 0)*cleanedJets_.at(2).pt() > min3JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(2), 0, MCSampleTag_)*cleanedJets_.at(2).pt() > min3JetPt_;
 
 	return false;
 }
 
-bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastFourGoodJets() const {
+bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastFourGoodJets(std::string MCSampleTag_) const {
 	if (cleanedJets_.size() > 3)
-		return getSmearedJetPtScale(cleanedJets_.at(3), 0)*cleanedJets_.at(3).pt() > min4JetPt_;
+		return getSmearedJetPtScale(cleanedJets_.at(3), 0, MCSampleTag_)*cleanedJets_.at(3).pt() > min4JetPt_;
 
 	return false;
 }

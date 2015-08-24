@@ -48,7 +48,7 @@ void BTagWeight_Producer::fillDescriptions(edm::ConfigurationDescriptions & desc
 	desc.add < InputTag > ("numberOfTagsInput");
 	desc.add < InputTag > ("jetInput");
 	desc.add < string > ("prefix", "BTagWeight_Producer");
-	desc.add < string > ("MCSampleTag");
+	desc.add < std::string > ("MCSampleTag", "Summer12");
 	desc.add<unsigned int>("targetBtagMultiplicity", 0);
 	desc.add<int>("BTagSystematic", 0);
 

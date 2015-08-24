@@ -107,9 +107,17 @@ process.eventWeightMuons.muonScaleFactorsFile = cms.FileInPath("BristolAnalysis/
 if options.CMSSW == '53X' and options.centreOfMassEnergy == 8:
   process.eventWeightElectrons.MCSampleTag = cms.string( 'Summer12' )
   process.eventWeightMuons.MCSampleTag = cms.string( 'Summer12' )
+  process.eventWeightBtagEPlusJets.MCSampleTag = cms.string( 'Summer12' )
+  process.eventWeightBtagMuPlusJets.MCSampleTag = cms.string( 'Summer12' )
+  process.unfoldingProducerElectron.MCSampleTag = cms.string( 'Summer12' )
+  process.unfoldingProducerMuon.MCSampleTag = cms.string( 'Summer12' )
 elif options.CMSSW == '53X' and options.centreOfMassEnergy == 7:
   process.eventWeightElectrons.MCSampleTag = cms.string( 'Summer11Leg' )
   process.eventWeightMuons.MCSampleTag = cms.string( 'Summer11Leg' )
+  process.eventWeightBtagEPlusJets.MCSampleTag = cms.string( 'Summer11Leg' )
+  process.eventWeightBtagMuPlusJets.MCSampleTag = cms.string( 'Summer11Leg' )
+  process.unfoldingProducerElectron.MCSampleTag = cms.string( 'Summer11Leg' )
+  process.unfoldingProducerMuon.MCSampleTag = cms.string( 'Summer11Leg' )
 
 electron_unfolding_analysers = [
     process.unfoldingProducerElectron,

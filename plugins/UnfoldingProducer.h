@@ -42,7 +42,7 @@ private:
 	bool do_electron_channel_; //if false do muon channel
 	bool is_semileptonic_;
 
-	const std::string     prefix,suffix;
+	const std::string prefix, suffix, MCSampleTag_;
 
 	bool storePDFWeights_;
 
@@ -51,10 +51,10 @@ private:
 	float get_reco_met(const edm::Event& iEvent) const;
 	
 	float get_gen_ht(const edm::Event& iEvent) const;
-	float get_reco_ht(const edm::Event& iEvent) const;
+	float get_reco_ht(const edm::Event& iEvent, std::string MCSampleTag_) const;
 
 	float get_gen_st(const edm::Event& iEvent) const;
-	float get_reco_st(const edm::Event& iEvent) const;
+	float get_reco_st(const edm::Event& iEvent, std::string MCSampleTag_) const;
 
 	float get_gen_mt(const edm::Event& iEvent) const;
 	float get_reco_mt(const edm::Event& iEvent) const;

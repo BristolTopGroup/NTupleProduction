@@ -60,7 +60,7 @@ public:
 
 	static void fillDescriptions(edm::ConfigurationDescriptions & descriptions);
 
-	virtual bool isGoodJet(const pat::Jet& jet) const;
+	virtual bool isGoodJet(const pat::Jet& jet, std::string MCSampleTag) const;
 	virtual bool isGoodMuon(const pat::Muon& muon) const;
 	//definitions of loose objects
 	virtual bool isLooseElectron(const pat::Electron& electron) const;
@@ -71,10 +71,10 @@ public:
 	virtual void getLooseElectrons();
 	virtual void getLooseMuons();
 	virtual void goodIsolatedMuons();
-	virtual void cleanedJets();
+	virtual void cleanedJets(std::string MCSampleTag);
 	virtual void cleanedBJets();
 
-	virtual bool passesSelectionStep(edm::Event& iEvent, unsigned int selectionStep) const;
+	virtual bool passesSelectionStep(edm::Event& iEvent, unsigned int selectionStep, std::string MCSampleTag) const;
 
 	virtual bool passesEventCleaning(edm::Event& iEvent) const;
 	virtual bool passesScrapingVeto(edm::Event& event) const;
@@ -82,17 +82,17 @@ public:
 	virtual bool hasExactlyOneIsolatedLepton() const;
 	virtual bool passesLooseMuonVeto() const;
 	virtual bool passesLooseElectronVeto() const;
-	virtual bool hasAtLeastOneGoodJet() const;
-	virtual bool hasAtLeastTwoGoodJets() const;
-	virtual bool hasAtLeastThreeGoodJets() const;
-	virtual bool hasAtLeastFourGoodJets() const;
+	virtual bool hasAtLeastOneGoodJet(std::string MCSampleTag) const;
+	virtual bool hasAtLeastTwoGoodJets(std::string MCSampleTag) const;
+	virtual bool hasAtLeastThreeGoodJets(std::string MCSampleTag) const;
+	virtual bool hasAtLeastFourGoodJets(std::string MCSampleTag) const;
 	virtual bool hasExactlyZeroGoodBJet() const;
 	virtual bool hasExactlyOneGoodBJet() const;
 	virtual bool hasAtLeastOneGoodBJet() const;
 	virtual bool hasAtLeastTwoGoodBJets() const;
 
 private:
-	virtual void setupEventContent(edm::Event& iEvent);
+	virtual void setupEventContent(edm::Event& iEvent, std::string MCSampleTag);
 
 	//config
 	edm::InputTag jetInput_, electronInput_, muonInput_, hltInputTag_, VertexInput_, trkInput_, hcalNoiseInput_;

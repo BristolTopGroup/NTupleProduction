@@ -97,7 +97,7 @@ std::vector<double> BTagWeight::getBScaleFactor(const pat::Jet& jet, std::string
 	double SFb(0);
 	double sf_error(0);
 	//these numbers are for CSVM only
-	double pt = getSmearedJetPtScale(jet, 0)*jet.pt();
+	double pt = getSmearedJetPtScale(jet, 0, MCSampleTag)*jet.pt();
 	double eta = fabs(jet.eta());
 
 	if (MCSampleTag == "Summer12") { // 2012 btag scale factors
@@ -215,7 +215,7 @@ std::vector<double> BTagWeight::getCScaleFactor(const pat::Jet& jet, std::string
 }
 
 std::vector<double> BTagWeight::getUDSGScaleFactor(const pat::Jet& jet, std::string MCSampleTag ) const {
-	double pt = getSmearedJetPtScale(jet, 0)*jet.pt();
+	double pt = getSmearedJetPtScale(jet, 0, MCSampleTag)*jet.pt();
 	double eta = fabs(jet.eta());
 	double SF_udsg_mean(0), SF_udsg_min(0), SF_udsg_max(0);
 	std::vector<double> SF_udsg_and_error;
@@ -362,7 +362,7 @@ double BTagWeight::getEfficiency( const unsigned int partonFlavour, const pat::J
 // Methods below for 2011 only: https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagPOG#2011_Data_and_MC
 double BTagWeight::getBEfficiency(const pat::Jet& jet, std::string MCSampleTag) const {
 	std::vector<double> binEdges{ 20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600, 800 };
-	double jetPt = getSmearedJetPtScale(jet, 0)*jet.pt();
+	double jetPt = getSmearedJetPtScale(jet, 0, MCSampleTag)*jet.pt();
 
 	if (MCSampleTag == "Summer12") { // 2012
 		std::vector<double> eff{
@@ -424,7 +424,7 @@ double BTagWeight::getBEfficiency(const pat::Jet& jet, std::string MCSampleTag) 
 
 double BTagWeight::getCEfficiency(const pat::Jet& jet, std::string MCSampleTag) const {
 	std::vector<double> binEdges{ 20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600, 800 };
-	double jetPt = getSmearedJetPtScale(jet, 0)*jet.pt();
+	double jetPt = getSmearedJetPtScale(jet, 0, MCSampleTag)*jet.pt();
 
 
 	if (MCSampleTag == "Summer12") { // 2012
@@ -487,7 +487,7 @@ double BTagWeight::getCEfficiency(const pat::Jet& jet, std::string MCSampleTag) 
 
 double BTagWeight::getUDSGEfficiency(const pat::Jet& jet, std::string MCSampleTag) const {
 	std::vector<double> binEdges{ 20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600, 800 };
-	double jetPt = getSmearedJetPtScale(jet, 0)*jet.pt();
+	double jetPt = getSmearedJetPtScale(jet, 0, MCSampleTag)*jet.pt();
 
 	if (MCSampleTag == "Summer12") { // 2012
 		std::vector<double> eff{
