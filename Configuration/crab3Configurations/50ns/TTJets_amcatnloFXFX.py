@@ -6,3 +6,4 @@ config.Data.inputDataset = '/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunI
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 5
 config.Data.publishDataName = 'TTJets_amcatnloFXFX'
+config.Data.ignoreLocality = True

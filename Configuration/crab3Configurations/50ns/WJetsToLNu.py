@@ -5,3 +5,4 @@ config.Data.inputDataset = '/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 5
 config.Data.publishDataName = 'WJetsToLNu'
+config.Data.ignoreLocality = True
