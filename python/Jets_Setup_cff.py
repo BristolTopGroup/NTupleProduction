@@ -25,30 +25,31 @@ def setup_jets(process, cms, options, postfix="PFlow"):
     applyResiduals = options.applyResiduals
 
     # MC setup
-    inputJetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'])
+    inputJetCorrLabel = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'])
 
     if runOnData:  # data set up
         if applyResiduals:
             inputJetCorrLabel = (
-                'AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual'])
+                'AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual'])
         else:
             inputJetCorrLabel = (
-                'AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'])
+                'AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'])
 
     if usePrivateSQlite:
         from CondCore.DBCommon.CondDBSetup_cfi import *
         import os
-        era = "Summer15_50nsV2_"
+        era = "Summer15_50nsV4_"
         if runOnData:
             era += 'DATA'
         else:
             era += 'MC'
         dBFile = os.path.expandvars(
-            "$CMSSW_BASE/src/BristolAnalysis/NTupleTools/data/JEC/" + era + ".db")
+            # "$CMSSW_BASE/src/BristolAnalysis/NTupleTools/data/JEC/" + era + ".db")
+            era + ".db")
         print 'Using JEC from DB: {0}'.format(dBFile)
         process.jec = cms.ESSource("PoolDBESSource", CondDBSetup,
                                    connect=cms.string(
-                                       "sqlite_file://" + dBFile),
+                                       "sqlite_file:" + dBFile),
                                    toGet=cms.VPSet(
                                        cms.PSet(
                                            record=cms.string(
@@ -72,6 +73,20 @@ def setup_jets(process, cms, options, postfix="PFlow"):
     print 'Using jet energy corrections: '
     print 'PF Jets'
     print inputJetCorrLabel
+
+    from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import patJetCorrFactorsUpdated
+    process.patJetCorrFactorsReapplyJEC = patJetCorrFactorsUpdated.clone(
+      src = cms.InputTag("slimmedJets"),
+      levels = inputJetCorrLabel[1],
+      payload = inputJetCorrLabel[0] ) # Make sure to choose the appropriate levels and payload here!
+
+    from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import patJetsUpdated
+    process.patJetsReapplyJEC = patJetsUpdated.clone(
+      jetSource = cms.InputTag("slimmedJets"),
+      jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
+      )
+
+    process.reapplyJEC = cms.Sequence( process.patJetCorrFactorsReapplyJEC + process. patJetsReapplyJEC )
 
 #     if options.CMSSW == '44X':
 #         process.patJetCorrFactorsPFlow.payload = inputJetCorrLabel[0]

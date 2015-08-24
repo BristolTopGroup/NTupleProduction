@@ -6,3 +6,4 @@ config.Data.inputDataset = '/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunII
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 5
 config.Data.publishDataName = 'TTJets_madgraphMLM'
+config.Data.ignoreLocality = True

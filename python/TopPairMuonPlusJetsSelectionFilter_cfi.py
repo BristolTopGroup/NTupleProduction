@@ -2,14 +2,14 @@ import FWCore.ParameterSet.Config as cms
 
 topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     # Specify input collections
-    jetInput=cms.InputTag("slimmedJets"),
+    jetInput=cms.InputTag("patJetsReapplyJEC"),
     electronInput=cms.InputTag("slimmedElectrons"),
     muonInput=cms.InputTag("slimmedMuons"),
     HLTInput=cms.InputTag('TriggerResults', '', 'HLT'),
     VertexInput=cms.InputTag('offlineSlimmedPrimaryVertices'),
 
     # Signal muon cuts
-    minSignalMuonPt=cms.double(23.),
+    minSignalMuonPt=cms.double(20.),
     maxSignalMuonEta=cms.double(2.1),
     minLooseMuonPt=cms.double(15.),
     maxLooseMuonEta=cms.double(2.1),

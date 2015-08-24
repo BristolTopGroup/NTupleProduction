@@ -28,7 +28,7 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		vtxInputTag(iConfig.getParameter < edm::InputTag > ("VertexInputTag")), // 
 		isRealData(iConfig.getParameter<bool>("isRealData")),
 
-		calib("csvv1", "CSVV1.csv"),
+		calib("csvv2", "CSVv2.csv"),
 		reader(		&calib,               // calibration instance
 					BTagEntry::OP_MEDIUM,  // operating point
 					"comb",               // measurement type
@@ -201,15 +201,15 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<int> > closestVertexZIndex(new std::vector<int>());
 
 	const JetCorrector* corrector = 0;
-	if ( readJEC ) {
+	// if ( readJEC ) {
 		corrector = JetCorrector::getJetCorrector (jetCorrectionService,iSetup);
-	}
+	// }
 
 	JetCorrectionUncertainty *jecUnc = 0;
 	if (readJECuncertainty ) {
-		//(See https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1075/1.html
-		// and https://hypernews.cern.ch/HyperNews/CMS/get/physTools/2367/1.html)
-		// handle the jet corrector parameters collection
+		// //(See https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1075/1.html
+		// // and https://hypernews.cern.ch/HyperNews/CMS/get/physTools/2367/1.html)
+		// // handle the jet corrector parameters collection
 		edm::ESHandle < JetCorrectorParametersCollection > JetCorParColl;
 		// get the jet corrector parameters collection from the global tag
 		iSetup.get<JetCorrectionsRecord>().get(jecUncPath, JetCorParColl);
@@ -217,6 +217,10 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 		JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
 		// instantiate the jec uncertainty object
 		jecUnc = new JetCorrectionUncertainty(JetCorPar);
+
+		// Or read from a file
+		// Only need this one line
+		// jecUnc = new JetCorrectionUncertainty("BristolAnalysis/NTupleTools/data/JEC/Summer15_50nsV2_DATA_Uncertainty_AK4PFchs.txt");
 	}
 
 	PFJetIDSelectionFunctor pfjetIDLoose(PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE);
@@ -263,11 +267,6 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			int passjetTight = 0;
 			if (pfjetIDTight(*it, retpf))
 				passjetTight = 1;
-
-			if (readJECuncertainty) {
-				jecUnc->setJetEta(it->eta());
-				jecUnc->setJetPt(it->pt()); // the uncertainty is a function of the corrected pt
-			}
 
 			if (!iEvent.isRealData()) {
 				// Store generated jet resolutions for monte carlo
@@ -456,8 +455,11 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			partonFlavour->push_back(it->partonFlavour());
 
 			//jet energy correction and uncertainties
-			if (readJECuncertainty)
+			if (readJECuncertainty){
+				jecUnc->setJetEta(it->eta());
+				jecUnc->setJetPt(it->pt()); // the uncertainty is a function of the corrected pt
 				jecUnc_vec->push_back(jecUnc->getUncertainty(true));
+			}
 			else
 				jecUnc_vec->push_back(-999);
 			l2l3resJEC_vec->push_back(it->pt() / it->correctedJet("L3Absolute").pt());
@@ -519,15 +521,24 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				else if ( fabs( it->partonFlavour() ) == 21 || ( fabs( it->partonFlavour() ) <= 3 && fabs( it->partonFlavour() ) >= 0 ) ) {
 					bTagEntryJetFlavour = 2;
 				}
+
+				double ptToUse = it->pt();
+				if ( ptToUse <= 30 ) {
+					ptToUse = 30;
+				}
+				else if ( ptToUse >= 670 ) {
+					ptToUse = 669;
+				}
+
 				double jet_weight = reader.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
 	                                      it->eta(), 
-	                                      it->pt());
+	                                      ptToUse);
 				double jet_weight_up = reader_up.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
 	                                      it->eta(), 
-	                                      it->pt());
+	                                      ptToUse);
 				double jet_weight_down = reader_down.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
 	                                      it->eta(), 
-	                                      it->pt());
+	                                      ptToUse);
 
 				btagSF->push_back( jet_weight );
 				btagSF_up->push_back( jet_weight_up );

@@ -1,13 +1,13 @@
 import FWCore.ParameterSet.Config as cms
 
 nTuplePFJets = cms.EDProducer("BristolNTuple_PFJets",
-    InputTag = cms.InputTag('slimmedJets'),
+    InputTag = cms.InputTag('patJetsReapplyJEC'),
     Prefix = cms.string('Jets.'),
     Suffix = cms.string(''),
     minJetPtToStore = cms.double(20.),
     MaxSize = cms.uint32(99),
-    JECUncertainty = cms.string('AK4PF'),
-    ReadJECuncertainty = cms.bool(False),
+    JECUncertainty = cms.string('AK4PFchs'),
+    ReadJECuncertainty = cms.bool(True),
     ReadJEC = cms.bool(False),
     JetCorrectionService = cms.string('ak4PFCHSL1FastL2L3'),    
     DoVertexAssociation = cms.bool(True),

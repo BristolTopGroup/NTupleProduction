@@ -12,7 +12,7 @@ process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 # Message Logger settings
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
-process.MessageLogger.cerr.FwkReport.reportEvery = 1
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 # Set the process options -- Display summary at the end, enable unscheduled execution
 process.options = cms.untracked.PSet(
@@ -38,13 +38,14 @@ process.source = cms.Source("PoolSource",
 #     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_PowhegPythia8_50ns.root')
 #     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/SingleMuon.root')
     fileNames = cms.untracked.vstring(
-#         'file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root',
+        # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root',
         'file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_PowhegPythia8_50ns.root',
-#         'file:/hdfs/TopQuarkGroup/run2/miniAOD/SingleMuon.root',
+        # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_powhegHerwigpp.root',
+        # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/SingleMuon.root',
           # '/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/244/00000/084C9A66-9227-E511-91E0-02163E0133F0.root',
           # 'root://xrootd.unl.edu//store/data/Run2015B/SingleMuon/MINIAOD/17Jul2015-v1/30000/16B50792-172E-E511-B0C8-0025905C43EC.root',
           # '/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/883/00000/00CD59FD-2B2D-E511-8DB2-02163E01267F.root'
-#         '/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/162/00000/160C08A3-4227-E511-B829-02163E01259F.root', #SingleMu via xrootd
+        # '/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/162/00000/160C08A3-4227-E511-B829-02163E01259F.root', #SingleMu via xrootd
 #         '/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/096/00000/22D22D7F-5626-E511-BDE3-02163E011FAB.root',
     )
 )
@@ -55,7 +56,7 @@ process.source = cms.Source("PoolSource",
 # process.source.lumisToProcess = LumiList.LumiList(filename = '/hdfs/TopQuarkGroup/run2/json/Cert_246908-251883_13TeV_PromptReco_Collisions15_JSON_v2.txt').getVLuminosityBlockRange()
 
 # Use to skip events e.g. to reach a problematic event quickly
-# process.source.skipEvents = cms.untracked.uint32(4099)
+# process.source.skipEvents = cms.untracked.uint32(2000)
 
 # Get options from command line
 from FWCore.ParameterSet.VarParsing import VarParsing
@@ -79,13 +80,13 @@ setup_electronID( process, cms )
 from BristolAnalysis.NTupleTools.metFilters_cfi import *
 setupMETFilters( process, cms )
 
-# Custom JEC
-from BristolAnalysis.NTupleTools.Jets_Setup_cff import setup_jets
-setup_jets(process, cms, options)
-
 # Rerun MET
 from BristolAnalysis.NTupleTools.MET_Setup_cff import setup_MET
 setup_MET(process, cms, options)
+
+# Custom JEC
+from BristolAnalysis.NTupleTools.Jets_Setup_cff import setup_jets
+setup_jets(process, cms, options)
 
 # Load the selection filters and the selection analyzers
 process.load( 'BristolAnalysis.NTupleTools.muonSelection_cff')
@@ -102,16 +103,17 @@ if options.tagAndProbe:
 
  
 ## Maximum Number of Events
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
 
 from BristolAnalysis.NTupleTools.NTupler_cff import *
 setup_ntupler(process, cms )
 
 process.makingNTuples = cms.Path(
-  process.HBHEFilterRerun *
+  process.metFilters *
   process.egmGsfElectronIDSequence *
+  process.reapplyJEC *
   process.electronSelectionAnalyzerSequence *
-  process.muonSelectionAnalyzerSequence *  
+  process.muonSelectionAnalyzerSequence *
   process.qcdMuonSelectionAnalyzerSequence *
   process.qcdElectronSelectionAnalyzerSequence *
   process.ttGenEvent *
@@ -137,8 +139,13 @@ process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsConversionS
 if not options.isData:
   process.triggerSequence.remove( process.nTupleTriggerIsoMu24eta2p1 )
   process.triggerSequence.remove( process.nTupleTriggerIsoMu20eta2p1 )
+  process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20eta2p1 )
   process.triggerSequence.remove( process.nTupleTriggerEle27WPTightGsf )
   process.triggerSequence.remove( process.nTupleTriggerEle27WPLooseGsf )
+  del process.nTupleTriggerIsoMu24eta2p1, process.nTupleTriggerIsoMu20eta2p1, process.nTupleTriggerIsoTkMu20eta2p1
+  del process.nTupleTriggerEle27WPTightGsf, process.nTupleTriggerEle27WPLooseGsf
+  process.makingNTuples.remove( process.metFilters )
+  pass
 else :
   process.makingNTuples.remove( process.makePseudoTop )
   process.nTuples.remove( process.pseudoTopSequence )
@@ -148,7 +155,12 @@ else :
   process.nTupleTree.outputCommands.append('drop *_nTuplePFJets_*Gen*_*')
   process.triggerSequence.remove( process.nTupleTriggerIsoMu24eta2p1MC )
   process.triggerSequence.remove( process.nTupleTriggerIsoMu20eta2p1MC )
+  process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20eta2p1MC )
   process.triggerSequence.remove( process.nTupleTriggerEle27WP75GsfMC )
+  del process.makePseudoTop, process.pseudoTopSequence, process.nTupleGenMET
+  del process.nTupleGenJets,  process.nTupleGenEventInfo
+  del process.nTupleTriggerIsoMu24eta2p1MC, process.nTupleTriggerIsoMu20eta2p1MC, process.nTupleTriggerIsoTkMu20eta2p1MC
+  del process.nTupleTriggerEle27WP75GsfMC
 
 if options.isData and options.isRereco:
   process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults','','PAT')

@@ -6,3 +6,4 @@ config.Data.inputDataset = '/TT_TuneCUETP8M1_13TeV-powheg-scaledown-pythia8/RunI
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 5
 config.Data.publishDataName = 'TTJets_PowhegPythia8_scaledown'
+config.Data.ignoreLocality = True
