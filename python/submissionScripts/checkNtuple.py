@@ -10,7 +10,7 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-pathOfCrabWorkdirs = '/storage/ec6821/NTupleProd/CMSSW_7_4_7_patch1/src/workdirCrab/v23/2015-07-24/'
+pathOfCrabWorkdirs = '/storage/ec6821/NTupleProd/CMSSW_7_4_8_patch1/src/workdirCrab/v28/2015-08-21/'
 
 for crabWorkdir in os.listdir(pathOfCrabWorkdirs):
 	if crabWorkdir == 'crab_TTJets_PowhegPythia6Tauola' : continue
@@ -34,7 +34,7 @@ for crabWorkdir in os.listdir(pathOfCrabWorkdirs):
 					unkownOrFailed = False
 					break
 				else :
-					percentDone = line.split('finished')[-1].split('%').strip()
+					percentDone = line.split('finished')[-1].split('%')[0].strip()
 			elif line.find('Task status')>=0 and line.find('FAILED')>=0:
 				failedToSubmit = True
 				break
