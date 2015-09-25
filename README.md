@@ -21,8 +21,8 @@ export CMSSW_GIT_REFERENCE=/storage/.cmsgit-cache
 # Set up the CMSSW release
 export SCRAM_ARCH=slc6_amd64_gcc491
 
-cmsrel CMSSW_7_4_8_patch1
-cd CMSSW_7_4_8_patch1/src/
+cmsrel CMSSW_7_4_10_patch1
+cd CMSSW_7_4_10_patch1/src/
 cmsenv
 git cms-init
 # Do merge-topics and addpkgs first if needed
@@ -31,9 +31,12 @@ git cms-merge-topic -u cms-met:METCorUnc74X
 # Clone our main ntuple producing software and checkout run2 branch
 git clone git@github.com:BristolTopGroup/NTupleProduction.git BristolAnalysis/NTupleTools
 cd BristolAnalysis/NTupleTools
+# optional for development
 git remote rename origin upstream
 git remote add origin git@github.com:<Your Git name with forked repo>/NTupleProduction.git
 git fetch --all
+# for ntuple production once a tag is available
+git checkout CMSSW_7_4_10_patch1_v1
 cd ../../
 
 # Clone our version of the TopSkimming software and checkout run2 branch
@@ -121,7 +124,7 @@ cp ~/.ssh/id_rsa* <your nTuple folder>
 mv /vagrant/id_rsa* ~/.ssh/.
 # next we need a CMSSW release
 cd ~
-cmsrel CMSSW_7_0_9_patch2
+cmsrel CMSSW_7_4_10_patch1
 ```
 Because CMSSW does not like symlinks we have to exit the Vagrant box now and change the mount point.
 Edit the Vagrant file to adjust your path to your CMSSW area, i.e.
@@ -129,7 +132,7 @@ Edit the Vagrant file to adjust your path to your CMSSW area, i.e.
 and restart the Vagrant box (```vagrant halt && vagrant up```).
 Now ssh into the box again and go into the CMSSW src folder
 ```shell 
-cd /home/vagrant/CMSSW_7_0_9_patch2/src
+cd /home/vagrant/CMSSW_7_4_10_patch1/src
 scram b -j2
 ```
 Hooray! You are compiling a CMSSW package on your machine!
