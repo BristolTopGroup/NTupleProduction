@@ -36,7 +36,7 @@ git remote rename origin upstream
 git remote add origin git@github.com:<Your Git name with forked repo>/NTupleProduction.git
 git fetch --all
 # for ntuple production once a tag is available
-git checkout CMSSW_7_4_10_patch1_v1
+git checkout CMSSW_7_4_10_patch1_v2
 cd ../../
 
 # Clone our version of the TopSkimming software and checkout run2 branch
