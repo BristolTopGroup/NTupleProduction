@@ -32,6 +32,12 @@ process.printEventContent = cms.EDAnalyzer("EventContentAnalyzer")
 # process.GlobalTag.globaltag = cms.string('PHYS14_25_V2::All')
 # process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 
+# New Global Tag for MiniAODv2
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
+# process.GlobalTag.globaltag = cms.string('74X_mcRun2_asymptotic_v2') # 25ns MC
+# process.GlobalTag.globaltag = cms.string('74X_mcRun2_startup_v2') # 50ns MC
+process.GlobalTag.globaltag = cms.string('74X_dataRun2_v2') # 25ns 50ns Data
+
 ## Source
 process.source = cms.Source("PoolSource",
 #     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root')
