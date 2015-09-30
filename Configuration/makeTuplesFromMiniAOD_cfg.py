@@ -38,6 +38,7 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 # process.GlobalTag.globaltag = cms.string('74X_mcRun2_startup_v2') # 50ns MC
 process.GlobalTag.globaltag = cms.string('74X_dataRun2_v2') # 25ns 50ns Data
 
+
 ## Source
 process.source = cms.Source("PoolSource",
 #     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root')
@@ -86,13 +87,15 @@ setup_electronID( process, cms )
 from BristolAnalysis.NTupleTools.metFilters_cfi import *
 setupMETFilters( process, cms )
 
-# Rerun MET
-from BristolAnalysis.NTupleTools.MET_Setup_cff import setup_MET
-setup_MET(process, cms, options)
+# If we have Global Tag with jet corrections in - don't need the Custom Jec.
+# Met is related, but not sure if should remove it entirely... For now it is
+# # Rerun MET
+# from BristolAnalysis.NTupleTools.MET_Setup_cff import setup_MET
+# setup_MET(process, cms, options)
 
-# Custom JEC
-from BristolAnalysis.NTupleTools.Jets_Setup_cff import setup_jets
-setup_jets(process, cms, options)
+# # Custom JEC
+# from BristolAnalysis.NTupleTools.Jets_Setup_cff import setup_jets
+# setup_jets(process, cms, options)
 
 # Load the selection filters and the selection analyzers
 process.load( 'BristolAnalysis.NTupleTools.muonSelection_cff')
