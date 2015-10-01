@@ -39,10 +39,10 @@ def getOptions( options ):
                         "Apply full selection in tagging mode")
       
       options.register('useJECFromFile',
-                        True,
+                        False,
                         VarParsing.multiplicity.singleton,
                         VarParsing.varType.bool,
-                        "Apply Jet Energy Corrections from SQLite file.")
+                        "Apply Jet Energy Corrections from SQLite file.")   #change to false???
       
       options.register('applyResiduals',
                         True,

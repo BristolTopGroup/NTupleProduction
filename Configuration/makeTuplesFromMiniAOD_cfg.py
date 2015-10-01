@@ -43,13 +43,13 @@ process.GlobalTag.globaltag = cms.string('74X_dataRun2_v2') # 25ns 50ns Data
 process.source = cms.Source("PoolSource",
 #     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root')
 #     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_PowhegPythia8_50ns.root')
-#     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/SingleMuon.root')
+    # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/SingleMuon.root')
     fileNames = cms.untracked.vstring(
         # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root',
-        'file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_PowhegPythia8_50ns.root',
+        # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_PowhegPythia8_50ns.root',
         # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_powhegHerwigpp.root',
         # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/SingleMuon.root',
-          # '/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/244/00000/084C9A66-9227-E511-91E0-02163E0133F0.root',
+          '/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/244/00000/084C9A66-9227-E511-91E0-02163E0133F0.root',
           # 'root://xrootd.unl.edu//store/data/Run2015B/SingleMuon/MINIAOD/17Jul2015-v1/30000/16B50792-172E-E511-B0C8-0025905C43EC.root',
           # '/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/883/00000/00CD59FD-2B2D-E511-8DB2-02163E01267F.root'
         # '/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/162/00000/160C08A3-4227-E511-B829-02163E01259F.root', #SingleMu via xrootd
@@ -68,11 +68,12 @@ process.source = cms.Source("PoolSource",
 # Get options from command line
 from FWCore.ParameterSet.VarParsing import VarParsing
 options = VarParsing ('python')
+
 from BristolAnalysis.NTupleTools.NTupleOptions_cff import *
 getOptions( options )
 
 # TT Gen Event configuration
-from BristolAnalysis.NTupleTools.ttGenConfig_cff import *
+from BristolAnalysis.NTupleTools.ttGenConfig_cff import * 
 setupTTGenEvent( process, cms )
 
 # Particle level definitions
@@ -89,13 +90,13 @@ setupMETFilters( process, cms )
 
 # If we have Global Tag with jet corrections in - don't need the Custom Jec.
 # Met is related, but not sure if should remove it entirely... For now it is
-# # Rerun MET
-# from BristolAnalysis.NTupleTools.MET_Setup_cff import setup_MET
-# setup_MET(process, cms, options)
+# Rerun MET
+from BristolAnalysis.NTupleTools.MET_Setup_cff import setup_MET
+setup_MET(process, cms, options)
 
-# # Custom JEC
-# from BristolAnalysis.NTupleTools.Jets_Setup_cff import setup_jets
-# setup_jets(process, cms, options)
+# Custom JEC
+from BristolAnalysis.NTupleTools.Jets_Setup_cff import setup_jets
+setup_jets(process, cms, options)
 
 # Load the selection filters and the selection analyzers
 process.load( 'BristolAnalysis.NTupleTools.muonSelection_cff')
