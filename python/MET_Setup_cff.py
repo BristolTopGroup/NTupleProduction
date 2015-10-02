@@ -18,32 +18,32 @@ def setup_MET(process, cms, options, postfix="PFlow"):
                                          "abs(pdgId)!=1 && abs(pdgId)!=2 && abs(eta)<3.0")
                                      )
 
-    from CondCore.DBCommon.CondDBSetup_cfi import *
-    import os
-    era = "Summer15_50nsV4_"
-    if runOnData:
-        era += 'DATA'
-    else:
-        era += 'MC'
-    dBFile = os.path.expandvars(
-        era + ".db")
-        # "$CMSSW_BASE/src/BristolAnalysis/NTupleTools/data/JEC/" + era + ".db")
-    process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
-                               connect = cms.string( "sqlite_file:"+dBFile ),
-                               toGet =  cms.VPSet(
-            cms.PSet(
-                record = cms.string("JetCorrectionsRecord"),
-                tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK4PF"),
-                label= cms.untracked.string("AK4PF")
-                ),
-            cms.PSet(
-                record = cms.string("JetCorrectionsRecord"),
-                tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK4PFchs"),
-                label= cms.untracked.string("AK4PFchs")
-                ),
-            )
-                               )
-    process.es_prefer_jec = cms.ESPrefer("PoolDBESSource",'jec')
+    # from CondCore.DBCommon.CondDBSetup_cfi import *
+    # import os
+    # era = "Summer15_50nsV4_"
+    # if runOnData:
+    #     era += 'DATA'
+    # else:
+    #     era += 'MC'
+    # dBFile = os.path.expandvars(
+    #     era + ".db")
+    #    # "$CMSSW_BASE/src/BristolAnalysis/NTupleTools/data/JEC/" + era + ".db")
+    # process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
+    #                            connect = cms.string( "sqlite_file:"+dBFile ),
+    #                            toGet =  cms.VPSet(
+    #         cms.PSet(
+    #             record = cms.string("JetCorrectionsRecord"),
+    #             tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK4PF"),
+    #             label= cms.untracked.string("AK4PF")
+    #             ),
+    #         cms.PSet(
+    #             record = cms.string("JetCorrectionsRecord"),
+    #             tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK4PFchs"),
+    #             label= cms.untracked.string("AK4PFchs")
+    #             ),
+    #         )
+    #                            )
+    # process.es_prefer_jec = cms.ESPrefer("PoolDBESSource",'jec')
 
 #     getattr(process,'patPFMet'+postfix).addGenMET = cms.bool(not options.isData)
 #     process.patPFMet.addGenMET = cms.bool(not options.useData)
@@ -72,11 +72,11 @@ def setup_MET(process, cms, options, postfix="PFlow"):
 #         getattr(process,'patType1p2CorrectedPFMet'+postfix).srcType1Corrections.append(cms.InputTag('pfMEtSysShiftCorr'))
 
     # recalculate MET with JEC from sqlite DB
-    runMetCorAndUncFromMiniAOD(
-        process,
-        isData=runOnData,
-        postfix="CustomJEC"
-    )
+    # runMetCorAndUncFromMiniAOD(
+    #     process,
+    #     isData=runOnData,
+    #     postfix="CustomJEC"
+    # )
     # recalculate MET without HF
     runMetCorAndUncFromMiniAOD(
         process,
