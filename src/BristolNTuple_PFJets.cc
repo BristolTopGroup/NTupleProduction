@@ -28,7 +28,8 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		vtxInputTag(iConfig.getParameter < edm::InputTag > ("VertexInputTag")), // 
 		isRealData(iConfig.getParameter<bool>("isRealData")),
 
-		calib("csvv2", "CSVv2.csv"),
+		calib("csvv2", "BristolAnalysis/NTupleTools/data/BTagSF/CSVv2.csv"),
+		// calib("csvv2", "CSVv2.csv"),
 		reader(		&calib,               // calibration instance
 					BTagEntry::OP_MEDIUM,  // operating point
 					"comb",               // measurement type
