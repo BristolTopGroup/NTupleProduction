@@ -36,6 +36,7 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 # process.GlobalTag.globaltag = cms.string('74X_mcRun2_asymptotic_v2') # 25ns MC
 # process.GlobalTag.globaltag = cms.string('74X_mcRun2_startup_v2') # 50ns MC
 process.GlobalTag.globaltag = cms.string('74X_dataRun2_v2') # 25ns 50ns Data
+process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 
 
 ## Source
