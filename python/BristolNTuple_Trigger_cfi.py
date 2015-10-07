@@ -32,12 +32,12 @@ nTupleTriggerEle27WP75GsfMC = nTupleTrigger.clone( Prefix='HLTEle27WP75GsfMC.', 
 # nTupleTriggerEle27eta2p1WP75GsfTriCentralPFJet504030 = nTupleTrigger.clone( Prefix='HLTEle27eta2p1WP75GsfTriCentralPFJet504030.', PathOfInterest='HLT_Ele27_eta2p1_WP75_Gsf_TriCentralPFJet50_40_30_v')
 
 
-nTupleTriggerIsoMu24eta2p1 = nTupleTrigger.clone( Prefix='HLTIsoMu24eta2p1.', PathOfInterest='HLT_IsoMu24_eta2p1_v')
-nTupleTriggerIsoMu20eta2p1 = nTupleTrigger.clone( Prefix='HLTIsoMu20eta2p1.', PathOfInterest='HLT_IsoMu20_eta2p1_v')
+nTupleTriggerIsoMu27 = nTupleTrigger.clone( Prefix='HLTIsoMu27.', PathOfInterest='HLT_IsoMu27_v')
+nTupleTriggerIsoMu20 = nTupleTrigger.clone( Prefix='HLTIsoMu20.', PathOfInterest='HLT_IsoMu20_v')
 nTupleTriggerIsoTkMu20eta2p1 = nTupleTrigger.clone( Prefix='HLTIsoTkMu20eta2p1.', PathOfInterest='HLT_IsoTkMu20_eta2p1_v')
-nTupleTriggerIsoMu24eta2p1MC = nTupleTrigger.clone( Prefix='HLTIsoMu24eta2p1MC.', PathOfInterest='HLT_IsoMu24_eta2p1_v')
+nTupleTriggerIsoMu27MC = nTupleTrigger.clone( Prefix='HLTIsoMu27MC.', PathOfInterest='HLT_IsoMu27_v')
+nTupleTriggerIsoMu20MC = nTupleTrigger.clone( Prefix='HLTIsoMu20MC.', PathOfInterest='HLT_IsoMu20_v')
 nTupleTriggerIsoTkMu20eta2p1MC = nTupleTrigger.clone( Prefix='HLTIsoTkMu20eta2p1MC.', PathOfInterest='HLT_IsoTkMu20_eta2p1_v')
-nTupleTriggerIsoMu20eta2p1MC = nTupleTrigger.clone( Prefix='HLTIsoMu20eta2p1MC.', PathOfInterest='HLT_IsoMu20_eta2p1_v')
 
 triggerSequence = cms.Sequence(
     # nTupleTriggerEle32eta2p1WP85Gsf *
@@ -50,14 +50,14 @@ triggerSequence = cms.Sequence(
     # nTupleTriggerEle27eta2p1WP85GsfHT200 *
     # nTupleTriggerEle27eta2p1WP75GsfTriCentralPFJet30 *
     # nTupleTriggerEle27eta2p1WP75GsfTriCentralPFJet504030 *
-    nTupleTriggerIsoMu24eta2p1 *
-    nTupleTriggerIsoMu20eta2p1 *
+    nTupleTriggerIsoMu27 *
+    nTupleTriggerIsoMu20 *
     nTupleTriggerIsoTkMu20eta2p1 *
     nTupleTriggerEle27WPLooseGsf *
     nTupleTriggerEle27WPTightGsf *
 
-    nTupleTriggerIsoMu24eta2p1MC *
-    nTupleTriggerIsoMu20eta2p1MC *
+    nTupleTriggerIsoMu27MC *
+    nTupleTriggerIsoMu20MC *
     nTupleTriggerIsoTkMu20eta2p1MC *
     nTupleTriggerEle27WP75GsfMC
     )

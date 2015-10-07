@@ -150,13 +150,17 @@ process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsQCDSelectio
 process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsConversionSelectionTagging_*FullSelection*_*' )
 
 if not options.isData:
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu24eta2p1 )
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu20eta2p1 )
+
+  process.triggerSequence.remove( process.nTupleTriggerIsoMu27 )
+  process.triggerSequence.remove( process.nTupleTriggerIsoMu20 )
   process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20eta2p1 )
   process.triggerSequence.remove( process.nTupleTriggerEle27WPTightGsf )
   process.triggerSequence.remove( process.nTupleTriggerEle27WPLooseGsf )
-  del process.nTupleTriggerIsoMu24eta2p1, process.nTupleTriggerIsoMu20eta2p1, process.nTupleTriggerIsoTkMu20eta2p1
+
+  del process.nTupleTriggerIsoMu20, process.nTupleTriggerIsoTkMu20eta2p1
+
   del process.nTupleTriggerEle27WPTightGsf, process.nTupleTriggerEle27WPLooseGsf
+
   process.makingNTuples.remove( process.metFilters )
   pass
 else :
@@ -166,13 +170,13 @@ else :
   process.nTuples.remove( process.nTupleGenJets )
   process.nTuples.remove( process.nTupleGenEventInfo )
   process.nTupleTree.outputCommands.append('drop *_nTuplePFJets_*Gen*_*')
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu24eta2p1MC )
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu20eta2p1MC )
+  # process.triggerSequence.remove( process.nTupleTriggerIsoMu24eta2p1MC )
+  process.triggerSequence.remove( process.nTupleTriggerIsoMu20MC )
   process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20eta2p1MC )
   process.triggerSequence.remove( process.nTupleTriggerEle27WP75GsfMC )
   del process.makePseudoTop, process.pseudoTopSequence, process.nTupleGenMET
   del process.nTupleGenJets,  process.nTupleGenEventInfo
-  del process.nTupleTriggerIsoMu24eta2p1MC, process.nTupleTriggerIsoMu20eta2p1MC, process.nTupleTriggerIsoTkMu20eta2p1MC
+  del process.nTupleTriggerIsoMu20MC, process.nTupleTriggerIsoTkMu20eta2p1MC
   del process.nTupleTriggerEle27WP75GsfMC
 
 if options.isData and options.isRereco:
