@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 eventWeightPU = cms.EDProducer("EventWeight_Producer_PU",
                                
-    PUSource            = cms.InputTag("addPileupInfo"),
+    PUSource            = cms.InputTag("slimmedAddPileupInfo"),
     WeightName          = cms.string("eventWeightPU"),                           
 
     MCSampleTag         = cms.string("Summer12"),  # valid identifier: Fall11, Summer12 or Summer11Leg
