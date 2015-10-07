@@ -71,7 +71,6 @@ def setup_ntupler(process, cms):
 
         # MET
         process.nTupleMET +
-        process.nTupleMETNoHF +
 
         # Gen Event
         process.nTupleGenEventInfo +

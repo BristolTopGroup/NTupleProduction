@@ -77,13 +77,7 @@ def setup_MET(process, cms, options, postfix="PFlow"):
     #     isData=runOnData,
     #     postfix="CustomJEC"
     # )
-    # recalculate MET without HF
-    runMetCorAndUncFromMiniAOD(
-        process,
-        isData=runOnData,
-        pfCandColl=cms.InputTag("noHFCands"),
-        postfix="NoHF",
-    )
+
     # if not applyResiduals:
     # process.patPFMetT1T2CorrCustomJEC.jetCorrLabelRes = cms.InputTag("L3Absolute")
     # process.patPFMetT1T2SmearCorrCustomJEC.jetCorrLabelRes = cms.InputTag("L3Absolute")

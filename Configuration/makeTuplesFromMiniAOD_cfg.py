@@ -7,7 +7,6 @@ process = cms.Process("Ntuples")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
-#process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 # Message Logger settings
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -40,23 +39,27 @@ process.GlobalTag.globaltag = cms.string('74X_dataRun2_v2') # 25ns 50ns Data
 
 
 ## Source
+# process.source = cms.Source("PoolSource",
+# #     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root')
+# #     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_PowhegPythia8_50ns.root')
+#     # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/SingleMuon.root')
+#     fileNames = cms.untracked.vstring(
+#         # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root',
+#         # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_PowhegPythia8_50ns.root',
+#         # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_powhegHerwigpp.root',
+#         # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/SingleMuon.root',
+#           '/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/244/00000/084C9A66-9227-E511-91E0-02163E0133F0.root',
+#           # 'root://xrootd.unl.edu//store/data/Run2015B/SingleMuon/MINIAOD/17Jul2015-v1/30000/16B50792-172E-E511-B0C8-0025905C43EC.root',
+#           # '/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/883/00000/00CD59FD-2B2D-E511-8DB2-02163E01267F.root'
+#         # '/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/162/00000/160C08A3-4227-E511-B829-02163E01259F.root', #SingleMu via xrootd
+# #         '/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/096/00000/22D22D7F-5626-E511-BDE3-02163E011FAB.root',
+#     )
+# )
 process.source = cms.Source("PoolSource",
-#     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root')
-#     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_PowhegPythia8_50ns.root')
-    # fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/SingleMuon.root')
     fileNames = cms.untracked.vstring(
-        # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root',
-        # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_PowhegPythia8_50ns.root',
-        # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_powhegHerwigpp.root',
-        # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/SingleMuon.root',
-          '/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/244/00000/084C9A66-9227-E511-91E0-02163E0133F0.root',
-          # 'root://xrootd.unl.edu//store/data/Run2015B/SingleMuon/MINIAOD/17Jul2015-v1/30000/16B50792-172E-E511-B0C8-0025905C43EC.root',
-          # '/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/883/00000/00CD59FD-2B2D-E511-8DB2-02163E01267F.root'
-        # '/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/162/00000/160C08A3-4227-E511-B829-02163E01259F.root', #SingleMu via xrootd
-#         '/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/096/00000/22D22D7F-5626-E511-BDE3-02163E011FAB.root',
+        'root://xrootd.unl.edu//store/data/Run2015D/SingleElectron/MINIAOD/PromptReco-v3/000/256/675/00000/864628EB-9C5F-E511-AF26-02163E014767.root',
     )
 )
-
 # If you want to run with a json file
 # import FWCore.PythonUtilities.LumiList as LumiList
 # process.source.lumisToProcess = LumiList.LumiList(filename = '/hdfs/TopQuarkGroup/run2/json/Cert_246908-251252_13TeV_PromptReco_Collisions15_JSON.txt').getVLuminosityBlockRange()

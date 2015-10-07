@@ -86,7 +86,7 @@ def setup_jets(process, cms, options, postfix="PFlow"):
       jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
       )
 
-    process.reapplyJEC = cms.Sequence( process.patJetCorrFactorsReapplyJEC + process. patJetsReapplyJEC )
+    process.reapplyJEC = cms.Sequence( process.patJetCorrFactorsReapplyJEC + process.patJetsReapplyJEC )
 
 #     if options.CMSSW == '44X':
 #         process.patJetCorrFactorsPFlow.payload = inputJetCorrLabel[0]
