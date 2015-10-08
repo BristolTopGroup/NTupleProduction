@@ -31,6 +31,7 @@ process.printEventContent = cms.EDAnalyzer("EventContentAnalyzer")
 # process.GlobalTag.globaltag = cms.string('PHYS14_25_V2::All')
 # process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 
+
 # New Global Tag for MiniAODv2
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 # process.GlobalTag.globaltag = cms.string('74X_mcRun2_asymptotic_v2') # 25ns MC
@@ -92,8 +93,6 @@ setup_electronID( process, cms )
 from BristolAnalysis.NTupleTools.metFilters_cfi import *
 setupMETFilters( process, cms )
 
-# If we have Global Tag with jet corrections in - don't need the Custom Jec.
-# Met is related, but not sure if should remove it entirely... For now it is
 # Rerun MET
 from BristolAnalysis.NTupleTools.MET_Setup_cff import setup_MET
 setup_MET(process, cms, options)

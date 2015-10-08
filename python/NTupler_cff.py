@@ -26,7 +26,6 @@ def setup_ntupler(process, cms):
                # jets
                'keep *_nTuplePFJets_*_*',
                # MET
-               'keep *_nTupleMET_*_*',
                'keep *_nTupleMETNoHF_*_*',
                # Gen Event
                'keep *_nTupleGenEventInfo_*_*',
