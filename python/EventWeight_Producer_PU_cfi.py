@@ -1,8 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 
 eventWeightPU = cms.EDProducer("EventWeight_Producer_PU",
-                               
-    PUSource            = cms.InputTag("slimmedAddPileupInfo"),
+    PUSource            = cms.InputTag("addPileupInfo"),  #MiniAODv1                            
+    # PUSource            = cms.InputTag("slimmedAddPileupInfo"), #MiniAODv2
     WeightName          = cms.string("eventWeightPU"),                           
 
     MCSampleTag         = cms.string("Summer12"),  # valid identifier: Fall11, Summer12 or Summer11Leg
@@ -13,3 +13,4 @@ eventWeightPU = cms.EDProducer("EventWeight_Producer_PU",
     DataHistoName       = cms.string("pileup"),
 
 )
+

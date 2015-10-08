@@ -42,7 +42,7 @@ def getOptions( options ):
                         False,
                         VarParsing.multiplicity.singleton,
                         VarParsing.varType.bool,
-                        "Apply Jet Energy Corrections from SQLite file.")   #change to false???
+                        "Apply Jet Energy Corrections from SQLite file.")   
       
       options.register('applyResiduals',
                         True,

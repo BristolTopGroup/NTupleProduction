@@ -34,9 +34,9 @@ process.printEventContent = cms.EDAnalyzer("EventContentAnalyzer")
 
 # New Global Tag for MiniAODv2
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
-# process.GlobalTag.globaltag = cms.string('74X_mcRun2_asymptotic_v2') # 25ns MC
+process.GlobalTag.globaltag = cms.string('74X_mcRun2_asymptotic_v2') # 25ns MC
 # process.GlobalTag.globaltag = cms.string('74X_mcRun2_startup_v2') # 50ns MC
-process.GlobalTag.globaltag = cms.string('74X_dataRun2_v2') # 25ns 50ns Data
+# process.GlobalTag.globaltag = cms.string('74X_dataRun2_v2') # 25ns 50ns Data
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 
 
@@ -59,7 +59,8 @@ process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 # )
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        'root://xrootd.unl.edu//store/data/Run2015D/SingleElectron/MINIAOD/PromptReco-v3/000/256/675/00000/864628EB-9C5F-E511-AF26-02163E014767.root',
+        # 'root://xrootd.unl.edu//store/data/Run2015D/SingleElectron/MINIAOD/PromptReco-v3/000/256/675/00000/864628EB-9C5F-E511-AF26-02163E014767.root',
+        'root://xrootd.unl.edu//store/mc/RunIISpring15DR74/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v2/00000/0AB045B5-BB0C-E511-81FD-0025905A60B8.root', # /TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/
     )
 )
 # If you want to run with a json file
@@ -151,6 +152,8 @@ process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsConversionS
 
 if not options.isData:
 
+  process.nTuples.remove( process.nTupleMET )
+
   process.triggerSequence.remove( process.nTupleTriggerIsoMu27 )
   process.triggerSequence.remove( process.nTupleTriggerIsoMu20 )
   process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20eta2p1 )
@@ -165,6 +168,9 @@ if not options.isData:
   pass
 else :
   process.makingNTuples.remove( process.makePseudoTop )
+
+  process.nTuples.remove( process.nTupleMETMC )
+
   process.nTuples.remove( process.pseudoTopSequence )
   process.nTuples.remove( process.nTupleGenMET )
   process.nTuples.remove( process.nTupleGenJets )
