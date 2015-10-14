@@ -26,10 +26,11 @@ def setup_ntupler(process, cms):
                # jets
                'keep *_nTuplePFJets_*_*',
                # MET
-               'keep *_nTupleMETNoHF_*_*',
+               'keep *_nTupleMET_*_*',
+               # 'keep *_nTupleMETNoHF_*_*',
                # Gen Event
-               'keep *_nTupleGenEventInfoMiniAODv1_*_*',
-               # 'keep *_nTupleGenEventInfo_*_*',
+               # 'keep *_nTupleGenEventInfoMiniAODv1_*_*',
+               'keep *_nTupleGenEventInfo_*_*',
                # Gen Jets
                'keep *_nTupleGenJets_*_*',
                # Gen MET
@@ -70,12 +71,12 @@ def setup_ntupler(process, cms):
         process.nTuplePFJets +
 
         # MET
+        # process.nTupleMET50ns +
         process.nTupleMET +
-        process.nTupleMETMC +
 
         # Gen Event
-        # process.nTupleGenEventInfo +
-        process.nTupleGenEventInfoMiniAODv1 +
+        process.nTupleGenEventInfo +
+        # process.nTupleGenEventInfoMiniAODv1 +
 
         # Gen MET
         process.nTupleGenMET +
