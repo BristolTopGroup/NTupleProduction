@@ -27,7 +27,8 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		doVertexAssociation(iConfig.getParameter<bool>("DoVertexAssociation")), //
 		vtxInputTag(iConfig.getParameter < edm::InputTag > ("VertexInputTag")), // 
 		isRealData(iConfig.getParameter<bool>("isRealData")),
-
+		
+		// calib("csvv2", "CSVv2.csv"), // Used for crab jobs
 		calib("csvv2", "BristolAnalysis/NTupleTools/data/BTagSF/CSVv2.csv"),
 		reader(		&calib,               // calibration instance
 					BTagEntry::OP_MEDIUM,  // operating point

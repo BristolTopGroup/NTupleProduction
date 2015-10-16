@@ -10,7 +10,7 @@ nTupleMET = cms.EDProducer("BristolNTuple_MET",
 )
 
 #slimmedMetsNoHF for 50 ns
-nTupleMET50ns = cms.EDProducer("BristolNTuple_MET",
+nTupleMETNoHF = cms.EDProducer("BristolNTuple_MET",
     InputTag=cms.InputTag('slimmedMETsNoHF'), 
     storeMETUncertainties=cms.bool(True),
     nMETUncertainties=cms.uint32(12),

@@ -19,7 +19,7 @@ config.section_("Data")
 config.Data.inputDBS = 'global'
 # config.Data.splitting = 'FileBased'
 # config.Data.unitsPerJob = 10
-config.Data.outLFNDirBase = '/store/user/ejclemen/'
+config.Data.outLFNDirBase = '/store/user/doburns/'
 config.Data.publication = True
 # config.Data.publishDataName = 'TTJets_Madgraph_PU20bx25'
 # config.Data.ignoreLocality = True
