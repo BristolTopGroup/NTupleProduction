@@ -32,6 +32,12 @@ def getOptions( options ):
                         VarParsing.varType.bool,
                         "Is this rereco data")
 
+      options.register ('isMiniAODv2',
+                        False,
+                        VarParsing.multiplicity.singleton,
+                        VarParsing.varType.bool,
+                        "Is this miniAODv2")
+
       options.register('selectionInTaggingMode',
                         False,
                         VarParsing.multiplicity.singleton,
@@ -39,10 +45,10 @@ def getOptions( options ):
                         "Apply full selection in tagging mode")
       
       options.register('useJECFromFile',
-                        True,
+                        False,
                         VarParsing.multiplicity.singleton,
                         VarParsing.varType.bool,
-                        "Apply Jet Energy Corrections from SQLite file.")
+                        "Apply Jet Energy Corrections from SQLite file.")   
       
       options.register('applyResiduals',
                         True,

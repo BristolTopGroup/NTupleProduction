@@ -48,6 +48,13 @@ void BristolNTuple_Trigger::produce(edm::Event& iEvent, const edm::EventSetup& i
     const edm::TriggerNames &names = iEvent.triggerNames(*triggerResults);
 	unsigned int triggerIndex = 9999;
 	std::string triggerName="Trigger";
+
+
+    // for (unsigned int i = 0, n = triggerResults->size(); i < n; ++i) {
+    // 	std::cout << "Trigger : " << i << " : " << names.triggerName(i) << std::endl;
+    // }
+
+
     for (unsigned int i = 0, n = triggerResults->size(); i < n; ++i) {
     	if ( names.triggerName(i).find(pathOfInterest_) != std::string::npos ) {
     		triggerIndex = i;

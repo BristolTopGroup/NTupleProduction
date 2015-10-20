@@ -21,12 +21,20 @@ export CMSSW_GIT_REFERENCE=/storage/.cmsgit-cache
 # Set up the CMSSW release
 export SCRAM_ARCH=slc6_amd64_gcc491
 
-cmsrel CMSSW_7_4_10_patch1
-cd CMSSW_7_4_10_patch1/src/
+cmsrel CMSSW_7_4_14
+cd CMSSW_7_4_14/src/
 cmsenv
 git cms-init
 # Do merge-topics and addpkgs first if needed
+# cms-met:METCorUnc74X is included in the 7_4_14 release
+# https://twiki.cern.ch/twiki/bin/view/CMS/MissingETUncertaintyPrescription#Instructions_for_7_4_X_X_12
 git cms-merge-topic -u cms-met:METCorUnc74X
+# ikrav:egm_id_7.4.12_v1 is required for Multivariate Electron ID
+# https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentificationRun2
+git cms-merge-topic ikrav:egm_id_7.4.12_v1
+# cms-met:HaloBranch7412 is required for met filters involving BeamHaloID
+https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2
+git cms-merge-topic -u cms-met:HaloBranch7412
 
 # Clone our main ntuple producing software and checkout run2 branch
 git clone git@github.com:BristolTopGroup/NTupleProduction.git BristolAnalysis/NTupleTools
@@ -36,7 +44,7 @@ git remote rename origin upstream
 git remote add origin git@github.com:<Your Git name with forked repo>/NTupleProduction.git
 git fetch --all
 # for ntuple production once a tag is available
-git checkout CMSSW_7_4_10_patch1_v2
+# git checkout CMSSW_7_4_10_patch1_v2
 cd ../../
 
 # Clone our version of the TopSkimming software and checkout run2 branch

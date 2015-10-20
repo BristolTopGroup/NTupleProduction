@@ -1,15 +1,16 @@
 import FWCore.ParameterSet.Config as cms
 
-eventWeightPU = cms.EDProducer("EventWeight_Producer_PU",
-                               
-    PUSource            = cms.InputTag("addPileupInfo"),
-    WeightName          = cms.string("eventWeightPU"),                           
 
+eventWeightPU = cms.EDProducer("EventWeight_Producer_PU",
+    PUSource            = cms.InputTag("addPileupInfo"),  #MiniAODv1                            
+    WeightName          = cms.string("eventWeightPU"),                           
     MCSampleTag         = cms.string("Summer12"),  # valid identifier: Fall11, Summer12 or Summer11Leg
-                               
     MCSampleFile        = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/MC_PUDist_Default2012.root"),
     MCSampleHistoName   = cms.string("puhisto"),
     DataFile            = cms.FileInPath("BristolAnalysis/NTupleTools/data/PileUp/Data_PUDist_2012Full.root"),
     DataHistoName       = cms.string("pileup"),
 
 )
+
+#eventWeightPU only used in NTupleTools_cff.py - I don't think this is relevant at the moment
+eventWeightPUMiniAODv2 = eventWeightPU.clone(PUSource='slimmedAddPileupInfo')

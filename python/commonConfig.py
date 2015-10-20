@@ -19,10 +19,13 @@ config.section_("Data")
 config.Data.inputDBS = 'global'
 # config.Data.splitting = 'FileBased'
 # config.Data.unitsPerJob = 10
-config.Data.outLFNDirBase = '/store/user/ejclemen/'
+config.Data.outLFNDirBase = '/store/user/doburns/'
 config.Data.publication = True
 # config.Data.publishDataName = 'TTJets_Madgraph_PU20bx25'
 # config.Data.ignoreLocality = True
 
 config.section_("Site")
 config.Site.storageSite = 'T2_UK_SGrid_Bristol'
+
+
+# https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions15/13TeV/Cert_246908-258159_13TeV_PromptReco_Collisions15_25ns_JSON_v3.txt
