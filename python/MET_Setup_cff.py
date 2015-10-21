@@ -12,11 +12,6 @@ def setup_MET(process, cms, options, postfix="PFlow"):
     '''
     applyResiduals = options.applyResiduals
 
-    process.noHFCands = cms.EDFilter("CandPtrSelector",
-        src=cms.InputTag("packedPFCandidates"),
-        cut=cms.string("abs(pdgId)!=1 && abs(pdgId)!=2 && abs(eta)<3.0"),
-        )
-
     # from CondCore.DBCommon.CondDBSetup_cfi import *
     # import os
     # era = "Summer15_50nsV4_"
@@ -91,17 +86,6 @@ def setup_MET(process, cms, options, postfix="PFlow"):
     # process.patPFMetT2SmearCorrNoHF.jetCorrLabelRes = cms.InputTag("L3Absolute")
     # process.shiftedPatJetEnDownNoHF.jetCorrLabelUpToL3Res = cms.InputTag("ak4PFCHSL1FastL2L3Corrector")
     # process.shiftedPatJetEnUpNoHF.jetCorrLabelUpToL3Res = cms.InputTag("ak4PFCHSL1FastL2L3Corrector")
-
-
-    # recalculate MET without HF
-    runMetCorAndUncFromMiniAOD(
-        process,
-        isData=runOnData,
-        pfCandColl=cms.InputTag("noHFCands"),
-        postfix="NoHF",
-    )
-
-
 
 def setup_MET_manually(process, cms, options, postfix="PFlow"):
     print '=' * 60
