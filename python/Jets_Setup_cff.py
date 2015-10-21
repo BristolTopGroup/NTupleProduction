@@ -38,7 +38,7 @@ def setup_jets(process, cms, options, postfix="PFlow"):
     if usePrivateSQlite:
         from CondCore.DBCommon.CondDBSetup_cfi import *
         import os
-        era = "Summer15_50nsV4_" #now version 5
+        era = "Summer15_50nsV5_"
         if runOnData:
             era += 'DATA'
         else:
