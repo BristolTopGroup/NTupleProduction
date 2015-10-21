@@ -28,5 +28,3 @@ nTupleGenEventInfo = cms.EDProducer("BristolNTuple_GenEventInfo",
     maxGenJetAbsoluteEta = cms.double(999.),
 
 )
-
-nTupleGenEventInfoMiniAODv1 = nTupleGenEventInfo.clone(pileupInfo='addPileupInfo')
