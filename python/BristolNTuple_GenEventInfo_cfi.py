@@ -6,7 +6,7 @@ nTupleGenEventInfo = cms.EDProducer("BristolNTuple_GenEventInfo",
     StorePDFWeights      = cms.bool(True),
     PUWeightsInputTag    = cms.InputTag('eventWeightPU'),
     PDFWeightsInputTag   = cms.InputTag('pdfWeights','cteq66'),
-    pileupInfo           = cms.InputTag('addPileupInfo'),
+    pileupInfo           = cms.InputTag('slimmedAddPileupInfo'),
     Prefix               = cms.string('Event.'),
     Suffix               = cms.string(''),
     ttbarDecayFlags      = cms.VInputTag(
@@ -28,3 +28,5 @@ nTupleGenEventInfo = cms.EDProducer("BristolNTuple_GenEventInfo",
     maxGenJetAbsoluteEta = cms.double(999.),
 
 )
+
+nTupleGenEventInfoMiniAODv1 = nTupleGenEventInfo.clone(pileupInfo='addPileupInfo')
