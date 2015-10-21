@@ -15,7 +15,7 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     maxLooseMuonEta=cms.double(2.1),
     minLooseElectronPt=cms.double(15.),
     maxLooseElectronEta=cms.double(2.1),
-    looseElectronIDMap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-loose'),
+    looseElectronIDMap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-loose'),
     minLooseElectronID=cms.double(0),
 
     #jet cuts
