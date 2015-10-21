@@ -193,25 +193,6 @@ else :
   # del process.nTupleTriggerEle27WP75GsfMC
 
 
-# addPileupInfo --> slimmedAddPileupInfo
-if not options.isMiniAODv2 :
-  process.nTuples.remove( process.nTupleMET )
-  process.nTuples.remove( process.nTupleGenEventInfo )
-  process.nTupleTree.outputCommands.append('drop *_nTupleMET_*_*')
-  process.nTupleTree.outputCommands.append('drop *_nTupleGenEventInfo_*_*')
-
-  del process.nTupleMET, process.nTupleGenEventInfo
-  print "Using nTupleMETNoHF"
-  if not options.isData : print "Using nTupleGenEventInfoMiniAODv1"
-else:
-  process.nTuples.remove( process.nTupleMETNoHF )
-  process.nTuples.remove( process.nTupleGenEventInfoMiniAODv1 )
-  process.nTupleTree.outputCommands.append('drop *_nTupleMETNoHF_*_*')
-  process.nTupleTree.outputCommands.append('drop *_nTupleGenEventInfoMiniAODv1_*_*')
-  del process.nTupleMETNoHF, process.nTupleGenEventInfoMiniAODv1
-  print "Using nTupleMET"
-  if not options.isData : print "Using nTupleGenEventInfo"
-
 if options.isData and options.isRereco:
   process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults','','PAT')
 
