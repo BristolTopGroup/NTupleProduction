@@ -7,7 +7,6 @@ process = cms.Process("Ntuples")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
-#process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 # Message Logger settings
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -24,36 +23,30 @@ process.options = cms.untracked.PSet(
 process.printEventContent = cms.EDAnalyzer("EventContentAnalyzer")
 
 
-# If you would like to change the Global Tag e.g. for JEC
-
-# process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-# Most recent JEC not available in V3
-# process.GlobalTag.globaltag = cms.string('PHYS14_25_V3::All')
-# process.GlobalTag.globaltag = cms.string('PHYS14_25_V2::All')
-# process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
-
 ## Source
+# process.source = cms.Source("PoolSource",
+# #     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root')
 process.source = cms.Source("PoolSource",
-#     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root')
-#     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_PowhegPythia8_50ns.root')
-#     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/SingleMuon.root')
     fileNames = cms.untracked.vstring(
-        # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root',
-        'file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_PowhegPythia8_50ns.root',
-        # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_powhegHerwigpp.root',
-        # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/SingleMuon.root',
-          # '/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/244/00000/084C9A66-9227-E511-91E0-02163E0133F0.root',
-          # 'root://xrootd.unl.edu//store/data/Run2015B/SingleMuon/MINIAOD/17Jul2015-v1/30000/16B50792-172E-E511-B0C8-0025905C43EC.root',
-          # '/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/883/00000/00CD59FD-2B2D-E511-8DB2-02163E01267F.root'
-        # '/store/data/Run2015B/SingleMuon/MINIAOD/PromptReco-v1/000/251/162/00000/160C08A3-4227-E511-B829-02163E01259F.root', #SingleMu via xrootd
-#         '/store/data/Run2015B/SingleElectron/MINIAOD/PromptReco-v1/000/251/096/00000/22D22D7F-5626-E511-BDE3-02163E011FAB.root',
+        # 'root://xrootd.unl.edu//store/data/Run2015D/SingleElectron/MINIAOD/PromptReco-v3/000/256/675/00000/864628EB-9C5F-E511-AF26-02163E014767.root',
+      
+        # MC
+        'root://xrootd.unl.edu//store/mc/RunIISpring15MiniAODv2/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v3/60000/00181849-176A-E511-8B11-848F69FD4C94.root', # /TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/
+       
+        # Data 
+        # 05-Oct-2015
+        # 'root://xrootd.unl.edu//store/data/Run2015D/SingleElectron/MINIAOD/05Oct2015-v1/10000/00991D45-4E6F-E511-932C-0025905A48F2.root',
+        # 'root://xrootd.unl.edu//store/data/Run2015D/SingleMuon/MINIAOD/05Oct2015-v1/10000/021FD3F0-876F-E511-99D2-0025905A6060.root',
+        
+        # Prompt-Reco
+        # 'root://xrootd.unl.edu//store/data/Run2015D/SingleElectron/MINIAOD/PromptReco-v4/000/258/159/00000/0EC56452-186C-E511-8158-02163E0146D5.root',
+        # 'root://xrootd.unl.edu//store/data/Run2015D/SingleMuon/MINIAOD/PromptReco-v4/000/258/159/00000/6CA1C627-246C-E511-8A6A-02163E014147.root',
+
     )
 )
-
 # If you want to run with a json file
 # import FWCore.PythonUtilities.LumiList as LumiList
-# process.source.lumisToProcess = LumiList.LumiList(filename = '/hdfs/TopQuarkGroup/run2/json/Cert_246908-251252_13TeV_PromptReco_Collisions15_JSON.txt').getVLuminosityBlockRange()
-# process.source.lumisToProcess = LumiList.LumiList(filename = '/hdfs/TopQuarkGroup/run2/json/Cert_246908-251883_13TeV_PromptReco_Collisions15_JSON_v2.txt').getVLuminosityBlockRange()
+# process.source.lumisToProcess = LumiList.LumiList(filename = '/hdfs/TopQuarkGroup/run2/json/Cert_246908-258159_13TeV_PromptReco_Collisions15_25ns_JSON_v3.txt').getVLuminosityBlockRange()
 
 # Use to skip events e.g. to reach a problematic event quickly
 # process.source.skipEvents = cms.untracked.uint32(2000)
@@ -61,11 +54,29 @@ process.source = cms.Source("PoolSource",
 # Get options from command line
 from FWCore.ParameterSet.VarParsing import VarParsing
 options = VarParsing ('python')
+
 from BristolAnalysis.NTupleTools.NTupleOptions_cff import *
 getOptions( options )
 
+
+# If you would like to change the Global Tag e.g. for JEC
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
+globaltag = ''
+if (options.isData) : 
+  # globaltag='74X_dataRun2_v2'  dataset=/*/Run2015B-PromptReco-v1/MINIAOD,  dataset=/*/Run2015B-17Jul2015-v1/MINIAOD (50ns)
+  # globaltag='74X_dataRun2_Prompt_v4' #  dataset=/*/Run2015D-PromptReco-v4/MINIAOD
+  globaltag='74X_dataRun2_reMiniAOD_v0' #  dataset=/*/Run2015*05Oct2015*/MINIAOD,  dataset=/*/Run2015D-PromptReco-v3/MINIAOD
+else :
+  globaltag = '74X_mcRun2_asymptotic_v2' # 25ns MC
+  # globaltag = '74X_mcRun2_startup_v2' # 50ns MC
+
+print "Using Global Tag : ", globaltag
+process.GlobalTag.globaltag = cms.string(globaltag)
+process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
+
+
 # TT Gen Event configuration
-from BristolAnalysis.NTupleTools.ttGenConfig_cff import *
+from BristolAnalysis.NTupleTools.ttGenConfig_cff import * 
 setupTTGenEvent( process, cms )
 
 # Particle level definitions
@@ -137,30 +148,69 @@ process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsQCDSelectio
 process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsConversionSelectionTagging_*FullSelection*_*' )
 
 if not options.isData:
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu24eta2p1 )
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu20eta2p1 )
-  process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20eta2p1 )
-  process.triggerSequence.remove( process.nTupleTriggerEle27WPTightGsf )
-  process.triggerSequence.remove( process.nTupleTriggerEle27WPLooseGsf )
-  del process.nTupleTriggerIsoMu24eta2p1, process.nTupleTriggerIsoMu20eta2p1, process.nTupleTriggerIsoTkMu20eta2p1
-  del process.nTupleTriggerEle27WPTightGsf, process.nTupleTriggerEle27WPLooseGsf
+  # 25ns Triggers
+  process.triggerSequence.remove( process.nTupleTriggerEle23WPLooseGsf )
+  process.triggerSequence.remove( process.nTupleTriggerIsoMu18 )
+  process.triggerSequence.remove( process.nTupleTrigger )
+  del process.nTupleTriggerEle23WPLooseGsf, process.nTupleTriggerIsoMu18, process.nTupleTrigger
+
+  # 50nsTriggers
+  # process.triggerSequence.remove( process.nTupleTriggerIsoMu24eta2p1 )
+  # process.triggerSequence.remove( process.nTupleTriggerIsoMu20eta2p1 )
+  # process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20eta2p1 )
+  # process.triggerSequence.remove( process.nTupleTriggerEle27WPTightGsf )
+  # process.triggerSequence.remove( process.nTupleTriggerEle27WPLooseGsf )
+  # del process.nTupleTriggerIsoMu24eta2p1, process.nTupleTriggerIsoMu20eta2p1, process.nTupleTriggerIsoTkMu20eta2p1
+  # del process.nTupleTriggerEle27WPTightGsf, process.nTupleTriggerEle27WPLooseGsf
+
   process.makingNTuples.remove( process.metFilters )
+  del process.metFilters
   pass
+
 else :
   process.makingNTuples.remove( process.makePseudoTop )
+
   process.nTuples.remove( process.pseudoTopSequence )
   process.nTuples.remove( process.nTupleGenMET )
   process.nTuples.remove( process.nTupleGenJets )
   process.nTuples.remove( process.nTupleGenEventInfo )
   process.nTupleTree.outputCommands.append('drop *_nTuplePFJets_*Gen*_*')
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu24eta2p1MC )
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu20eta2p1MC )
-  process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20eta2p1MC )
-  process.triggerSequence.remove( process.nTupleTriggerEle27WP75GsfMC )
   del process.makePseudoTop, process.pseudoTopSequence, process.nTupleGenMET
   del process.nTupleGenJets,  process.nTupleGenEventInfo
-  del process.nTupleTriggerIsoMu24eta2p1MC, process.nTupleTriggerIsoMu20eta2p1MC, process.nTupleTriggerIsoTkMu20eta2p1MC
-  del process.nTupleTriggerEle27WP75GsfMC
+
+  # 25ns Triggers
+  process.triggerSequence.remove( process.nTupleTriggerEle27WP75GsfMC )
+  process.triggerSequence.remove( process.nTupleTriggerIsoMu20erMC )
+  process.triggerSequence.remove( process.nTupleTrigger )
+  del process.nTupleTriggerEle27WP75GsfMC, process.nTupleTriggerIsoMu20erMC, process.nTupleTrigger
+
+  # 50nsTriggers
+  # process.triggerSequence.remove( process.nTupleTriggerIsoMu24eta2p1MC )
+  # process.triggerSequence.remove( process.nTupleTriggerIsoMu20eta2p1MC )
+  # process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20eta2p1MC )
+  # process.triggerSequence.remove( process.nTupleTriggerEle27WP75GsfMC )
+  # del process.nTupleTriggerIsoMu24eta2p1MC, process.nTupleTriggerIsoMu20eta2p1MC, process.nTupleTriggerIsoTkMu20eta2p1MC
+  # del process.nTupleTriggerEle27WP75GsfMC
+
+
+# addPileupInfo --> slimmedAddPileupInfo
+if not options.isMiniAODv2 :
+  process.nTuples.remove( process.nTupleMET )
+  process.nTuples.remove( process.nTupleGenEventInfo )
+  process.nTupleTree.outputCommands.append('drop *_nTupleMET_*_*')
+  process.nTupleTree.outputCommands.append('drop *_nTupleGenEventInfo_*_*')
+
+  del process.nTupleMET, process.nTupleGenEventInfo
+  print "Using nTupleMETNoHF"
+  if not options.isData : print "Using nTupleGenEventInfoMiniAODv1"
+else:
+  process.nTuples.remove( process.nTupleMETNoHF )
+  process.nTuples.remove( process.nTupleGenEventInfoMiniAODv1 )
+  process.nTupleTree.outputCommands.append('drop *_nTupleMETNoHF_*_*')
+  process.nTupleTree.outputCommands.append('drop *_nTupleGenEventInfoMiniAODv1_*_*')
+  del process.nTupleMETNoHF, process.nTupleGenEventInfoMiniAODv1
+  print "Using nTupleMET"
+  if not options.isData : print "Using nTupleGenEventInfo"
 
 if options.isData and options.isRereco:
   process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults','','PAT')

@@ -11,14 +11,14 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     # Lepton cuts
     minSignalElectronPt=cms.double(25.),
     maxSignalElectronEta=cms.double(2.1),
-    signalElectronIDMap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-medium'),
-    signalElectronIDMap_bitmap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-mediumBitmap'),
+    signalElectronIDMap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-medium'),
+    signalElectronIDMap_bitmap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-mediumBitmap'),
     minSignalElectronID=cms.double(0),
     minLooseMuonPt=cms.double(15.),
     maxLooseMuonEta=cms.double(2.1),
     minLooseElectronPt=cms.double(15.),
     maxLooseElectronEta=cms.double(2.1),
-    looseElectronIDMap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-loose'),
+    looseElectronIDMap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-loose'),
     minLooseElectronID=cms.double(0),
 
     #jet cuts
