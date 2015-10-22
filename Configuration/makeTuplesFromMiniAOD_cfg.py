@@ -154,15 +154,6 @@ if not options.isData:
   process.triggerSequence.remove( process.nTupleTrigger )
   del process.nTupleTriggerEle23WPLooseGsf, process.nTupleTriggerIsoMu18, process.nTupleTrigger
 
-  # 50nsTriggers
-  # process.triggerSequence.remove( process.nTupleTriggerIsoMu24eta2p1 )
-  # process.triggerSequence.remove( process.nTupleTriggerIsoMu20eta2p1 )
-  # process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20eta2p1 )
-  # process.triggerSequence.remove( process.nTupleTriggerEle27WPTightGsf )
-  # process.triggerSequence.remove( process.nTupleTriggerEle27WPLooseGsf )
-  # del process.nTupleTriggerIsoMu24eta2p1, process.nTupleTriggerIsoMu20eta2p1, process.nTupleTriggerIsoTkMu20eta2p1
-  # del process.nTupleTriggerEle27WPTightGsf, process.nTupleTriggerEle27WPLooseGsf
-
   process.makingNTuples.remove( process.metFilters )
   del process.metFilters
   pass
@@ -183,14 +174,6 @@ else :
   process.triggerSequence.remove( process.nTupleTriggerIsoMu20erMC )
   process.triggerSequence.remove( process.nTupleTrigger )
   del process.nTupleTriggerEle27WP75GsfMC, process.nTupleTriggerIsoMu20erMC, process.nTupleTrigger
-
-  # 50nsTriggers
-  # process.triggerSequence.remove( process.nTupleTriggerIsoMu24eta2p1MC )
-  # process.triggerSequence.remove( process.nTupleTriggerIsoMu20eta2p1MC )
-  # process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20eta2p1MC )
-  # process.triggerSequence.remove( process.nTupleTriggerEle27WP75GsfMC )
-  # del process.nTupleTriggerIsoMu24eta2p1MC, process.nTupleTriggerIsoMu20eta2p1MC, process.nTupleTriggerIsoTkMu20eta2p1MC
-  # del process.nTupleTriggerEle27WP75GsfMC
 
 
 if options.isData and options.isRereco:
