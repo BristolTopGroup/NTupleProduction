@@ -508,7 +508,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			//b-tagging information
 			//names are changing between major software releases
 			combinedInclusiveSecondaryVertexV2BJetTags->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
-			passesMediumCSV->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.814 );
+			passesMediumCSV->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.890 );
 
 			// Read and store b tagging scale factors for MC
 			if (!iEvent.isRealData()) {
