@@ -29,11 +29,12 @@ def setup_ntupler(process, cms):
                'keep *_nTupleMET_*_*',
                # Gen Event
                'keep *_nTupleGenEventInfo_*_*',
+               # Gen Particles
+               'keep *_nTupleGenParticles_*_*',
                # Gen Jets
                'keep *_nTupleGenJets_*_*',
                # Gen MET
                'keep *_nTupleGenMET_*_*',
-
                # Pseudo Top
                'keep *_nTuplePseudoTop*_*_*',
 
@@ -75,7 +76,7 @@ def setup_ntupler(process, cms):
         process.nTupleGenEventInfo +
 
         # Gen Particles
-        # process.nTuplesGenParticles +
+        process.nTupleGenParticles +
 
         # Gen MET
         process.nTupleGenMET +
