@@ -12,38 +12,7 @@ def setup_MET(process, cms, options, postfix="PFlow"):
     '''
     applyResiduals = options.applyResiduals
 
-    process.noHFCands = cms.EDFilter("CandPtrSelector",
-                                     src=cms.InputTag("packedPFCandidates"),
-                                     cut=cms.string(
-                                         "abs(pdgId)!=1 && abs(pdgId)!=2 && abs(eta)<3.0")
-                                     )
 
-    from CondCore.DBCommon.CondDBSetup_cfi import *
-    import os
-    era = "Summer15_50nsV4_"
-    if runOnData:
-        era += 'DATA'
-    else:
-        era += 'MC'
-    dBFile = os.path.expandvars(
-        era + ".db")
-        # "$CMSSW_BASE/src/BristolAnalysis/NTupleTools/data/JEC/" + era + ".db")
-    process.jec = cms.ESSource("PoolDBESSource",CondDBSetup,
-                               connect = cms.string( "sqlite_file:"+dBFile ),
-                               toGet =  cms.VPSet(
-            cms.PSet(
-                record = cms.string("JetCorrectionsRecord"),
-                tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK4PF"),
-                label= cms.untracked.string("AK4PF")
-                ),
-            cms.PSet(
-                record = cms.string("JetCorrectionsRecord"),
-                tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK4PFchs"),
-                label= cms.untracked.string("AK4PFchs")
-                ),
-            )
-                               )
-    process.es_prefer_jec = cms.ESPrefer("PoolDBESSource",'jec')
 
 #     getattr(process,'patPFMet'+postfix).addGenMET = cms.bool(not options.isData)
 #     process.patPFMet.addGenMET = cms.bool(not options.useData)
@@ -71,19 +40,7 @@ def setup_MET(process, cms, options, postfix="PFlow"):
 #         getattr(process,'patType1CorrectedPFMet'+postfix).srcType1Corrections.append(cms.InputTag('pfMEtSysShiftCorr'))
 #         getattr(process,'patType1p2CorrectedPFMet'+postfix).srcType1Corrections.append(cms.InputTag('pfMEtSysShiftCorr'))
 
-    # recalculate MET with JEC from sqlite DB
-    runMetCorAndUncFromMiniAOD(
-        process,
-        isData=runOnData,
-        postfix="CustomJEC"
-    )
-    # recalculate MET without HF
-    runMetCorAndUncFromMiniAOD(
-        process,
-        isData=runOnData,
-        pfCandColl=cms.InputTag("noHFCands"),
-        postfix="NoHF",
-    )
+
     # if not applyResiduals:
     # process.patPFMetT1T2CorrCustomJEC.jetCorrLabelRes = cms.InputTag("L3Absolute")
     # process.patPFMetT1T2SmearCorrCustomJEC.jetCorrLabelRes = cms.InputTag("L3Absolute")
@@ -98,7 +55,6 @@ def setup_MET(process, cms, options, postfix="PFlow"):
     # process.patPFMetT2SmearCorrNoHF.jetCorrLabelRes = cms.InputTag("L3Absolute")
     # process.shiftedPatJetEnDownNoHF.jetCorrLabelUpToL3Res = cms.InputTag("ak4PFCHSL1FastL2L3Corrector")
     # process.shiftedPatJetEnUpNoHF.jetCorrLabelUpToL3Res = cms.InputTag("ak4PFCHSL1FastL2L3Corrector")
-
 
 def setup_MET_manually(process, cms, options, postfix="PFlow"):
     print '=' * 60

@@ -38,7 +38,7 @@ def setup_jets(process, cms, options, postfix="PFlow"):
     if usePrivateSQlite:
         from CondCore.DBCommon.CondDBSetup_cfi import *
         import os
-        era = "Summer15_50nsV4_"
+        era = "Summer15_25nsV5_"
         if runOnData:
             era += 'DATA'
         else:
@@ -86,7 +86,7 @@ def setup_jets(process, cms, options, postfix="PFlow"):
       jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
       )
 
-    process.reapplyJEC = cms.Sequence( process.patJetCorrFactorsReapplyJEC + process. patJetsReapplyJEC )
+    process.reapplyJEC = cms.Sequence( process.patJetCorrFactorsReapplyJEC + process.patJetsReapplyJEC )
 
 #     if options.CMSSW == '44X':
 #         process.patJetCorrFactorsPFlow.payload = inputJetCorrLabel[0]
