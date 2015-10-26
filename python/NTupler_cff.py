@@ -74,6 +74,9 @@ def setup_ntupler(process, cms):
         # Gen Event
         process.nTupleGenEventInfo +
 
+        # Gen Particles
+        # process.nTuplesGenParticles +
+
         # Gen MET
         process.nTupleGenMET +
 
