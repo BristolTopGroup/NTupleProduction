@@ -11,5 +11,5 @@ topPairMuPlusJetsQCDSelectionTagging2 = topPairMuPlusJetsSelection.clone( taggin
 																		prefix=cms.untracked.string('TopPairMuonPlusJetsQCDSelection1p5to3.'),
 																		nonIsolatedMuonSelection2=cms.bool(True) )
 
-qcdMuonSelectionAnalyzerSequence = cms.Sequence( topPairMuPlusJetsQCDSelectionTagging1 * topPairMuPlusJetsQCDSelectionAnalyser1 * 
-												topPairMuPlusJetsQCDSelectionTagging2 * topPairMuPlusJetsQCDSelectionAnalyser2 )
+qcdMuonSelectionAnalyzerSequence = cms.Sequence( topPairMuPlusJetsQCDSelectionTagging1 * topPairMuPlusJetsQCDSelectionAnalyser3toInf * 
+												topPairMuPlusJetsQCDSelectionTagging2 * topPairMuPlusJetsQCDSelectionAnalyser1p5to3 )
