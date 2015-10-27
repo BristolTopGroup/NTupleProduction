@@ -65,6 +65,7 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 		debug_(iConfig.getUntrackedParameter<bool>("debug")), //
 		taggingMode_(iConfig.getParameter<bool>("taggingMode")), //
 		bSelectionInTaggingMode_(iConfig.getParameter<bool>("bSelectionInTaggingMode")), //
+
 		nonIsolatedMuonSelection1_(iConfig.getParameter<bool>("nonIsolatedMuonSelection1")), //
 		nonIsolatedMuonSelection2_(iConfig.getParameter<bool>("nonIsolatedMuonSelection2")), //
 		passes_(), //
@@ -375,7 +376,7 @@ void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
         }
         if ( nonIsolatedMuonSelection2_ ) {
         	passesIso = getRelativeIsolation(muon, 0.4, true) > controlMuonIso2_ 
-        		&& getRelativeIsolation(muon, 0.4, true) < controlMuonIso2_;
+        		&& getRelativeIsolation(muon, 0.4, true) < controlMuonIso1_;
         	// passesIso = muon.trackIso() / muon.pt() > controlMuonIso_;
 		}
 	   	else {
