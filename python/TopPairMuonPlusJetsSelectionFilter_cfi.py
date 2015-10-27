@@ -32,7 +32,8 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     # Maximum isolation for signal region
     tightMuonIsolation=cms.double(0.12),
     # Minimum isolation for control region
-    controlMuonIsolation=cms.double(0.12),
+    controlMuonIsolation1=cms.double(0.3),
+    controlMuonIsolation2=cms.double(0.15),
 
     looseMuonIsolation=cms.double(0.2),
 
@@ -54,6 +55,7 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     tagAndProbeStudies = cms.bool(False),
     dropTriggerSelection = cms.bool(False),
     bSelectionInTaggingMode = cms.bool(False),
-    nonIsolatedMuonSelection = cms.bool(False),
+    nonIsolatedMuonSelection1 = cms.bool(False),
+    nonIsolatedMuonSelection2 = cms.bool(False),
 )
 
