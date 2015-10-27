@@ -53,7 +53,8 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 		minBJetDiscriminator_(iConfig.getParameter<double>("minBJetDiscriminator")), //
 
 		tightMuonIso_(iConfig.getParameter<double>("tightMuonIsolation")), //
-        controlMuonIso_(iConfig.getParameter<double>("controlMuonIsolation")), //
+        controlMuonIso1_(iConfig.getParameter<double>("controlMuonIsolation1")), //
+        controlMuonIso2_(iConfig.getParameter<double>("controlMuonIsolation2")), //
         looseMuonIso_(iConfig.getParameter<double>("looseMuonIsolation")), //
 
 		// Flags and labels
@@ -64,7 +65,9 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 		debug_(iConfig.getUntrackedParameter<bool>("debug")), //
 		taggingMode_(iConfig.getParameter<bool>("taggingMode")), //
 		bSelectionInTaggingMode_(iConfig.getParameter<bool>("bSelectionInTaggingMode")), //
-		nonIsolatedMuonSelection_(iConfig.getParameter<bool>("nonIsolatedMuonSelection")), //
+
+		nonIsolatedMuonSelection1_(iConfig.getParameter<bool>("nonIsolatedMuonSelection1")), //
+		nonIsolatedMuonSelection2_(iConfig.getParameter<bool>("nonIsolatedMuonSelection2")), //
 		passes_(), //
 		runNumber_(0), //
 		signalMuonIndex_(999), //
@@ -131,7 +134,8 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 	desc.add<double>("minBJetDiscriminator", 0.679 );
 
 	desc.add<double>("tightMuonIsolation", 0.12);
-	desc.add<double>("controlMuonIsolation", 0.3);
+	desc.add<double>("controlMuonIsolation1", 0.3);
+	desc.add<double>("controlMuonIsolation2", 0.15);
 	desc.add<double>("looseMuonIsolation", 0.2);
 
 	desc.add<bool>("tagAndProbeStudies", false);
@@ -142,7 +146,8 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 	desc.addUntracked<bool>("debug", false);
 	desc.add<bool>("taggingMode", false);
 	desc.add<bool>("bSelectionInTaggingMode", false);
-	desc.add<bool>("nonIsolatedMuonSelection", false);
+	desc.add<bool>("nonIsolatedMuonSelection1", false);
+	desc.add<bool>("nonIsolatedMuonSelection2", false);
 	descriptions.add("applyTopPairMuonPlusJetsSelection", desc);
 }
 
@@ -169,7 +174,7 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 		// Remove at least 4 jet selection for QCD control region (only need at least 3)
 		// Also require exactly zero b jets
 		// Or exactly one b jet, as e.g. angle(b,l) only makes sense if there is at least one b jet
-		if ( nonIsolatedMuonSelection_ ) {
+		if ( nonIsolatedMuonSelection1_ || nonIsolatedMuonSelection2_) {
 			if ( stepName == TTbarMuPlusJetsReferenceSelection::AtLeastFourGoodJets )
 				passesStep = true;
 
@@ -366,8 +371,12 @@ void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
 		// bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < tightMuonIso_;
 		bool passesIso = false;
 
-        if ( nonIsolatedMuonSelection_ ) {
-        	passesIso = getRelativeIsolation(muon, 0.4, true) > controlMuonIso_;
+        if ( nonIsolatedMuonSelection1_ ) {
+        	passesIso = getRelativeIsolation(muon, 0.4, true) > controlMuonIso1_;
+        }
+        if ( nonIsolatedMuonSelection2_ ) {
+        	passesIso = getRelativeIsolation(muon, 0.4, true) > controlMuonIso2_ 
+        		&& getRelativeIsolation(muon, 0.4, true) < controlMuonIso1_;
         	// passesIso = muon.trackIso() / muon.pt() > controlMuonIso_;
 		}
 	   	else {
