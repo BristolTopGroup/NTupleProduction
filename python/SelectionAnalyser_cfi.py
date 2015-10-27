@@ -111,7 +111,7 @@ selectionCuts = [
                          ]
 selectionProducts = [cms.InputTag(selectionName, selectionPrefix + cut, 'Ntuples') for cut in selectionCuts]
 
-topPairMuPlusJetsQCDSelectionAnalyser1 = cms.EDAnalyzer("SelectionAnalyser",
+topPairMuPlusJetsQCDSelectionAnalyser3toInf = cms.EDAnalyzer("SelectionAnalyser",
     # PUWeightInput=cms.InputTag('eventWeightPU'),
     selectionFlags=cms.VInputTag(selectionProducts),
     selectionNames=cms.vstring(selectionCuts),
@@ -134,7 +134,7 @@ selectionCuts = [
                          ]
 selectionProducts = [cms.InputTag(selectionName, selectionPrefix + cut, 'Ntuples') for cut in selectionCuts]
 
-topPairMuPlusJetsQCDSelectionAnalyser2 = cms.EDAnalyzer("SelectionAnalyser",
+topPairMuPlusJetsQCDSelectionAnalyser1p5to3 = cms.EDAnalyzer("SelectionAnalyser",
     # PUWeightInput=cms.InputTag('eventWeightPU'),
     selectionFlags=cms.VInputTag(selectionProducts),
     selectionNames=cms.vstring(selectionCuts),
