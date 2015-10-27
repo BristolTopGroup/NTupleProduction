@@ -133,7 +133,8 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 	desc.add<double>("minBJetDiscriminator", 0.679 );
 
 	desc.add<double>("tightMuonIsolation", 0.12);
-	desc.add<double>("controlMuonIsolation", 0.3);
+	desc.add<double>("controlMuonIsolation1", 0.3);
+	desc.add<double>("controlMuonIsolation2", 0.15);
 	desc.add<double>("looseMuonIsolation", 0.2);
 
 	desc.add<bool>("tagAndProbeStudies", false);
@@ -144,7 +145,8 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 	desc.addUntracked<bool>("debug", false);
 	desc.add<bool>("taggingMode", false);
 	desc.add<bool>("bSelectionInTaggingMode", false);
-	desc.add<bool>("nonIsolatedMuonSelection", false);
+	desc.add<bool>("nonIsolatedMuonSelection1", false);
+	desc.add<bool>("nonIsolatedMuonSelection2", false);
 	descriptions.add("applyTopPairMuonPlusJetsSelection", desc);
 }
 

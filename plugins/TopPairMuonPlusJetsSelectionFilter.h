@@ -111,7 +111,7 @@ private:
 	std::string bJetDiscriminator_;
 	double minBJetDiscriminator_;
 
-	double tightMuonIso_, controlMuonIso_, looseMuonIso_;
+	double tightMuonIso_, controlMuonIso1_, controlMuonIso2_, looseMuonIso_;
 
 	bool tagAndProbeStudies_, dropTriggerSelection_;
 
@@ -120,7 +120,7 @@ private:
 	bool debug_, taggingMode_, bSelectionInTaggingMode_;
 
    	// Control region selections
-	bool nonIsolatedMuonSelection_;
+	bool nonIsolatedMuonSelection1_, nonIsolatedMuonSelection2_;
 
 	//internal
 	boost::array<bool, TTbarMuPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS> passes_;
