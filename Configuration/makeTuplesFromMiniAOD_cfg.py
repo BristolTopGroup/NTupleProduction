@@ -35,8 +35,8 @@ process.source = cms.Source("PoolSource",
        
         # Data 
         # 05-Oct-2015
-        'root://xrootd.unl.edu//store/data/Run2015D/SingleElectron/MINIAOD/05Oct2015-v1/10000/00991D45-4E6F-E511-932C-0025905A48F2.root',
-        # 'root://xrootd.unl.edu//store/data/Run2015D/SingleMuon/MINIAOD/05Oct2015-v1/10000/021FD3F0-876F-E511-99D2-0025905A6060.root',
+        # 'root://xrootd.unl.edu//store/data/Run2015D/SingleElectron/MINIAOD/05Oct2015-v1/10000/00991D45-4E6F-E511-932C-0025905A48F2.root',
+        'root://xrootd.unl.edu//store/data/Run2015D/SingleMuon/MINIAOD/05Oct2015-v1/10000/021FD3F0-876F-E511-99D2-0025905A6060.root',
         
         # Prompt-Reco
         # 'root://xrootd.unl.edu//store/data/Run2015D/SingleElectron/MINIAOD/PromptReco-v4/000/258/159/00000/0EC56452-186C-E511-8158-02163E0146D5.root',
@@ -136,13 +136,15 @@ process.makingNTuples = cms.Path(
   )
 
 process.nTupleTree.outputCommands.append( 'keep uint*_topPairMuPlusJetsSelectionTagging_*_*' )
-process.nTupleTree.outputCommands.append( 'keep uint*_topPairMuPlusJetsQCDSelectionTagging_*_*' )
+process.nTupleTree.outputCommands.append( 'keep uint*_topPairMuPlusJetsQCDSelectionTagging1_*_*' )
+process.nTupleTree.outputCommands.append( 'keep uint*_topPairMuPlusJetsQCDSelectionTagging2_*_*' )
 process.nTupleTree.outputCommands.append( 'keep uint*_topPairEPlusJetsSelectionTagging_*_*' )
 process.nTupleTree.outputCommands.append( 'keep uint*_topPairEPlusJetsQCDSelectionTagging_*_*' )
 process.nTupleTree.outputCommands.append( 'keep uint*_topPairEPlusJetsConversionSelectionTagging_*_*' )
 
 process.nTupleTree.outputCommands.append( 'keep bool_topPairMuPlusJetsSelectionTagging_*FullSelection*_*' )
-process.nTupleTree.outputCommands.append( 'keep bool_topPairMuPlusJetsQCDSelectionTagging_*FullSelection*_*' )
+process.nTupleTree.outputCommands.append( 'keep bool_topPairMuPlusJetsQCDSelectionTagging1_*FullSelection*_*' )
+process.nTupleTree.outputCommands.append( 'keep bool_topPairMuPlusJetsQCDSelectionTagging2_*FullSelection*_*' )
 process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsSelectionTagging_*FullSelection*_*' )
 process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsQCDSelectionTagging_*FullSelection*_*' )
 process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsConversionSelectionTagging_*FullSelection*_*' )
@@ -165,9 +167,10 @@ else :
   process.nTuples.remove( process.nTupleGenMET )
   process.nTuples.remove( process.nTupleGenJets )
   process.nTuples.remove( process.nTupleGenEventInfo )
+  process.nTuples.remove( process.nTupleGenParticles )
   process.nTupleTree.outputCommands.append('drop *_nTuplePFJets_*Gen*_*')
   del process.makePseudoTop, process.pseudoTopSequence, process.nTupleGenMET
-  del process.nTupleGenJets,  process.nTupleGenEventInfo
+  del process.nTupleGenJets,  process.nTupleGenEventInfo, process.nTupleGenParticles
 
   # 25ns Triggers
   process.triggerSequence.remove( process.nTupleTriggerEle27WP75GsfMC )
