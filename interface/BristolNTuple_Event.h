@@ -13,9 +13,9 @@ public:
 private:
 	void produce(edm::Event &, const edm::EventSetup &);
 	edm::InputTag recoVertexInputTag_;
-	edm::InputTag metFiltersInputTag_;
+	// edm::InputTag metFiltersInputTag_;
 
-	std::vector<std::string> metFiltersOfInterest_;
+	// std::vector<std::string> metFiltersOfInterest_;
 
 	const std::string prefix, suffix;
 
