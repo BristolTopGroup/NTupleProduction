@@ -28,7 +28,8 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		vtxInputTag(iConfig.getParameter < edm::InputTag > ("VertexInputTag")), // 
 		isRealData(iConfig.getParameter<bool>("isRealData")),
 
-		calib("csvv2", "CSVv2.csv"),
+		calib("csvv2", "BristolAnalysis/NTupleTools/data/BTagSF/CSVv2.csv"),
+		// calib("csvv2", "CSVv2.csv"),
 		reader(		&calib,               // calibration instance
 					BTagEntry::OP_MEDIUM,  // operating point
 					"comb",               // measurement type
@@ -507,7 +508,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			//b-tagging information
 			//names are changing between major software releases
 			combinedInclusiveSecondaryVertexV2BJetTags->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
-			passesMediumCSV->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.814 );
+			passesMediumCSV->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.890 );
 
 			// Read and store b tagging scale factors for MC
 			if (!iEvent.isRealData()) {
