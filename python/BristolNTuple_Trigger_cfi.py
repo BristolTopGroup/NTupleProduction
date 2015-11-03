@@ -12,6 +12,7 @@ nTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
 # Data
 nTupleTriggerEle23WPLooseGsf = nTupleTrigger.clone( Prefix='HLTEle23WPLooseGsf.', PathOfInterest='HLT_Ele23_WPLoose_Gsf_v')
 nTupleTriggerIsoMu18 = nTupleTrigger.clone( Prefix='HLTIsoMu18.', PathOfInterest='HLT_IsoMu18_v')
+nTupleTriggerIsoMu20 = nTupleTrigger.clone( Prefix='HLTIsoMu20.', PathOfInterest='HLT_IsoMu20_v')
 
 # MC
 nTupleTriggerEle27WP75GsfMC = nTupleTrigger.clone( Prefix='HLTEle27WP75GsfMC.', PathOfInterest='HLT_Ele27_eta2p1_WP75_Gsf_v')
@@ -24,6 +25,7 @@ triggerSequence = cms.Sequence(
     # RunII 25ns
     nTupleTriggerEle23WPLooseGsf *
     nTupleTriggerIsoMu18 *
+    nTupleTriggerIsoMu20 *
 
     nTupleTriggerEle27WP75GsfMC *
     nTupleTriggerIsoMu20erMC 
