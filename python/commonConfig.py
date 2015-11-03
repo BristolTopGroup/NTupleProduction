@@ -1,4 +1,5 @@
-from WMCore.Configuration import Configuration, getUsernameFromSiteDB
+from WMCore.Configuration import Configuration
+from CRABClient.UserUtilities import getUsernameFromSiteDB
 config = Configuration()
 
 config.section_("General")
@@ -26,3 +27,4 @@ config.Data.publication = True
 
 config.section_("Site")
 config.Site.storageSite = 'T2_UK_SGrid_Bristol'
+config.Site.blacklist = ["T2_BR_SPRACE", "T2_UA_KIPT"]

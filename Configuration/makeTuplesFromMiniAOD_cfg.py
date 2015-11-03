@@ -36,7 +36,7 @@ process.source = cms.Source("PoolSource",
         # Data 
 
         # 05-Oct-2015 Run C
- 		'root://xrootd.unl.edu//store/data/Run2015C_25ns/SingleElectron/MINIAOD/05Oct2015-v1/30000/045710AD-C774-E511-9A9A-003048FFD770.root'
+ 		# 'root://xrootd.unl.edu//store/data/Run2015C_25ns/SingleElectron/MINIAOD/05Oct2015-v1/30000/045710AD-C774-E511-9A9A-003048FFD770.root'
         
         # 05-Oct-2015 Run D
         # 'root://xrootd.unl.edu//store/data/Run2015D/SingleElectron/MINIAOD/05Oct2015-v1/10000/00991D45-4E6F-E511-932C-0025905A48F2.root',
@@ -46,7 +46,7 @@ process.source = cms.Source("PoolSource",
         # 'root://xrootd.unl.edu//store/data/Run2015D/SingleElectron/MINIAOD/PromptReco-v4/000/258/159/00000/0EC56452-186C-E511-8158-02163E0146D5.root',
         # 'root://xrootd.unl.edu//store/data/Run2015D/SingleMuon/MINIAOD/PromptReco-v4/000/258/159/00000/6CA1C627-246C-E511-8A6A-02163E014147.root',
 
-
+        'root://xrootd.unl.edu//store/mc/RunIISpring15MiniAODv2/QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/60000/0005C178-4A71-E511-ACB2-0002C94CD13C.root'
     )
 )
 # If you want to run with a json file
@@ -68,9 +68,11 @@ getOptions( options )
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 globaltag = ''
 if (options.isData) : 
-  globaltag='74X_dataRun2_v4' # dataset=/*/Run2015C_25ns*05Oct2015*/MINIAOD,
-  # globaltag='74X_dataRun2_Prompt_v4' #  dataset=/*/Run2015D-PromptReco-v4/MINIAOD
-  # globaltag='74X_dataRun2_reMiniAOD_v0' #  dataset=/*/Run2015*05Oct2015*/MINIAOD,  dataset=/*/Run2015D-PromptReco-v3/MINIAOD
+  	globaltag='74X_dataRun2_Prompt_v4' #  dataset=/*/Run2015D-PromptReco-v4/MINIAOD
+	if options.isRunC :
+		globaltag='74X_dataRun2_v4' # dataset=/*/Run2015C_25ns*05Oct2015*/MINIAOD,
+	if options.isReReco :
+  		globaltag='74X_dataRun2_reMiniAOD_v0' #  dataset=/*/Run2015*05Oct2015*/MINIAOD
 else :
   globaltag = '74X_mcRun2_asymptotic_v2' # 25ns MC
 
@@ -185,8 +187,8 @@ else :
   del process.nTupleTriggerEle27WP75GsfMC, process.nTupleTriggerIsoMu20erMC, process.nTupleTrigger, process.nTupleTriggerIsoMu20
 
 
-if options.isData and options.isRereco:
-  process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults','','PAT')
+# if options.isData and options.isRereco:
+#   process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults','','PAT')
 
 
 if options.isData and options.isRunC:
