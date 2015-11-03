@@ -26,7 +26,7 @@ def getOptions( options ):
                         VarParsing.varType.bool,
                         "Is this data")
 
-      options.register ('isRereco',
+      options.register ('isReReco',
                         False,
                         VarParsing.multiplicity.singleton,
                         VarParsing.varType.bool,
