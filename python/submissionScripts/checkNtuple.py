@@ -10,7 +10,7 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-pathOfCrabWorkdirs = '/storage/ec6821/NTupleProd/CMSSW_7_4_8_patch1/src/workdirCrab/v28/2015-08-21/'
+pathOfCrabWorkdirs = '/storage/db0268/TopCrossSections/NTupleProduction/CMSSW_7_4_15/src/workdirCrab/v29/2015-10-28'
 
 for crabWorkdir in os.listdir(pathOfCrabWorkdirs):
 	if crabWorkdir == 'crab_TTJets_PowhegPythia6Tauola' : continue
