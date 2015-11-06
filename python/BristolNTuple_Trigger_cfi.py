@@ -10,25 +10,28 @@ nTupleTrigger = cms.EDProducer("BristolNTuple_Trigger",
 
 # RunD 25ns
 # Data
-nTupleTriggerEle23WPLooseGsf = nTupleTrigger.clone( Prefix='HLTEle23WPLooseGsf.', PathOfInterest='HLT_Ele23_WPLoose_Gsf_v')
-nTupleTriggerIsoMu18 = nTupleTrigger.clone( Prefix='HLTIsoMu18.', PathOfInterest='HLT_IsoMu18_v')
+nTupleTriggerEle27erWPLooseGsf = nTupleTrigger.clone( Prefix='HLTEle27erWPLooseGsf.', PathOfInterest='HLT_Ele27_eta2p1_WPLoose_Gsf_v')
+# nTupleTriggerIsoMu18 = nTupleTrigger.clone( Prefix='HLTIsoMu18.', PathOfInterest='HLT_IsoMu18_v')
 nTupleTriggerIsoMu20 = nTupleTrigger.clone( Prefix='HLTIsoMu20.', PathOfInterest='HLT_IsoMu20_v')
+nTupleTriggerIsoTkMu20 = nTupleTrigger.clone( Prefix='HLTIsoTkMu20.', PathOfInterest='HLT_IsoTkMu20_v')
 
 # MC
-nTupleTriggerEle27WP75GsfMC = nTupleTrigger.clone( Prefix='HLTEle27WP75GsfMC.', PathOfInterest='HLT_Ele27_eta2p1_WP75_Gsf_v')
-nTupleTriggerIsoMu20erMC = nTupleTrigger.clone( Prefix='HLTIsoMu20erMC.', PathOfInterest='HLT_IsoMu20_eta2p1_v')
+nTupleTriggerEle27erWP75GsfMC = nTupleTrigger.clone( Prefix='HLTEle27erWP75GsfMC.', PathOfInterest='HLT_Ele27_eta2p1_WP75_Gsf_v')
+nTupleTriggerIsoMu20MC = nTupleTrigger.clone( Prefix='HLTIsoMu20MC.', PathOfInterest='HLT_IsoMu20_v')
+nTupleTriggerIsoTkMu20MC = nTupleTrigger.clone( Prefix='HLTIsoTkMu20MC.', PathOfInterest='HLT_IsoTkMu20_v')
 
 
 
 triggerSequence = cms.Sequence(
 
     # RunII 25ns
-    nTupleTriggerEle23WPLooseGsf *
-    nTupleTriggerIsoMu18 *
+    nTupleTriggerEle27erWPLooseGsf *
     nTupleTriggerIsoMu20 *
+    nTupleTriggerIsoTkMu20 *
 
-    nTupleTriggerEle27WP75GsfMC *
-    nTupleTriggerIsoMu20erMC 
+    nTupleTriggerEle27erWP75GsfMC *
+    nTupleTriggerIsoMu20MC *
+    nTupleTriggerIsoTkMu20MC 
 )
 
 

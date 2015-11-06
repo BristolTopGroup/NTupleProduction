@@ -36,7 +36,7 @@ process.source = cms.Source("PoolSource",
         # Data 
 
         # 05-Oct-2015 Run C
- 		# 'root://xrootd.unl.edu//store/data/Run2015C_25ns/SingleElectron/MINIAOD/05Oct2015-v1/30000/045710AD-C774-E511-9A9A-003048FFD770.root'
+ 		    # 'root://xrootd.unl.edu//store/data/Run2015C_25ns/SingleElectron/MINIAOD/05Oct2015-v1/30000/045710AD-C774-E511-9A9A-003048FFD770.root'
         
         # 05-Oct-2015 Run D
         # 'root://xrootd.unl.edu//store/data/Run2015D/SingleElectron/MINIAOD/05Oct2015-v1/10000/00991D45-4E6F-E511-932C-0025905A48F2.root',
@@ -45,8 +45,10 @@ process.source = cms.Source("PoolSource",
         # Prompt-Reco
         # 'root://xrootd.unl.edu//store/data/Run2015D/SingleElectron/MINIAOD/PromptReco-v4/000/258/159/00000/0EC56452-186C-E511-8158-02163E0146D5.root',
         # 'root://xrootd.unl.edu//store/data/Run2015D/SingleMuon/MINIAOD/PromptReco-v4/000/258/159/00000/6CA1C627-246C-E511-8A6A-02163E014147.root',
-
-        'root://xrootd.unl.edu//store/mc/RunIISpring15MiniAODv2/QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/60000/0005C178-4A71-E511-ACB2-0002C94CD13C.root'
+        
+        # 'root://xrootd.unl.edu//store/mc/RunIISpring15MiniAODv2/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v3/60000/00181849-176A-E511-8B11-848F69FD4C94.root'
+        'root://xrootd.unl.edu//store/mc/RunIISpring15MiniAODv2/TT_TuneEE5C_13TeV-amcatnlo-herwigpp/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/00A9F13F-C66D-E511-A943-0025901895CA.root'
+        # 'root://xrootd.unl.edu//store/mc/RunIISpring15MiniAODv2/QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/60000/0005C178-4A71-E511-ACB2-0002C94CD13C.root'
     )
 )
 # If you want to run with a json file
@@ -157,11 +159,15 @@ process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsConversionS
 
 if not options.isData:
   # 25ns Triggers
-  process.triggerSequence.remove( process.nTupleTriggerEle23WPLooseGsf )
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu18 )
+  # process.triggerSequence.remove( process.nTupleTriggerEle23WPLooseGsf )
+  # process.triggerSequence.remove( process.nTupleTriggerIsoMu18 )
+  # process.triggerSequence.remove( process.nTupleTriggerIsoMu20 )
+  process.triggerSequence.remove( process.nTupleTriggerEle27erWPLooseGsf )
   process.triggerSequence.remove( process.nTupleTriggerIsoMu20 )
+  process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20 )
   process.triggerSequence.remove( process.nTupleTrigger )
-  del process.nTupleTriggerEle23WPLooseGsf, process.nTupleTriggerIsoMu18, process.nTupleTriggerIsoMu20, process.nTupleTrigger
+  # del process.nTupleTriggerEle23WPLooseGsf, process.nTupleTriggerIsoMu18, process.nTupleTriggerIsoMu20, process.nTupleTrigger
+  del process.nTupleTriggerEle27erWPLooseGsf, process.nTupleTriggerIsoMu20, process.nTupleTriggerIsoTkMu20, process.nTupleTrigger
 
   process.makingNTuples.remove( process.metFilters )
   del process.metFilters
@@ -180,20 +186,24 @@ else :
   del process.nTupleGenJets,  process.nTupleGenEventInfo, process.nTupleGenParticles
 
   # 25ns Triggers
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu20 )
-  process.triggerSequence.remove( process.nTupleTriggerEle27WP75GsfMC )
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu20erMC )
+  # process.triggerSequence.remove( process.nTupleTriggerIsoMu20 )
+  # process.triggerSequence.remove( process.nTupleTriggerEle27WP75GsfMC )
+  # process.triggerSequence.remove( process.nTupleTriggerIsoMu20erMC )
+  # process.triggerSequence.remove( process.nTupleTrigger )
+  # del process.nTupleTriggerEle27WP75GsfMC, process.nTupleTriggerIsoMu20erMC, process.nTupleTrigger, process.nTupleTriggerIsoMu20
+  process.triggerSequence.remove( process.nTupleTriggerEle27erWP75GsfMC )
+  process.triggerSequence.remove( process.nTupleTriggerIsoMu20MC )
+  process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20MC )
   process.triggerSequence.remove( process.nTupleTrigger )
-  del process.nTupleTriggerEle27WP75GsfMC, process.nTupleTriggerIsoMu20erMC, process.nTupleTrigger, process.nTupleTriggerIsoMu20
-
+  del process.nTupleTriggerEle27erWP75GsfMC, process.nTupleTriggerIsoMu20MC, process.nTupleTriggerIsoTkMu20MC, process.nTupleTrigger
 
 # if options.isData and options.isRereco:
 #   process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults','','PAT')
 
 
-if options.isData and options.isRunC:
-	process.triggerSequence.remove( process.nTupleTriggerIsoMu18 )
-	del process.nTupleTriggerIsoMu18
+# if options.isData and options.isRunC:
+# 	process.triggerSequence.remove( process.nTupleTriggerIsoMu18 )
+# 	del process.nTupleTriggerIsoMu18
 
 if not options.isTTbarMC:
   process.makingNTuples.remove( process.ttGenEvent )

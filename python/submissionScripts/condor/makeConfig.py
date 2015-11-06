@@ -2,13 +2,13 @@ import os
 import glob
 from mergeROOTFilesWithCompression import getGroupedFilesToUse
 
-pathOfCrabWorkdirs = '/storage/ec6821/NTupleProd/CMSSW_7_4_4_patch2/src/workdirCrab/v21/2015-07-13/'
+pathOfCrabWorkdirs = '/storage/db0268/TopCrossSections/NTupleProduction/CMSSW_7_4_15/src/workdirCrab/v29/2015-10-28'
 
-version = pathOfCrabWorkdirs.split('/')[-3]
+version = pathOfCrabWorkdirs.split('/')[-2]
 
-ntupleBaseDir = '/hdfs/dpm/phy.bris.ac.uk/home/cms/store/user/ejclemen/'
+ntupleBaseDir = '/hdfs/dpm/phy.bris.ac.uk/home/cms/store/user/doburns/'
 
-outputBaseDir = '/hdfs/TopQuarkGroup/run2/ntuples/'
+outputBaseDir = '/hdfs/TopQuarkGroup/run2/ntuples/25ns/'
 outputDirHdfs = outputBaseDir + version + '/'
 
 configFile = open('mergeConfig.py','w');
