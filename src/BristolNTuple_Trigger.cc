@@ -16,6 +16,10 @@ BristolNTuple_Trigger::BristolNTuple_Trigger(const edm::ParameterSet& iConfig) :
 		hltInputTag_(iConfig.getParameter < edm::InputTag > ("HLTInputTag")), //
 		hltObjectsInputTag_(iConfig.getParameter < edm::InputTag > ("HLTObjectsInputTag")), //
 		pathOfInterest_(iConfig.getParameter <std::string> ("PathOfInterest")), //
+		tightenTrigger_(iConfig.getParameter<bool>("tightenTrigger")),
+	    triggerFilterName_(iConfig.getParameter<std::string>("hltFilter")),
+	    minNumber_(iConfig.getParameter<unsigned>("minNumber")),
+	    triggerObjectSelector_(iConfig.getParameter<std::string>("cut")),
 		prefix_(iConfig.getParameter <std::string> ("Prefix")), //
 		suffix_(iConfig.getParameter < std::string > ("Suffix")) {
 
@@ -65,8 +69,19 @@ void BristolNTuple_Trigger::produce(edm::Event& iEvent, const edm::EventSetup& i
 
     edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
 	iEvent.getByLabel(hltObjectsInputTag_, triggerObjects);
+
+	unsigned int nPass = 0;
     for (pat::TriggerObjectStandAlone obj : *triggerObjects) {
         
+        if ( tightenTrigger_ ) {
+			// Consider only those objects that pass the requested filter
+			if (obj.hasFilterLabel(triggerFilterName_)) {
+				if (triggerObjectSelector_(obj)) {
+					++nPass;
+				}
+			}
+        }
+
         obj.unpackPathNames(names);
 
         std::vector<std::string> pathNamesAll  = obj.pathNames(true);
@@ -75,18 +90,16 @@ void BristolNTuple_Trigger::produce(edm::Event& iEvent, const edm::EventSetup& i
         for ( unsigned int trigPath = 0 ; trigPath < pathNamesLast.size(); trigPath++ ) {
         	// Check if this object is associated to this path and that it is associated to the last filter in that path
         	if ( pathNamesLast[trigPath] == triggerName && obj.hasPathName( triggerName, true, true ) ) {
-
         		toEnergy->push_back( obj.energy() );
         		toPt->push_back( obj.pt() );
         		toEta->push_back( obj.eta() );
         		toPhi->push_back( obj.phi() );
-
-				// std::cout << "\tTrigger object:  pt " << obj.pt() << ", eta " << obj.eta() << ", phi " << obj.phi() << std::endl;
-				// std::cout << "\t   Collection: " << obj.collection() << std::endl;
-				// bool isLF   = obj.hasPathName( triggerName, true, true ); 
-				// std::cout << "Is last filter and succesful : " << isLF << std::endl;
     		}
         }
+    }
+
+    if ( tightenTrigger_ && nPass < minNumber_ ) {
+    	*fired = false;
     }
 
 	//-----------------------------------------------------------------
