@@ -33,8 +33,11 @@ git cms-merge-topic -u cms-met:METCorUnc74X
 # https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentificationRun2
 git cms-merge-topic ikrav:egm_id_7.4.12_v1
 # cms-met:HaloBranch7412 is required for met filters involving BeamHaloID
-https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2
+# https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2
 git cms-merge-topic -u cms-met:HaloBranch7412
+# Debugged Pseudo top producer
+git-cms-merge-topic jhgoh:PseudoTop
+
 
 # Clone our main ntuple producing software and checkout run2 branch
 git clone git@github.com:BristolTopGroup/NTupleProduction.git BristolAnalysis/NTupleTools
