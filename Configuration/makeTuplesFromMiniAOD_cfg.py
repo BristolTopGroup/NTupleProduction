@@ -161,11 +161,11 @@ if not options.isData:
   # 25ns Triggers
   process.triggerSequence.remove( process.nTupleTriggerEle27erWPLooseGsf )
   process.triggerSequence.remove( process.nTupleTriggerEle23erWPLooseGsf )
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu18 )
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu20 )
-  process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20 )
+  process.triggerSequence.remove( process.nTupleTriggerIsoMu18er )
+  process.triggerSequence.remove( process.nTupleTriggerIsoMu20er )
+  process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20er )
   process.triggerSequence.remove( process.nTupleTrigger )
-  del process.nTupleTriggerEle27erWPLooseGsf, process.nTupleTriggerEle23erWPLooseGsf, process.nTupleTriggerIsoMu18, process.nTupleTriggerIsoMu20, process.nTupleTriggerIsoTkMu20, process.nTupleTrigger
+  del process.nTupleTriggerEle27erWPLooseGsf, process.nTupleTriggerEle23erWPLooseGsf, process.nTupleTriggerIsoMu18er, process.nTupleTriggerIsoMu20er, process.nTupleTriggerIsoTkMu20er, process.nTupleTrigger
 
   process.makingNTuples.remove( process.metFilters )
   del process.metFilters
@@ -186,11 +186,11 @@ else :
   # 25ns Triggers
   process.triggerSequence.remove( process.nTupleTriggerEle27erWP75GsfMC )
   process.triggerSequence.remove( process.nTupleTriggerEle23erWP75GsfMC )
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu18MC )
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu20MC )
-  process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20MC )
+  process.triggerSequence.remove( process.nTupleTriggerIsoMu18erMC )
+  process.triggerSequence.remove( process.nTupleTriggerIsoMu20erMC )
+  process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20erMC )
   process.triggerSequence.remove( process.nTupleTrigger )
-  del process.nTupleTriggerEle27erWP75GsfMC, process.nTupleTriggerEle23erWP75GsfMC, process.nTupleTriggerIsoMu20MC, process.nTupleTriggerIsoMu18MC, process.nTupleTriggerIsoTkMu20MC, process.nTupleTrigger
+  del process.nTupleTriggerEle27erWP75GsfMC, process.nTupleTriggerEle23erWP75GsfMC, process.nTupleTriggerIsoMu20erMC, process.nTupleTriggerIsoMu18erMC, process.nTupleTriggerIsoTkMu20erMC, process.nTupleTrigger
 
 # if options.isData and options.isRereco:
 #   process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults','','PAT')
