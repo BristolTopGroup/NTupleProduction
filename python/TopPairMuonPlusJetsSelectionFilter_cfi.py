@@ -9,7 +9,7 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     VertexInput=cms.InputTag('offlineSlimmedPrimaryVertices'),
 
     # Signal muon cuts
-    minSignalMuonPt=cms.double(20.),
+    minSignalMuonPt=cms.double(18.),
     maxSignalMuonEta=cms.double(2.1),
     minLooseMuonPt=cms.double(15.),
     maxLooseMuonEta=cms.double(2.1),
