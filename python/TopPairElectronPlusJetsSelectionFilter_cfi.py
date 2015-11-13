@@ -58,7 +58,7 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     tagAndProbeStudies = cms.bool(False),
     dropTriggerSelection = cms.bool(False),
     jetSelectionInTaggingMode = cms.bool(False),
-    bSelectionInTaggingMode = cms.bool(False),
+    bSelectionInTaggingMode = cms.bool(True),
     nonIsolatedElectronSelection = cms.bool(False),
     invertedConversionSelection = cms.bool(False),
 )

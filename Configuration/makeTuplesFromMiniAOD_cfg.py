@@ -205,8 +205,6 @@ if not options.isTTbarMC:
   process.selectionCriteriaAnalyzer.genSelectionCriteriaInput = cms.VInputTag()
 else:
   process.nTupleGenEventInfo.isTTbarMC = cms.bool( True )
-  process.topPairEPlusJetsSelectionTagging.bSelectionInTaggingMode = cms.bool( True )
-  process.topPairMuPlusJetsSelectionTagging.bSelectionInTaggingMode = cms.bool( True )
 
 if not options.printEventContent:
     process.makingNTuples.remove(process.printEventContent)

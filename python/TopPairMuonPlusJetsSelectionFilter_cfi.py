@@ -54,7 +54,7 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
 
     tagAndProbeStudies = cms.bool(False),
     dropTriggerSelection = cms.bool(False),
-    bSelectionInTaggingMode = cms.bool(False),
+    bSelectionInTaggingMode = cms.bool(True),
     nonIsolatedMuonSelection1 = cms.bool(False),
     nonIsolatedMuonSelection2 = cms.bool(False),
 )
