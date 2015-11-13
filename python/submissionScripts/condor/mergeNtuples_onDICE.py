@@ -39,7 +39,7 @@ p.wait()
 # os.system(command)
 
 # print 'mv ' + sampleName + ' ' + outputDir + '/'
-if os.path.exists( outputDir + '/' + sampleName):
-	os.system('mv ' + sampleName + '/*.root ' + outputDir + '/' + sampleName)
+if os.path.exists( outputDir + sampleName):
+	os.system('mv ' + sampleName + '/*.root ' + outputDir + sampleName)
 else :
-	os.system('mv ' + sampleName + ' ' + outputDir + '/')
+	os.system('mv ' + sampleName + ' ' + outputDir)

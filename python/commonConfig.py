@@ -4,7 +4,7 @@ config = Configuration()
 
 config.section_("General")
 # config.General.requestName = 'TTJets_Madgraph_PU20bx25'
-config.General.workArea = 'workdirCrab/v29/2015-10-28'
+config.General.workArea = 'workdirCrab/v2/2015-11-10'
 config.General.transferOutputs = True
 # config.General.transferLogs = True
 
