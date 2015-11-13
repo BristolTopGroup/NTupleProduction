@@ -47,8 +47,8 @@ triggerSequence = cms.Sequence(
     nTupleTriggerEle27erWP75GsfMC *
     nTupleTriggerEle23erWP75GsfMC *
     nTupleTriggerIsoMu18erMC *
-    nTupleTriggerIsoMu20erMC *
-    nTupleTriggerIsoTkMu20erMC 
+    nTupleTriggerIsoMu20MC *
+    nTupleTriggerIsoTkMu20MC 
 )
 
 

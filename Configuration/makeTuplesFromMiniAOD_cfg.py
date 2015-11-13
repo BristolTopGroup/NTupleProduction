@@ -45,8 +45,9 @@ process.source = cms.Source("PoolSource",
         # Prompt-Reco
         # 'root://xrootd.unl.edu//store/data/Run2015D/SingleElectron/MINIAOD/PromptReco-v4/000/258/159/00000/0EC56452-186C-E511-8158-02163E0146D5.root',
         # 'root://xrootd.unl.edu//store/data/Run2015D/SingleMuon/MINIAOD/PromptReco-v4/000/258/159/00000/6CA1C627-246C-E511-8A6A-02163E014147.root',
-        
+        # 'root://xrootd.unl.edu//store/mc/RunIISpring15MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/40000/00087FEB-236E-E511-9ACB-003048FF86CA.root'
         'file:/hdfs/TopQuarkGroup/run2/miniAOD/TTJets_amcanlo_25ns.root',
+        # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/TTJets_powhegPythia8_25ns.root',
         # 'root://xrootd.unl.edu//store/mc/RunIISpring15MiniAODv2/TT_TuneEE5C_13TeV-amcatnlo-herwigpp/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/00A9F13F-C66D-E511-A943-0025901895CA.root'
         # 'root://xrootd.unl.edu//store/mc/RunIISpring15MiniAODv2/QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/60000/0005C178-4A71-E511-ACB2-0002C94CD13C.root'
     )
@@ -187,10 +188,10 @@ else :
   process.triggerSequence.remove( process.nTupleTriggerEle27erWP75GsfMC )
   process.triggerSequence.remove( process.nTupleTriggerEle23erWP75GsfMC )
   process.triggerSequence.remove( process.nTupleTriggerIsoMu18erMC )
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu20erMC )
-  process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20erMC )
+  process.triggerSequence.remove( process.nTupleTriggerIsoMu20MC )
+  process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20MC )
   process.triggerSequence.remove( process.nTupleTrigger )
-  del process.nTupleTriggerEle27erWP75GsfMC, process.nTupleTriggerEle23erWP75GsfMC, process.nTupleTriggerIsoMu20erMC, process.nTupleTriggerIsoMu18erMC, process.nTupleTriggerIsoTkMu20erMC, process.nTupleTrigger
+  del process.nTupleTriggerEle27erWP75GsfMC, process.nTupleTriggerEle23erWP75GsfMC, process.nTupleTriggerIsoMu20MC, process.nTupleTriggerIsoMu18erMC, process.nTupleTriggerIsoTkMu20MC, process.nTupleTrigger
 
 # if options.isData and options.isRereco:
 #   process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults','','PAT')
