@@ -11,8 +11,8 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     # Signal muon cuts
     minSignalMuonPt=cms.double(18.),
     maxSignalMuonEta=cms.double(2.1),
-    minLooseMuonPt=cms.double(15.),
-    maxLooseMuonEta=cms.double(2.1),
+    minLooseMuonPt=cms.double(10.),
+    maxLooseMuonEta=cms.double(2.5),
     minLooseElectronPt=cms.double(15.),
     maxLooseElectronEta=cms.double(2.1),
     looseElectronIDMap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-loose'),
@@ -30,12 +30,12 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     cleaningDeltaR=cms.double(0.4),
 
     # Maximum isolation for signal region
-    tightMuonIsolation=cms.double(0.12),
+    tightMuonIsolation=cms.double(0.15),
     # Minimum isolation for control region
     controlMuonIsolation1=cms.double(0.3),
     controlMuonIsolation2=cms.double(0.15),
 
-    looseMuonIsolation=cms.double(0.2),
+    looseMuonIsolation=cms.double(0.25),
 
     # Apply different JEC
     applyJEC = cms.bool(False),

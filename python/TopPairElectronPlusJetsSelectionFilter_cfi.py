@@ -14,8 +14,8 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     signalElectronIDMap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-medium'),
     signalElectronIDMap_bitmap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-mediumBitmap'),
     minSignalElectronID=cms.double(0),
-    minLooseMuonPt=cms.double(15.),
-    maxLooseMuonEta=cms.double(2.1),
+    minLooseMuonPt=cms.double(10.),
+    maxLooseMuonEta=cms.double(2.5),
     minLooseElectronPt=cms.double(15.),
     maxLooseElectronEta=cms.double(2.1),
     looseElectronIDMap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-loose'),
@@ -46,7 +46,7 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
 
     controlElectronIsolation=cms.double(0.),
 
-    looseMuonIsolation=cms.double(0.2),
+    looseMuonIsolation=cms.double(0.25),
    
     prefix=cms.untracked.string('TopPairElectronPlusJetsSelection.'),
     MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12 or Summer11Leg
