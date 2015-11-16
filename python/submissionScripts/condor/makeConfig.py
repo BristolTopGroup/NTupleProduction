@@ -5,13 +5,11 @@ from mergeROOTFilesWithCompression import getGroupedFilesToUse
 pathOfCrabWorkdirs = '/storage/db0268/TopCrossSections/NTupleProduction/CMSSW_7_4_15/src/workdirCrab/v2/2015-11-10'
 
 version = pathOfCrabWorkdirs.split('/')[-2]
-print version
 
 ntupleBaseDir = '/hdfs/dpm/phy.bris.ac.uk/home/cms/store/user/doburns/'
 
 outputBaseDir = '/hdfs/TopQuarkGroup/run2/ntuples/25ns/'
 outputDirHdfs = outputBaseDir + version + '/'
-print outputDirHdfs
 configFile = open('mergeConfig.py','w');
 
 configFile.write('outputDir = "' + outputDirHdfs + '"\n')
