@@ -8,6 +8,7 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
 class SelectionAnalyser : public edm::EDAnalyzer {
 public:
@@ -25,7 +26,7 @@ private:
 	std::vector<std::string> selectionNames_;
 	unsigned int numberOfCuts_;
 	//distributions
-	// TH1F* consecutiveCuts_, *individualCuts_;
+	TH1F* consecutiveCuts_, *individualCuts_;
 	TH1F* consecutiveCuts_unweighted_, *individualCuts_unweighted_;
 
 };
