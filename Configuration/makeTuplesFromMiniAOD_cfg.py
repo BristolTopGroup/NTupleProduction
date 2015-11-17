@@ -163,10 +163,10 @@ if not options.isData:
   process.triggerSequence.remove( process.nTupleTriggerEle27erWPLooseGsf )
   process.triggerSequence.remove( process.nTupleTriggerEle23erWPLooseGsf )
   process.triggerSequence.remove( process.nTupleTriggerIsoMu18er )
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu20er )
-  process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20er )
+  process.triggerSequence.remove( process.nTupleTriggerIsoMu20 )
+  process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20 )
   process.triggerSequence.remove( process.nTupleTrigger )
-  del process.nTupleTriggerEle27erWPLooseGsf, process.nTupleTriggerEle23erWPLooseGsf, process.nTupleTriggerIsoMu18er, process.nTupleTriggerIsoMu20er, process.nTupleTriggerIsoTkMu20er, process.nTupleTrigger
+  del process.nTupleTriggerEle27erWPLooseGsf, process.nTupleTriggerEle23erWPLooseGsf, process.nTupleTriggerIsoMu18er, process.nTupleTriggerIsoMu20, process.nTupleTriggerIsoTkMu20, process.nTupleTrigger
 
   process.makingNTuples.remove( process.metFilters )
   del process.metFilters

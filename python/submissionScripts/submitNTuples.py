@@ -4,7 +4,7 @@ from shutil import move
 from os import remove
 import os
 
-version = '1'
+version = '3'
 crabWorkArea = 'workdirCrab/v'+version+'/'+str(date.today())
 print 'Using workdir ',crabWorkArea
 miniAodDir = 'BristolAnalysis/NTupleTools/Configuration/crab3Configurations/25ns/'
@@ -54,11 +54,12 @@ miniAodDir + 'QCD_bcToE_80to170.py',
 # miniAodDir + 'TTJets_PowhegPythia6Tauola.py',
 miniAodDir + 'TTJets_PowhegPythia8_mtop1695.py',
 miniAodDir + 'TTJets_PowhegPythia8_mtop1755.py',
-# miniAodDir + 'TTJets_PowhegPythia8_scaledown.py',
-# miniAodDir + 'TTJets_PowhegPythia8_scaleup.py',
+miniAodDir + 'TTJets_PowhegPythia8_scaledown.py',
+miniAodDir + 'TTJets_PowhegPythia8_scaleup.py',
 miniAodDir + 'TTJets_amcatnloFXFX.py',
 miniAodDir + 'TTJets_amcatnloFXFX_mtop1695.py',
 miniAodDir + 'TTJets_amcatnloFXFX_mtop1755.py',
+miniAodDir + 'TTJets_amcatnloHerwigpp.py',
 # miniAodDir + 'TTJets_amcatnloFXFX_scaledown.py',
 # miniAodDir + 'TTJets_amcatnloFXFX_scaleup.py',
 miniAodDir + 'TTJets_madgraphMLM.py',

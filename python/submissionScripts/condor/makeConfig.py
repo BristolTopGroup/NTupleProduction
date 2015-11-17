@@ -2,7 +2,7 @@ import os
 import glob
 from mergeROOTFilesWithCompression import getGroupedFilesToUse
 
-pathOfCrabWorkdirs = '/storage/db0268/TopCrossSections/NTupleProduction/CMSSW_7_4_15/src/workdirCrab/v29/2015-10-28'
+pathOfCrabWorkdirs = '/storage/db0268/TopCrossSections/NTupleProduction/CMSSW_7_4_15/src/workdirCrab/v2/2015-11-10'
 
 version = pathOfCrabWorkdirs.split('/')[-2]
 
@@ -10,7 +10,6 @@ ntupleBaseDir = '/hdfs/dpm/phy.bris.ac.uk/home/cms/store/user/doburns/'
 
 outputBaseDir = '/hdfs/TopQuarkGroup/run2/ntuples/25ns/'
 outputDirHdfs = outputBaseDir + version + '/'
-
 configFile = open('mergeConfig.py','w');
 
 configFile.write('outputDir = "' + outputDirHdfs + '"\n')
@@ -22,7 +21,6 @@ if not os.path.exists(outputDirHdfs):
 print "There are ",len(os.listdir(pathOfCrabWorkdirs))," samples"
 nJobs = 0
 for crabWorkdir in os.listdir(pathOfCrabWorkdirs):
-
 	crabLogFile = open(pathOfCrabWorkdirs+'/'+crabWorkdir+'/crab.log','r')
 
 	gotTaskName = False
@@ -41,7 +39,7 @@ for crabWorkdir in os.listdir(pathOfCrabWorkdirs):
 			tasknameTemp = tasknameTemp[0].strip() + '_' + tasknameTemp[1].strip()
 			taskName = tasknameTemp.split(':')[0]
 			gotTaskName = True
-		elif not gotRequestName and line.find('publishDataName')>=0:
+		elif not gotRequestName and line.find('outputDatasetTag')>=0:
 			requestName = line.split('\'')[-2]
 			gotRequestName = True
 		elif not gotInputDataset and line.find('inputDataset')>=0:
@@ -50,6 +48,7 @@ for crabWorkdir in os.listdir(pathOfCrabWorkdirs):
 
 		if gotTaskName and gotRequestName and gotInputDataset :
 			break
+
 
 	crabLogFile.close()
 
