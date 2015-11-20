@@ -93,6 +93,7 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 		produces<bool>(prefix_ + TTbarMuPlusJetsReferenceSelection::StringSteps[step]);
 	}
 	produces<bool>(prefix_ + "FullSelection");
+	produces<bool>(prefix_ + "FullSelectionNoB");
 	produces<unsigned int>(prefix_ + "NumberOfBtags");
 	produces<unsigned int>(prefix_ + "NumberOfJets");
 	produces<std::vector<unsigned int> >(prefix_ + "cleanedJetIndex");
@@ -201,6 +202,7 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 		iEvent.put(passesStep, prefix_ + TTbarMuPlusJetsReferenceSelection::StringSteps[step]);
 	}
 	iEvent.put(std::auto_ptr<bool>(new bool(passesSelection)), prefix_ + "FullSelection");
+	iEvent.put(std::auto_ptr<bool>(new bool(passesSelectionExceptBtagging)), prefix_ + "FullSelectionNoB");
 
 	// Store number of cleaned jets in event
 	unsigned int numberOfJets(cleanedJets_.size());
