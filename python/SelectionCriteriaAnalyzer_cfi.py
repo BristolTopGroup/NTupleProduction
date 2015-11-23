@@ -3,12 +3,12 @@ import FWCore.ParameterSet.Config as cms
 selectionCriteriaAnalyzer = cms.EDFilter('SelectionCriteriaAnalyzer',
     # Specify input collections
     offlineSelectionCriteriaInput      = cms.VInputTag(
-                                     cms.InputTag('topPairMuPlusJetsSelectionTagging', 'TopPairMuonPlusJetsSelection.FullSelection', 'Ntuples'),
-                                     cms.InputTag('topPairEPlusJetsSelectionTagging', 'TopPairElectronPlusJetsSelection.FullSelection', 'Ntuples'),
-                                     cms.InputTag('topPairMuPlusJetsQCDSelectionTagging2', 'TopPairMuonPlusJetsQCDSelection1p5to3.FullSelection', 'Ntuples'),
-                                     cms.InputTag('topPairMuPlusJetsQCDSelectionTagging1', 'TopPairMuonPlusJetsQCDSelection3toInf.FullSelection', 'Ntuples'),  
-                                     cms.InputTag('topPairEPlusJetsQCDSelectionTagging', 'TopPairElectronPlusJetsQCDSelection.FullSelection', 'Ntuples'),
-                                     cms.InputTag('topPairEPlusJetsConversionSelectionTagging', 'TopPairElectronPlusJetsConversionSelection.FullSelection', 'Ntuples'),
+                                     cms.InputTag('topPairMuPlusJetsSelectionTagging', 'TopPairMuonPlusJetsSelection.FullSelectionNoB', 'Ntuples'),
+                                     cms.InputTag('topPairEPlusJetsSelectionTagging', 'TopPairElectronPlusJetsSelection.FullSelectionNoB', 'Ntuples'),
+                                     cms.InputTag('topPairMuPlusJetsQCDSelectionTagging2', 'TopPairMuonPlusJetsQCDSelection1p5to3.FullSelectionNoB', 'Ntuples'),
+                                     cms.InputTag('topPairMuPlusJetsQCDSelectionTagging1', 'TopPairMuonPlusJetsQCDSelection3toInf.FullSelectionNoB', 'Ntuples'),  
+                                     cms.InputTag('topPairEPlusJetsQCDSelectionTagging', 'TopPairElectronPlusJetsQCDSelection.FullSelectionNoB', 'Ntuples'),
+                                     cms.InputTag('topPairEPlusJetsConversionSelectionTagging', 'TopPairElectronPlusJetsConversionSelection.FullSelectionNoB', 'Ntuples'),
             ),
     genSelectionCriteriaInput      = cms.VInputTag(
 									# cms.InputTag('ttFullHadronicFilter',       	 '', 'Ntuples'),
