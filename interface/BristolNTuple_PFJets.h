@@ -9,6 +9,7 @@
 #include "CondFormats/BTauObjects/interface/BTagCalibrationReader.h"
 
 class BristolNTuple_PFJets : public edm::EDProducer {
+
  public:
   explicit BristolNTuple_PFJets(const edm::ParameterSet&);
 
@@ -17,7 +18,7 @@ class BristolNTuple_PFJets : public edm::EDProducer {
   const edm::InputTag   inputTag;
   const std::string     prefix,suffix;
   const unsigned int    maxSize;
-  const double 			minJetPtToStore;
+  const double      minJetPtToStore;
   const std::string jecUncPath;
   const bool readJEC;
   const std::string jetCorrectionService;
@@ -26,9 +27,12 @@ class BristolNTuple_PFJets : public edm::EDProducer {
   const bool isRealData;
 
   BTagCalibration calib;
-  BTagCalibrationReader reader;
-  BTagCalibrationReader reader_up;
-  BTagCalibrationReader reader_down;
+  BTagCalibrationReader reader_b;
+  BTagCalibrationReader reader_b_up;
+  BTagCalibrationReader reader_b_down;
+  BTagCalibrationReader reader_cl;
+  BTagCalibrationReader reader_cl_up;
+  BTagCalibrationReader reader_cl_down;
 };
 
 #endif

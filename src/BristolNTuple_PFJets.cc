@@ -30,12 +30,15 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 
 		// calib("csvv2", "BristolAnalysis/NTupleTools/data/BTagSF/CSVv2.csv"),
 		calib("csvv2", "CSVv2.csv"),
-		reader(		&calib,               // calibration instance
+		reader_b(		&calib,               // calibration instance
 					BTagEntry::OP_MEDIUM,  // operating point
 					"comb",               // measurement type
 					"central"),           // systematics type
-		reader_up(&calib, BTagEntry::OP_MEDIUM, "comb", "up"),  // sys up
-		reader_down(&calib, BTagEntry::OP_MEDIUM, "comb", "down")  // sys down
+		reader_b_up(&calib, BTagEntry::OP_MEDIUM, "comb", "up"),  // sys up
+		reader_b_down(&calib, BTagEntry::OP_MEDIUM, "comb", "down"),  // sys down
+		reader_cl(&calib, BTagEntry::OP_MEDIUM, "mujets", "central"),  // sys down
+		reader_cl_up(&calib, BTagEntry::OP_MEDIUM, "mujets", "up"),  // sys down
+		reader_cl_down(&calib, BTagEntry::OP_MEDIUM, "mujets", "down")  // sys down
 
 		 {
 	//kinematic variables
@@ -505,13 +508,20 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			passLooseID->push_back(passjetLoose);
 			passTightID->push_back(passjetTight);
 
+
+
+
 			//b-tagging information
 			//names are changing between major software releases
 			combinedInclusiveSecondaryVertexV2BJetTags->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
 			passesMediumCSV->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.890 );
+			
+			// std::cout << "2" << std::endl;
+			// std::cout << "BTag : " << it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") << std::endl;
 
 			// Read and store b tagging scale factors for MC
 			if (!iEvent.isRealData()) {
+
 				unsigned int bTagEntryJetFlavour = 999;
 				if ( fabs( it->partonFlavour() ) == 5 ) {
 					bTagEntryJetFlavour = 0;
@@ -523,6 +533,11 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 					bTagEntryJetFlavour = 2;
 				}
 
+				if (bTagEntryJetFlavour ==2) bTagEntryJetFlavour=1;
+				// std::cout << "PartonEntryFlavour : " << bTagEntryJetFlavour << std::endl;
+				// std::cout << "Pt : " << it->pt() << std::endl;
+				// std::cout << "Eta : " << it->eta() << std::endl;
+
 				double ptToUse = it->pt();
 				if ( ptToUse <= 30 ) {
 					ptToUse = 30;
@@ -531,15 +546,38 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 					ptToUse = 669;
 				}
 
-				double jet_weight = reader.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
-	                                      it->eta(), 
-	                                      ptToUse);
-				double jet_weight_up = reader_up.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
-	                                      it->eta(), 
-	                                      ptToUse);
-				double jet_weight_down = reader_down.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
-	                                      it->eta(), 
-	                                      ptToUse);
+				double jet_weight = 999;
+				double jet_weight_up = 999;
+				double jet_weight_down = 999;			
+				// std::cout << "2.3" << std::endl;
+				if (bTagEntryJetFlavour == 0 || bTagEntryJetFlavour == 1) {
+
+					jet_weight = reader_cl.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
+		                                      it->eta(), 
+		                                      ptToUse);
+					// std::cout << "2.31" << std::endl;
+					jet_weight_up = reader_cl_up.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
+		                                      it->eta(), 
+		                                      ptToUse);
+					// std::cout << "2.32" << std::endl;
+					jet_weight_down = reader_cl_down.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
+		                                      it->eta(), 
+		                                      ptToUse);
+				}
+				else{
+					jet_weight = reader_b.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
+		                                      it->eta(), 
+		                                      ptToUse);
+					// std::cout << "2.31" << std::endl;
+					jet_weight_up = reader_b_up.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
+		                                      it->eta(), 
+		                                      ptToUse);
+					// std::cout << "2.32" << std::endl;
+					jet_weight_down = reader_b_down.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
+		                                      it->eta(), 
+		                                      ptToUse);					
+				}
+				// std::cout << "2.4" << std::endl;
 
 				btagSF->push_back( jet_weight );
 				btagSF_up->push_back( jet_weight_up );
