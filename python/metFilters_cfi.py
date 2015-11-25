@@ -18,7 +18,7 @@ def setupMETFilters(process, cms):
 		inputLabel = cms.InputTag('HBHENoiseFilterResultProducer','HBHEIsoNoiseFilterResult'),
 		reverseDecision = cms.bool(False)
 	)
-	process.HBHEFilterRerun = cms.Sequence(process.HBHENoiseFilterResultProducer * process.ApplyBaselineHBHENoiseFilter) # * process.ApplyBaselineHBHEIsoNoiseFilter)
+	process.HBHEFilterRerun = cms.Sequence(process.HBHENoiseFilterResultProducer * process.ApplyBaselineHBHENoiseFilter * process.ApplyBaselineHBHEIsoNoiseFilter)
 
 	# PV filter
 	process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
@@ -28,23 +28,25 @@ def setupMETFilters(process, cms):
 		maxd0 = cms.double(2)
 	)
 
+	# BeamHaloID filters have been moved to .txt files for filtering in AS. Also included in .txt files is the fourth bad EE SC.
+
 	# Bad EE Supercrystal filter
 	process.load('RecoMET.METFilters.eeBadScFilter_cfi')
 	process.eeBadScFilterv2 = process.eeBadScFilter.clone(
 		EERecHitSource = cms.InputTag('reducedEgamma','reducedEERecHits',''),
 		)
 
-	# Run II Beam Halo ID filter
-	# Beam Halo ID filter requires
-	process.load('RecoMET.METProducers.CSCHaloData_cfi')
-	process.load('RecoMET.METProducers.EcalHaloData_cfi')
-	process.load('RecoMET.METProducers.HcalHaloData_cfi')
-	process.load('RecoMET.METProducers.GlobalHaloData_cfi')
-	process.load('RecoMET.METProducers.BeamHaloSummary_cfi')
-	process.BeamHaloId = cms.Sequence(process.CSCHaloData*process.EcalHaloData*process.HcalHaloData*process.GlobalHaloData*process.BeamHaloSummary)
+	# # Run II Beam Halo ID filter
+	# # Beam Halo ID filter requires
+	# process.load('RecoMET.METProducers.CSCHaloData_cfi')
+	# process.load('RecoMET.METProducers.EcalHaloData_cfi')
+	# process.load('RecoMET.METProducers.HcalHaloData_cfi')
+	# process.load('RecoMET.METProducers.GlobalHaloData_cfi')
+	# process.load('RecoMET.METProducers.BeamHaloSummary_cfi')
+	# process.BeamHaloId = cms.Sequence(process.CSCHaloData*process.EcalHaloData*process.HcalHaloData*process.GlobalHaloData*process.BeamHaloSummary)
 
-	process.load('RecoMET.METFilters.CSCTightHalo2015Filter_cfi')
-	process.CSCTightHalo2015Filter.taggingMode = cms.bool(True)
+	# process.load('RecoMET.METFilters.CSCTightHalo2015Filter_cfi')
+	# process.CSCTightHalo2015Filter.taggingMode = cms.bool(True)
 
 
-	process.metFilters = cms.Sequence( process.primaryVertexFilter + process.HBHEFilterRerun + process.BeamHaloId + process.CSCTightHalo2015Filter + process.eeBadScFilterv2)
+	process.metFilters = cms.Sequence( process.primaryVertexFilter + process.HBHEFilterRerun + process.eeBadScFilterv2)
