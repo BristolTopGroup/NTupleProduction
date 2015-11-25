@@ -1,7 +1,7 @@
 from BristolAnalysis.NTupleTools.commonConfig import config
 
 config.General.requestName = 'SingleMuon_ReReco_RunD'
-config.JobType.pyCfgParams = ['isData=1','isReReco=1']
+config.JobType.pyCfgParams = ['isData=1']
 config.Data.inputDataset = '/SingleMuon/Run2015D-05Oct2015-v1/MINIAOD'
 config.Data.splitting = 'EventAwareLumiBased'
 config.Data.unitsPerJob = 500000

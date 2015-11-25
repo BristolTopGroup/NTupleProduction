@@ -71,13 +71,9 @@ getOptions( options )
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 globaltag = ''
 if (options.isData) : 
-  	globaltag='74X_dataRun2_Prompt_v4' #  dataset=/*/Run2015D-PromptReco-v4/MINIAOD
-	if options.isRunC :
-		globaltag='74X_dataRun2_v4' # dataset=/*/Run2015C_25ns*05Oct2015*/MINIAOD,
-	if options.isReReco :
-  		globaltag='74X_dataRun2_reMiniAOD_v0' #  dataset=/*/Run2015*05Oct2015*/MINIAOD
+  globaltag='74X_dataRun2_v5' # ReReco+Prompt JECv6
 else :
-  globaltag = '74X_mcRun2_asymptotic_v2' # 25ns MC
+  globaltag = '74X_mcRun2_asymptotic_v4' # 25ns MC
 
 print "Using Global Tag : ", globaltag
 process.GlobalTag.globaltag = cms.string(globaltag)
