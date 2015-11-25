@@ -30,15 +30,15 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 
 		// calib("csvv2", "BristolAnalysis/NTupleTools/data/BTagSF/CSVv2.csv"),
 		calib("csvv2", "CSVv2.csv"),
-		reader_b(		&calib,               // calibration instance
+		reader_bc(		&calib,               // calibration instance
 					BTagEntry::OP_MEDIUM,  // operating point
 					"comb",               // measurement type
 					"central"),           // systematics type
-		reader_b_up(&calib, BTagEntry::OP_MEDIUM, "comb", "up"),  // sys up
-		reader_b_down(&calib, BTagEntry::OP_MEDIUM, "comb", "down"),  // sys down
-		reader_cl(&calib, BTagEntry::OP_MEDIUM, "mujets", "central"),  // sys down
-		reader_cl_up(&calib, BTagEntry::OP_MEDIUM, "mujets", "up"),  // sys down
-		reader_cl_down(&calib, BTagEntry::OP_MEDIUM, "mujets", "down")  // sys down
+		reader_bc_up(&calib, BTagEntry::OP_MEDIUM, "comb", "up"),  // sys up
+		reader_bc_down(&calib, BTagEntry::OP_MEDIUM, "comb", "down"),  // sys down
+		reader_l(&calib, BTagEntry::OP_MEDIUM, "mujets", "central"),  // sys down
+		reader_l_up(&calib, BTagEntry::OP_MEDIUM, "mujets", "up"),  // sys down
+		reader_l_down(&calib, BTagEntry::OP_MEDIUM, "mujets", "down")  // sys down
 
 		 {
 	//kinematic variables
@@ -541,28 +541,28 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
 				if (bTagEntryJetFlavour == 0 || bTagEntryJetFlavour == 1) {
 
-					jet_weight = reader_cl.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
+					jet_weight = reader_bc.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
 		                                      it->eta(), 
 		                                      ptToUse);
 
-					jet_weight_up = reader_cl_up.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
+					jet_weight_up = reader_bc_up.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
 		                                      it->eta(), 
 		                                      ptToUse);
 
-					jet_weight_down = reader_cl_down.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
+					jet_weight_down = reader_bc_down.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
 		                                      it->eta(), 
 		                                      ptToUse);
 				}
 				else{
-					jet_weight = reader_b.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
+					jet_weight = reader_l.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
 		                                      it->eta(), 
 		                                      ptToUse);
 
-					jet_weight_up = reader_b_up.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
+					jet_weight_up = reader_l_up.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
 		                                      it->eta(), 
 		                                      ptToUse);
 
-					jet_weight_down = reader_b_down.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
+					jet_weight_down = reader_l_down.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
 		                                      it->eta(), 
 		                                      ptToUse);					
 				}

@@ -27,12 +27,12 @@ class BristolNTuple_PFJets : public edm::EDProducer {
   const bool isRealData;
 
   BTagCalibration calib;
-  BTagCalibrationReader reader_b;
-  BTagCalibrationReader reader_b_up;
-  BTagCalibrationReader reader_b_down;
-  BTagCalibrationReader reader_cl;
-  BTagCalibrationReader reader_cl_up;
-  BTagCalibrationReader reader_cl_down;
+  BTagCalibrationReader reader_bc;
+  BTagCalibrationReader reader_bc_up;
+  BTagCalibrationReader reader_bc_down;
+  BTagCalibrationReader reader_l;
+  BTagCalibrationReader reader_l_up;
+  BTagCalibrationReader reader_l_down;
 };
 
 #endif
