@@ -32,13 +32,13 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		calib("csvv2", "CSVv2.csv"),
 		reader_bc(		&calib,               // calibration instance
 					BTagEntry::OP_MEDIUM,  // operating point
-					"comb",               // measurement type
+					"mujets",               // measurement type
 					"central"),           // systematics type
-		reader_bc_up(&calib, BTagEntry::OP_MEDIUM, "comb", "up"),  // sys up
-		reader_bc_down(&calib, BTagEntry::OP_MEDIUM, "comb", "down"),  // sys down
-		reader_l(&calib, BTagEntry::OP_MEDIUM, "mujets", "central"),  // sys down
-		reader_l_up(&calib, BTagEntry::OP_MEDIUM, "mujets", "up"),  // sys down
-		reader_l_down(&calib, BTagEntry::OP_MEDIUM, "mujets", "down")  // sys down
+		reader_bc_up(&calib, BTagEntry::OP_MEDIUM, "mujets", "up"),  // sys up
+		reader_bc_down(&calib, BTagEntry::OP_MEDIUM, "mujets", "down"),  // sys down
+		reader_l(&calib, BTagEntry::OP_MEDIUM, "comb", "central"),  // sys down
+		reader_l_up(&calib, BTagEntry::OP_MEDIUM, "comb", "up"),  // sys down
+		reader_l_down(&calib, BTagEntry::OP_MEDIUM, "comb", "down")  // sys down
 
 		 {
 	//kinematic variables

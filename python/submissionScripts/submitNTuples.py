@@ -4,7 +4,7 @@ from shutil import move
 from os import remove
 import os
 
-version = '5'
+version = '6'
 crabWorkArea = 'workdirCrab/v'+version+'/'+str(date.today())
 print 'Using workdir ',crabWorkArea
 miniAodDir = 'BristolAnalysis/NTupleTools/Configuration/crab3Configurations/25ns/'
