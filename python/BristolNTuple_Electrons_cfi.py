@@ -1,8 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
 nTupleElectrons = cms.EDProducer("BristolNTuple_Electrons",
-    TracksInputTag = cms.InputTag('generalTracks'),
-    DCSInputTag = cms.InputTag('scalersRawToDigi'),
     InputTag = cms.InputTag('slimmedElectrons'),
     Prefix = cms.string('Electrons.'),
     Suffix = cms.string(''),
