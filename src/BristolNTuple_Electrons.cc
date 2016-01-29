@@ -14,17 +14,15 @@
 #include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
 
 BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfig) :
-		trkInputTag(iConfig.getParameter < edm::InputTag > ("TracksInputTag")), //
-		dcsInputTag(iConfig.getParameter < edm::InputTag > ("DCSInputTag")), //
-		inputTag(iConfig.getParameter < edm::InputTag > ("InputTag")), //
+  		inputTag(consumes<edm::View<pat::Electron>>(iConfig.getParameter<edm::InputTag>("InputTag"))),			
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //
 		suffix(iConfig.getParameter < std::string > ("Suffix")), //
 		maxSize(iConfig.getParameter<unsigned int>("MaxSize")), //
 		storePFIsolation_(iConfig.getParameter<bool>("storePFIsolation")), //
 		debugRelease_(iConfig.getParameter<bool>("debugRelease")), //
-		vtxInputTag(iConfig.getParameter < edm::InputTag > ("VertexInputTag")), //
-		beamSpotInputTag(iConfig.getParameter < edm::InputTag > ("BeamSpotInputTag")), //
-		conversionsInputTag(iConfig.getParameter < edm::InputTag > ("ConversionsInputTag")), //
+		vtxInputTag(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))), //		
+		beamSpotInputTag(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"))), //
+		conversionsInputTag(consumes<std::vector<reco::Conversion>>(iConfig.getParameter<edm::InputTag>("ConversionsInputTag"))), // 		
   		tightElectronIDMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("tightElectronIDMap"))), //
   		tightElectronIDMapToken_bitmap_(consumes<edm::ValueMap<unsigned int> >(iConfig.getParameter<edm::InputTag>("tightElectronIDMap_bitmap"))) //
 {
@@ -227,26 +225,17 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 	//-----------------------------------------------------------------
 
-	edm::Handle <edm::View<pat::Electron> > electrons;
-	iEvent.getByLabel(inputTag, electrons);
+    edm::Handle<edm::View<pat::Electron> > electrons;
+    iEvent.getByToken(inputTag,electrons);
 
-	edm::Handle < reco::BeamSpot > bsHandle;
-	iEvent.getByLabel(beamSpotInputTag, bsHandle);
+	edm::Handle< reco::BeamSpot > bsHandle;
+	iEvent.getByToken(beamSpotInputTag, bsHandle);
 
-	edm::Handle < reco::ConversionCollection > hConversions;
-	iEvent.getByLabel(conversionsInputTag, hConversions);
+	edm::Handle< std::vector< reco::Conversion > > hConversions;
+	iEvent.getByToken(conversionsInputTag, hConversions);
 
-	edm::Handle < reco::TrackCollection > tracks;
-	iEvent.getByLabel(trkInputTag, tracks);
-
-	edm::Handle < DcsStatusCollection > dcsHandle;
-	iEvent.getByLabel(dcsInputTag, dcsHandle);
-
-	edm::Handle < reco::VertexCollection > primaryVertices;
-	iEvent.getByLabel(vtxInputTag, primaryVertices);
-
-	edm::Handle < reco::PFCandidateCollection > pfCandidates;
-	iEvent.getByLabel("particleFlow", pfCandidates);
+	edm::Handle< std::vector< reco::Vertex > > primaryVertices;
+	iEvent.getByToken(vtxInputTag, primaryVertices);
 
 	edm::Handle<edm::ValueMap<bool> > tight_id_decisions;
 	iEvent.getByToken(tightElectronIDMapToken_,tight_id_decisions);
@@ -257,19 +246,18 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	tightElectronIDDecisions_bitmap_ = *tight_id_decisions_bitmap;
 
 	if (electrons.isValid()) {
+
 		edm::LogInfo("BristolNTuple_ElectronsExtraInfo") << "Total # Electrons: " << electrons->size();
+
 		for (size_t index = 0; index < electrons->size(); ++index){
 			const auto it = electrons->ptrAt(index);
 
-		// for (std::vector<pat::Electron>::const_iterator it = electrons->begin(); it != electrons->end(); ++it) {
-			// exit from loop when you reach the required number of electrons
-			if (px->size() >= maxSize)
-				break;
-
+			// exit from loop when you reach the required number of electrons (99)
+			if (px->size() >= maxSize) break;
 
 			// Check ID
-			// edm::View<pat::Electron> > el = *it;
 			isTightElectron->push_back( tightElectronIDDecisions_[it] );
+
 			if ( tightElectronIDDecisions_bitmap_[it] == 3327 || tightElectronIDDecisions_bitmap_[it] == 3583 || tightElectronIDDecisions_bitmap_[it] == 3839) {
 				isTightNonIsoElectron->push_back( true );
 			}
@@ -292,14 +280,15 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			bool matchesConv = false;
 			if (hConversions.isValid() && bsHandle.isValid()) {
 				matchesConv = ConversionTools::hasMatchedConversion(*it, hConversions, bsHandle->position());
-			} else {
-				if (!bsHandle.isValid())
-					edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product "
-							<< beamSpotInputTag;
-				if (!hConversions.isValid())
-					edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product "
-							<< conversionsInputTag;
-			}
+			} 
+			// else {
+			// 	if (!bsHandle.isValid())
+			// 		edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product "
+			// 				<< beamSpotInputTag;
+			// 	if (!hConversions.isValid())
+			// 		edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product "
+			// 				<< conversionsInputTag;
+			// }
 			// Vertex association
 			double minVtxDist3D = 9999.;
 			int vtxIndex_ = -1;
@@ -332,9 +321,10 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 						vtxDistZ_ = distZ;
 					}
 				}
-			} else {
-				edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << vtxInputTag;
 			}
+// 			} else {
+// 				edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << vtxInputTag;
+// 			}
 
 			//kinematic variables
 			px->push_back(it->px());
@@ -434,9 +424,10 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			primaryVertexDXYCorr->push_back(vtxDistXY_Corr);
 
 		}
-	} else {
-		edm::LogError("BristolNTuple_ElectronsExtraError") << "Error! Can't get the product " << inputTag;
 	}
+	// } else {
+	// 	edm::LogError("BristolNTuple_ElectronsExtraError") << "Error! Can't get the product " << inputTag;
+	// }
 
 	//-----------------------------------------------------------------
 	// put vectors in the event
@@ -535,3 +526,11 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	iEvent.put(primaryVertexDXYCorr, prefix + "PrimaryVertexDXYCorr" + suffix);
 
 }
+
+
+
+
+
+
+
+

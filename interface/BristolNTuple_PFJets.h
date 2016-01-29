@@ -4,6 +4,7 @@
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
 
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondFormats/BTauObjects/interface/BTagCalibrationReader.h"
@@ -15,7 +16,7 @@ class BristolNTuple_PFJets : public edm::EDProducer {
 
  private:
   void produce( edm::Event &, const edm::EventSetup & );
-  const edm::InputTag   inputTag;
+  const edm::EDGetTokenT<std::vector<pat::Jet>> inputTag;
   const std::string     prefix,suffix;
   const unsigned int    maxSize;
   const double      minJetPtToStore;
@@ -23,7 +24,7 @@ class BristolNTuple_PFJets : public edm::EDProducer {
   const bool readJEC;
   const std::string jetCorrectionService;
   const bool readJECuncertainty, doVertexAssociation;
-  const edm::InputTag   vtxInputTag;
+  const edm::EDGetTokenT<std::vector<reco::Vertex>> vtxInputTag;
   const bool isRealData;
 
   BTagCalibration calib;

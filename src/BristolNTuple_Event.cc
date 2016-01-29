@@ -9,7 +9,7 @@
 using namespace std;
 
 BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig) :
-		recoVertexInputTag_(iConfig.getParameter < edm::InputTag > ("recoVertexInputTag")), //
+		recoVertexInputTag_(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("recoVertexInputTag"))), //		
 		// metFiltersInputTag_(iConfig.getParameter < edm::InputTag > ("metFiltersInputTag")), //
 		// metFiltersOfInterest_(iConfig.getParameter < std::vector<std::string> > ("metFiltersOfInterest")), //
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //
@@ -31,8 +31,8 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	double usec = 0xFFFFFFFF & iEvent.time().value();
 	double conv = 1e6;
 
- 	edm::Handle<reco::VertexCollection> primaryVertices;
- 	iEvent.getByLabel(recoVertexInputTag_,primaryVertices);
+	edm::Handle< std::vector< reco::Vertex > > primaryVertices;
+	iEvent.getByToken(recoVertexInputTag_, primaryVertices);
 
 	std::auto_ptr<unsigned int> run(new unsigned int(iEvent.id().run()));
 	std::auto_ptr<unsigned int> eventNumber(new unsigned int(iEvent.id().event()));

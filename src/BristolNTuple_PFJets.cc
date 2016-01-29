@@ -2,7 +2,6 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/PatCandidates/interface/Jet.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
@@ -15,7 +14,7 @@
 using namespace std;
 
 BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
-		inputTag(iConfig.getParameter < edm::InputTag > ("InputTag")), //
+  		inputTag(consumes<std::vector<pat::Jet>>(iConfig.getParameter<edm::InputTag>("InputTag"))),			
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //
 		suffix(iConfig.getParameter < std::string > ("Suffix")), //
 		maxSize(iConfig.getParameter<unsigned int>("MaxSize")), //
@@ -25,11 +24,11 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		jetCorrectionService(iConfig.getParameter<std::string> ("JetCorrectionService")), //
 		readJECuncertainty(iConfig.getParameter<bool>("ReadJECuncertainty")), //
 		doVertexAssociation(iConfig.getParameter<bool>("DoVertexAssociation")), //
-		vtxInputTag(iConfig.getParameter < edm::InputTag > ("VertexInputTag")), // 
+		vtxInputTag(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))), //		
 		isRealData(iConfig.getParameter<bool>("isRealData")),
 
-		// calib("csvv2", "BristolAnalysis/NTupleTools/data/BTagSF/CSVv2.csv"),
-		calib("csvv2", "CSVv2.csv"),
+		calib("csvv2", "BristolAnalysis/NTupleTools/data/BTagSF/CSVv2.csv"),
+		// calib("csvv2", "CSVv2.csv"),
 		reader_bc(		&calib,               // calibration instance
 					BTagEntry::OP_MEDIUM,  // operating point
 					"mujets",               // measurement type
@@ -233,13 +232,13 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	pat::strbitset retpf = pfjetIDLoose.getBitTemplate();
 
 	edm::Handle < std::vector<pat::Jet> > jets;
-	iEvent.getByLabel(inputTag, jets);
+	iEvent.getByToken(inputTag, jets);
 
 	edm::Handle < reco::VertexCollection > primaryVertices; // DB
-	iEvent.getByLabel(vtxInputTag, primaryVertices); // DB
+	iEvent.getByToken(vtxInputTag, primaryVertices); // DB
 
 	if (jets.isValid()) {
-		edm::LogInfo("BristolNTuple_PFJetsInfo") << "Total # PFJets: " << jets->size();
+		// edm::LogInfo("BristolNTuple_PFJetsInfo") << "Total # PFJets: " << jets->size();
 
 		for (std::vector<pat::Jet>::const_iterator it = jets->begin(); it != jets->end(); ++it) {
 			// exit from loop when you reach the required number of jets
@@ -349,7 +348,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			// Loop on primary Vertices and jets and perform associations
 
 			if (primaryVertices.isValid()) {
-				edm::LogInfo("BristolNTuple_PFJetsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
+				// edm::LogInfo("BristolNTuple_PFJetsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
 				if (doVertexAssociation) {
 					// Main Vertex Loop
 					for (reco::VertexCollection::const_iterator v_it = primaryVertices->begin();
@@ -428,9 +427,10 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 					}
 				}
 				//std::cout<<"---------------------"<<std::endl;
-			} else {
-				edm::LogError("BristolNTuple_PFJetsError") << "Error! Can't get the product " << vtxInputTag;
-			}
+			} 
+			// else {
+			// 	edm::LogError("BristolNTuple_PFJetsError") << "Error! Can't get the product " << vtxInputTag;
+			// }
 
 			// fill in all the vectors
 			//kinematic variables
@@ -584,9 +584,10 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				closestVertexZIndex->push_back(bestVtxIndexZdist);
 			}
 		}
-	} else {
-		edm::LogError("BristolNTuple_PFJetsError") << "Error! Can't get the product " << inputTag;
-	}
+	} 
+	// else {
+	// 	edm::LogError("BristolNTuple_PFJetsError") << "Error! Can't get the product " << inputTag;
+	// }
 	delete jecUnc;
 	//-----------------------------------------------------------------
 	// put vectors in the event
