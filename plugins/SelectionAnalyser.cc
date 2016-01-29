@@ -11,20 +11,31 @@ using namespace std;
 SelectionAnalyser::SelectionAnalyser(const edm::ParameterSet& iConfig) :
 		// PUWeightInput_(iConfig.getParameter < edm::InputTag > ("PUWeightInput")), //
 //		BtagWeightInput_(iConfig.getParameter < edm::InputTag > ("BtagWeightInput")), //
-		selectionFlags_(iConfig.getParameter < vector<InputTag> > ("selectionFlags")), //
-		selectionNames_(iConfig.getParameter < vector<string> > ("selectionNames")), //
-		numberOfCuts_(selectionNames_.size()), //
+  //   	genEventInfoProductToken_(consumes< GenEventInfoProduct > (iConfig.getParameter<edm::InputTag>("genEvtInfoProduct"))),
+
+  //  		selectionNames_(iConfig.getParameter < vector<string> > ("selectionNames")), //
+		// numberOfCuts_(selectionNames_.size()), //
 		consecutiveCuts_(), //
 		individualCuts_(), //
 		consecutiveCuts_unweighted_(), //
 		individualCuts_unweighted_() {
-
+    	
+    genEventInfoProductToken_ = consumes< GenEventInfoProduct > (iConfig.getParameter<edm::InputTag>("genEvtInfoProduct"));
+    for (edm::InputTag const & tag : iConfig.getParameter< std::vector<edm::InputTag> > ("selectionFlags"))
+    selectionFlags_.push_back(consumes<bool>(tag));
+	selectionNames_ = iConfig.getParameter < vector<string> > ("selectionNames"); //
+	numberOfCuts_ = selectionNames_.size(); //
 }
 
 void SelectionAnalyser::fillDescriptions(edm::ConfigurationDescriptions & descriptions) {
 	edm::ParameterSetDescription desc;
+
+	// for any parameter input
+	// desc.setAllowAnything();
+
 	// desc.add < InputTag > ("PUWeightInput");
-//	desc.add < InputTag > ("BtagWeightInput");
+	// desc.add < InputTag > ("BtagWeightInput");
+	desc.add < InputTag > ("genEvtInfoProduct");
 	desc.add < vector<InputTag> > ("selectionFlags");
 	desc.add < vector<string> > ("selectionNames");
 
@@ -64,11 +75,13 @@ void SelectionAnalyser::beginJob() {
 void SelectionAnalyser::endJob() {
 
 }
+    
 
 void SelectionAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup&) {
 
 	edm::Handle < GenEventInfoProduct > genEvtInfoProduct;
-	iEvent.getByLabel("generator", genEvtInfoProduct);
+	iEvent.getByToken(genEventInfoProductToken_, genEvtInfoProduct);
+
 	double weight = 1;
 	if (genEvtInfoProduct.isValid()) {
 		// cout << "Gen weight : " << genEvtInfoProduct->weight() << endl;

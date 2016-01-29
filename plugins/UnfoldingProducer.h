@@ -36,9 +36,11 @@ private:
 	edm::InputTag electron_input_, muon_input_;
 	edm::InputTag electronIndex_input_, muonIndex_input_;
 	edm::InputTag vertex_input_, gen_event_input_;
-	edm::InputTag selection_flag_input_;
+	edm::EDGetTokenT<bool>  selection_flag_input_;
 	edm::InputTag is_fully_hadronic_ttbar_flag_, is_dileptonic_ttbar_flag_;
-	edm::InputTag is_semileptonic_tau_flag_, is_semileptonic_electron_flag_, is_semileptonic_muon_flag_;
+	edm::EDGetTokenT<bool> is_semileptonic_tau_flag_;
+	edm::EDGetTokenT<bool> is_semileptonic_electron_flag_;
+	edm::EDGetTokenT<bool> is_semileptonic_muon_flag_;
 	bool do_electron_channel_; //if false do muon channel
 	bool is_semileptonic_;
 

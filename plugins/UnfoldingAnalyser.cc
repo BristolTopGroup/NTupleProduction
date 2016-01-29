@@ -31,12 +31,12 @@ UnfoldingAnalyser::UnfoldingAnalyser(const edm::ParameterSet& iConfig) :
 		muon_input_(iConfig.getParameter < edm::InputTag > ("muon_input")), //
 		vertex_input_(iConfig.getParameter < edm::InputTag > ("vertex_input")), //
 		gen_event_input_(iConfig.getParameter < edm::InputTag > ("gen_event_input")), //
-		selection_flag_input_(iConfig.getParameter < edm::InputTag > ("selection_flag_input")), //
-		is_fully_hadronic_ttbar_flag_(iConfig.getParameter < edm::InputTag > ("is_fully_hadronic_flag")), //
-		is_dileptonic_ttbar_flag_(iConfig.getParameter < edm::InputTag > ("is_dileptonic_flag")), //
-		is_semileptonic_tau_flag_(iConfig.getParameter < edm::InputTag > ("is_semileptonic_tau_flag")), //
-		is_semileptonic_electron_flag_(iConfig.getParameter < edm::InputTag > ("is_semileptonic_electron_flag")), //
-		is_semileptonic_muon_flag_(iConfig.getParameter < edm::InputTag > ("is_semileptonic_muon_flag")), //
+		selection_flag_input_(consumes<bool>(iConfig.getParameter < edm::InputTag > ("selection_flag_input"))), //
+		is_fully_hadronic_ttbar_flag_(consumes<bool>(iConfig.getParameter < edm::InputTag > ("is_fully_hadronic_flag"))), //
+		is_dileptonic_ttbar_flag_(consumes<bool>(iConfig.getParameter < edm::InputTag > ("is_dileptonic_flag"))), //
+		is_semileptonic_tau_flag_(consumes<bool>(iConfig.getParameter < edm::InputTag > ("is_semileptonic_tau_flag"))), //
+		is_semileptonic_electron_flag_(consumes<bool>(iConfig.getParameter < edm::InputTag > ("is_semileptonic_electron_flag"))), //
+		is_semileptonic_muon_flag_(consumes<bool>(iConfig.getParameter < edm::InputTag > ("is_semileptonic_muon_flag"))), //
 		do_electron_channel_(iConfig.getUntrackedParameter<bool>("do_electron_channel")), //
 		variable_under_analysis_(iConfig.getParameter < string > ("variable_under_analysis")), //
 		variable_min_(iConfig.getParameter<double>("variable_min")), //
@@ -60,7 +60,6 @@ UnfoldingAnalyser::UnfoldingAnalyser(const edm::ParameterSet& iConfig) :
 		contamination_asym_bins_in_reco_variable_(), //
 		response_asym_bins_(), //
 		response_without_fakes_asym_bins_() {
-
 }
 
 void UnfoldingAnalyser::fillDescriptions(edm::ConfigurationDescriptions & descriptions) {

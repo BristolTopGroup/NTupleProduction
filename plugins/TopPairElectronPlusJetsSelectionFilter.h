@@ -98,7 +98,15 @@ private:
 	virtual void setupEventContent(edm::Event& iEvent, const edm::EventSetup& iSetup);
 
 	//config
-	edm::InputTag jetInput_, electronInput_, muonInput_, hltInputTag_, vertexInputTag_;
+	// edm::InputTag jetInput_, electronInput_, muonInput_, hltInputTag_, vertexInputTag_;
+
+	edm::EDGetTokenT<pat::JetCollection> jetInput_;
+	edm::EDGetToken electronInput_;
+
+	// edm::EDGetTokenT<pat::ElectronCollection> electronInput_;
+	edm::EDGetTokenT<pat::MuonCollection> muonInput_;
+	edm::EDGetTokenT<edm::TriggerResults> hltInputTag_;
+	edm::EDGetTokenT<reco::VertexCollection> vertexInputTag_;
 
 	double minSignalElectronPt_, maxSignalElectronEta_;
 	edm::EDGetTokenT<edm::ValueMap<bool> > signalElectronIDMapToken_;
@@ -140,7 +148,7 @@ private:
 	bool isRealData_, hasSignalElectron_;
 	std::vector< unsigned int> cleanedJetIndex_, cleanedBJetIndex_;
 	pat::JetCollection jets_, cleanedJets_, cleanedBJets_;
-	edm::Handle <edm::View<pat::Electron> > electrons_;
+    edm::Handle<edm::View<pat::Electron> > electrons_;
 	pat::ElectronCollection goodIsolatedElectrons_, looseElectrons_;
 	pat::MuonCollection muons_, looseMuons_;
 	pat::Electron signalElectron_;

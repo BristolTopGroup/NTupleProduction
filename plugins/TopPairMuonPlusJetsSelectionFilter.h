@@ -92,7 +92,13 @@ private:
 	virtual void setupEventContent(edm::Event& iEvent, const edm::EventSetup& iSetup);
 
 	//config
-	edm::InputTag jetInput_, electronInput_, muonInput_, hltInputTag_, VertexInput_;
+	edm::EDGetTokenT<pat::JetCollection> jetInput_;
+	edm::EDGetToken electronInput_;
+
+	// edm::EDGetTokenT<pat::ElectronCollection> electronInput_;
+	edm::EDGetTokenT<pat::MuonCollection> muonInput_;
+	edm::EDGetTokenT<edm::TriggerResults> hltInputTag_;
+	edm::EDGetTokenT<reco::VertexCollection> VertexInput_;
 
 	double minSignalMuonPt_, maxSignalMuonEta_;
 	double minLooseMuonPt_, maxLooseMuonEta_, minLooseElectronPt_, maxLooseElectronEta_;

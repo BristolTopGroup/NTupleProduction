@@ -1,6 +1,4 @@
 #include "EventWeight_Producer_PU.h"
-#include "DataFormats/Common/interface/View.h"
-#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 // =============
@@ -8,7 +6,7 @@
 // =============
 
 EventWeight_Producer_PU::EventWeight_Producer_PU(const edm::ParameterSet& cfg) :
-		inTag_PUSource(cfg.getParameter < edm::InputTag > ("PUSource")), //
+		inTag_PUSource(consumes< edm::View<PileupSummaryInfo> > (cfg.getParameter < edm::InputTag > ("PUSource"))), //
 		inTag_WeightName(cfg.getParameter < std::string > ("WeightName")), //
 		inTag_MCSampleTag(cfg.getParameter < std::string > ("MCSampleTag")), //
 		inTag_MCSampleFile(cfg.getParameter < edm::FileInPath > ("MCSampleFile")), //
@@ -51,7 +49,7 @@ void EventWeight_Producer_PU::produce(edm::Event& evt, const edm::EventSetup& se
 	else {
 
 		edm::Handle < edm::View<PileupSummaryInfo> > pPUInfo;
-		evt.getByLabel(inTag_PUSource, pPUInfo);
+		evt.getByToken(inTag_PUSource, pPUInfo);
 
 		edm::View<PileupSummaryInfo>::const_iterator iterPU;
 

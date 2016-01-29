@@ -31,9 +31,9 @@ UnfoldingProducer::UnfoldingProducer(const edm::ParameterSet& iConfig) :
 		muonIndex_input_(iConfig.getParameter < edm::InputTag > ("muonIndex_input")), //
 		vertex_input_(iConfig.getParameter < edm::InputTag > ("vertex_input")), //
 		gen_event_input_(iConfig.getParameter < edm::InputTag > ("gen_event_input")), //
-		selection_flag_input_(iConfig.getParameter < edm::InputTag > ("selection_flag_input")), //
-		is_semileptonic_electron_flag_(iConfig.getParameter < edm::InputTag > ("is_semileptonic_electron_flag")), //
-		is_semileptonic_muon_flag_(iConfig.getParameter < edm::InputTag > ("is_semileptonic_muon_flag")), //
+		selection_flag_input_(consumes<bool>(iConfig.getParameter < edm::InputTag > ("selection_flag_input"))), //
+		is_semileptonic_electron_flag_(consumes<bool>(iConfig.getParameter < edm::InputTag > ("is_semileptonic_electron_flag"))), //
+		is_semileptonic_muon_flag_(consumes<bool>(iConfig.getParameter < edm::InputTag > ("is_semileptonic_muon_flag"))), //
 		do_electron_channel_(iConfig.getUntrackedParameter<bool>("do_electron_channel")), //
 		is_semileptonic_(false), //
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //

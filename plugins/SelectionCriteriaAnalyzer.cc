@@ -11,12 +11,13 @@ using namespace edm;
 using namespace std;
 
 
-SelectionCriteriaAnalyzer::SelectionCriteriaAnalyzer(const edm::ParameterSet& iConfig) :
-		// Input tags
-		offlineSelectionCriteriaInput_(iConfig.getParameter < std::vector<edm::InputTag> > ("offlineSelectionCriteriaInput")), //
-		genSelectionCriteriaInput_(iConfig.getParameter < std::vector<edm::InputTag> > ("genSelectionCriteriaInput")) //
+SelectionCriteriaAnalyzer::SelectionCriteriaAnalyzer(const edm::ParameterSet& iConfig) {
 
-{
+    for (edm::InputTag const & tag : iConfig.getParameter< std::vector<edm::InputTag> > ("offlineSelectionCriteriaInput"))
+    offlineSelectionCriteriaInput_.push_back(consumes<bool>(tag));
+    for (edm::InputTag const & tag : iConfig.getParameter< std::vector<edm::InputTag> > ("genSelectionCriteriaInput"))
+    genSelectionCriteriaInput_.push_back(consumes<bool>(tag));
+
 	produces< vector<unsigned int> >("passesOfflineSelection");
 	produces< vector<unsigned int> >("passesGenSelection");	
 }
