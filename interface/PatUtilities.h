@@ -18,7 +18,7 @@ reco::TrackRef pmcTrack(const pat::Muon& mu, int & refit_id);
 reco::TrackRef tevOptimized(const reco::TrackRef& trackerTrack, const reco::TrackRef& gmrTrack,
 		const reco::TrackRef& fmsTrack, const reco::TrackRef& pmrTrack, int & refit_id);
 
-bool passesFilter(const edm::Event& event, const edm::InputTag filter);
+bool passesFilter(const edm::Event& event, const edm::EDGetTokenT<bool> filter);
 
 bool triggerFired(const std::string& triggerWildCard, const HLTConfigProvider& hltConfig,
 		const edm::TriggerResults& triggerResults);

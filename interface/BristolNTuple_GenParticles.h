@@ -4,6 +4,7 @@
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 class BristolNTuple_GenParticles : public edm::EDProducer {
  public:
@@ -11,7 +12,7 @@ class BristolNTuple_GenParticles : public edm::EDProducer {
 
  private:
   void produce( edm::Event &, const edm::EventSetup & );
-  const edm::InputTag   inputTag;
+  const edm::EDGetTokenT< reco::GenParticleCollection > inputTag;
   const std::string     prefix,suffix;
   const unsigned int    maxSize;
 };

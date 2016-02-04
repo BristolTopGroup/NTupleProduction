@@ -1,11 +1,10 @@
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_RecoMET.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/METReco/interface/PFMET.h"
-#include "DataFormats/METReco/interface/PFMETCollection.h"
+
 
 BristolNTuple_RecoMET::BristolNTuple_RecoMET(const edm::ParameterSet& iConfig) :
-	inputTag(iConfig.getParameter < edm::InputTag > ("InputTag")), //
+	inputTag(consumes< std::vector<reco::PFMET> > (iConfig.getParameter < edm::InputTag > ("InputTag"))), //
 	prefix(iConfig.getParameter < std::string > ("Prefix")), //
 	suffix(iConfig.getParameter < std::string > ("Suffix"))
 {
@@ -18,10 +17,10 @@ BristolNTuple_RecoMET::BristolNTuple_RecoMET(const edm::ParameterSet& iConfig) :
 
 void BristolNTuple_RecoMET::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::Handle < std::vector<reco::PFMET> > recomets;
-    iEvent.getByLabel(inputTag, recomets);
+    iEvent.getByToken(inputTag, recomets);
 
-    if (!recomets.isValid())
-      edm::LogError("BristolNTuple_RecoMETExtraError") << "Error! Can't get the product " << inputTag;
+    // if (!recomets.isValid())
+    //   edm::LogError("BristolNTuple_RecoMETExtraError") << "Error! Can't get the product " << inputTag;
 
     const reco::PFMET recoPFMET(recomets->at(0));
 
