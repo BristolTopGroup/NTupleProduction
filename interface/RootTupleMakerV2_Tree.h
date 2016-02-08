@@ -58,6 +58,9 @@ private:
   std::vector<BranchConnector*> connectors;
   edm::ParameterSet pset;
 
+  template <class T>
+  void registerBranch(edm::BranchDescription const* branchDesc, const std::string& type);
+
 public:
   explicit RootTupleMakerV2_Tree(const edm::ParameterSet& iConfig) :
   	  treeName(iConfig.getParameter <std::string> ("treeName")),
@@ -76,5 +79,7 @@ public:
 		 INT_V_V
                  };
 };
+
+#include "BristolAnalysis/NTupleTools/interface/RootTupleMakerV2_Tree.hxx"
 
 #endif
