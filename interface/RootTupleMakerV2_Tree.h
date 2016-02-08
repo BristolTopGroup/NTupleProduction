@@ -42,8 +42,8 @@ private:
   template <class T>
   class TypedBranchConnector : public BranchConnector {
   private:
-    std::string ml;   //module label
-    std::string pin;  //product instance name
+    std::string moduleLabel_;   //module label
+    std::string productInstanceName_;  //product instance name
     T object_;
     T* object_ptr_;
   public:
@@ -51,21 +51,21 @@ private:
     void connect(const edm::Event&);
   };
 
-  edm::Service<TFileService> fs;
-  TTree * tree;
-  const std::string treeName;
+  edm::Service<TFileService> fs_;
+  TTree * tree_;
+  const std::string treeName_;
 
-  std::vector<BranchConnector*> connectors;
-  edm::ParameterSet pset;
+  std::vector<BranchConnector*> connectors_;
+  edm::ParameterSet pset_;
 
   template <class T>
   void registerBranch(edm::BranchDescription const* branchDesc, const std::string& type);
 
 public:
-  explicit RootTupleMakerV2_Tree(const edm::ParameterSet& iConfig) :
-  	  treeName(iConfig.getParameter <std::string> ("treeName")),
-	  pset(iConfig)
-  {}
+	explicit RootTupleMakerV2_Tree(const edm::ParameterSet& iConfig) :
+					treeName_(iConfig.getParameter < std::string > ("treeName")),
+					pset_(iConfig) {
+	}
 
   enum LEAFTYPE {BOOL=1,  BOOL_V,
                  SHORT,   SHORT_V,           U_SHORT, U_SHORT_V,

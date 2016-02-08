@@ -13,35 +13,35 @@
 #include <TLorentzVector.h>
 
 void RootTupleMakerV2_Tree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
-	BOOST_FOREACH(BranchConnector * connector, connectors)
+	BOOST_FOREACH(BranchConnector * connector, connectors_)
 			connector->connect(iEvent);
-	tree->Fill();
+	tree_->Fill();
 }
 
 template<class T>
 void RootTupleMakerV2_Tree::TypedBranchConnector<T>::connect(const edm::Event& iEvent) {
-	edm::Handle < T > handle_;
-	iEvent.getByLabel(ml, pin, handle_);
-	object_ = *handle_;
+	edm::Handle < T > handle;
+	iEvent.getByLabel(moduleLabel_, productInstanceName_, handle);
+	object_ = *handle;
 }
 
 template<class T>
 RootTupleMakerV2_Tree::TypedBranchConnector<T>::TypedBranchConnector(edm::BranchDescription const* desc, std::string t,
 		TTree * tree) :
-				ml(desc->moduleLabel()),
-				pin(desc->productInstanceName()) {
+				moduleLabel_(desc->moduleLabel()),
+				productInstanceName_(desc->productInstanceName()) {
 	object_ptr_ = &object_;
-	std::string s = pin + t;
+	std::string s = productInstanceName_ + t;
 	if (t != "") {
-		tree->Branch(pin.c_str(), object_ptr_, s.c_str());
+		tree->Branch(productInstanceName_.c_str(), object_ptr_, s.c_str());
 	} //raw type
 	else {
-		tree->Branch(pin.c_str(), &object_ptr_);
+		tree->Branch(productInstanceName_.c_str(), &object_ptr_);
 	} //vector<type>
 }
 
 void RootTupleMakerV2_Tree::beginJob() {
-	tree = fs->make < TTree > (treeName.c_str(), "");
+	tree_ = fs_->make < TTree > (treeName_.c_str(), "");
 
 	typedef std::map<std::string, bool> mapStringBool;
 	typedef std::map<std::string, int> mapStringInt;
@@ -83,7 +83,7 @@ void RootTupleMakerV2_Tree::beginJob() {
 
 	edm::Service < edm::ConstProductRegistry > reg;
 	edm::SelectedProducts allBranches = reg->allBranchDescriptions();
-	edm::ProductSelectorRules groupSelectorRules_(pset, "outputCommands", "RootTupleMakerV2_Tree");
+	edm::ProductSelectorRules groupSelectorRules_(pset_, "outputCommands", "RootTupleMakerV2_Tree");
 	edm::ProductSelector groupSelector_;
 	groupSelector_.initialize(groupSelectorRules_, allBranches);
 
