@@ -61,11 +61,10 @@ private:
   template <class T>
   void registerBranch(edm::BranchDescription const* branchDesc, const std::string& type);
 
+  void registerBranches();
+
 public:
-	explicit RootTupleMakerV2_Tree(const edm::ParameterSet& iConfig) :
-					treeName_(iConfig.getParameter < std::string > ("treeName")),
-					pset_(iConfig) {
-	}
+	RootTupleMakerV2_Tree(const edm::ParameterSet& iConfig);
 
   enum LEAFTYPE {BOOL=1,  BOOL_V,
                  SHORT,   SHORT_V,           U_SHORT, U_SHORT_V,

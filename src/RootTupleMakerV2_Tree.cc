@@ -12,6 +12,12 @@
 #include <TBranch.h>
 #include <TLorentzVector.h>
 
+RootTupleMakerV2_Tree::RootTupleMakerV2_Tree(const edm::ParameterSet& iConfig) :
+				treeName_(iConfig.getParameter < std::string > ("treeName")),
+				pset_(iConfig) {
+	registerBranches();
+}
+
 void RootTupleMakerV2_Tree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	BOOST_FOREACH(BranchConnector * connector, connectors_)
 			connector->connect(iEvent);
@@ -39,8 +45,10 @@ RootTupleMakerV2_Tree::TypedBranchConnector<T>::TypedBranchConnector(edm::Branch
 		tree->Branch(productInstanceName_.c_str(), &object_ptr_);
 	} //vector<type>
 }
-
 void RootTupleMakerV2_Tree::beginJob() {
+
+}
+void RootTupleMakerV2_Tree::registerBranches() {
 	tree_ = fs_->make < TTree > (treeName_.c_str(), "");
 
 	typedef std::map<std::string, bool> mapStringBool;
