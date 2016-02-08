@@ -19,8 +19,9 @@ RootTupleMakerV2_Tree::RootTupleMakerV2_Tree(const edm::ParameterSet& iConfig) :
 }
 
 void RootTupleMakerV2_Tree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
-	BOOST_FOREACH(BranchConnector * connector, connectors_)
-			connector->connect(iEvent);
+	for (BranchConnector * connector : connectors_) {
+		connector->connect(iEvent);
+	}
 	tree_->Fill();
 }
 
@@ -97,68 +98,115 @@ void RootTupleMakerV2_Tree::registerBranches() {
 
 	std::set < std::string > branchnames;
 
-	BOOST_FOREACH( const edm::SelectedProducts::value_type& selection, allBranches) {
-		if(groupSelector_.selected(*selection)) {
+	for (auto const& selection : allBranches) {
+		if (groupSelector_.selected(*selection)) {
 
 			//Check for duplicate branch names
-			if (branchnames.find( selection->productInstanceName()) != branchnames.end() ) {
-				throw edm::Exception(edm::errors::Configuration)
-				<< "More than one branch named: "
-				<< selection->productInstanceName() << std::endl
-				<< "Exception thrown from RootTupleMakerV2_Tree::beginJob" << std::endl;
-			}
-			else {
-				branchnames.insert( selection->productInstanceName() );
+			if (branchnames.find(selection->productInstanceName()) != branchnames.end()) {
+				throw edm::Exception(edm::errors::Configuration) << "More than one branch named: "
+						<< selection->productInstanceName() << std::endl
+						<< "Exception thrown from RootTupleMakerV2_Tree::beginJob" << std::endl;
+			} else {
+				branchnames.insert(selection->productInstanceName());
 			}
 
 			//Create RootTupleMakerV2_Tree branch
-			switch(leafmap.find( selection->friendlyClassName() )->second) {
-				case BOOL : registerBranch<bool>(selection, "/O"); break;
-				case BOOL_V : registerBranch<std::vector <bool> > (selection, ""); break;
-				case INT : registerBranch<int> (selection, "/I"); break;
-				case INT_V : registerBranch<std::vector <int> > (selection, "" ); break;
-				case U_INT : registerBranch <unsigned int> (selection, "/i" ); break;
-				case U_INT_V : registerBranch<std::vector <unsigned int> > (selection, "" ); break;
-				case SHORT : registerBranch <short> (selection, "/S" ); break;
-				case SHORT_V : registerBranch<std::vector <short> > (selection, "" ); break;
-				case U_SHORT : registerBranch <unsigned short> (selection, "/s" ); break;
-				case U_SHORT_V : registerBranch<std::vector<unsigned short> > (selection, "" ); break;
-				case FLOAT : registerBranch <float> (selection, "/F" ); break;
-				case FLOAT_V : registerBranch<std::vector <float> > (selection, "" ); break;
-				case DOUBLE : registerBranch <double> (selection, "/D" ); break;
-				case DOUBLE_V : registerBranch<std::vector <double> > (selection, "" ); break;
-				case LONG : registerBranch <long> (selection, "/L" ); break;
-				case LONG_V : registerBranch<std::vector <long> > (selection, "" ); break;
-				case U_LONG : registerBranch <unsigned long> (selection, "/l" ); break;
-				case U_LONG_V : registerBranch<std::vector <unsigned long> > (selection, "" ); break;
+			switch (leafmap.find(selection->friendlyClassName())->second) {
+			case BOOL:
+				registerBranch<bool>(selection, "/O");
+				break;
+			case BOOL_V:
+				registerBranch < std::vector<bool> > (selection, "");
+				break;
+			case INT:
+				registerBranch<int>(selection, "/I");
+				break;
+			case INT_V:
+				registerBranch < std::vector<int> > (selection, "");
+				break;
+			case U_INT:
+				registerBranch<unsigned int>(selection, "/i");
+				break;
+			case U_INT_V:
+				registerBranch < std::vector<unsigned int> > (selection, "");
+				break;
+			case SHORT:
+				registerBranch<short>(selection, "/S");
+				break;
+			case SHORT_V:
+				registerBranch < std::vector<short> > (selection, "");
+				break;
+			case U_SHORT:
+				registerBranch<unsigned short>(selection, "/s");
+				break;
+			case U_SHORT_V:
+				registerBranch < std::vector<unsigned short> > (selection, "");
+				break;
+			case FLOAT:
+				registerBranch<float>(selection, "/F");
+				break;
+			case FLOAT_V:
+				registerBranch < std::vector<float> > (selection, "");
+				break;
+			case DOUBLE:
+				registerBranch<double>(selection, "/D");
+				break;
+			case DOUBLE_V:
+				registerBranch < std::vector<double> > (selection, "");
+				break;
+			case LONG:
+				registerBranch<long>(selection, "/L");
+				break;
+			case LONG_V:
+				registerBranch < std::vector<long> > (selection, "");
+				break;
+			case U_LONG:
+				registerBranch<unsigned long>(selection, "/l");
+				break;
+			case U_LONG_V:
+				registerBranch < std::vector<unsigned long> > (selection, "");
+				break;
 				//
-				case STRING : registerBranch <std::string > (selection, "" ); break;
-				case STRING_V : registerBranch<std::vector <std::string > > (selection, "" ); break;
+			case STRING:
+				registerBranch < std::string > (selection, "");
+				break;
+			case STRING_V:
+				registerBranch < std::vector<std::string> > (selection, "");
+				break;
 
-				case STRING_INT_M : registerBranch<mapStringInt> (selection, "" ); break;
-				case STRING_BOOL_M : registerBranch<mapStringBool> (selection, "" ); break;
-				case STRING_STRING_M : registerBranch<mapStringString> (selection, "" ); break;
-				case STRING_FLOAT_V_M: registerBranch<mapStringDoubles> (selection, "" ); break;
-				case FLOAT_V_V : registerBranch<vectorVectorFloats> (selection, "" ); break;
-				case INT_V_V : registerBranch<vectorVectorInts> (selection, "" ); break;
+			case STRING_INT_M:
+				registerBranch < mapStringInt > (selection, "");
+				break;
+			case STRING_BOOL_M:
+				registerBranch < mapStringBool > (selection, "");
+				break;
+			case STRING_STRING_M:
+				registerBranch < mapStringString > (selection, "");
+				break;
+			case STRING_FLOAT_V_M:
+				registerBranch < mapStringDoubles > (selection, "");
+				break;
+			case FLOAT_V_V:
+				registerBranch < vectorVectorFloats > (selection, "");
+				break;
+			case INT_V_V:
+				registerBranch < vectorVectorInts > (selection, "");
+				break;
 
-				default:
-				{
-					std::string leafstring = "";
-					typedef std::pair<std::string, LEAFTYPE> pair_t;
-					BOOST_FOREACH( const pair_t& leaf, leafmap)
+			default: {
+				std::string leafstring = "";
+				typedef std::pair<std::string, LEAFTYPE> pair_t;
+				for( const pair_t& leaf: leafmap){
 					leafstring+= "\t" + leaf.first + "\n";
-
-					throw edm::Exception(edm::errors::Configuration)
-					<< "class RootTupleMakerV2_Tree does not handle leaves of type " << selection->className() << " like\n"
-					<< selection->friendlyClassName() << "_"
-					<< selection->moduleLabel() << "_"
-					<< selection->productInstanceName() << "_"
-					<< selection->processName() << std::endl
-					<< "Valid leaf types are (friendlyClassName):\n"
-					<< leafstring
-					<< "Exception thrown from RootTupleMakerV2_Tree::beginJob\n";
 				}
+
+				throw edm::Exception(edm::errors::Configuration)
+						<< "class RootTupleMakerV2_Tree does not handle leaves of type " << selection->className()
+						<< " like\n" << selection->friendlyClassName() << "_" << selection->moduleLabel() << "_"
+						<< selection->productInstanceName() << "_" << selection->processName() << std::endl
+						<< "Valid leaf types are (friendlyClassName):\n" << leafstring
+						<< "Exception thrown from RootTupleMakerV2_Tree::beginJob\n";
+			}
 			}
 		}
 	}
