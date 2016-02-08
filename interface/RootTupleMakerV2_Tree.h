@@ -95,7 +95,9 @@ public:
 		STRING_STRING_M,
 		STRING_FLOAT_V_M,
 		FLOAT_V_V,
-		INT_V_V
+		INT_V_V,
+		BOOL_V_V,
+		STRING_V_V
 	};
 };
 
