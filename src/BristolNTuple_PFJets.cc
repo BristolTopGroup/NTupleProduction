@@ -27,7 +27,7 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		vtxInputTag(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))), //		
 		isRealData(iConfig.getParameter<bool>("isRealData")),
 
-		calib("csvv2", "BristolAnalysis/NTupleTools/data/BTagSF/CSVv2.csv"),
+		calib("csvv2", "BristolAnalysis/NTupleTools/data/BTagSF/CSVv2_prelim.csv"),
 		// calib("csvv2", "CSVv2.csv"),
 		reader_bc(		&calib,               // calibration instance
 					BTagEntry::OP_MEDIUM,  // operating point
@@ -35,9 +35,9 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 					"central"),           // systematics type
 		reader_bc_up(&calib, BTagEntry::OP_MEDIUM, "mujets", "up"),  // sys up
 		reader_bc_down(&calib, BTagEntry::OP_MEDIUM, "mujets", "down"),  // sys down
-		reader_l(&calib, BTagEntry::OP_MEDIUM, "comb", "central"),  // sys down
-		reader_l_up(&calib, BTagEntry::OP_MEDIUM, "comb", "up"),  // sys down
-		reader_l_down(&calib, BTagEntry::OP_MEDIUM, "comb", "down")  // sys down
+		reader_l(&calib, BTagEntry::OP_MEDIUM, "incl", "central"),  // sys down
+		reader_l_up(&calib, BTagEntry::OP_MEDIUM, "incl", "up"),  // sys down
+		reader_l_down(&calib, BTagEntry::OP_MEDIUM, "incl", "down")  // sys down
 
 		 {
 	//kinematic variables
@@ -511,7 +511,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			//b-tagging information
 			//names are changing between major software releases
 			combinedInclusiveSecondaryVertexV2BJetTags->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
-			passesMediumCSV->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.890 );
+			passesMediumCSV->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.800 );
 			
 			// Read and store b tagging scale factors for MC
 			if (!iEvent.isRealData()) {
