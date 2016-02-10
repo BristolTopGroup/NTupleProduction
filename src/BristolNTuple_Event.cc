@@ -52,6 +52,8 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 		const edm::TriggerNames &names = iEvent.triggerNames(*metFiltersResults);
 		for ( unsigned int i = 0; i < metFiltersResults->size(); ++i) {
 			if ( std::find( metFiltersOfInterest_.begin(), metFiltersOfInterest_.end(), names.triggerName(i) ) != metFiltersOfInterest_.end() ) {
+    			// std::cout << "MetFilter : " << names.triggerName(i) << " is registered" << std::endl;
+
 				*passesMETFilters = *passesMETFilters && metFiltersResults->accept( i );
 				metFilters->push_back( metFiltersResults->accept( i ) );
 			}

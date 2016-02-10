@@ -1,7 +1,7 @@
 def setupMETFilters(process, cms):
 
 	print '=' * 60
-	print "Setting up MET filters"
+	print "Setting up MET filters - metFilters_cfi.py not currently in use"
 	print '=' * 60
 
 	# # HBHE and HBHE Iso filters

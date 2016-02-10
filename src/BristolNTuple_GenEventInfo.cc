@@ -16,7 +16,6 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 		genEvtInfoInputTag(consumes< GenEventInfoProduct > (iConfig.getParameter<edm::InputTag>("GenEventInfoInputTag"))),
 		lheEventProductToken_(consumes< LHEEventProduct > (iConfig.getParameter<edm::InputTag>("LHEEventInfoInputTag"))),
 	    genJetsInputTag_(consumes<reco::GenJetCollection > (iConfig.getParameter<edm::InputTag>("GenJetsInputTag"))),
-		// ttbarDecayFlags_(consumes<std::vector<bool>> (iConfig.getParameter < std::vector<edm::InputTag> > ("ttbarDecayFlags"))), //
 		puWeightsInputTag_(iConfig.getParameter < edm::InputTag > ("PUWeightsInputTag")), //
 		storePDFWeights_(iConfig.getParameter<bool>("StorePDFWeights")), //
 		isTTbarMC_(iConfig.getParameter<bool>("isTTbarMC")), //

@@ -46,9 +46,10 @@ RootTupleMakerV2_Tree::TypedBranchConnector<T>::TypedBranchConnector(edm::Branch
 		tree->Branch(productInstanceName_.c_str(), &object_ptr_);
 	} //vector<type>
 }
-void RootTupleMakerV2_Tree::beginJob() {
 
+void RootTupleMakerV2_Tree::beginJob() {
 }
+
 void RootTupleMakerV2_Tree::registerBranches() {
 	tree_ = fs_->make < TTree > (treeName_.c_str(), "");
 
@@ -220,4 +221,5 @@ void RootTupleMakerV2_Tree::registerBranches() {
 		}
 	}
 }
+
 
