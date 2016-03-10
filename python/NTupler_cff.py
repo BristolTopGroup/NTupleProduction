@@ -43,9 +43,9 @@ def setup_ntupler(process, cms):
         )
 
     process.nTupleTreeMuon = process.nTupleTree.clone( treeName = cms.string('muonTree') )
-    process.nTupleTreeMuon.outputCommands.append( 'keep uint*_topPairMuPlusJetsSelectionTagging_*_*' )
+    process.nTupleTreeMuon.outputCommands.append( 'keep *_topPairMuPlusJetsSelectionTagging_*_*' )
     process.nTupleTreeElectron = process.nTupleTree.clone( treeName = cms.string('electronTree') )
-    process.nTupleTreeElectron.outputCommands.append( 'keep uint*_topPairEPlusJetsSelectionTagging_*_*' )
+    process.nTupleTreeElectron.outputCommands.append( 'keep *_topPairEPlusJetsSelectionTagging_*_*' )
 
     process.nTuples = cms.Sequence(
         # Event
