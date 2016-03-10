@@ -27,8 +27,8 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		vtxInputTag(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))), //		
 		isRealData(iConfig.getParameter<bool>("isRealData")),
 
-		calib("csvv2", "BristolAnalysis/NTupleTools/data/BTagSF/CSVv2_prelim.csv"),
-		// calib("csvv2", "CSVv2_prelim.csv"),
+		// calib("csvv2", "BristolAnalysis/NTupleTools/data/BTagSF/CSVv2.csv"),
+		calib("csvv2", "CSVv2.csv"),
 		reader_bc(		&calib,               // calibration instance
 					BTagEntry::OP_MEDIUM,  // operating point
 					"mujets",               // measurement type
@@ -111,10 +111,10 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "btagSFDown" + suffix);
 
 	// JER information
-	produces < std::vector<double> > (prefix + "jer" + suffix);
-	produces < std::vector<double> > (prefix + "jerSF" + suffix);
-	produces < std::vector<double> > (prefix + "jerSFUp" + suffix);
-	produces < std::vector<double> > (prefix + "jerSFDown" + suffix);
+	// produces < std::vector<double> > (prefix + "jer" + suffix);
+	// produces < std::vector<double> > (prefix + "jerSF" + suffix);
+	// produces < std::vector<double> > (prefix + "jerSFUp" + suffix);
+	// produces < std::vector<double> > (prefix + "jerSFDown" + suffix);
 
 	//jet-vertex association
 	if (doVertexAssociation) {
@@ -131,6 +131,7 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 }
 
 void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
+
 	//kinematic variables
 	std::auto_ptr < std::vector<double> > px(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > py(new std::vector<double>());
@@ -199,10 +200,10 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<double> > btagSF_up(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > btagSF_down(new std::vector<double>());
 
-	std::auto_ptr < std::vector<double> > jer(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > jerSF(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > jerSF_up(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > jerSF_down(new std::vector<double>());
+	// std::auto_ptr < std::vector<double> > jer(new std::vector<double>());
+	// std::auto_ptr < std::vector<double> > jerSF(new std::vector<double>());
+	// std::auto_ptr < std::vector<double> > jerSF_up(new std::vector<double>());
+	// std::auto_ptr < std::vector<double> > jerSF_down(new std::vector<double>());
 
 	//jet-vertex association
 	std::auto_ptr < std::vector<double> > bestVertexTrackAssociationFactor(new std::vector<double>());
@@ -249,8 +250,8 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.getByToken(vtxInputTag, primaryVertices); // DB
 
 
-	// JME::JetResolution resolution = JME::JetResolution::get(iSetup, "AK4PFchs");
-	// JME::JetResolutionScaleFactor resolution_sf = JME::JetResolutionScaleFactor::get(iSetup, "AK4PFchs_pt");
+	// JME::JetResolution resolution = JME::JetResolution::get(iSetup, "AK4PFchs_pt");
+	// JME::JetResolutionScaleFactor resolution_sf = JME::JetResolutionScaleFactor::get(iSetup, "AK4PFchs");
 // std::string jetSFType_;
 // std::string jetResPtType_;
 
@@ -712,10 +713,10 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(btagSF_up, prefix + "btagSFUp" + suffix);
 	iEvent.put(btagSF_down, prefix + "btagSFDown" + suffix);
 
-	iEvent.put(jer, prefix + "jer" + suffix);
-	iEvent.put(jerSF, prefix + "jerSF" + suffix);
-	iEvent.put(jerSF_up, prefix + "jerSFUp" + suffix);
-	iEvent.put(jerSF_down, prefix + "jerSFDown" + suffix);
+	// iEvent.put(jer, prefix + "jer" + suffix);
+	// iEvent.put(jerSF, prefix + "jerSF" + suffix);
+	// iEvent.put(jerSF_up, prefix + "jerSFUp" + suffix);
+	// iEvent.put(jerSF_down, prefix + "jerSFDown" + suffix);
 
 	//jet-vertex association
 	if (doVertexAssociation) {
