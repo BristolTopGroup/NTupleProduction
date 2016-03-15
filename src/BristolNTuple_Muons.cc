@@ -10,14 +10,15 @@
 #include "DataFormats/PatCandidates/interface/Isolation.h"
 
 BristolNTuple_Muons::BristolNTuple_Muons(const edm::ParameterSet& iConfig) :
-		inputTag(iConfig.getParameter < edm::InputTag > ("InputTag")), //
+  		inputTag(consumes<std::vector<pat::Muon>>(iConfig.getParameter<edm::InputTag>("InputTag"))),			
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //
 		suffix(iConfig.getParameter < std::string > ("Suffix")), //
 		maxSize(iConfig.getParameter<unsigned int>("MaxSize")), //
 		muonID(iConfig.getParameter < std::string > ("MuonID")), //
 		beamSpotCorr(iConfig.getParameter<bool>("BeamSpotCorr")), //
 		storePFIsolation(iConfig.getParameter<bool>("storePFIsolation")), //
-		vtxInputTag(iConfig.getParameter < edm::InputTag > ("VertexInputTag")) //
+		vtxInputTag(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))), //		
+		beamSpotInputTag(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"))) //
 {
 
 	//kinematic variables
@@ -177,16 +178,13 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
 	//-----------------------------------------------------------------
 	edm::Handle < std::vector<pat::Muon> > muons;
-	iEvent.getByLabel(inputTag, muons);
+	iEvent.getByToken(inputTag, muons);
 
 	edm::Handle < reco::VertexCollection > primaryVertices;
-	iEvent.getByLabel(vtxInputTag, primaryVertices);
+	iEvent.getByToken(vtxInputTag, primaryVertices);
 
 	edm::Handle < reco::BeamSpot > beamSpot;
-	iEvent.getByLabel("offlineBeamSpot", beamSpot);
-
-	edm::Handle < reco::PFCandidateCollection > pfCandidates;
-	iEvent.getByLabel("particleFlow", pfCandidates);
+	iEvent.getByToken(beamSpotInputTag, beamSpot);
 
 	if (muons.isValid()) {
 		edm::LogInfo("BristolNTuple_MuonsExtraInfo") << "Total # Muons: " << muons->size();
@@ -202,8 +200,9 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
 			if (beamSpotCorr && beamSpot.isValid()) {
 				trkd0 = -(it->track()->dxy(beamSpot->position()));
-			} else if (beamSpotCorr && !beamSpot.isValid())
-				edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the offlineBeamSpot";
+			} 
+			// else if (beamSpotCorr && !beamSpot.isValid())
+			// 	edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the offlineBeamSpot";
 
 			double minVtxDist3D = 9999.;
 			int vtxIndex_ = -1;
@@ -227,9 +226,10 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 						vtxDistZ_ = distZ;
 					}
 				}
-			} else {
-				edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the product " << vtxInputTag;
-			}
+			} 
+			// else {
+			// 	edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the product " << vtxInputTag;
+			// }
 
 			//kinematic variables
 			px->push_back(it->px());
@@ -315,9 +315,10 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 			beamSpotDXY->push_back(it->dB(pat::Muon::BS2D));
 			beamSpotDXYError->push_back(it->edB(pat::Muon::BS2D));
 		}
-	} else {
-		edm::LogError("BristolNTuple_MuonsExtraError") << "Error! Can't get the product " << inputTag;
-	}
+	} 
+	// else {
+	// 	edm::LogError("BristolNTuple_MuonsExtraError") << "Error! Can't get the product " << inputTag;
+	// }
 
 	//-----------------------------------------------------------------
 	// put vectors in the event

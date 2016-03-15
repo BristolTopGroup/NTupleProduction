@@ -19,6 +19,7 @@ selectionProducts = [cms.InputTag(selectionName, selectionPrefix + cut, 'Ntuples
 
 topPairEPlusJetsSelectionAnalyser = cms.EDAnalyzer("SelectionAnalyser",
     # PUWeightInput=cms.InputTag('eventWeightPU'),
+    genEvtInfoProduct = cms.InputTag("generator"),
     selectionFlags=cms.VInputTag(selectionProducts),
     selectionNames=cms.vstring(selectionCuts),
 )
@@ -43,6 +44,7 @@ selectionProducts = [cms.InputTag(selectionName, selectionPrefix + cut, 'Ntuples
 
 topPairEPlusJetsQCDSelectionAnalyser = cms.EDAnalyzer("SelectionAnalyser",
     # PUWeightInput=cms.InputTag('eventWeightPU'),
+    genEvtInfoProduct = cms.InputTag("generator"),
     selectionFlags=cms.VInputTag(selectionProducts),
     selectionNames=cms.vstring(selectionCuts),
 )
@@ -67,6 +69,7 @@ selectionProducts = [cms.InputTag(selectionName, selectionPrefix + cut, 'Ntuples
 
 topPairEPlusJetsConversionSelectionAnalyser = cms.EDAnalyzer("SelectionAnalyser",
     # PUWeightInput=cms.InputTag('eventWeightPU'),
+    genEvtInfoProduct = cms.InputTag("generator"),
     selectionFlags=cms.VInputTag(selectionProducts),
     selectionNames=cms.vstring(selectionCuts),
 )
@@ -90,6 +93,7 @@ selectionProducts = [cms.InputTag(selectionName, selectionPrefix + cut, 'Ntuples
 
 topPairMuPlusJetsSelectionAnalyser = cms.EDAnalyzer("SelectionAnalyser",
     # PUWeightInput=cms.InputTag('eventWeightPU'),
+    genEvtInfoProduct = cms.InputTag("generator"),
     selectionFlags=cms.VInputTag(selectionProducts),
     selectionNames=cms.vstring(selectionCuts),
 )
@@ -113,6 +117,7 @@ selectionProducts = [cms.InputTag(selectionName, selectionPrefix + cut, 'Ntuples
 
 topPairMuPlusJetsQCDSelectionAnalyser3toInf = cms.EDAnalyzer("SelectionAnalyser",
     # PUWeightInput=cms.InputTag('eventWeightPU'),
+    genEvtInfoProduct = cms.InputTag("generator"),
     selectionFlags=cms.VInputTag(selectionProducts),
     selectionNames=cms.vstring(selectionCuts),
 )
@@ -136,6 +141,7 @@ selectionProducts = [cms.InputTag(selectionName, selectionPrefix + cut, 'Ntuples
 
 topPairMuPlusJetsQCDSelectionAnalyser1p5to3 = cms.EDAnalyzer("SelectionAnalyser",
     # PUWeightInput=cms.InputTag('eventWeightPU'),
+    genEvtInfoProduct = cms.InputTag("generator"),
     selectionFlags=cms.VInputTag(selectionProducts),
     selectionNames=cms.vstring(selectionCuts),
 )

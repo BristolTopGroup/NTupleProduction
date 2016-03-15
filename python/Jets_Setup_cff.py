@@ -35,17 +35,18 @@ def setup_jets(process, cms, options, postfix="PFlow"):
             inputJetCorrLabel = (
                 'AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'])
 
+    # If you want to use other JEC files then put .db file in data/JEC/ and use option useJECFromFile=1 on command line
     if usePrivateSQlite:
         from CondCore.DBCommon.CondDBSetup_cfi import *
         import os
-        era = "Summer15_25nsV5_"
+        era = "Fall15_25nsV2_"
         if runOnData:
             era += 'DATA'
         else:
             era += 'MC'
         dBFile = os.path.expandvars(
-            # "$CMSSW_BASE/src/BristolAnalysis/NTupleTools/data/JEC/" + era + ".db")
-            era + ".db")
+            "$CMSSW_BASE/src/BristolAnalysis/NTupleTools/data/JEC/" + era + ".db")
+            # era + ".db")
         print 'Using JEC from DB: {0}'.format(dBFile)
         process.jec = cms.ESSource("PoolDBESSource", CondDBSetup,
                                    connect=cms.string(
@@ -69,6 +70,7 @@ def setup_jets(process, cms, options, postfix="PFlow"):
                                    )
                                    )
         process.es_prefer_jec = cms.ESPrefer("PoolDBESSource", 'jec')
+
 
     print 'Using jet energy corrections: '
     print 'PF Jets'

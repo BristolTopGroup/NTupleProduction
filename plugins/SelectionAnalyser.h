@@ -22,7 +22,8 @@ public:
 private:
 	//non-global event weights (global = i.e. lumi-weight)
 	// edm::InputTag PUWeightInput_;//, ZeroBtagWeightInput_, OneBtagWeightInput_, TwoBtagWeightInput_;
-	std::vector<edm::InputTag> selectionFlags_;
+  	edm::EDGetTokenT<GenEventInfoProduct> genEventInfoProductToken_;
+	std::vector<edm::EDGetTokenT<bool> >selectionFlags_;
 	std::vector<std::string> selectionNames_;
 	unsigned int numberOfCuts_;
 	//distributions

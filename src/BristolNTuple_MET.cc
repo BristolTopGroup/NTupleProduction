@@ -6,7 +6,7 @@
 
 using namespace std;
 BristolNTuple_MET::BristolNTuple_MET(const edm::ParameterSet& iConfig) :
-		inputTag(iConfig.getParameter < edm::InputTag > ("InputTag")), //
+  		inputTag(consumes<std::vector<pat::MET>>(iConfig.getParameter<edm::InputTag>("InputTag"))),			
 		storeMETUncertainties_(iConfig.getParameter<bool>("storeMETUncertainties")), //
 		nMETUncertainties_(iConfig.getParameter<unsigned int>("nMETUncertainties")), //
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //
@@ -24,10 +24,10 @@ BristolNTuple_MET::BristolNTuple_MET(const edm::ParameterSet& iConfig) :
 
 void BristolNTuple_MET::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	edm::Handle < std::vector<pat::MET> > mets;
-	iEvent.getByLabel(inputTag, mets);
+	iEvent.getByToken(inputTag, mets);
 
-	if (!mets.isValid())
-		edm::LogError("BristolNTuple_METExtraError") << "Error! Can't get the product " << inputTag;
+	// if (!mets.isValid())
+	// 	edm::LogError("BristolNTuple_METExtraError") << "Error! Can't get the product " << inputTag;
 
 	const pat::MET & patMET(mets->at(0));
 

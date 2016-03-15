@@ -2,6 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 nTupleGenEventInfo = cms.EDProducer("BristolNTuple_GenEventInfo",
     GenEventInfoInputTag = cms.InputTag('generator'),
+    LHEEventInfoInputTag = cms.InputTag('externalLHEProducer'),
     GenJetsInputTag      = cms.InputTag('slimmedGenJets'),
     StorePDFWeights      = cms.bool(True),
     PUWeightsInputTag    = cms.InputTag('eventWeightPU'),

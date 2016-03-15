@@ -20,11 +20,11 @@ using namespace pat;
 
 TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm::ParameterSet& iConfig) :
 		// Input tags
-		jetInput_(iConfig.getParameter < edm::InputTag > ("jetInput")), //
-		electronInput_(iConfig.getParameter < edm::InputTag > ("electronInput")), //
-		muonInput_(iConfig.getParameter < edm::InputTag > ("muonInput")), //
-		hltInputTag_(iConfig.getParameter < edm::InputTag > ("HLTInput")), //
-		VertexInput_(iConfig.getParameter < edm::InputTag > ("VertexInput")), //
+		jetInput_(consumes< pat::JetCollection > (iConfig.getParameter < edm::InputTag > ("jetInput"))), //
+		electronInput_(consumes<edm::View<pat::Electron>> (iConfig.getParameter < edm::InputTag > ("electronInput"))), //
+		muonInput_(consumes< pat::MuonCollection > (iConfig.getParameter < edm::InputTag > ("muonInput"))), //
+		hltInputTag_(consumes< edm::TriggerResults > (iConfig.getParameter < edm::InputTag > ("HLTInput"))), //
+		VertexInput_(consumes< reco::VertexCollection > (iConfig.getParameter < edm::InputTag > ("VertexInput"))), //
 
 		// Selection criteria
 		minSignalMuonPt_(iConfig.getParameter<double>("minSignalMuonPt")), //
@@ -236,24 +236,25 @@ void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent, c
 
 	// Trigger results
 	edm::Handle < edm::TriggerResults > triggerResults;
-	iEvent.getByLabel(hltInputTag_, triggerResults);
+	iEvent.getByToken(hltInputTag_, triggerResults);
 	triggerResults_ = *triggerResults;
 
 	// Primary vertices
 	edm::Handle < reco::VertexCollection > primaryVertices;
-	iEvent.getByLabel(VertexInput_, primaryVertices);
+	iEvent.getByToken(VertexInput_, primaryVertices);
 	if (primaryVertices.isValid()) {
 		if (primaryVertices->size() >= 1) {
 			primaryVertex_ = primaryVertices->at(0);
 			hasGoodPV_ = true;
 		} else
 			hasGoodPV_ = false;
-	} else
-		edm::LogError("TopPairMuonPlusJetsSelectionFilterError") << "Error! Can't get the product " << VertexInput_;
+	} 
+	// else
+	// 	edm::LogError("TopPairMuonPlusJetsSelectionFilterError") << "Error! Can't get the product " << VertexInput_;
 
 	// Jet collection
 	edm::Handle < pat::JetCollection > jets;
-	iEvent.getByLabel(jetInput_, jets);
+	iEvent.getByToken(jetInput_, jets);
 	jets_ = *jets;
 
 	if ( applyJEC_ ) {
@@ -262,7 +263,7 @@ void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent, c
 	}
 
 	// Electrons (for veto)
-	iEvent.getByLabel(electronInput_, electrons_);
+	iEvent.getByToken(electronInput_, electrons_);
 
 	// Electron VID Decisions
 	Handle<edm::ValueMap<bool> > loose_id_decisions;
@@ -271,7 +272,7 @@ void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent, c
 
 	// Muons
 	edm::Handle < pat::MuonCollection > muons;
-	iEvent.getByLabel(muonInput_, muons);
+	iEvent.getByToken(muonInput_, muons);
 	muons_ = *muons;
 
 	// Choose electrons that pass the loose selection
@@ -297,9 +298,10 @@ void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent, c
 		if (hasSignalMuon_)
 			signalMuon_ = goodIsolatedMuons_.front();
 
-	} else {
-		edm::LogError("TopPairMuonPlusJetsSelectionFilterError") << "Error! Can't get the product " << muonInput_;
-	}
+	} 
+	// else {
+	// 	edm::LogError("TopPairMuonPlusJetsSelectionFilterError") << "Error! Can't get the product " << muonInput_;
+	// }
 
 	// Clean jets against signal muon
 	if (debug_)
@@ -660,18 +662,18 @@ void TopPairMuonPlusJetsSelectionFilter::endJob() {
 
 bool TopPairMuonPlusJetsSelectionFilter::beginRun(edm::Run& iRun, const edm::EventSetup& iSetup) {
 
-	bool changed = true;
-	if (hltConfig_.init(iRun, iSetup, hltInputTag_.process(), changed)) {
-		// if init returns TRUE, initialisation has succeeded!
-		edm::LogInfo("TopPairMuonPlusJetsSelectionFilter") << "HLT config with process name "
-				<< hltInputTag_.process() << " successfully extracted";
-	} else {
-		// if init returns FALSE, initialisation has NOT succeeded, which indicates a problem
-		// with the file and/or code and needs to be investigated!
-		edm::LogError("TopPairMuonPlusJetsSelectionFilter_Error")
-				<< "Error! HLT config extraction with process name " << hltInputTag_.process() << " failed";
-		// In this case, all access methods will return empty values!
-	}
+	// bool changed = true;
+	// if (hltConfig_.init(iRun, iSetup, hltInputTag_.process(), changed)) {
+	// 	// if init returns TRUE, initialisation has succeeded!
+	// 	edm::LogInfo("TopPairMuonPlusJetsSelectionFilter") << "HLT config with process name "
+	// 			<< hltInputTag_.process() << " successfully extracted";
+	// } else {
+	// 	// if init returns FALSE, initialisation has NOT succeeded, which indicates a problem
+	// 	// with the file and/or code and needs to be investigated!
+	// 	edm::LogError("TopPairMuonPlusJetsSelectionFilter_Error")
+	// 			<< "Error! HLT config extraction with process name " << hltInputTag_.process() << " failed";
+	// 	// In this case, all access methods will return empty values!
+	// }
 	return true;
 }
 

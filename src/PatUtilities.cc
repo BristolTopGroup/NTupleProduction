@@ -4,6 +4,7 @@
 #include "DataFormats/RecoCandidate/interface/IsoDepositVetos.h"
 #include "DataFormats/PatCandidates/interface/Isolation.h"
 #include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
+#include "FWCore/Framework/interface/EDConsumerBase.h"
 
 using namespace edm;
 using namespace std;
@@ -45,15 +46,17 @@ reco::TrackRef tevOptimized(const reco::TrackRef& trackerTrack, const reco::Trac
 	return refit[chosen];
 }
 
-bool passesFilter(const edm::Event& event, const edm::InputTag filter) {
+bool passesFilter(const edm::Event& event, const edm::EDGetTokenT<bool> filter) {
 	bool result(false);
+
 	edm::Handle<bool> filterResult;
-	event.getByLabel(filter, filterResult);
+	event.getByToken(filter, filterResult);
 	if (filterResult.isValid()) {
-		edm::LogInfo("PatUtilities_Filter") << "Successfully obtained " << filter;
+		// edm::LogInfo("PatUtilities_Filter") << "Successfully obtained " << filter;
 		result = *filterResult;
-	} else
-		edm::LogError("PatUtilities_Filter_Error") << "Error! Can't get the product " << filter;
+	} 
+	// else
+	// 	edm::LogError("PatUtilities_Filter_Error") << "Error! Can't get the product " << filter;
 
 	return result;
 }

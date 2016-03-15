@@ -28,28 +28,13 @@ process.printEventContent = cms.EDAnalyzer("EventContentAnalyzer")
 # #     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root')
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        # 'root://xrootd.unl.edu//store/data/Run2015D/SingleElectron/MINIAOD/PromptReco-v3/000/256/675/00000/864628EB-9C5F-E511-AF26-02163E014767.root',
-      
-        # MC
-        # 'root://xrootd.unl.edu//store/mc/RunIISpring15MiniAODv2/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v3/60000/00181849-176A-E511-8B11-848F69FD4C94.root', # /TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/
-       
-        # Data 
+        # 'root://xrootd.unl.edu//store/mc/RunIIFall15MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext3-v1/00000/00DF0A73-17C2-E511-B086-E41D2D08DE30.root',
+        'root://xrootd.unl.edu//store/mc/RunIIFall15MiniAODv2/TT_TuneEE5C_13TeV-amcatnlo-herwigpp/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/10000/0047D532-93B8-E511-AEF5-C4346BC8D568.root'
 
-        # 05-Oct-2015 Run C
- 		    # 'root://xrootd.unl.edu//store/data/Run2015C_25ns/SingleElectron/MINIAOD/05Oct2015-v1/30000/045710AD-C774-E511-9A9A-003048FFD770.root'
-        
-        # 05-Oct-2015 Run D
-        # 'root://xrootd.unl.edu//store/data/Run2015D/SingleElectron/MINIAOD/05Oct2015-v1/10000/00991D45-4E6F-E511-932C-0025905A48F2.root',
-        # 'root://xrootd.unl.edu//store/data/Run2015D/SingleMuon/MINIAOD/05Oct2015-v1/10000/021FD3F0-876F-E511-99D2-0025905A6060.root',
-        
-        # Prompt-Reco
-        # 'root://xrootd.unl.edu//store/data/Run2015D/SingleElectron/MINIAOD/PromptReco-v4/000/258/159/00000/0EC56452-186C-E511-8158-02163E0146D5.root',
-        # 'root://xrootd.unl.edu//store/data/Run2015D/SingleMuon/MINIAOD/PromptReco-v4/000/258/159/00000/6CA1C627-246C-E511-8A6A-02163E014147.root',
-        # 'root://xrootd.unl.edu//store/mc/RunIISpring15MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/40000/00087FEB-236E-E511-9ACB-003048FF86CA.root'
-        'file:/hdfs/TopQuarkGroup/run2/miniAOD/TTJets_amcanlo_25ns.root',
-        # 'file:/hdfs/TopQuarkGroup/run2/miniAOD/TTJets_powhegPythia8_25ns.root',
-        # 'root://xrootd.unl.edu//store/mc/RunIISpring15MiniAODv2/TT_TuneEE5C_13TeV-amcatnlo-herwigpp/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/00A9F13F-C66D-E511-A943-0025901895CA.root'
-        # 'root://xrootd.unl.edu//store/mc/RunIISpring15MiniAODv2/QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/60000/0005C178-4A71-E511-ACB2-0002C94CD13C.root'
+        # 'root://xrootd.unl.edu//store/data/Run2015C_25ns/SingleMuon/MINIAOD/16Dec2015-v1/00000/002C22D4-E1AF-E511-AE8E-001E673971CA.root'
+        # 'file:/storage/db0268/TopCrossSections/NTupleProduction/CMSSW_7_6_3/src/testSingleMuon.root'
+        # 'file:/storage/db0268/TopCrossSections/NTupleProduction/CMSSW_7_6_3/src/testMC.root'
+
     )
 )
 # If you want to run with a json file
@@ -71,21 +56,21 @@ getOptions( options )
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 globaltag = ''
 if (options.isData) : 
-  globaltag='74X_dataRun2_v5' # ReReco+Prompt JECv6
+  globaltag='76X_dataRun2_16Dec2015_v0' # ReReco+Prompt JECv6
 else :
-  globaltag = '74X_mcRun2_asymptotic_v4' # 25ns MC
+  globaltag = '76X_mcRun2_asymptotic_RunIIFall15DR76_v1' # 25ns MC
 
 print "Using Global Tag : ", globaltag
 process.GlobalTag.globaltag = cms.string(globaltag)
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
-
+# process.load('JetMETCorrections.Configuration.CorrectedJetProducersDefault_cff')
 
 # TT Gen Event configuration
 from BristolAnalysis.NTupleTools.ttGenConfig_cff import * 
 setupTTGenEvent( process, cms )
 
 # Particle level definitions
-from BristolAnalysis.NTupleTools.pseudoTopConfig_cff import *
+from BristolAnalysis.NTupleTools.pseudoTopConfig_cff import * #check if needed
 setupPseudoTop( process, cms )
 
 # Electron VID
@@ -119,13 +104,13 @@ if options.tagAndProbe:
 
  
 ## Maximum Number of Events
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 from BristolAnalysis.NTupleTools.NTupler_cff import *
 setup_ntupler(process, cms )
 
 process.makingNTuples = cms.Path(
-  process.metFilters *
+  # process.metFilters *
   process.egmGsfElectronIDSequence *
   process.reapplyJEC *
   process.electronSelectionAnalyzerSequence *
@@ -147,59 +132,65 @@ process.nTupleTree.outputCommands.append( 'keep uint*_topPairEPlusJetsSelectionT
 process.nTupleTree.outputCommands.append( 'keep uint*_topPairEPlusJetsQCDSelectionTagging_*_*' )
 process.nTupleTree.outputCommands.append( 'keep uint*_topPairEPlusJetsConversionSelectionTagging_*_*' )
 
-process.nTupleTree.outputCommands.append( 'keep bool_topPairMuPlusJetsSelectionTagging_*FullSelection*_*' )
+process.nTupleTree.outputCommands.append( 'keep bool_topPairMuPlusJetsSelectionTagging_*_*' )
 process.nTupleTree.outputCommands.append( 'keep bool_topPairMuPlusJetsQCDSelectionTagging1_*FullSelection*_*' )
 process.nTupleTree.outputCommands.append( 'keep bool_topPairMuPlusJetsQCDSelectionTagging2_*FullSelection*_*' )
-process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsSelectionTagging_*FullSelection*_*' )
+process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsSelectionTagging_*_*' )
 process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsQCDSelectionTagging_*FullSelection*_*' )
 process.nTupleTree.outputCommands.append( 'keep bool_topPairEPlusJetsConversionSelectionTagging_*FullSelection*_*' )
 
+
 if not options.isData:
-  # 25ns Triggers
-  process.triggerSequence.remove( process.nTupleTriggerEle27erWPLooseGsf )
-  process.triggerSequence.remove( process.nTupleTriggerEle23erWPLooseGsf )
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu18er )
+  # Remove 76X Data 25ns Triggers
+  process.triggerSequence.remove( process.nTupleTriggerEle22erWPLooseGsf )
+  process.triggerSequence.remove( process.nTupleTriggerEle23WPLooseGsf )
+  process.triggerSequence.remove( process.nTupleTriggerIsoMu18 )
   process.triggerSequence.remove( process.nTupleTriggerIsoMu20 )
   process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20 )
   process.triggerSequence.remove( process.nTupleTrigger )
-  del process.nTupleTriggerEle27erWPLooseGsf, process.nTupleTriggerEle23erWPLooseGsf, process.nTupleTriggerIsoMu18er, process.nTupleTriggerIsoMu20, process.nTupleTriggerIsoTkMu20, process.nTupleTrigger
 
-  process.makingNTuples.remove( process.metFilters )
-  del process.metFilters
-  pass
+  # Delete removed modules 
+  del process.nTupleTriggerEle22erWPLooseGsf, process.nTupleTriggerEle23WPLooseGsf
+  del process.nTupleTriggerIsoMu18, process.nTupleTriggerIsoMu20, process.nTupleTriggerIsoTkMu20, process.nTupleTrigger
 
 else :
-  process.makingNTuples.remove( process.makePseudoTop )
+  # Remove 76X MC 25ns Triggers
+  process.triggerSequence.remove( process.nTupleTriggerEle22erWPLooseGsfMC )
+  process.triggerSequence.remove( process.nTupleTriggerEle23WPLooseGsfMC )
+  process.triggerSequence.remove( process.nTupleTriggerIsoMu18MC )
+  process.triggerSequence.remove( process.nTupleTriggerIsoMu20MC )
+  process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20MC )
+  process.triggerSequence.remove( process.nTupleTrigger )
 
+  # Remove PseudoTop and MC Gen Variables
+  process.makingNTuples.remove( process.makePseudoTop )
   process.nTuples.remove( process.pseudoTopSequence )
   process.nTuples.remove( process.nTupleGenMET )
   process.nTuples.remove( process.nTupleGenJets )
   process.nTuples.remove( process.nTupleGenEventInfo )
   process.nTuples.remove( process.nTupleGenParticles )
+
+  # Do not keep Gen branches
   process.nTupleTree.outputCommands.append('drop *_nTuplePFJets_*Gen*_*')
-  del process.makePseudoTop, process.pseudoTopSequence, process.nTupleGenMET
-  del process.nTupleGenJets,  process.nTupleGenEventInfo, process.nTupleGenParticles
 
-  # 25ns Triggers
-  process.triggerSequence.remove( process.nTupleTriggerEle27erWP75GsfMC )
-  process.triggerSequence.remove( process.nTupleTriggerEle23erWP75GsfMC )
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu18erMC )
-  process.triggerSequence.remove( process.nTupleTriggerIsoMu20MC )
-  process.triggerSequence.remove( process.nTupleTriggerIsoTkMu20MC )
-  process.triggerSequence.remove( process.nTupleTrigger )
-  del process.nTupleTriggerEle27erWP75GsfMC, process.nTupleTriggerEle23erWP75GsfMC, process.nTupleTriggerIsoMu20MC, process.nTupleTriggerIsoMu18erMC, process.nTupleTriggerIsoTkMu20MC, process.nTupleTrigger
+  # Delete removed modules and sequences (So they do not run on unscheduled)
+  del process.makePseudoTop, process.pseudoTopSequence, process.pseudoTop
+  del process.nTuplePseudoTopJets, process.nTuplePseudoTopLeptons, process.nTuplePseudoTopNeutrinos, process.nTuplePseudoTops
+  del process.nTupleGenMET, process.nTupleGenJets,  process.nTupleGenEventInfo, process.nTupleGenParticles
+  del process.nTupleTriggerEle22erWPLooseGsfMC, process.nTupleTriggerEle23WPLooseGsfMC
+  del process.nTupleTriggerIsoMu18MC, process.nTupleTriggerIsoMu20MC, process.nTupleTriggerIsoTkMu20MC, process.nTupleTrigger
 
-# if options.isData and options.isRereco:
+# 76X datasets are all ReReco so far
+process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults','','PAT')
+
+# if options.isData and options.isReReco:
 #   process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults','','PAT')
-
-
-# if options.isData and options.isRunC:
-# 	process.triggerSequence.remove( process.nTupleTriggerIsoMu18 )
-# 	del process.nTupleTriggerIsoMu18
 
 if not options.isTTbarMC:
   process.makingNTuples.remove( process.ttGenEvent )
   process.selectionCriteriaAnalyzer.genSelectionCriteriaInput = cms.VInputTag()
+  del process.ttGenEvent
+
 else:
   process.nTupleGenEventInfo.isTTbarMC = cms.bool( True )
 

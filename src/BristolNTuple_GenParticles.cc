@@ -1,11 +1,10 @@
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_GenParticles.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 
 BristolNTuple_GenParticles::BristolNTuple_GenParticles(const edm::ParameterSet& iConfig) :
-    inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
+    inputTag(consumes< reco::GenParticleCollection > (iConfig.getParameter<edm::InputTag>("InputTag"))),
     prefix  (iConfig.getParameter<std::string>  ("Prefix")),
     suffix  (iConfig.getParameter<std::string>  ("Suffix")),
     maxSize (iConfig.getParameter<unsigned int> ("MaxSize"))
@@ -45,10 +44,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	//-----------------------------------------------------------------
 	if (!iEvent.isRealData()) {
 		edm::Handle < reco::GenParticleCollection > genParticles;
-		iEvent.getByLabel(inputTag, genParticles);
+		iEvent.getByToken(inputTag, genParticles);
 
 		if (genParticles.isValid()) {
-			edm::LogInfo("BristolNTuple_GenParticlesInfo") << "Total # GenParticles: " << genParticles->size();
+			// edm::LogInfo("BristolNTuple_GenParticlesInfo") << "Total # GenParticles: " << genParticles->size();
 
 			for (reco::GenParticleCollection::const_iterator it = genParticles->begin(); it != genParticles->end();
 					++it) {
@@ -80,9 +79,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 				}
 				motherIndex->push_back(idx);
 			}
-		} else {
-			edm::LogError("BristolNTuple_GenParticlesError") << "Error! Can't get the product " << inputTag;
-		}
+		} 
+		// else {
+		// 	edm::LogError("BristolNTuple_GenParticlesError") << "Error! Can't get the product " << inputTag;
+		// }
 	}
 	//-----------------------------------------------------------------
 	// put vectors in the event

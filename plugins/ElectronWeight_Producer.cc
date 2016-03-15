@@ -1,7 +1,6 @@
 #include "BristolAnalysis/NTupleTools/plugins/ElectronWeight_Producer.h"
 #include "BristolAnalysis/NTupleTools/interface/ElectronWeight.h"
 #include "FWCore/Utilities/interface/InputTag.h"
-#include "DataFormats/PatCandidates/interface/Electron.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include <boost/filesystem.hpp>
@@ -12,8 +11,8 @@ using namespace edm;
 using namespace std;
 
 ElectronWeight_Producer::ElectronWeight_Producer(const edm::ParameterSet& iConfig) :
-		electronInput_(iConfig.getParameter < InputTag > ("electronInput")), //
-		jetInput_(iConfig.getParameter < InputTag > ("jetInput")), //		
+		electronInput_(consumes< pat::ElectronCollection > (iConfig.getParameter < InputTag > ("electronInput"))), //
+		jetInput_(consumes< pat::JetCollection > (iConfig.getParameter < InputTag > ("jetInput"))), //		
 		prefix_(iConfig.getParameter < string > ("prefix")), //
 		MCSampleTag_(iConfig.getParameter < std::string > ("MCSampleTag")), //
 		Systematic_(iConfig.getParameter<int>("ElectronSystematic")),
@@ -70,10 +69,10 @@ void ElectronWeight_Producer::produce(edm::Event& iEvent, const edm::EventSetup&
 	if (!iEvent.isRealData()) {
 		//get jets and numberOfBtags
 		edm::Handle < pat::ElectronCollection > electrons;
-		iEvent.getByLabel(electronInput_, electrons);
+		iEvent.getByToken(electronInput_, electrons);
 
 		edm::Handle < pat::JetCollection > jets;
-		iEvent.getByLabel(jetInput_, jets);
+		iEvent.getByToken(jetInput_, jets);
 
 		if ( jets->size() > 0 ) {
 			unsigned int jetIndex = 3;

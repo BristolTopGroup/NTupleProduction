@@ -1,11 +1,10 @@
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_GenJets.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/JetReco/interface/GenJetCollection.h"
 
 
 BristolNTuple_GenJets::BristolNTuple_GenJets(const edm::ParameterSet& iConfig) :
-    inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
+    inputTag( consumes< reco::GenJetCollection >(iConfig.getParameter<edm::InputTag>("InputTag"))),
     prefix  (iConfig.getParameter<std::string>  ("Prefix")),
     suffix  (iConfig.getParameter<std::string>  ("Suffix")),
     minPt (iConfig.getParameter<double> ("minPt")),
@@ -42,10 +41,10 @@ void BristolNTuple_GenJets::produce(edm::Event& iEvent, const edm::EventSetup& i
 	//-----------------------------------------------------------------
 	if (!iEvent.isRealData()) {
 		edm::Handle < reco::GenJetCollection > genJets;
-		iEvent.getByLabel(inputTag, genJets);
+		iEvent.getByToken(inputTag, genJets);
 
 		if (genJets.isValid()) {
-			edm::LogInfo("BristolNTuple_GenJetsExtraInfo") << "Total # GenJets: " << genJets->size();
+			// edm::LogInfo("BristolNTuple_GenJetsExtraInfo") << "Total # GenJets: " << genJets->size();
 
 			for (reco::GenJetCollection::const_iterator it = genJets->begin(); it != genJets->end(); ++it) {
 				// exit from loop when you reach the required number of GenJets
@@ -68,9 +67,10 @@ void BristolNTuple_GenJets::produce(edm::Event& iEvent, const edm::EventSetup& i
 				emf->push_back(it->emEnergy() / it->energy());
 				hadf->push_back(it->hadEnergy() / it->energy());
 			}
-		} else {
-			edm::LogError("BristolNTuple_GenJetsExtraError") << "Error! Can't get the product " << inputTag;
-		}
+		} 
+		// else {
+		// 	edm::LogError("BristolNTuple_GenJetsExtraError") << "Error! Can't get the product " << inputTag;
+		// }
 	}
 
 	//-----------------------------------------------------------------

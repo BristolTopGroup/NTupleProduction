@@ -1,8 +1,6 @@
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_GenEventInfo.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "boost/filesystem.hpp"
 
 #include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
@@ -15,19 +13,23 @@
 using namespace std;
 
 BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& iConfig) : //
-		genEvtInfoInputTag(iConfig.getParameter < edm::InputTag > ("GenEventInfoInputTag")), //
-	    genJetsInputTag_(iConfig.getParameter<edm::InputTag>("GenJetsInputTag")),
-		ttbarDecayFlags_(iConfig.getParameter < std::vector<edm::InputTag> > ("ttbarDecayFlags")), //
+		genEvtInfoInputTag(consumes< GenEventInfoProduct > (iConfig.getParameter<edm::InputTag>("GenEventInfoInputTag"))),
+		lheEventProductToken_(consumes< LHEEventProduct > (iConfig.getParameter<edm::InputTag>("LHEEventInfoInputTag"))),
+	    genJetsInputTag_(consumes<reco::GenJetCollection > (iConfig.getParameter<edm::InputTag>("GenJetsInputTag"))),
 		puWeightsInputTag_(iConfig.getParameter < edm::InputTag > ("PUWeightsInputTag")), //
 		storePDFWeights_(iConfig.getParameter<bool>("StorePDFWeights")), //
 		isTTbarMC_(iConfig.getParameter<bool>("isTTbarMC")), //
 		pdfWeightsInputTag_(iConfig.getParameter < edm::InputTag > ("PDFWeightsInputTag")), //
-		pileupInfoSrc_(iConfig.getParameter < edm::InputTag > ("pileupInfo")), //
-		tt_gen_event_input_(iConfig.getParameter < edm::InputTag > ("tt_gen_event_input")), //
+		pileupInfoSrc_(consumes< std::vector< PileupSummaryInfo> > (iConfig.getParameter < edm::InputTag > ("pileupInfo"))), //
+		tt_gen_event_input_(consumes<TtGenEvent > (iConfig.getParameter < edm::InputTag > ("tt_gen_event_input"))), //
 	    minGenJetPt_ (iConfig.getParameter<double> ("minGenJetPt")),
 	    maxGenJetAbsoluteEta_ (iConfig.getParameter<double> ("maxGenJetAbsoluteEta")),
 		prefix_(iConfig.getParameter < std::string > ("Prefix")), //
 		suffix_(iConfig.getParameter < std::string > ("Suffix")) {
+
+    for (edm::InputTag const & tag : iConfig.getParameter< std::vector<edm::InputTag> > ("ttbarDecayFlags"))
+    ttbarDecayFlags_.push_back(consumes<bool>(tag));
+			
 	produces<unsigned int>(prefix_ + "ProcessID" + suffix_);
 	produces<double>(prefix_ + "PtHat" + suffix_);
 	produces<double>(prefix_ + "PUWeight" + suffix_);
@@ -277,21 +279,22 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	if (!iEvent.isRealData()) {
 		// GenEventInfo Part
 		edm::Handle < GenEventInfoProduct > genEvtInfoProduct;
-		iEvent.getByLabel(genEvtInfoInputTag, genEvtInfoProduct);
+		iEvent.getByToken(genEvtInfoInputTag, genEvtInfoProduct);
 
 
 
 		if (genEvtInfoProduct.isValid()) {
-			edm::LogInfo("BristolNTuple_GenEventInfoInfo") << "Successfully obtained " << genEvtInfoInputTag;
+			// edm::LogInfo("BristolNTuple_GenEventInfoInfo") << "Successfully obtained " << genEvtInfoInputTag;
 
 			*processID.get() = genEvtInfoProduct->signalProcessID();
 			*ptHat.get() = (genEvtInfoProduct->hasBinningValues() ? genEvtInfoProduct->binningValues()[0] : 0.);
 
 			*generatorWeight.get() = genEvtInfoProduct->weight();
 
-		} else {
-			edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product " << genEvtInfoInputTag;
-		}
+		} 
+		// else {
+		// 	edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product " << genEvtInfoInputTag;
+		// }
 
 		// // PU Weights Part
 		// edm::Handle<double> puWeightsHandle;
@@ -323,7 +326,7 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 		// }
 		// PileupSummary Part
 		edm::Handle < std::vector<PileupSummaryInfo> > puInfo;
-		iEvent.getByLabel(pileupInfoSrc_, puInfo);
+		iEvent.getByToken(pileupInfoSrc_, puInfo);
 
 		if (puInfo.isValid()) {
 
@@ -332,9 +335,10 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 				OriginBX->push_back(it->getBunchCrossing());
 				NumberOfTrueInteractions->push_back(it->getTrueNumInteractions());
 			}
-		} else {
-			edm::LogError("BristolNTuple_PileUpError") << "Error! Can't get the product " << pileupInfoSrc_;
-		}
+		} 
+		// else {
+		// 	edm::LogError("BristolNTuple_PileUpError") << "Error! Can't get the product " << pileupInfoSrc_;
+		// }
 
 		//identify ttbar decay mode
 		if (isTTbarMC_) {
@@ -361,7 +365,7 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 			// Store weights from LHE
 			// For pdf and generator systematics
 			edm::Handle<LHEEventProduct> EvtHandle ;
-			iEvent.getByLabel( "externalLHEProducer" , EvtHandle ) ;
+			iEvent.getByToken( lheEventProductToken_ , EvtHandle ) ;
 
 			*centralLHEWeight.get() = EvtHandle->originalXWGTUP();
 
@@ -379,7 +383,7 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 
 				// Get parton info
 				edm::Handle < TtGenEvent > ttGenEvt;
-				iEvent.getByLabel(tt_gen_event_input_, ttGenEvt);
+				iEvent.getByToken(tt_gen_event_input_, ttGenEvt);
 
 				if ( ttGenEvt->isSemiLeptonic() ) {
 
@@ -454,7 +458,7 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 
 					// Get gen jets
 					edm::Handle < reco::GenJetCollection > genJets;
-					iEvent.getByLabel(genJetsInputTag_, genJets);
+					iEvent.getByToken(genJetsInputTag_, genJets);
 
 					// Get subset of gen jets that are stored in ntuple
 					vector<reco::GenJet> genJetsInNtuple;

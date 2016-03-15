@@ -13,7 +13,8 @@
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-
+#include "DataFormats/Common/interface/View.h"
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 
 class EventWeight_Producer_PU: public edm::EDProducer {
@@ -28,7 +29,7 @@ private:
 
 	virtual void produce(edm::Event&, const edm::EventSetup&);
 
-	edm::InputTag inTag_PUSource;
+	edm::EDGetToken inTag_PUSource;
 	std::string inTag_WeightName;
 
 	std::string inTag_MCSampleTag;

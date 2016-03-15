@@ -1,7 +1,6 @@
 #include "BristolAnalysis/NTupleTools/plugins/MuonWeight_Producer.h"
 #include "BristolAnalysis/NTupleTools/interface/MuonWeight.h"
 #include "FWCore/Utilities/interface/InputTag.h"
-#include "DataFormats/PatCandidates/interface/Muon.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include <boost/filesystem.hpp>
@@ -12,7 +11,7 @@ using namespace edm;
 using namespace std;
 
 MuonWeight_Producer::MuonWeight_Producer(const edm::ParameterSet& iConfig) :
-		muonInput_(iConfig.getParameter < InputTag > ("muonInput")), //
+		muonInput_(consumes< pat::MuonCollection > (iConfig.getParameter < InputTag > ("muonInput"))), //
 		prefix_(iConfig.getParameter < string > ("prefix")), //
 		MCSampleTag_(iConfig.getParameter < std::string > ("MCSampleTag")) , //
 		Systematic_(iConfig.getParameter<int>("MuonSystematic")),
@@ -37,7 +36,7 @@ void MuonWeight_Producer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	if (!iEvent.isRealData()) {
 		//get jets and numberOfBtags
 		edm::Handle < pat::MuonCollection > muons;
-		iEvent.getByLabel(muonInput_, muons);
+		iEvent.getByToken(muonInput_, muons);
 		muonWeights = MuonWeights(*muons, &*muonIdIsoScaleFactorsHistogram_, &*muonTriggerScaleFactorsHistogram_, Systematic_, MCSampleTag_);
 	}
 

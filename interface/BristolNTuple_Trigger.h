@@ -6,6 +6,8 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
 #include "CommonTools/Utils/interface/StringCutObjectSelector.h"
 class BristolNTuple_Trigger : public edm::EDProducer {
  public:
@@ -16,7 +18,9 @@ class BristolNTuple_Trigger : public edm::EDProducer {
   void beginRun( edm::Run &, const edm::EventSetup & );
   //unsigned int findTrigger(const std::string& triggerWildCard);
 
-  const edm::InputTag   hltInputTag_, hltObjectsInputTag_;
+  const edm::EDGetTokenT<edm::TriggerResults> hltInputTag_;
+  const edm::EDGetTokenT<std::vector<pat::TriggerObjectStandAlone>> hltObjectsInputTag_;
+
   const std::string pathOfInterest_;
 
   const bool tightenTrigger_;

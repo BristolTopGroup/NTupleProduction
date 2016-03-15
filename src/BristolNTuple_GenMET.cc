@@ -1,13 +1,11 @@
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_GenMET.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/METReco/interface/GenMET.h"
-#include "DataFormats/METReco/interface/GenMETFwd.h"
-#include "DataFormats/PatCandidates/interface/MET.h"
+
 
 
 BristolNTuple_GenMET::BristolNTuple_GenMET(const edm::ParameterSet& iConfig) :
-    inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
+    inputTag(consumes< std::vector<pat::MET> > (iConfig.getParameter<edm::InputTag>("InputTag"))),
     prefix  (iConfig.getParameter<std::string>  ("Prefix")),
     suffix  (iConfig.getParameter<std::string>  ("Suffix"))
 {
@@ -30,11 +28,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     if (!iEvent.isRealData()) {
 
         edm::Handle < std::vector<pat::MET> > mets;
-        iEvent.getByLabel(inputTag, mets);
+        iEvent.getByToken(inputTag, mets);
         const pat::MET patMET(mets->at(0));
         const reco::GenMET* genMET(patMET.genMET());
-        // edm::Handle < reco::GenMETCollection > mets;
-        // iEvent.getByLabel(inputTag, mets);
 
         *px = genMET->px();
         *py = genMET->py();

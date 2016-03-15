@@ -20,11 +20,12 @@ using namespace isodeposit;
 using namespace pat;
 
 TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(const edm::ParameterSet& iConfig) :
-		jetInput_(iConfig.getParameter < edm::InputTag > ("jetInput")), //
-		electronInput_(iConfig.getParameter < edm::InputTag > ("electronInput")), //
-		muonInput_(iConfig.getParameter < edm::InputTag > ("muonInput")), //
-		hltInputTag_(iConfig.getParameter < edm::InputTag > ("HLTInput")), //
-		vertexInputTag_(iConfig.getParameter < edm::InputTag > ("VertexInputTag")), //
+		jetInput_(consumes<pat::JetCollection>(iConfig.getParameter < edm::InputTag > ("jetInput"))), //
+		// electronInput_(consumes<pat::ElectronCollection>(iConfig.getParameter < edm::InputTag > ("electronInput"))), //
+  		electronInput_(consumes<edm::View<pat::Electron>>(iConfig.getParameter < edm::InputTag > ("electronInput"))),			
+		muonInput_(consumes<pat::MuonCollection>(iConfig.getParameter < edm::InputTag > ("muonInput"))), //
+		hltInputTag_(consumes<edm::TriggerResults>(iConfig.getParameter < edm::InputTag > ("HLTInput"))), //
+		vertexInputTag_(consumes<reco::VertexCollection>(iConfig.getParameter < edm::InputTag > ("VertexInputTag"))), //
 
 		// Selection criteria
 		minSignalElectronPt_(iConfig.getParameter<double>("minSignalElectronPt")), //
@@ -242,18 +243,18 @@ void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEven
 	// Vertices (for re calculating electron ID)
 	if ( nonIsolatedElectronSelection_ || invertedConversionSelection_ ) {
 		edm::Handle < reco::VertexCollection > verticesHandle;
-	   	iEvent.getByLabel(vertexInputTag_, verticesHandle);
+	   	iEvent.getByToken(vertexInputTag_, verticesHandle);
 	   	vertices_ = *verticesHandle;
 	}
 	
 	// Trigger info
 	edm::Handle < edm::TriggerResults > triggerResults;
-	iEvent.getByLabel(hltInputTag_, triggerResults);
+	iEvent.getByToken(hltInputTag_, triggerResults);
 	triggerResults_ = *triggerResults;
 
 	// Jets
 	edm::Handle < pat::JetCollection > jets;
-	iEvent.getByLabel(jetInput_, jets);
+	iEvent.getByToken(jetInput_, jets);
 	jets_ = *jets;
 
 	if ( applyJEC_ ) {
@@ -262,7 +263,7 @@ void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEven
 	}
 
 	// Electrons
-	iEvent.getByLabel(electronInput_, electrons_);
+	iEvent.getByToken(electronInput_, electrons_);
 
 	// Electron VID Decisions
 	Handle<edm::ValueMap<bool> > medium_id_decisions;
@@ -279,7 +280,7 @@ void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEven
 
 	// Muons (for veto)
 	edm::Handle < pat::MuonCollection > muons;
-	iEvent.getByLabel(muonInput_, muons);
+	iEvent.getByToken(muonInput_, muons);
 	muons_ = *muons;
 
 	// Choose electrons that pass loose selection
@@ -707,18 +708,18 @@ void TopPairElectronPlusJetsSelectionFilter::endJob() {
 
 bool TopPairElectronPlusJetsSelectionFilter::beginRun(edm::Run& iRun, const edm::EventSetup& iSetup) {
 
-	bool changed = true;
-	if (hltConfig_.init(iRun, iSetup, hltInputTag_.process(), changed)) {
-		// if init returns TRUE, initialisation has succeeded!
-		edm::LogInfo("TopPairElectronPlusJetsSelectionFilter") << "HLT config with process name "
-				<< hltInputTag_.process() << " successfully extracted";
-	} else {
-		// if init returns FALSE, initialisation has NOT succeeded, which indicates a problem
-		// with the file and/or code and needs to be investigated!
-		edm::LogError("TopPairElectronPlusJetsSelectionFilter_Error")
-				<< "Error! HLT config extraction with process name " << hltInputTag_.process() << " failed";
-		// In this case, all access methods will return empty values!
-	}
+	// bool changed = true;
+	// if (hltConfig_.init(iRun, iSetup, hltInputTag_.process(), changed)) {
+	// 	// if init returns TRUE, initialisation has succeeded!
+	// 	edm::LogInfo("TopPairElectronPlusJetsSelectionFilter") << "HLT config with process name "
+	// 			<< hltInputTag_.process() << " successfully extracted";
+	// } else {
+	// 	// if init returns FALSE, initialisation has NOT succeeded, which indicates a problem
+	// 	// with the file and/or code and needs to be investigated!
+	// 	edm::LogError("TopPairElectronPlusJetsSelectionFilter_Error")
+	// 			<< "Error! HLT config extraction with process name " << hltInputTag_.process() << " failed";
+	// 	// In this case, all access methods will return empty values!
+	// }
 	return true;
 }
 

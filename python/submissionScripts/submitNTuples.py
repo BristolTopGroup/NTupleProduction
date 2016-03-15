@@ -4,19 +4,17 @@ from shutil import move
 from os import remove
 import os
 
-version = '6'
+version = '11'
 crabWorkArea = 'workdirCrab/v'+version+'/'+str(date.today())
 print 'Using workdir ',crabWorkArea
-miniAodDir = 'BristolAnalysis/NTupleTools/Configuration/crab3Configurations/25ns/'
+miniAodDir = 'BristolAnalysis/NTupleTools/Configuration/crab3Configurations/FALL15/'
 jobConfigs = [
 
 # Data
-miniAodDir+'SingleMuon_PromptReco_RunD.py',
-miniAodDir+'SingleMuon_ReReco_RunD.py',
-miniAodDir+'SingleMuon_ReReco_RunC.py',
-miniAodDir+'SingleElectron_PromptReco_RunD.py',
-miniAodDir+'SingleElectron_ReReco_RunD.py',
-miniAodDir+'SingleElectron_ReReco_RunC.py',
+miniAodDir+'SingleMuon_16Dec2015_RunC.py',
+miniAodDir+'SingleElectron_16Dec2015_RunC.py',
+miniAodDir+'SingleMuon_16Dec2015_RunD.py',
+miniAodDir+'SingleElectron_16Dec2015_RunD.py',
 
 # MC
 # Central
@@ -24,18 +22,21 @@ miniAodDir + 'TTJets_PowhegPythia8.py',
 
 # Backgrounds and Tunes/Generators
 miniAodDir + 'DYJetsToLL_M50.py',
-miniAodDir + 'GJets_15toInf.py',
+miniAodDir + 'GJets_100to200.py',
+miniAodDir + 'GJets_200to400.py',
+miniAodDir + 'GJets_400to600.py',
+miniAodDir + 'GJets_600toInf.py',
 miniAodDir + 'QCD_EMEnriched_120to170.py',
 miniAodDir + 'QCD_EMEnriched_15to20.py',
 miniAodDir + 'QCD_EMEnriched_170to300.py',
 miniAodDir + 'QCD_EMEnriched_20to30.py',
 miniAodDir + 'QCD_EMEnriched_300toInf.py',
-miniAodDir + 'QCD_EMEnriched_30to50.py',
+# miniAodDir + 'QCD_EMEnriched_30to50.py',
 miniAodDir + 'QCD_EMEnriched_50to80.py',
 miniAodDir + 'QCD_EMEnriched_80to120.py',
 miniAodDir + 'QCD_MuEnriched_1000toInf.py',
 miniAodDir + 'QCD_MuEnriched_120to170.py',
-miniAodDir + 'QCD_MuEnriched_15to20.py',
+# miniAodDir + 'QCD_MuEnriched_15to20.py',
 miniAodDir + 'QCD_MuEnriched_170to300.py',
 miniAodDir + 'QCD_MuEnriched_20to30.py',
 miniAodDir + 'QCD_MuEnriched_300to470.py',
@@ -51,7 +52,6 @@ miniAodDir + 'QCD_bcToE_20to30.py',
 miniAodDir + 'QCD_bcToE_250toInf.py',
 miniAodDir + 'QCD_bcToE_30to80.py',
 miniAodDir + 'QCD_bcToE_80to170.py',
-# miniAodDir + 'TTJets_PowhegPythia6Tauola.py',
 miniAodDir + 'TTJets_PowhegPythia8_mtop1695.py',
 miniAodDir + 'TTJets_PowhegPythia8_mtop1755.py',
 miniAodDir + 'TTJets_PowhegPythia8_scaledown.py',
@@ -59,9 +59,9 @@ miniAodDir + 'TTJets_PowhegPythia8_scaleup.py',
 miniAodDir + 'TTJets_amcatnloFXFX.py',
 miniAodDir + 'TTJets_amcatnloFXFX_mtop1695.py',
 miniAodDir + 'TTJets_amcatnloFXFX_mtop1755.py',
-miniAodDir + 'TTJets_amcatnloHerwigpp.py',
-# miniAodDir + 'TTJets_amcatnloFXFX_scaledown.py',
-# miniAodDir + 'TTJets_amcatnloFXFX_scaleup.py',
+miniAodDir + 'TTJets_PowhegHerwigpp.py',
+miniAodDir + 'TTJets_amcatnloFXFX_scaledown.py',
+miniAodDir + 'TTJets_amcatnloFXFX_scaleup.py',
 miniAodDir + 'TTJets_madgraphMLM.py',
 miniAodDir + 'TToLeptons_t.py',
 miniAodDir + 'T_tW.py',

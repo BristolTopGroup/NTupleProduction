@@ -2,20 +2,19 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/PatCandidates/interface/Jet.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
+#include "JetMETCorrections/Modules/interface/JetResolution.h"
 #include "FWCore/Framework/interface/ESHandle.h"
-#include <iostream>
 
 using namespace std;
 
 BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
-		inputTag(iConfig.getParameter < edm::InputTag > ("InputTag")), //
+  		inputTag(consumes<std::vector<pat::Jet>>(iConfig.getParameter<edm::InputTag>("InputTag"))),			
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //
 		suffix(iConfig.getParameter < std::string > ("Suffix")), //
 		maxSize(iConfig.getParameter<unsigned int>("MaxSize")), //
@@ -25,7 +24,7 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		jetCorrectionService(iConfig.getParameter<std::string> ("JetCorrectionService")), //
 		readJECuncertainty(iConfig.getParameter<bool>("ReadJECuncertainty")), //
 		doVertexAssociation(iConfig.getParameter<bool>("DoVertexAssociation")), //
-		vtxInputTag(iConfig.getParameter < edm::InputTag > ("VertexInputTag")), // 
+		vtxInputTag(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))), //		
 		isRealData(iConfig.getParameter<bool>("isRealData")),
 
 		// calib("csvv2", "BristolAnalysis/NTupleTools/data/BTagSF/CSVv2.csv"),
@@ -36,9 +35,9 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 					"central"),           // systematics type
 		reader_bc_up(&calib, BTagEntry::OP_MEDIUM, "mujets", "up"),  // sys up
 		reader_bc_down(&calib, BTagEntry::OP_MEDIUM, "mujets", "down"),  // sys down
-		reader_l(&calib, BTagEntry::OP_MEDIUM, "comb", "central"),  // sys down
-		reader_l_up(&calib, BTagEntry::OP_MEDIUM, "comb", "up"),  // sys down
-		reader_l_down(&calib, BTagEntry::OP_MEDIUM, "comb", "down")  // sys down
+		reader_l(&calib, BTagEntry::OP_MEDIUM, "incl", "central"),  // sys down
+		reader_l_up(&calib, BTagEntry::OP_MEDIUM, "incl", "up"),  // sys down
+		reader_l_down(&calib, BTagEntry::OP_MEDIUM, "incl", "down")  // sys down
 
 		 {
 	//kinematic variables
@@ -111,6 +110,12 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "btagSFUp" + suffix);
 	produces < std::vector<double> > (prefix + "btagSFDown" + suffix);
 
+	// JER information
+	// produces < std::vector<double> > (prefix + "jer" + suffix);
+	// produces < std::vector<double> > (prefix + "jerSF" + suffix);
+	// produces < std::vector<double> > (prefix + "jerSFUp" + suffix);
+	// produces < std::vector<double> > (prefix + "jerSFDown" + suffix);
+
 	//jet-vertex association
 	if (doVertexAssociation) {
 		produces < std::vector<double> > (prefix + "BestVertexTrackAssociationFactor" + suffix);
@@ -126,6 +131,7 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 }
 
 void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
+
 	//kinematic variables
 	std::auto_ptr < std::vector<double> > px(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > py(new std::vector<double>());
@@ -194,6 +200,11 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<double> > btagSF_up(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > btagSF_down(new std::vector<double>());
 
+	// std::auto_ptr < std::vector<double> > jer(new std::vector<double>());
+	// std::auto_ptr < std::vector<double> > jerSF(new std::vector<double>());
+	// std::auto_ptr < std::vector<double> > jerSF_up(new std::vector<double>());
+	// std::auto_ptr < std::vector<double> > jerSF_down(new std::vector<double>());
+
 	//jet-vertex association
 	std::auto_ptr < std::vector<double> > bestVertexTrackAssociationFactor(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > bestVertexTrackAssociationIndex(new std::vector<int>());
@@ -233,13 +244,36 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	pat::strbitset retpf = pfjetIDLoose.getBitTemplate();
 
 	edm::Handle < std::vector<pat::Jet> > jets;
-	iEvent.getByLabel(inputTag, jets);
+	iEvent.getByToken(inputTag, jets);
 
 	edm::Handle < reco::VertexCollection > primaryVertices; // DB
-	iEvent.getByLabel(vtxInputTag, primaryVertices); // DB
+	iEvent.getByToken(vtxInputTag, primaryVertices); // DB
+
+
+	// JME::JetResolution resolution = JME::JetResolution::get(iSetup, "AK4PFchs_pt");
+	// JME::JetResolutionScaleFactor resolution_sf = JME::JetResolutionScaleFactor::get(iSetup, "AK4PFchs");
+// std::string jetSFType_;
+// std::string jetResPtType_;
+
+// srcJets = cms.InputTag("ak4PFJetsCHS"),
+// srcJetSF = cms.string('AK4PFchs'),
+// srcJetResPt = cms.string('AK4PFchs_pt'),
+// srcJetResPhi = cms.string('AK4PFchs_phi'),
+
+// jetSFType_ = iConfig.getParameter<std::string>("srcJetSF");
+// jetResPtType_ = iConfig.getParameter<std::string>("srcJetResPt");
+// jetResPhiType_ = iConfig.getParameter<std::string>("srcJetResPhi");
+// rhoToken_ = consumes<double>(iConfig.getParameter<edm::InputTag>("srcRho"));
+
+// JME::JetResolution resPtObj = JME::JetResolution::get(setup, jetResPtType_);
+// JME::JetResolution resPhiObj = JME::JetResolution::get(setup, jetResPhiType_);
+// JME::JetResolutionScaleFactor resSFObj = JME::JetResolutionScaleFactor::get(setup, jetSFType_);
+
+
+
 
 	if (jets.isValid()) {
-		edm::LogInfo("BristolNTuple_PFJetsInfo") << "Total # PFJets: " << jets->size();
+		// edm::LogInfo("BristolNTuple_PFJetsInfo") << "Total # PFJets: " << jets->size();
 
 		for (std::vector<pat::Jet>::const_iterator it = jets->begin(); it != jets->end(); ++it) {
 			// exit from loop when you reach the required number of jets
@@ -333,6 +367,21 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				genParton_pdgId->push_back(genparton_pdgId);
 			}
 
+
+
+			// JME::JetParameters jetParams;
+
+			// // JER SF only depend on jet eta
+			// jetParams.setJetEta(it->eta());
+			// jerSF->push_back(resolution_sf.getScaleFactor(jetParams));
+			// jerSF_up->push_back(resolution_sf.getScaleFactor(jetParams, Variation::UP));
+			// jerSF_down->push_back(resolution_sf.getScaleFactor(jetParams, Variation::DOWN));
+
+			// // JER depends on jet eta and jet pt
+			// jetParams.setJetPt(it->pt());
+			// jer->push_back(resolution.getResolution(jetParams));
+
+
 			// Vertex association
 
 			int bestVtxIndex3Ddist = -1;
@@ -349,7 +398,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			// Loop on primary Vertices and jets and perform associations
 
 			if (primaryVertices.isValid()) {
-				edm::LogInfo("BristolNTuple_PFJetsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
+				// edm::LogInfo("BristolNTuple_PFJetsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
 				if (doVertexAssociation) {
 					// Main Vertex Loop
 					for (reco::VertexCollection::const_iterator v_it = primaryVertices->begin();
@@ -428,9 +477,10 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 					}
 				}
 				//std::cout<<"---------------------"<<std::endl;
-			} else {
-				edm::LogError("BristolNTuple_PFJetsError") << "Error! Can't get the product " << vtxInputTag;
-			}
+			} 
+			// else {
+			// 	edm::LogError("BristolNTuple_PFJetsError") << "Error! Can't get the product " << vtxInputTag;
+			// }
 
 			// fill in all the vectors
 			//kinematic variables
@@ -511,7 +561,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			//b-tagging information
 			//names are changing between major software releases
 			combinedInclusiveSecondaryVertexV2BJetTags->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
-			passesMediumCSV->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.890 );
+			passesMediumCSV->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.800 );
 			
 			// Read and store b tagging scale factors for MC
 			if (!iEvent.isRealData()) {
@@ -584,9 +634,10 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				closestVertexZIndex->push_back(bestVtxIndexZdist);
 			}
 		}
-	} else {
-		edm::LogError("BristolNTuple_PFJetsError") << "Error! Can't get the product " << inputTag;
-	}
+	} 
+	// else {
+	// 	edm::LogError("BristolNTuple_PFJetsError") << "Error! Can't get the product " << inputTag;
+	// }
 	delete jecUnc;
 	//-----------------------------------------------------------------
 	// put vectors in the event
@@ -661,6 +712,11 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(btagSF, prefix + "btagSF" + suffix);
 	iEvent.put(btagSF_up, prefix + "btagSFUp" + suffix);
 	iEvent.put(btagSF_down, prefix + "btagSFDown" + suffix);
+
+	// iEvent.put(jer, prefix + "jer" + suffix);
+	// iEvent.put(jerSF, prefix + "jerSF" + suffix);
+	// iEvent.put(jerSF_up, prefix + "jerSFUp" + suffix);
+	// iEvent.put(jerSF_down, prefix + "jerSFDown" + suffix);
 
 	//jet-vertex association
 	if (doVertexAssociation) {

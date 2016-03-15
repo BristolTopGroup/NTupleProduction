@@ -2,8 +2,6 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
-#include "DataFormats/Common/interface/TriggerResults.h"
-#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
 
@@ -13,8 +11,8 @@ using namespace std;
 // https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD#Trigger
 
 BristolNTuple_Trigger::BristolNTuple_Trigger(const edm::ParameterSet& iConfig) :
-		hltInputTag_(iConfig.getParameter < edm::InputTag > ("HLTInputTag")), //
-		hltObjectsInputTag_(iConfig.getParameter < edm::InputTag > ("HLTObjectsInputTag")), //
+  		hltInputTag_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("HLTInputTag"))),			
+  		hltObjectsInputTag_(consumes<std::vector<pat::TriggerObjectStandAlone>>(iConfig.getParameter<edm::InputTag>("HLTObjectsInputTag"))),			
 		pathOfInterest_(iConfig.getParameter <std::string> ("PathOfInterest")), //
 		tightenTrigger_(iConfig.getParameter<bool>("tightenTrigger")),
 	    triggerFilterName_(iConfig.getParameter<std::string>("hltFilter")),
@@ -47,7 +45,7 @@ void BristolNTuple_Trigger::produce(edm::Event& iEvent, const edm::EventSetup& i
 	std::auto_ptr <std::vector<float>  > toPhi(new std::vector<float>());
 
 	edm::Handle < edm::TriggerResults > triggerResults;
-	iEvent.getByLabel(hltInputTag_, triggerResults);
+	iEvent.getByToken(hltInputTag_, triggerResults);
 
     const edm::TriggerNames &names = iEvent.triggerNames(*triggerResults);
 	unsigned int triggerIndex = 9999;
@@ -68,7 +66,7 @@ void BristolNTuple_Trigger::produce(edm::Event& iEvent, const edm::EventSetup& i
 	}
 
     edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
-	iEvent.getByLabel(hltObjectsInputTag_, triggerObjects);
+	iEvent.getByToken(hltObjectsInputTag_, triggerObjects);
 
 	unsigned int nPass = 0;
     for (pat::TriggerObjectStandAlone obj : *triggerObjects) {

@@ -1,12 +1,10 @@
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_METcorrections.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/METReco/interface/PFMET.h"
-#include "DataFormats/METReco/interface/PFMETCollection.h"
-#include "DataFormats/METReco/interface/CorrMETData.h"
+
 
 BristolNTuple_METcorrections::BristolNTuple_METcorrections(const edm::ParameterSet& iConfig) :
-        inputTag(iConfig.getParameter < edm::InputTag > ("InputTag")), //
+        inputTag(consumes<CorrMETData> (iConfig.getParameter < edm::InputTag > ("InputTag"))), //
         prefix(iConfig.getParameter < std::string > ("Prefix")), //
         suffix(iConfig.getParameter < std::string > ("Suffix"))
 {
@@ -17,10 +15,10 @@ BristolNTuple_METcorrections::BristolNTuple_METcorrections(const edm::ParameterS
 
 void BristolNTuple_METcorrections::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::Handle<CorrMETData> metCorr;
-    iEvent.getByLabel(inputTag, metCorr);
+    iEvent.getByToken(inputTag, metCorr);
 
-    if (!metCorr.isValid())
-      edm::LogError("BristolNTuple_METcorrectionsExtra") << "Error! Can't get the product " << inputTag;
+    // if (!metCorr.isValid())
+    //   edm::LogError("BristolNTuple_METcorrectionsExtra") << "Error! Can't get the product " << inputTag;
 
     //    std::cout << "Systematic shift corrections, corrx = " << metCorr->mex << ", corry = " << metCorr->mey << std::endl;
 

@@ -6,6 +6,8 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
@@ -20,8 +22,8 @@ public:
 
 private:
 	void produce(edm::Event &, const edm::EventSetup &);
-	const edm::InputTag electronInput_;
-	const edm::InputTag jetInput_;
+	const edm::EDGetTokenT< pat::ElectronCollection > electronInput_;
+	const edm::EDGetTokenT< pat::JetCollection > jetInput_;
 	const std::string prefix_, MCSampleTag_;
 	const int Systematic_;
 

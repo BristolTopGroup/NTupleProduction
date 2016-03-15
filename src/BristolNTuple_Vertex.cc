@@ -1,12 +1,11 @@
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_Vertex.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 
 
 BristolNTuple_Vertex::BristolNTuple_Vertex(const edm::ParameterSet& iConfig) :
-    inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
+    inputTag(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("InputTag"))), //   
     prefix  (iConfig.getParameter<std::string>  ("Prefix")),
     suffix  (iConfig.getParameter<std::string>  ("Suffix"))
 {
@@ -44,10 +43,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   //-----------------------------------------------------------------
   edm::Handle<reco::VertexCollection> primaryVertices;
-  iEvent.getByLabel(inputTag,primaryVertices);
+  iEvent.getByToken(inputTag,primaryVertices);
 
   if(primaryVertices.isValid()) {
-    edm::LogInfo("BristolNTuple_VertexInfo") << "Total # Primary Vertices: " << primaryVertices->size();
+    // edm::LogInfo("BristolNTuple_VertexInfo") << "Total # Primary Vertices: " << primaryVertices->size();
 
     *nvertices = primaryVertices->size();
 
@@ -65,9 +64,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       ntracksw05->push_back( it->nTracks(0.5) ); // number of tracks in the vertex with weight above 0.5
       isfake->push_back( it->isFake() ? 1 : 0);
     }
-  } else {
-    edm::LogError("BristolNTuple_VertexError") << "Error! Can't get the product " << inputTag;
-  }
+  } 
+  // else {
+  //   edm::LogError("BristolNTuple_VertexError") << "Error! Can't get the product " << inputTag;
+  // }
 
   //-----------------------------------------------------------------
   // put vectors in the event
