@@ -273,7 +273,6 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
 
 	if (jets.isValid()) {
-		// edm::LogInfo("BristolNTuple_PFJetsInfo") << "Total # PFJets: " << jets->size();
 
 		for (std::vector<pat::Jet>::const_iterator it = jets->begin(); it != jets->end(); ++it) {
 			// exit from loop when you reach the required number of jets
@@ -398,7 +397,6 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			// Loop on primary Vertices and jets and perform associations
 
 			if (primaryVertices.isValid()) {
-				// edm::LogInfo("BristolNTuple_PFJetsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
 				if (doVertexAssociation) {
 					// Main Vertex Loop
 					for (reco::VertexCollection::const_iterator v_it = primaryVertices->begin();
@@ -478,9 +476,6 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				}
 				//std::cout<<"---------------------"<<std::endl;
 			} 
-			// else {
-			// 	edm::LogError("BristolNTuple_PFJetsError") << "Error! Can't get the product " << vtxInputTag;
-			// }
 
 			// fill in all the vectors
 			//kinematic variables
@@ -635,9 +630,6 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			}
 		}
 	} 
-	// else {
-	// 	edm::LogError("BristolNTuple_PFJetsError") << "Error! Can't get the product " << inputTag;
-	// }
 	delete jecUnc;
 	//-----------------------------------------------------------------
 	// put vectors in the event

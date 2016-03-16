@@ -17,9 +17,6 @@ void BristolNTuple_METcorrections::produce(edm::Event& iEvent, const edm::EventS
     edm::Handle<CorrMETData> metCorr;
     iEvent.getByToken(inputTag, metCorr);
 
-    // if (!metCorr.isValid())
-    //   edm::LogError("BristolNTuple_METcorrectionsExtra") << "Error! Can't get the product " << inputTag;
-
     //    std::cout << "Systematic shift corrections, corrx = " << metCorr->mex << ", corry = " << metCorr->mey << std::endl;
 
     std::auto_ptr<double> corrx(new double(metCorr->mex));

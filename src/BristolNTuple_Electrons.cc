@@ -281,14 +281,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			if (hConversions.isValid() && bsHandle.isValid()) {
 				matchesConv = ConversionTools::hasMatchedConversion(*it, hConversions, bsHandle->position());
 			} 
-			// else {
-			// 	if (!bsHandle.isValid())
-			// 		edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product "
-			// 				<< beamSpotInputTag;
-			// 	if (!hConversions.isValid())
-			// 		edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product "
-			// 				<< conversionsInputTag;
-			// }
+
 			// Vertex association
 			double minVtxDist3D = 9999.;
 			int vtxIndex_ = -1;
@@ -322,9 +315,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 					}
 				}
 			}
-// 			} else {
-// 				edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << vtxInputTag;
-// 			}
 
 			//kinematic variables
 			px->push_back(it->px());
@@ -425,9 +415,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 		}
 	}
-	// } else {
-	// 	edm::LogError("BristolNTuple_ElectronsExtraError") << "Error! Can't get the product " << inputTag;
-	// }
 
 	//-----------------------------------------------------------------
 	// put vectors in the event
@@ -526,11 +513,3 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	iEvent.put(primaryVertexDXYCorr, prefix + "PrimaryVertexDXYCorr" + suffix);
 
 }
-
-
-
-
-
-
-
-

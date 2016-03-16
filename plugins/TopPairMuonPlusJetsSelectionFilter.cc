@@ -249,8 +249,6 @@ void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent, c
 		} else
 			hasGoodPV_ = false;
 	} 
-	// else
-	// 	edm::LogError("TopPairMuonPlusJetsSelectionFilterError") << "Error! Can't get the product " << VertexInput_;
 
 	// Jet collection
 	edm::Handle < pat::JetCollection > jets;
@@ -299,9 +297,6 @@ void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent, c
 			signalMuon_ = goodIsolatedMuons_.front();
 
 	} 
-	// else {
-	// 	edm::LogError("TopPairMuonPlusJetsSelectionFilterError") << "Error! Can't get the product " << muonInput_;
-	// }
 
 	// Clean jets against signal muon
 	if (debug_)
@@ -327,7 +322,7 @@ void TopPairMuonPlusJetsSelectionFilter::getLooseElectrons() {
 
 bool TopPairMuonPlusJetsSelectionFilter::isLooseElectron(const edm::Ptr<pat::Electron>& electron) const {
 	bool passesPtAndEta = electron->pt() > minLooseElectronPt_ && fabs(electron->eta()) < maxLooseElectronEta_;
-	//		bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
+	// bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
 	// bool passesID = electron.electronID("mvaTrigV0") > 0.5;
 
 	bool passesID = looseElectronIDDecisions_[electron];
@@ -660,20 +655,7 @@ void TopPairMuonPlusJetsSelectionFilter::beginJob() {
 void TopPairMuonPlusJetsSelectionFilter::endJob() {
 }
 
-bool TopPairMuonPlusJetsSelectionFilter::beginRun(edm::Run& iRun, const edm::EventSetup& iSetup) {
-
-	// bool changed = true;
-	// if (hltConfig_.init(iRun, iSetup, hltInputTag_.process(), changed)) {
-	// 	// if init returns TRUE, initialisation has succeeded!
-	// 	edm::LogInfo("TopPairMuonPlusJetsSelectionFilter") << "HLT config with process name "
-	// 			<< hltInputTag_.process() << " successfully extracted";
-	// } else {
-	// 	// if init returns FALSE, initialisation has NOT succeeded, which indicates a problem
-	// 	// with the file and/or code and needs to be investigated!
-	// 	edm::LogError("TopPairMuonPlusJetsSelectionFilter_Error")
-	// 			<< "Error! HLT config extraction with process name " << hltInputTag_.process() << " failed";
-	// 	// In this case, all access methods will return empty values!
-	// }
+bool TopPairMuonPlusJetsSelectionFilter::beginRun() {
 	return true;
 }
 

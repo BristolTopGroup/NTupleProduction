@@ -47,7 +47,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 		iEvent.getByToken(inputTag, genParticles);
 
 		if (genParticles.isValid()) {
-			// edm::LogInfo("BristolNTuple_GenParticlesInfo") << "Total # GenParticles: " << genParticles->size();
 
 			for (reco::GenParticleCollection::const_iterator it = genParticles->begin(); it != genParticles->end();
 					++it) {
@@ -80,9 +79,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 				motherIndex->push_back(idx);
 			}
 		} 
-		// else {
-		// 	edm::LogError("BristolNTuple_GenParticlesError") << "Error! Can't get the product " << inputTag;
-		// }
 	}
 	//-----------------------------------------------------------------
 	// put vectors in the event

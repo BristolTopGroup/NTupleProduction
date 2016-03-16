@@ -284,7 +284,6 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 
 
 		if (genEvtInfoProduct.isValid()) {
-			// edm::LogInfo("BristolNTuple_GenEventInfoInfo") << "Successfully obtained " << genEvtInfoInputTag;
 
 			*processID.get() = genEvtInfoProduct->signalProcessID();
 			*ptHat.get() = (genEvtInfoProduct->hasBinningValues() ? genEvtInfoProduct->binningValues()[0] : 0.);
@@ -292,9 +291,6 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 			*generatorWeight.get() = genEvtInfoProduct->weight();
 
 		} 
-		// else {
-		// 	edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product " << genEvtInfoInputTag;
-		// }
 
 		// // PU Weights Part
 		// edm::Handle<double> puWeightsHandle;
@@ -305,8 +301,6 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 
 		// 	*PUWeight.get() = *puWeightsHandle;
 
-		// } else {
-		// 	edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product " << puWeightsInputTag_;
 		// }
 
 		// // PDF Weights Part
@@ -319,9 +313,6 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 
 		// 		*pdfWeights.get() = *pdfWeightsHandle;
 
-		// 	} else {
-		// 		edm::LogError("BristolNTuple_GenEventInfoError") << "Error! Can't get the product "
-		// 				<< pdfWeightsInputTag_;
 		// 	}
 		// }
 		// PileupSummary Part
@@ -336,9 +327,6 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 				NumberOfTrueInteractions->push_back(it->getTrueNumInteractions());
 			}
 		} 
-		// else {
-		// 	edm::LogError("BristolNTuple_PileUpError") << "Error! Can't get the product " << pileupInfoSrc_;
-		// }
 
 		//identify ttbar decay mode
 		if (isTTbarMC_) {

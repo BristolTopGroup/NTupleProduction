@@ -706,20 +706,7 @@ void TopPairElectronPlusJetsSelectionFilter::beginJob() {
 void TopPairElectronPlusJetsSelectionFilter::endJob() {
 }
 
-bool TopPairElectronPlusJetsSelectionFilter::beginRun(edm::Run& iRun, const edm::EventSetup& iSetup) {
-
-	// bool changed = true;
-	// if (hltConfig_.init(iRun, iSetup, hltInputTag_.process(), changed)) {
-	// 	// if init returns TRUE, initialisation has succeeded!
-	// 	edm::LogInfo("TopPairElectronPlusJetsSelectionFilter") << "HLT config with process name "
-	// 			<< hltInputTag_.process() << " successfully extracted";
-	// } else {
-	// 	// if init returns FALSE, initialisation has NOT succeeded, which indicates a problem
-	// 	// with the file and/or code and needs to be investigated!
-	// 	edm::LogError("TopPairElectronPlusJetsSelectionFilter_Error")
-	// 			<< "Error! HLT config extraction with process name " << hltInputTag_.process() << " failed";
-	// 	// In this case, all access methods will return empty values!
-	// }
+bool TopPairElectronPlusJetsSelectionFilter::beginRun() {
 	return true;
 }
 

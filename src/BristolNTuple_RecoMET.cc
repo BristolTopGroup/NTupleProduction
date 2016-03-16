@@ -19,9 +19,6 @@ void BristolNTuple_RecoMET::produce(edm::Event& iEvent, const edm::EventSetup& i
     edm::Handle < std::vector<reco::PFMET> > recomets;
     iEvent.getByToken(inputTag, recomets);
 
-    // if (!recomets.isValid())
-    //   edm::LogError("BristolNTuple_RecoMETExtraError") << "Error! Can't get the product " << inputTag;
-
     const reco::PFMET recoPFMET(recomets->at(0));
 
     std::auto_ptr<double> px(new double(recoPFMET.px()));

@@ -46,7 +46,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.getByToken(inputTag,primaryVertices);
 
   if(primaryVertices.isValid()) {
-    // edm::LogInfo("BristolNTuple_VertexInfo") << "Total # Primary Vertices: " << primaryVertices->size();
 
     *nvertices = primaryVertices->size();
 
@@ -65,9 +64,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       isfake->push_back( it->isFake() ? 1 : 0);
     }
   } 
-  // else {
-  //   edm::LogError("BristolNTuple_VertexError") << "Error! Can't get the product " << inputTag;
-  // }
 
   //-----------------------------------------------------------------
   // put vectors in the event
