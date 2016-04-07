@@ -31,7 +31,8 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		minSignalElectronPt_(iConfig.getParameter<double>("minSignalElectronPt")), //
 		maxSignalElectronEta_(iConfig.getParameter<double>("maxSignalElectronEta")), //
   		signalElectronIDMapToken_(consumes<ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("signalElectronIDMap"))),
-  		signalElectronIDMapToken_bitmap_(consumes<ValueMap<unsigned int> >(iConfig.getParameter<edm::InputTag>("signalElectronIDMap_bitmap"))),
+  		eleMediumIdFullInfoMapToken_(consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("signalElectronIDMap"))),		 
+
 		minSignalElectronID_(iConfig.getParameter<double>("minSignalElectronID")), //
 		minLooseMuonPt_(iConfig.getParameter<double>("minLooseMuonPt")), //
 		maxLooseMuonEta_(iConfig.getParameter<double>("maxLooseMuonEta")), //
@@ -119,7 +120,6 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 	desc.add<double>("maxSignalElectronEta",10.);
 	desc.add<double>("minSignalElectronID",0);
 	desc.add < InputTag > ("signalElectronIDMap");
-	desc.add < InputTag > ("signalElectronIDMap_bitmap");
 	desc.add < InputTag > ("looseElectronIDMap");
 	desc.add<double>("minLooseMuonPt",0.);
 	desc.add<double>("maxLooseMuonEta",10.);
@@ -270,13 +270,13 @@ void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEven
 	iEvent.getByToken(signalElectronIDMapToken_,medium_id_decisions);
 	signalElectronIDDecisions_ = *medium_id_decisions;
 
-	Handle<edm::ValueMap<unsigned int> > medium_id_decisions_bitmap;
-	iEvent.getByToken(signalElectronIDMapToken_bitmap_,medium_id_decisions_bitmap);
-	signalElectronIDDecisions_bitmap_ = *medium_id_decisions_bitmap;
-
 	Handle<edm::ValueMap<bool> > loose_id_decisions;
 	iEvent.getByToken(looseElectronIDMapToken_,loose_id_decisions);
 	looseElectronIDDecisions_ = *loose_id_decisions;
+
+  	edm::Handle<edm::ValueMap<vid::CutFlowResult> > medium_id_cutflow_data;
+  	iEvent.getByToken(eleMediumIdFullInfoMapToken_, medium_id_cutflow_data);
+	medium_id_cutflow_data_ = *medium_id_cutflow_data;
 
 	// Muons (for veto)
 	edm::Handle < pat::MuonCollection > muons;
@@ -329,10 +329,6 @@ void TopPairElectronPlusJetsSelectionFilter::getLooseElectrons() {
 
 bool TopPairElectronPlusJetsSelectionFilter::isLooseElectron(const edm::Ptr<pat::Electron>& electron) const {
 	bool passesPtAndEta = electron->pt() > minLooseElectronPt_ && fabs(electron->eta()) < maxLooseElectronEta_;
-	//		bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
-	// bool passesID = electron.electronID("mvaTrigV0") > 0.5;
-	// bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrectionsForElectrons_,
-	// 		useRhoActiveAreaCorrections_) < looseElectronIso_;
 	bool passesID = looseElectronIDDecisions_[electron];
 	bool passesIso = true; // FIXME Iso already applied in ID (check in AT)
 	return passesPtAndEta && passesID && passesIso;
@@ -367,19 +363,8 @@ void TopPairElectronPlusJetsSelectionFilter::goodIsolatedElectrons() {
 
 		// const pat::Electron electron = electrons_.at(index);
 		const auto electron = electrons_->ptrAt(index);
-		// bool passesIso = getRelativeIsolation(electron, 0.3, rho_, isRealData_, useDeltaBetaCorrectionsForElectrons_,
-				// useRhoActiveAreaCorrections_) < tightElectronIso_;
-		bool passesIso = false;
 
-		double relIsoWithDBeta = electronIsolation(*electron);
-		if ( nonIsolatedElectronSelection_ ) {
-			passesIso = relIsoWithDBeta > controlElectronIso_ ? true : false;
-		}
-      	else {
-      		passesIso = true;
-      	}
-
-		if (isGoodElectron(electron) && passesIso) {
+		if (isGoodElectron(electron)) {
 			goodIsolatedElectrons_.push_back(*electron);
 			//Check if this is the first, and therefore the signal, electron
 			if ( goodIsolatedElectrons_.size()==1 ) signalElectronIndex_ = index;
@@ -391,37 +376,36 @@ bool TopPairElectronPlusJetsSelectionFilter::isGoodElectron(const edm::Ptr<pat::
 	bool passesPtAndEta = electron->pt() > minSignalElectronPt_ && fabs(electron->eta()) < maxSignalElectronEta_;
 	bool notInCrack = fabs(electron->superCluster()->eta()) < 1.4442 || fabs(electron->superCluster()->eta()) > 1.5660;
 	bool inECAL = fabs(electron->superCluster()->eta()) < 2.5;
-
-	//2D impact w.r.t primary vertex
-	// bool passesD0 = fabs(electron.dB(pat::Electron::PV2D)) < 0.02; //cm
-	// bool passesID = electron.electronID("mvaTrigV0") > 0.5;
 	bool passesID = false;
 
+	// ID Cuts
+	// Index : Name
+	//----------------------------------------- 
+	//   0   : MinPtCut
+	//   1   : GsfEleSCEtaMultiRangeCut
+	//   2   : GsfEleDEtaInCut
+	//   3   : GsfEleDPhiInCut
+	//   4   : GsfEleFull5x5SigmaIEtaIEtaCut
+	//   5   : GsfEleHadronicOverEMCut
+	//   6   : GsfEleDxyCut
+	//   7   : GsfEleDzCut 
+	//   8   : GsfEleEInverseMinusPInverseCut
+	//   9   : GsfEleEffAreaPFIsoCut
+	//   10  : GsfEleConversionVetoCut
+	//   11  : GsfEleMissingHitsCut
+
 	if ( nonIsolatedElectronSelection_ ) {
-		if ( signalElectronIDDecisions_bitmap_[electron] == 3327 || signalElectronIDDecisions_bitmap_[electron] == 3583 || signalElectronIDDecisions_bitmap_[electron] == 3839) {
+		if ( returnInvertedSelection(electron, 9) ) {
 			passesID = true;
 		}
 	}
 	else if ( invertedConversionSelection_ ) {
-		if ( signalElectronIDDecisions_bitmap_[electron] == 1023 || signalElectronIDDecisions_bitmap_[electron] == 2047 || signalElectronIDDecisions_bitmap_[electron] == 3071) {
+		if ( returnInvertedSelection(electron, 10) ){
 			passesID = true;
 		}
 	}
 	else {
 		passesID = signalElectronIDDecisions_[electron];
-		
-		// if (passesID) {
-		// 	// cout << x << endl;
-		// }
-		// else if ( signalElectronIDDecisions_bitmap_[electron] == 1023 || signalElectronIDDecisions_bitmap_[electron] == 2047 || signalElectronIDDecisions_bitmap_[electron] == 3071) {
-		// 	cout << "Fails conversion veto : " << x << endl;
-		// 	cout << electron->passConversionVeto() << endl;
-		// 	cout << electron->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::HitCategory::MISSING_INNER_HITS) << endl;
-		// }
-		// else if ( signalElectronIDDecisions_bitmap_[electron] == 3327 || signalElectronIDDecisions_bitmap_[electron] == 3583 || signalElectronIDDecisions_bitmap_[electron] == 3839) {
-		// 	cout << "Fails isolation : " << x << endl;
-		// 	cout << electronIsolation( *electron ) << endl;
-		// }
 	}
 
 	return passesPtAndEta && notInCrack && inECAL && passesID;
@@ -435,6 +419,22 @@ double TopPairElectronPlusJetsSelectionFilter::electronIsolation(const pat::Elec
 	return absiso/electron.pt();
 }
 
+bool TopPairElectronPlusJetsSelectionFilter::returnInvertedSelection(const edm::Ptr<pat::Electron>& electron, int invertedSelection) const {
+
+	vid::CutFlowResult fullCutFlowData = medium_id_cutflow_data_[electron];
+	bool passInversion = false;
+	// printf("\nDEBUG CutFlow, full info for cand with pt=%f:\n", electron->pt());
+	// printf("    CutFlow name= %s    decision is %d\n", fullCutFlowData.cutFlowName().c_str(), (int) fullCutFlowData.cutFlowPassed());
+	// printf(" Index                               cut name              isMasked    value-cut-upon     pass?\n");
+	for(uint icut = 0; icut < fullCutFlowData.cutFlowSize(); icut++){
+		// printf("  %2d      %50s    %d        %f          %d\n", 
+		// icut, fullCutFlowData.getNameAtIndex(icut).c_str(), (int)fullCutFlowData.isCutMasked(icut), fullCutFlowData.getValueCutUpon(icut), (int)fullCutFlowData.getCutResultByIndex(icut));
+		passInversion = fullCutFlowData.getCutResultByIndex(icut);
+		if (icut==uint(invertedSelection) ) passInversion = !passInversion;
+		if (!passInversion) break;
+	}
+	return passInversion;
+}
 
 void TopPairElectronPlusJetsSelectionFilter::cleanedJets() {
 	cleanedJets_.clear();
@@ -697,6 +697,12 @@ bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastOneGoodBJet() const {
 bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastTwoGoodBJets() const {
 	return cleanedBJets_.size() > 1;
 }
+
+
+
+
+
+
 
 // ------------ method called once each job just before starting event loop  ------------
 void TopPairElectronPlusJetsSelectionFilter::beginJob() {
