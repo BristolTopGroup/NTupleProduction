@@ -367,13 +367,11 @@ void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
 		if (!( muon.isGlobalMuon() || muon.isTrackerMuon() ) )
 			continue;
 
-		// bool passesIso = getRelativeIsolation(muon, 0.4, useDeltaBetaCorrectionsForMuons_) < tightMuonIso_;
 		bool passesIso = false;
-
         if ( nonIsolatedMuonSelection1_ ) {
         	passesIso = getRelativeIsolation(muon, 0.4, true) > controlMuonIso1_;
         }
-        if ( nonIsolatedMuonSelection2_ ) {
+        else if ( nonIsolatedMuonSelection2_ ) {
         	passesIso = getRelativeIsolation(muon, 0.4, true) > controlMuonIso2_ 
         		&& getRelativeIsolation(muon, 0.4, true) < controlMuonIso1_;
         	// passesIso = muon.trackIso() / muon.pt() > controlMuonIso_;
