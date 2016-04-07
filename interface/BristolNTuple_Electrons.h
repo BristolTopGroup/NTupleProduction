@@ -7,10 +7,12 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "DataFormats/PatCandidates/interface/VIDCutFlowResult.h"
 
 class BristolNTuple_Electrons : public edm::EDProducer {
  public:
   explicit BristolNTuple_Electrons(const edm::ParameterSet&);
+  virtual bool returnInvertedSelection(const vid::CutFlowResult fullCutFlowData, uint invertedSelection) const;
 
  private:
   void produce( edm::Event &, const edm::EventSetup & );
@@ -24,10 +26,10 @@ class BristolNTuple_Electrons : public edm::EDProducer {
   const edm::EDGetTokenT<std::vector<reco::Vertex>> vtxInputTag;
   const edm::EDGetTokenT<reco::BeamSpot> beamSpotInputTag;
   const edm::EDGetTokenT<std::vector<reco::Conversion>> conversionsInputTag;
-  edm::EDGetTokenT<edm::ValueMap<bool> > tightElectronIDMapToken_;
-  edm::EDGetTokenT<edm::ValueMap<unsigned int> > tightElectronIDMapToken_bitmap_;
-  edm::ValueMap<bool> tightElectronIDDecisions_;
-  edm::ValueMap<unsigned int> tightElectronIDDecisions_bitmap_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > mediumElectronIDMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<vid::CutFlowResult> > eleMediumIdFullInfoMapToken_;
+  edm::ValueMap<bool> mediumElectronIDDecisions_;
+  edm::ValueMap<vid::CutFlowResult> medium_id_cutflow_data_;
 };
 
 #endif
