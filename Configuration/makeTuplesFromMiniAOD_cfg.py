@@ -24,16 +24,14 @@ process.printEventContent = cms.EDAnalyzer("EventContentAnalyzer")
 
 
 ## Source
-# process.source = cms.Source("PoolSource",
-# #     fileNames = cms.untracked.vstring('file:/hdfs/TopQuarkGroup/run2/miniAOD/TT_amcatnlo_25ns.root')
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
         # 'root://xrootd.unl.edu//store/mc/RunIIFall15MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext3-v1/00000/00DF0A73-17C2-E511-B086-E41D2D08DE30.root',
-        'root://xrootd.unl.edu//store/mc/RunIIFall15MiniAODv2/TT_TuneEE5C_13TeV-amcatnlo-herwigpp/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/10000/0047D532-93B8-E511-AEF5-C4346BC8D568.root'
+        # 'root://xrootd.unl.edu//store/mc/RunIIFall15MiniAODv2/TT_TuneEE5C_13TeV-amcatnlo-herwigpp/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/10000/0047D532-93B8-E511-AEF5-C4346BC8D568.root'
 
         # 'root://xrootd.unl.edu//store/data/Run2015C_25ns/SingleMuon/MINIAOD/16Dec2015-v1/00000/002C22D4-E1AF-E511-AE8E-001E673971CA.root'
         # 'file:/storage/db0268/TopCrossSections/NTupleProduction/CMSSW_7_6_3/src/testSingleMuon.root'
-        # 'file:/storage/db0268/TopCrossSections/NTupleProduction/CMSSW_7_6_3/src/testMC.root'
+        'file:/storage/db0268/TopCrossSections/NTupleProduction/CMSSW_7_6_3/src/testMC.root'
 
     )
 )
@@ -51,7 +49,6 @@ options = VarParsing ('python')
 from BristolAnalysis.NTupleTools.NTupleOptions_cff import *
 getOptions( options )
 
-
 # If you would like to change the Global Tag e.g. for JEC
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 globaltag = ''
@@ -66,19 +63,19 @@ process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 # process.load('JetMETCorrections.Configuration.CorrectedJetProducersDefault_cff')
 
 # TT Gen Event configuration
-from BristolAnalysis.NTupleTools.ttGenConfig_cff import * 
+from BristolAnalysis.NTupleTools.ttGenConfig_cff import setupTTGenEvent 
 setupTTGenEvent( process, cms )
 
 # Particle level definitions
-from BristolAnalysis.NTupleTools.pseudoTopConfig_cff import * #check if needed
+from BristolAnalysis.NTupleTools.pseudoTopConfig_cff import setupPseudoTop
 setupPseudoTop( process, cms )
 
 # Electron VID
-from BristolAnalysis.NTupleTools.ElectronID_cff import *
+from BristolAnalysis.NTupleTools.ElectronID_cff import setup_electronID
 setup_electronID( process, cms )
 
 # Rerun HBHE filter and others
-from BristolAnalysis.NTupleTools.metFilters_cfi import *
+from BristolAnalysis.NTupleTools.metFilters_cfi import setupMETFilters
 setupMETFilters( process, cms )
 
 # Rerun MET
@@ -151,7 +148,8 @@ if not options.isData:
 
   # Delete removed modules 
   del process.nTupleTriggerEle22erWPLooseGsf, process.nTupleTriggerEle23WPLooseGsf
-  del process.nTupleTriggerIsoMu18, process.nTupleTriggerIsoMu20, process.nTupleTriggerIsoTkMu20, process.nTupleTrigger
+  del process.nTupleTriggerIsoMu18, process.nTupleTriggerIsoMu20, process.nTupleTriggerIsoTkMu20
+  del process.nTupleTrigger
 
 else :
   # Remove 76X MC 25ns Triggers
@@ -178,7 +176,8 @@ else :
   del process.nTuplePseudoTopJets, process.nTuplePseudoTopLeptons, process.nTuplePseudoTopNeutrinos, process.nTuplePseudoTops
   del process.nTupleGenMET, process.nTupleGenJets,  process.nTupleGenEventInfo, process.nTupleGenParticles
   del process.nTupleTriggerEle22erWPLooseGsfMC, process.nTupleTriggerEle23WPLooseGsfMC
-  del process.nTupleTriggerIsoMu18MC, process.nTupleTriggerIsoMu20MC, process.nTupleTriggerIsoTkMu20MC, process.nTupleTrigger
+  del process.nTupleTriggerIsoMu18MC, process.nTupleTriggerIsoMu20MC, process.nTupleTriggerIsoTkMu20MC
+  del process.nTupleTrigger
 
 # 76X datasets are all ReReco so far
 process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults','','PAT')
