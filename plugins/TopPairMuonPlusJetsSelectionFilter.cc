@@ -364,23 +364,20 @@ void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
 		// This is part of tight muon ID
 		// But still have to do this (and faff with indexToStore) to get index of 
 		// muon out of those that get stored in the ntuple (all but SA muons)
-		if (!( muon.isGlobalMuon() || muon.isTrackerMuon() ) )
-			continue;
+		if (!( muon.isGlobalMuon() || muon.isTrackerMuon() ) ) continue;
 
 		bool passesIso = false;
+
         if ( nonIsolatedMuonSelection1_ ) {
         	passesIso = getRelativeIsolation(muon, 0.4, true) > controlMuonIso1_;
         }
         else if ( nonIsolatedMuonSelection2_ ) {
         	passesIso = getRelativeIsolation(muon, 0.4, true) > controlMuonIso2_ 
-        		&& getRelativeIsolation(muon, 0.4, true) < controlMuonIso1_;
-        	// passesIso = muon.trackIso() / muon.pt() > controlMuonIso_;
+        	&& getRelativeIsolation(muon, 0.4, true) < controlMuonIso1_;
 		}
 	   	else {
            	passesIso = getRelativeIsolation(muon, 0.4, true) < tightMuonIso_;
-        	// passesIso = muon.trackIso() / muon.pt() < tightMuonIso_;
 	   	}
-
 
 		if (isGoodMuon(muon) && passesIso) {
 			goodIsolatedMuons_.push_back(muon);
@@ -653,8 +650,7 @@ void TopPairMuonPlusJetsSelectionFilter::beginJob() {
 void TopPairMuonPlusJetsSelectionFilter::endJob() {
 }
 
-bool TopPairMuonPlusJetsSelectionFilter::beginRun() {
-	return true;
+void TopPairMuonPlusJetsSelectionFilter::beginRun() {
 }
 
 //define this as a plug-in

@@ -60,14 +60,14 @@ public:
 	virtual void beginJob();
 	virtual bool filter(edm::Event&, const edm::EventSetup&);
 	virtual void endJob();
-	virtual bool beginRun();
+	virtual void beginRun();
 
 	static void fillDescriptions(edm::ConfigurationDescriptions & descriptions);
 
 	virtual bool isGoodJet(const pat::Jet& jet) const;
 	virtual bool isGoodElectron(const edm::Ptr<pat::Electron>&) const;
 	virtual double electronIsolation(const pat::Electron& electron) const;
-	virtual	bool returnInvertedSelection(const edm::Ptr<pat::Electron>& , int invertedSelection) const;
+	virtual	bool returnInvertedSelection(const edm::Ptr<pat::Electron>& , uint invertedSelection) const;
 
 	//definitions of loose objects
 	virtual bool isLooseElectron(const edm::Ptr<pat::Electron>& electron) const;

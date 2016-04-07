@@ -419,21 +419,24 @@ double TopPairElectronPlusJetsSelectionFilter::electronIsolation(const pat::Elec
 	return absiso/electron.pt();
 }
 
-bool TopPairElectronPlusJetsSelectionFilter::returnInvertedSelection(const edm::Ptr<pat::Electron>& electron, int invertedSelection) const {
+bool TopPairElectronPlusJetsSelectionFilter::returnInvertedSelection(const edm::Ptr<pat::Electron>& electron, uint invertedSelection) const {
 
 	vid::CutFlowResult fullCutFlowData = medium_id_cutflow_data_[electron];
-	bool passInversion = false;
+	bool passesFullSelection = true;
 	// printf("\nDEBUG CutFlow, full info for cand with pt=%f:\n", electron->pt());
 	// printf("    CutFlow name= %s    decision is %d\n", fullCutFlowData.cutFlowName().c_str(), (int) fullCutFlowData.cutFlowPassed());
 	// printf(" Index                               cut name              isMasked    value-cut-upon     pass?\n");
 	for(uint icut = 0; icut < fullCutFlowData.cutFlowSize(); icut++){
-		// printf("  %2d      %50s    %d        %f          %d\n", 
+        // printf("  %2d      %50s    %d        %f          %d\n", 
 		// icut, fullCutFlowData.getNameAtIndex(icut).c_str(), (int)fullCutFlowData.isCutMasked(icut), fullCutFlowData.getValueCutUpon(icut), (int)fullCutFlowData.getCutResultByIndex(icut));
-		passInversion = fullCutFlowData.getCutResultByIndex(icut);
-		if (icut==uint(invertedSelection) ) passInversion = !passInversion;
-		if (!passInversion) break;
+    	bool passesThisCut = fullCutFlowData.getCutResultByIndex(icut);
+    	if ( icut==invertedSelection ) passesThisCut = !passesThisCut;
+    	if ( !passesThisCut ) {
+            passesFullSelection = false;
+            break;
+        }		
 	}
-	return passInversion;
+	return passesFullSelection;
 }
 
 void TopPairElectronPlusJetsSelectionFilter::cleanedJets() {
@@ -712,8 +715,7 @@ void TopPairElectronPlusJetsSelectionFilter::beginJob() {
 void TopPairElectronPlusJetsSelectionFilter::endJob() {
 }
 
-bool TopPairElectronPlusJetsSelectionFilter::beginRun() {
-	return true;
+void TopPairElectronPlusJetsSelectionFilter::beginRun() {
 }
 
 //define this as a plug-in

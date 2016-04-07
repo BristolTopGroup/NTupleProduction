@@ -57,7 +57,7 @@ public:
 	virtual void beginJob();
 	virtual bool filter(edm::Event&, const edm::EventSetup&);
 	virtual void endJob();
-	virtual bool beginRun();
+	virtual void beginRun();
 
 	static void fillDescriptions(edm::ConfigurationDescriptions & descriptions);
 
