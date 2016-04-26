@@ -55,6 +55,14 @@ scramv1 b -j 8
 ### Not yet available
 ```
 
+## Experimental setup
+This setup is a very new feature and is currently only meant for testing
+```
+git clone git@github.com:BristolTopGroup/NTupleProduction.git
+cd NTupleProduction
+python setup.py run2:latest
+```
+
 ## Notes
 More information can be found at [Bristol Ntuple Recipes twiki page](https://twiki.cern.ch/twiki/bin/view/CMS/BristolNTuplerRecipes), although it's outdated.
 

@@ -1,0 +1,32 @@
+{
+	"name": "NTupleProduction",
+	"version": "CMSSW_7_6_3_patch2",
+	"summary": "For the creation of n-tuples",
+	"author": "Bristol Top Quark Group",
+	"source": "https://github.com/BristolTopGroup/NTupleProduction.git",
+	"destination": "BristolAnalysis/NTupleTools",
+	"links": [ "BuildFile.xml",
+		"Configuration",
+		"data",
+		"interface",
+		"plugins",
+		"python",
+		"src",
+		"test"
+	],
+	"project_page": "https://github.com/BristolTopGroup",
+	"license": "Apache License, Version 2.0",
+	"cmssw_version": "CMSSW_7_6_3_patch2",
+	"dependencies": [{
+			"name": "TopSkimming",
+			"source": "https://github.com/BristolTopGroup/TopSkimming.git",
+			"destination": "TopQuarkAnalysis/TopSkimming",
+			"provider": "git"
+		},{
+			"name": "PseudoTop",
+			"source": "jhgoh:PseudoTop76",
+			"destination": "",
+			"provider": "git-cms-merge-topic"
+		}
+	]
+}
