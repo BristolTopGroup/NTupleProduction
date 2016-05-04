@@ -395,12 +395,14 @@ bool TopPairElectronPlusJetsSelectionFilter::isGoodElectron(const edm::Ptr<pat::
 	//   11  : GsfEleMissingHitsCut
 
 	if ( nonIsolatedElectronSelection_ ) {
-		if ( returnInvertedSelection(electron, 9) ) {
+		std::vector<uint> idCutsToInvert {9};
+		if ( returnInvertedSelection(electron, idCutsToInvert) ) {
 			passesID = true;
 		}
 	}
 	else if ( invertedConversionSelection_ ) {
-		if ( returnInvertedSelection(electron, 10) ){
+		std::vector<uint> idCutsToInvert {10, 11};
+		if ( returnInvertedSelection(electron, idCutsToInvert) ){
 			passesID = true;
 		}
 	}
@@ -419,7 +421,7 @@ double TopPairElectronPlusJetsSelectionFilter::electronIsolation(const pat::Elec
 	return absiso/electron.pt();
 }
 
-bool TopPairElectronPlusJetsSelectionFilter::returnInvertedSelection(const edm::Ptr<pat::Electron>& electron, uint invertedSelection) const {
+bool TopPairElectronPlusJetsSelectionFilter::returnInvertedSelection(const edm::Ptr<pat::Electron>& electron, std::vector<uint> invertedSelection) const {
 
 	vid::CutFlowResult fullCutFlowData = medium_id_cutflow_data_[electron];
 	bool passesFullSelection = true;
@@ -430,7 +432,9 @@ bool TopPairElectronPlusJetsSelectionFilter::returnInvertedSelection(const edm::
         // printf("  %2d      %50s    %d        %f          %d\n", 
 		// icut, fullCutFlowData.getNameAtIndex(icut).c_str(), (int)fullCutFlowData.isCutMasked(icut), fullCutFlowData.getValueCutUpon(icut), (int)fullCutFlowData.getCutResultByIndex(icut));
     	bool passesThisCut = fullCutFlowData.getCutResultByIndex(icut);
-    	if ( icut==invertedSelection ) passesThisCut = !passesThisCut;
+ 		for ( auto invertedCut = invertedSelection.begin(); invertedCut != invertedSelection.end(); invertedCut++ ) {
+    		if ( icut== *invertedCut ) passesThisCut = !passesThisCut;
+		}
     	if ( !passesThisCut ) {
             passesFullSelection = false;
             break;

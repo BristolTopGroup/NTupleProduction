@@ -17,39 +17,40 @@
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include <boost/array.hpp>
 #include <string>
+#include <vector>
 #include "DataFormats/PatCandidates/interface/VIDCutFlowResult.h"
 
 namespace TTbarEPlusJetsReferenceSelection {
-enum Step {
-	AllEvents,
-	EventCleaningAndTrigger,
-	ExactlyOneSignalElectron,
-	LooseMuonVeto,
-	LooseElectronVeto,
-	ConversionVeto,
-	AtLeastOneGoodJet,
-	AtLeastTwoGoodJets,
-	AtLeastThreeGoodJets,
-	AtLeastFourGoodJets,
-	AtLeastOneBtag,
-	AtLeastTwoBtags,
-	NUMBER_OF_SELECTION_STEPS
-};
+	enum Step {
+		AllEvents,
+		EventCleaningAndTrigger,
+		ExactlyOneSignalElectron,
+		LooseMuonVeto,
+		LooseElectronVeto,
+		ConversionVeto,
+		AtLeastOneGoodJet,
+		AtLeastTwoGoodJets,
+		AtLeastThreeGoodJets,
+		AtLeastFourGoodJets,
+		AtLeastOneBtag,
+		AtLeastTwoBtags,
+		NUMBER_OF_SELECTION_STEPS
+	};
 
-const std::string StringSteps[NUMBER_OF_SELECTION_STEPS] = { //
+	const std::string StringSteps[NUMBER_OF_SELECTION_STEPS] = { //
 		"AllEvents", //
-				"EventCleaningAndTrigger", //
-				"ExactlyOneSignalElectron", //
-				"LooseMuonVeto", //
-				"LooseElectronVeto", //
-				"ConversionVeto", //
-				"AtLeastOneGoodJet", //
-				"AtLeastTwoGoodJets", //
-				"AtLeastThreeGoodJets", //
-				"AtLeastFourGoodJets", //
-				"AtLeastOneBtag", //
-				"AtLeastTwoBtags" //
-		};
+		"EventCleaningAndTrigger", //
+		"ExactlyOneSignalElectron", //
+		"LooseMuonVeto", //
+		"LooseElectronVeto", //
+		"ConversionVeto", //
+		"AtLeastOneGoodJet", //
+		"AtLeastTwoGoodJets", //
+		"AtLeastThreeGoodJets", //
+		"AtLeastFourGoodJets", //
+		"AtLeastOneBtag", //
+		"AtLeastTwoBtags" //
+	};
 }
 
 class TopPairElectronPlusJetsSelectionFilter: public edm::EDFilter {
@@ -67,7 +68,7 @@ public:
 	virtual bool isGoodJet(const pat::Jet& jet) const;
 	virtual bool isGoodElectron(const edm::Ptr<pat::Electron>&) const;
 	virtual double electronIsolation(const pat::Electron& electron) const;
-	virtual	bool returnInvertedSelection(const edm::Ptr<pat::Electron>& , uint invertedSelection) const;
+	virtual	bool returnInvertedSelection(const edm::Ptr<pat::Electron>& , std::vector<uint> invertedSelection) const;
 
 	//definitions of loose objects
 	virtual bool isLooseElectron(const edm::Ptr<pat::Electron>& electron) const;

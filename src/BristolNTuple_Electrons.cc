@@ -253,7 +253,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 		for (size_t index = 0; index < electrons->size(); ++index){
 			const auto it = electrons->ptrAt(index);
-
+			std::vector<uint> idCutsToInvert {99};
 			// exit from loop when you reach the required number of electrons (99)
 			if (px->size() >= maxSize) break;
 
@@ -261,14 +261,16 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			// Check ID
 			isMediumElectron->push_back( mediumElectronIDDecisions_[it] );
 
-			if ( returnInvertedSelection(fullCutFlowData, 9) ) {
+			idCutsToInvert = {9};
+			if ( returnInvertedSelection(fullCutFlowData, idCutsToInvert) ){
 				isMediumNonIsoElectron->push_back( true );
 			}
 			else {
 				isMediumNonIsoElectron->push_back( false );
 			}
 
-			if ( returnInvertedSelection(fullCutFlowData, 10) ){
+			idCutsToInvert = {10, 11};
+			if ( returnInvertedSelection(fullCutFlowData, idCutsToInvert) ){
 				isMediumConversionElectron->push_back( true );
 			}
 			else {
@@ -518,12 +520,14 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 }
 
-bool BristolNTuple_Electrons::returnInvertedSelection(const vid::CutFlowResult fullCutFlowData, uint invertedSelection) const {
+bool BristolNTuple_Electrons::returnInvertedSelection(const vid::CutFlowResult fullCutFlowData, std::vector<uint> invertedSelection) const {
 
 	bool passesFullSelection = true;
 	for(uint icut = 0; icut < fullCutFlowData.cutFlowSize(); icut++){
    	bool passesThisCut = fullCutFlowData.getCutResultByIndex(icut);
-    	if ( icut==invertedSelection ) passesThisCut = !passesThisCut;
+ 		for ( auto invertedCut = invertedSelection.begin(); invertedCut != invertedSelection.end(); invertedCut++ ) {
+    		if ( icut== *invertedCut ) passesThisCut = !passesThisCut;
+    	}
     	if ( !passesThisCut ) {
             passesFullSelection = false;
             break;
@@ -531,4 +535,3 @@ bool BristolNTuple_Electrons::returnInvertedSelection(const vid::CutFlowResult f
 	}
 	return passesFullSelection;
 }
-
