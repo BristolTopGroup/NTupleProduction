@@ -53,6 +53,7 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "Charge" + suffix);
 	produces < std::vector<double> > (prefix + "Mass" + suffix);
 	produces < std::vector<int> > (prefix + "PartonFlavour" + suffix);
+	produces < std::vector<int> > (prefix + "HadronFlavour" + suffix);
 	//generated jet properties
     if (!isRealData) {
         produces < std::vector<double> > (prefix + "GenJet.Energy" + suffix);
@@ -145,6 +146,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<double> > charge(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > mass(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > partonFlavour(new std::vector<int>());
+	std::auto_ptr < std::vector<int> > hadronFlavour(new std::vector<int>());
 	//generated jet properties
 	std::auto_ptr < std::vector<double> > genJet_energy(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > genJet_pt(new std::vector<double>());
@@ -501,6 +503,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			charge->push_back(it->jetCharge());
 			mass->push_back(it->mass());
 			partonFlavour->push_back(it->partonFlavour());
+			hadronFlavour->push_back(it->hadronFlavour());
 
 			//jet energy correction and uncertainties
 			if (readJECuncertainty){
@@ -646,6 +649,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(charge, prefix + "Charge" + suffix);
 	iEvent.put(mass, prefix + "Mass" + suffix);
 	iEvent.put(partonFlavour, prefix + "PartonFlavour" + suffix);
+	iEvent.put(hadronFlavour, prefix + "HadronFlavour" + suffix);
 	//generated jet properties
     if (!iEvent.isRealData()) {
 		iEvent.put(genJet_energy, prefix + "GenJet.Energy" + suffix);
