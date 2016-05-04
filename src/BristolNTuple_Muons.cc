@@ -201,8 +201,6 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 			if (beamSpotCorr && beamSpot.isValid()) {
 				trkd0 = -(it->track()->dxy(beamSpot->position()));
 			} 
-			// else if (beamSpotCorr && !beamSpot.isValid())
-			// 	edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the offlineBeamSpot";
 
 			double minVtxDist3D = 9999.;
 			int vtxIndex_ = -1;
@@ -227,9 +225,6 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 					}
 				}
 			} 
-			// else {
-			// 	edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the product " << vtxInputTag;
-			// }
 
 			//kinematic variables
 			px->push_back(it->px());
@@ -316,9 +311,6 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 			beamSpotDXYError->push_back(it->edB(pat::Muon::BS2D));
 		}
 	} 
-	// else {
-	// 	edm::LogError("BristolNTuple_MuonsExtraError") << "Error! Can't get the product " << inputTag;
-	// }
 
 	//-----------------------------------------------------------------
 	// put vectors in the event

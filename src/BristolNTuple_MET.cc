@@ -26,9 +26,6 @@ void BristolNTuple_MET::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	edm::Handle < std::vector<pat::MET> > mets;
 	iEvent.getByToken(inputTag, mets);
 
-	// if (!mets.isValid())
-	// 	edm::LogError("BristolNTuple_METExtraError") << "Error! Can't get the product " << inputTag;
-
 	const pat::MET & patMET(mets->at(0));
 
 	std::auto_ptr<double> px(new double(patMET.px()));

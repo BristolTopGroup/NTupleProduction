@@ -17,6 +17,7 @@
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include <boost/array.hpp>
 #include <string>
+#include "DataFormats/PatCandidates/interface/VIDCutFlowResult.h"
 
 namespace TTbarEPlusJetsReferenceSelection {
 enum Step {
@@ -59,13 +60,14 @@ public:
 	virtual void beginJob();
 	virtual bool filter(edm::Event&, const edm::EventSetup&);
 	virtual void endJob();
-	virtual bool beginRun(edm::Run &, const edm::EventSetup &);
+	virtual void beginRun();
 
 	static void fillDescriptions(edm::ConfigurationDescriptions & descriptions);
 
 	virtual bool isGoodJet(const pat::Jet& jet) const;
 	virtual bool isGoodElectron(const edm::Ptr<pat::Electron>&) const;
 	virtual double electronIsolation(const pat::Electron& electron) const;
+	virtual	bool returnInvertedSelection(const edm::Ptr<pat::Electron>& , uint invertedSelection) const;
 
 	//definitions of loose objects
 	virtual bool isLooseElectron(const edm::Ptr<pat::Electron>& electron) const;
@@ -110,7 +112,8 @@ private:
 
 	double minSignalElectronPt_, maxSignalElectronEta_;
 	edm::EDGetTokenT<edm::ValueMap<bool> > signalElectronIDMapToken_;
-	edm::EDGetTokenT<edm::ValueMap<unsigned int> > signalElectronIDMapToken_bitmap_;
+	edm::EDGetTokenT<edm::ValueMap<vid::CutFlowResult> > eleMediumIdFullInfoMapToken_;
+
 	double minSignalElectronID_;
 	double minLooseMuonPt_, maxLooseMuonEta_, minLooseElectronPt_, maxLooseElectronEta_;
 	edm::EDGetTokenT<edm::ValueMap<bool> > looseElectronIDMapToken_;
@@ -153,7 +156,7 @@ private:
 	pat::MuonCollection muons_, looseMuons_;
 	pat::Electron signalElectron_;
 	edm::ValueMap<bool> signalElectronIDDecisions_, looseElectronIDDecisions_;
-	edm::ValueMap<unsigned int> signalElectronIDDecisions_bitmap_;
+	edm::ValueMap<vid::CutFlowResult> medium_id_cutflow_data_;
 	reco::VertexCollection vertices_;
 	HLTConfigProvider hltConfig_;
 	edm::TriggerResults triggerResults_;

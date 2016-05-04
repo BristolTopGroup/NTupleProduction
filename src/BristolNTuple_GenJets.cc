@@ -44,7 +44,6 @@ void BristolNTuple_GenJets::produce(edm::Event& iEvent, const edm::EventSetup& i
 		iEvent.getByToken(inputTag, genJets);
 
 		if (genJets.isValid()) {
-			// edm::LogInfo("BristolNTuple_GenJetsExtraInfo") << "Total # GenJets: " << genJets->size();
 
 			for (reco::GenJetCollection::const_iterator it = genJets->begin(); it != genJets->end(); ++it) {
 				// exit from loop when you reach the required number of GenJets
@@ -68,9 +67,6 @@ void BristolNTuple_GenJets::produce(edm::Event& iEvent, const edm::EventSetup& i
 				hadf->push_back(it->hadEnergy() / it->energy());
 			}
 		} 
-		// else {
-		// 	edm::LogError("BristolNTuple_GenJetsExtraError") << "Error! Can't get the product " << inputTag;
-		// }
 	}
 
 	//-----------------------------------------------------------------

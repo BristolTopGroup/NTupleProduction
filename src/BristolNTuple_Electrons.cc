@@ -23,8 +23,8 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 		vtxInputTag(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))), //		
 		beamSpotInputTag(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"))), //
 		conversionsInputTag(consumes<std::vector<reco::Conversion>>(iConfig.getParameter<edm::InputTag>("ConversionsInputTag"))), // 		
-  		tightElectronIDMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("tightElectronIDMap"))), //
-  		tightElectronIDMapToken_bitmap_(consumes<edm::ValueMap<unsigned int> >(iConfig.getParameter<edm::InputTag>("tightElectronIDMap_bitmap"))) //
+  		mediumElectronIDMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("mediumElectronIDMap"))), //
+  		eleMediumIdFullInfoMapToken_(consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("mediumElectronIDMap")))	 
 {
 
 	//kinematic variables
@@ -79,6 +79,7 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 		
 		produces < std::vector<double> > (prefix + "PFRelIso03DeltaBeta" + suffix);
 		produces < std::vector<double> > (prefix + "PFRelIso04DeltaBeta" + suffix);
+		produces < std::vector<double> > (prefix + "PFRelIsoWithEA" + suffix);
 	}
 
 	//high energy electron isolation variables
@@ -91,9 +92,9 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 	produces < std::vector<double> > (prefix + "HcalIsoD2Heep04" + suffix);
 	produces < std::vector<double> > (prefix + "TrkIsoHeep04" + suffix);
 
-	produces < std::vector<bool> > (prefix + "isTightElectron" + suffix);
-	produces < std::vector<bool> > (prefix + "isTightNonIsoElectron" + suffix);
-	produces < std::vector<bool> > (prefix + "isTightConversionElectron" + suffix);
+	produces < std::vector<bool> > (prefix + "isMediumElectron" + suffix);
+	produces < std::vector<bool> > (prefix + "isMediumNonIsoElectron" + suffix);
+	produces < std::vector<bool> > (prefix + "isMediumConversionElectron" + suffix);
 
 	//electron conversion identification variables
 	produces < std::vector<double> > (prefix + "Dist" + suffix);
@@ -178,12 +179,13 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > PFRelIso03DeltaBeta(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PFRelIso04DeltaBeta(new std::vector<double>());
 
+	std::auto_ptr < std::vector<double> > PFRelIsoWithEA(new std::vector<double>());
 //    std::auto_ptr < std::vector<double> > dB(new std::vector<double>());
 
 	// Electron ID variables
-	std::auto_ptr < std::vector<bool> > isTightElectron(new std::vector<bool>());
-	std::auto_ptr < std::vector<bool> > isTightConversionElectron(new std::vector<bool>());
-	std::auto_ptr < std::vector<bool> > isTightNonIsoElectron(new std::vector<bool>());
+	std::auto_ptr < std::vector<bool> > isMediumElectron(new std::vector<bool>());
+	std::auto_ptr < std::vector<bool> > isMediumConversionElectron(new std::vector<bool>());
+	std::auto_ptr < std::vector<bool> > isMediumNonIsoElectron(new std::vector<bool>());
 
 	//high energy electron isolation variables
 	std::auto_ptr < std::vector<double> > ecalIsoHeep03(new std::vector<double>());
@@ -237,13 +239,13 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	edm::Handle< std::vector< reco::Vertex > > primaryVertices;
 	iEvent.getByToken(vtxInputTag, primaryVertices);
 
-	edm::Handle<edm::ValueMap<bool> > tight_id_decisions;
-	iEvent.getByToken(tightElectronIDMapToken_,tight_id_decisions);
-	tightElectronIDDecisions_ = *tight_id_decisions;
+	edm::Handle<edm::ValueMap<bool> > medium_id_decisions;
+	iEvent.getByToken(mediumElectronIDMapToken_,medium_id_decisions);
+	mediumElectronIDDecisions_ = *medium_id_decisions;
 
-	edm::Handle<edm::ValueMap<unsigned int> > tight_id_decisions_bitmap;
-	iEvent.getByToken(tightElectronIDMapToken_bitmap_,tight_id_decisions_bitmap);
-	tightElectronIDDecisions_bitmap_ = *tight_id_decisions_bitmap;
+  	edm::Handle<edm::ValueMap<vid::CutFlowResult> > medium_id_cutflow_data;
+  	iEvent.getByToken(eleMediumIdFullInfoMapToken_, medium_id_cutflow_data);
+	medium_id_cutflow_data_ = *medium_id_cutflow_data;
 
 	if (electrons.isValid()) {
 
@@ -255,22 +257,24 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			// exit from loop when you reach the required number of electrons (99)
 			if (px->size() >= maxSize) break;
 
+			vid::CutFlowResult fullCutFlowData = medium_id_cutflow_data_[it];
 			// Check ID
-			isTightElectron->push_back( tightElectronIDDecisions_[it] );
+			isMediumElectron->push_back( mediumElectronIDDecisions_[it] );
 
-			if ( tightElectronIDDecisions_bitmap_[it] == 3327 || tightElectronIDDecisions_bitmap_[it] == 3583 || tightElectronIDDecisions_bitmap_[it] == 3839) {
-				isTightNonIsoElectron->push_back( true );
+			if ( returnInvertedSelection(fullCutFlowData, 9) ) {
+				isMediumNonIsoElectron->push_back( true );
 			}
 			else {
-				isTightNonIsoElectron->push_back( false );
+				isMediumNonIsoElectron->push_back( false );
 			}
 
-			if ( tightElectronIDDecisions_bitmap_[it] == 1023 || tightElectronIDDecisions_bitmap_[it] == 2047 || tightElectronIDDecisions_bitmap_[it] == 3071) {
-				isTightConversionElectron->push_back( true );
+			if ( returnInvertedSelection(fullCutFlowData, 10) ){
+				isMediumConversionElectron->push_back( true );
 			}
 			else {
-				isTightConversionElectron->push_back( false );
+				isMediumConversionElectron->push_back( false );
 			}
+			PFRelIsoWithEA->push_back( fullCutFlowData.getValueCutUpon(9) );
 
 			/* Conversion (fit)
 			 * See https://indico.cern.ch/getFile.py/access?contribId=12&sessionId=0&resId=0&materialId=slides&confId=133587
@@ -281,14 +285,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			if (hConversions.isValid() && bsHandle.isValid()) {
 				matchesConv = ConversionTools::hasMatchedConversion(*it, hConversions, bsHandle->position());
 			} 
-			// else {
-			// 	if (!bsHandle.isValid())
-			// 		edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product "
-			// 				<< beamSpotInputTag;
-			// 	if (!hConversions.isValid())
-			// 		edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product "
-			// 				<< conversionsInputTag;
-			// }
 			// Vertex association
 			double minVtxDist3D = 9999.;
 			int vtxIndex_ = -1;
@@ -322,9 +318,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 					}
 				}
 			}
-// 			} else {
-// 				edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << vtxInputTag;
-// 			}
 
 			//kinematic variables
 			px->push_back(it->px());
@@ -425,9 +418,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 		}
 	}
-	// } else {
-	// 	edm::LogError("BristolNTuple_ElectronsExtraError") << "Error! Can't get the product " << inputTag;
-	// }
 
 	//-----------------------------------------------------------------
 	// put vectors in the event
@@ -481,6 +471,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 		
 		iEvent.put(PFRelIso03DeltaBeta, prefix + "PFRelIso03DeltaBeta" + suffix);
 		iEvent.put(PFRelIso04DeltaBeta, prefix + "PFRelIso04DeltaBeta" + suffix);
+		iEvent.put(PFRelIsoWithEA, prefix + "PFRelIsoWithEA" + suffix);
 	}
 
 	//high energy electron isolation variables
@@ -494,9 +485,9 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	iEvent.put(hcalIsoD2Heep04, prefix + "HcalIsoD2Heep04" + suffix);
 	iEvent.put(trkIsoHeep04, prefix + "TrkIsoHeep04" + suffix);
 
-	iEvent.put(isTightElectron, prefix + "isTightElectron" + suffix);
-	iEvent.put(isTightNonIsoElectron, prefix + "isTightNonIsoElectron" + suffix);
-	iEvent.put(isTightConversionElectron, prefix + "isTightConversionElectron" + suffix);
+	iEvent.put(isMediumElectron, prefix + "isMediumElectron" + suffix);
+	iEvent.put(isMediumNonIsoElectron, prefix + "isMediumNonIsoElectron" + suffix);
+	iEvent.put(isMediumConversionElectron, prefix + "isMediumConversionElectron" + suffix);
 
 	//electron conversion identification variables
 	iEvent.put(missingHits, prefix + "MissingHits" + suffix);
@@ -527,10 +518,17 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 }
 
+bool BristolNTuple_Electrons::returnInvertedSelection(const vid::CutFlowResult fullCutFlowData, uint invertedSelection) const {
 
-
-
-
-
-
+	bool passesFullSelection = true;
+	for(uint icut = 0; icut < fullCutFlowData.cutFlowSize(); icut++){
+   	bool passesThisCut = fullCutFlowData.getCutResultByIndex(icut);
+    	if ( icut==invertedSelection ) passesThisCut = !passesThisCut;
+    	if ( !passesThisCut ) {
+            passesFullSelection = false;
+            break;
+        }		
+	}
+	return passesFullSelection;
+}
 
