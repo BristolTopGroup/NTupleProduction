@@ -17,7 +17,6 @@ git config --global user.github $GITHUBUSERNAME
 #on soolin:
 export CMSSW_GIT_REFERENCE=/cvmfs/cms.cern.ch/cmssw.git
 
-
 # Set up the CMSSW release
 export SCRAM_ARCH=slc6_amd64_gcc493
 
@@ -25,9 +24,9 @@ cmsrel CMSSW_8_0_8_patch1
 cd CMSSW_8_0_8_patch1/src/
 cmsenv
 git cms-init
-# Do merge-topics and addpkgs first if needed
 
-# Debugged Pseudo top producer
+# Do merge-topics and addpkgs first if needed
+# Pseudo top producer
 git-cms-merge-topic jhgoh:PseudoTop76
 
 
