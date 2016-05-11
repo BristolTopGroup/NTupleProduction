@@ -26,9 +26,8 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		doVertexAssociation(iConfig.getParameter<bool>("DoVertexAssociation")), //
 		vtxInputTag(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))), //		
 		isRealData(iConfig.getParameter<bool>("isRealData")),
-
-		// calib("csvv2", "BristolAnalysis/NTupleTools/data/BTagSF/CSVv2.csv"),
-		calib("csvv2", "CSVv2.csv"),
+		btagCalibrationFile_(iConfig.getParameter<std::string>("btagCalibrationFile")), //
+		calib("csvv2", btagCalibrationFile_.c_str()), //
 		reader_bc(		&calib,               // calibration instance
 					BTagEntry::OP_MEDIUM,  // operating point
 					"mujets",               // measurement type
