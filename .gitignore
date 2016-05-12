@@ -7,3 +7,4 @@ python/submissionScripts/condor/*.log
 python/submissionScripts/condor/*.err
 python/submissionScripts/__init__.py
 python/submissionScripts/condor/__init__.py
+python/htcondenser
