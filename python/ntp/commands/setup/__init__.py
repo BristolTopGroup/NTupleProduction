@@ -58,6 +58,8 @@ def setup_dependencies(workspace, dependencies):
             print('Unknown provider "{0}"'.format(provider))
             sys.exit()
         commands.append(command)
+        if 'setup-cmds' in dep:
+            commands.extend(dep['setup-cmds'])
 
     all_in_one = ' && '.join(commands)
     all_in_one = all_in_one.format(workspace=workspace)
