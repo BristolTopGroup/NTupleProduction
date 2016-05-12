@@ -1,6 +1,7 @@
 #ifndef BristolNTuplePFJetsExtra
 #define BristolNTuplePFJetsExtra
 
+#include <string>
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
@@ -27,6 +28,7 @@ class BristolNTuple_PFJets : public edm::EDProducer {
   const edm::EDGetTokenT<std::vector<reco::Vertex>> vtxInputTag;
   const bool isRealData;
 
+  const std::string btagCalibrationFile_;
   BTagCalibration calib;
   BTagCalibrationReader reader_bc;
   BTagCalibrationReader reader_bc_up;

@@ -16,7 +16,7 @@
 	],
 	"project_page": "https://github.com/BristolTopGroup",
 	"license": "Apache License, Version 2.0",
-	"cmssw_version": "CMSSW_7_6_3_patch2",
+	"cmssw_version": "CMSSW_8_0_7_patch2",
 	"dependencies": [{
 			"name": "TopSkimming",
 			"source": "https://github.com/BristolTopGroup/TopSkimming.git",

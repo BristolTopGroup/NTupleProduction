@@ -12,5 +12,8 @@ nTuplePFJets = cms.EDProducer("BristolNTuple_PFJets",
     JetCorrectionService = cms.string('ak4PFCHSL1FastL2L3'),    
     DoVertexAssociation = cms.bool(True),
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices'),
-    isRealData = cms.bool(False)
+    isRealData = cms.bool(False),
+    btagCalibrationFile = cms.string('CSVv2.csv'),
+#     btagCalibrationFile = cms.string)'BristolAnalysis/NTupleTools/data/BTagSF/CSVv2.csv'),
+#     btagCalibrationFile = cms.string('/vagrant/data/BTagSF/CSVv2.csv'),
 )

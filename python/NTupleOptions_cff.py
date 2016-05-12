@@ -1,5 +1,6 @@
 from FWCore.ParameterSet.VarParsing import VarParsing
 import sys
+import os
 
 def getOptions( options ):
       options.register ('tagAndProbe',
@@ -70,3 +71,6 @@ def getOptions( options ):
             print 'Error : Do not run tag and probe studies without jet selection in tagging mode.'
             sys.exit()
 
+CMSSW_VERSION = os.environ['CMSSW_VERSION']
+varray = CMSSW_VERSION.split('_')
+CMSSW_MAJOR_VERSION, CMSSW_MINOR_VERSION = varray[1], varray[2]
