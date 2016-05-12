@@ -6,7 +6,7 @@ from RecoJets.JetProducers.PFJetParameters_cfi import *
 from RecoJets.JetProducers.CaloJetParameters_cfi import *
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 from RecoJets.JetProducers.GenJetParameters_cfi import *
-
+from BristolAnalysis.NTupleTools.NTupleOptions_cff import CMSSW_MAJOR_VERSION, CMSSW_MINOR_VERSION
 # this has to run AFTER setup_PF2PAT
 
 
@@ -76,13 +76,19 @@ def setup_jets(process, cms, options, postfix="PFlow"):
     print 'PF Jets'
     print inputJetCorrLabel
 
-    from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJetCorrFactors
+    if int(CMSSW_MAJOR_VERSION) < 8:
+        from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import patJetCorrFactorsUpdated as updatedPatJetCorrFactors
+    else:
+        from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJetCorrFactors
     process.patJetCorrFactorsReapplyJEC = updatedPatJetCorrFactors.clone(
       src = cms.InputTag("slimmedJets"),
       levels = inputJetCorrLabel[1],
       payload = inputJetCorrLabel[0] ) # Make sure to choose the appropriate levels and payload here!
 
-    from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJets
+    if int(CMSSW_MAJOR_VERSION) < 8:
+        from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import patJetsUpdated as updatedPatJets
+    else:
+        from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJets
     process.patJetsReapplyJEC = updatedPatJets.clone(
       jetSource = cms.InputTag("slimmedJets"),
       jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
