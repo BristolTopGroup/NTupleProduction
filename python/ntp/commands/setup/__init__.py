@@ -161,13 +161,14 @@ class Command(C):
         cmssw_version = metadata['cmssw_version']
         setup_cmssw(workspace, cmssw_version)
 
+        # set up NTP
         cmssw_workspace = workspace + '/{0}/src'.format(cmssw_version)
-        dependencies = metadata['dependencies']
-        setup_dependencies(cmssw_workspace, dependencies)
-
         destination = metadata['destination']
         links = metadata['links']
         link_ntp(cmssw_workspace, destination, links)
+
+        dependencies = metadata['dependencies']
+        setup_dependencies(cmssw_workspace, dependencies)
 
         compile_workspace(cmssw_workspace)
 
