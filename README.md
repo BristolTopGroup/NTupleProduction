@@ -15,7 +15,7 @@ To setup the code:
 export GITHUBUSERNAME=yourGITHUBUsername
 git config --global user.github $GITHUBUSERNAME
 #on soolin:
-export CMSSW_GIT_REFERENCE=/storage/.cmsgit-cache
+export CMSSW_GIT_REFERENCE=/cvmfs/cms.cern.ch/cmssw.git
 
 
 # Set up the CMSSW release
@@ -60,7 +60,8 @@ This setup is a very new feature and is currently only meant for testing
 ```
 git clone git@github.com:BristolTopGroup/NTupleProduction.git
 cd NTupleProduction
-python setup.py run2:latest
+source bin/env.sh
+ntp setup run2:latest
 ```
 
 ## Notes

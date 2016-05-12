@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+import os
+import readline
+import string
+import shlex
+import sys
+import types
+import warnings
+
+warnings.filterwarnings("ignore")
+
+current_path = os.path.split(__file__)[0]
+# add ntp python path to PYTHONPATH
+path_to_ntp = os.path.join(current_path, '..', 'python')
+sys.path.append(path_to_ntp)
+
+import ntp as custom_python_shell
+
+if len(sys.argv) == 1:
+    if not sys.stdout.isatty():
+        rc = custom_python_shell.run_command(['help'])
+        sys.exit(rc)
+    else:
+        os.environ['TERM'] = 'vt100'
+        name_of_this_script = os.path.basename(sys.argv[0])
+        custom_python_shell.run_cli('{0} > '.format(name_of_this_script))
+else:
+    args = sys.argv[1:]
+    rc = custom_python_shell.run_command(args)
+    sys.exit(rc)

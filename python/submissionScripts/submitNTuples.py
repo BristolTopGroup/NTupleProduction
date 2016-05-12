@@ -7,7 +7,7 @@ import os
 version = '11'
 crabWorkArea = 'workdirCrab/v'+version+'/'+str(date.today())
 print 'Using workdir ',crabWorkArea
-miniAodDir = 'BristolAnalysis/NTupleTools/Configuration/crab3Configurations/FALL15/'
+miniAodDir = 'BristolAnalysis/NTupleTools/python/crab/FALL15/'
 jobConfigs = [
 
 # Data
@@ -67,8 +67,8 @@ miniAodDir + 'WJetsToLNu.py',
 ]
 
 # Replace workArea name in commonConfig.py
-commonConfig = 'BristolAnalysis/NTupleTools/python/commonConfig.py'
-tempCommonConfig = 'BristolAnalysis/NTupleTools/python/commonConfig.py_temp'
+commonConfig = 'BristolAnalysis/NTupleTools/python/crab/base.py'
+tempCommonConfig = 'BristolAnalysis/NTupleTools/python/crab/base.py_temp'
 openCommonConfig = open(commonConfig)
 openTempCommonConfig = open(tempCommonConfig, 'w')
 
