@@ -22,6 +22,8 @@
 """
 from __future__ import print_function
 import os
+import logging
+
 from .. import Command as C
 from ntp.commands.setup import get_cmssw_workspace
 from crab.util import get_files
@@ -39,6 +41,8 @@ process.source.fileNames = cms.untracked.vstring(
 )
 """
 
+LOG = logging.getLogger(__name__)
+
 
 class Command(C):
 
@@ -53,7 +57,8 @@ class Command(C):
         super(Command, self).__init__(path, doc)
 
     def run(self, args, variables):
-        import subprocess
+        from ntp.interpreter import call
+        import resource
         self.__prepare(args, variables)
 
         NTPROOT = os.environ['NTPROOT']
@@ -68,10 +73,11 @@ class Command(C):
         input_file = self.__variables['file']
 
         if input_file == '':
-            print("Searching for a file of {0}/{1}".format(campaign, dataset))
+            LOG.info(
+                "Searching for a file of {0}/{1}".format(campaign, dataset))
             files = get_files(campaign, dataset)
             input_file = files[0]
-        print("Using file {0} for NTP input".format(input_file))
+        LOG.info("Using file {0} for NTP input".format(input_file))
 
         with open(pset, 'w+') as f:
             content = BASE.format(
@@ -89,18 +95,19 @@ class Command(C):
         all_in_one = all_in_one.format(
             workspace=workspace, pset=pset, params=self.__extract_params())
 
-        log_file = NTPROOT + '/workspace/log/local.log'
-        error_file = NTPROOT + '/workspace/log/local.err'
-        with open(log_file, 'a+') as f:
-            with open(error_file, 'a+') as e:
-                print("executing cmsRun")
-                subprocess.call(all_in_one, shell=True, stdout=f, stderr=e)
+        LOG.info("Executing cmsRun")
+        usage_start = resource.getrusage(resource.RUSAGE_CHILDREN)
+        call([all_in_one], LOG, stdout_log_level=logging.INFO, shell=True)
+        usage_end = resource.getrusage(resource.RUSAGE_CHILDREN)
 
-        self.__text = "Ran {pset}\n"
+        cpu_time = usage_end.ru_utime - usage_start.ru_utime
+        # RSS = https://en.wikipedia.org/wiki/Resident_set_size
+        memory = usage_end.ru_maxrss
+
+        self.__text = "Ran {pset} in {cpu_time:.1f}s and used {memory:.1f}MB of RAM\n"
         self.__text += "Logs can be found in {workspace}/log/local.*"
-        self.__text = self.__text.format(pset=pset, workspace=workspace)
-
-#         self.__text = "NOT IMPLEMENTED - but would be running locally"
+        self.__text = self.__text.format(pset=pset, workspace=workspace,
+                                         cpu_time=cpu_time, memory=memory / 1024)
 
         return True
 

@@ -10,17 +10,17 @@
 
             force:    forces workspace to be deleted if it already exists.
 """
-
-from __future__ import print_function
 import json
 import shutil
 import os
 import sys
 import optparse
 import subprocess
+import logging
 
 from .. import Command as C
 
+LOG = logging.getLogger(__name__)
 
 def setup_cmssw(workspace, version):
     commands = [
@@ -44,7 +44,7 @@ def setup_dependencies(workspace, dependencies):
     ]
 
     for dep in dependencies:
-        print('Setting up dependency "{0}"'.format(dep['name']))
+        LOG.info('Setting up dependency "{0}"'.format(dep['name']))
         provider = dep['provider']
         source = dep['source']
         destination = dep['destination']
@@ -55,7 +55,7 @@ def setup_dependencies(workspace, dependencies):
         elif provider == 'git-cms-merge-topic':
             command = 'git-cms-merge-topic {source}'.format(source=source)
         else:
-            print('Unknown provider "{0}"'.format(provider))
+            LOG.error('Unknown provider "{0}"'.format(provider))
             sys.exit()
         commands.append(command)
         if 'setup-cmds' in dep:
@@ -145,16 +145,16 @@ class Command(C):
         workspace = NTPROOT + '/workspace'
 
         if os.path.exists(workspace):
-            print('Workspace already exists')
+            LOG.warning('Workspace already exists')
             if self.__variables['force']:
-                print('Deleting existing workspace')
+                LOG.info('Deleting existing workspace')
                 if os.path.exists(workspace + '.save'):
                     shutil.rmtree(workspace + '.save')
                 shutil.move(workspace, workspace + '.save')
             else:
                 sys.exit(-1)
 
-        print('Creating workspace')
+        LOG.info('Creating workspace')
         os.mkdir(workspace)
         os.mkdir(workspace + '/cache')
         os.mkdir(workspace + '/log')

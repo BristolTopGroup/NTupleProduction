@@ -5,6 +5,11 @@ import os
 import shlex
 import types
 import sys
+import logging
+import select
+import subprocess
+
+LOG = logging.getLogger(__name__)
 
 try:
     import importlib
@@ -152,13 +157,11 @@ def __execute(command, parameters, variables):
     try:
         rc = command.run(parameters, variables)
     except Exception, e:
-        print('Command failed: ' + str(e), file=sys.stderr)
+        LOG.error('Command failed: ' + str(e))
 
     text = command.get_text()
     if len(text) > 0:
-        print(text, end='')
-        if text[len(text) - 1] != '\n':
-            print()
+        LOG.info(text)
     if rc is True:
         return 0
     return -1
@@ -244,10 +247,50 @@ def run_command(args):
     parameters, variables = _parse_args(arguments)
 
     if command is None:
-        print('Error - Invalid command "{0}"'.format(args[0]), file=sys.stderr)
-        print('Known commands:\n', '\n '.join(COMMANDS.keys()))
+        LOG.error('Invalid command "{0}"'.format(args[0]))
+        LOG.error('Invalid command "{0}"'.format(args[0]))
+        LOG.info('Known commands:\n' + '\n '.join(COMMANDS.keys()))
         return -1
 
     # log command
     # execute
     __execute(command, parameters, variables)
+
+
+def checkio(process, logger, log_levels):
+    ready_to_read = select.select(
+        [process.stdout, process.stderr],
+        [], [], 1000
+    )[0]
+    for io in ready_to_read:
+        line = io.readline()
+        logger.log(log_levels[io], line[:-1])
+
+
+def call(cmd_and_args, logger, stdout_log_level=logging.DEBUG, stderr_log_level=logging.ERROR, **kwargs):
+    """
+    Variant of subprocess.call that accepts a logger instead of stdout/stderr,
+    and logs stdout messages via logger.debug and stderr messages via
+    logger.error.
+    From: https://gist.github.com/bgreenlee/1402841
+    """
+    child = subprocess.Popen(cmd_and_args, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, **kwargs)
+
+    log_level = {child.stdout: stdout_log_level,
+                 child.stderr: stderr_log_level}
+
+    def check_io():
+        ready_to_read = select.select(
+            [child.stdout, child.stderr], [], [], 1000)[0]
+        for io in ready_to_read:
+            line = io.readline()
+            logger.log(log_level[io], line[:-1])
+
+    # keep checking stdout/stderr until the child exits
+    while child.poll() is None:
+        check_io()
+
+    check_io()  # check again to catch anything after the process exits
+
+    return child.wait()
