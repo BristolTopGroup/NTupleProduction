@@ -39,6 +39,8 @@ process.TFileService.fileName=cms.string('{output_file}')
 process.source.fileNames = cms.untracked.vstring(
 '{input_file}',
 )
+
+process.nTuplePFJets.btagCalibrationFile = cms.string('{btag_calib_file}')
 """
 
 LOG = logging.getLogger(__name__)
@@ -67,21 +69,31 @@ class Command(C):
         workspace = get_cmssw_workspace()
         output_file = NTPROOT + '/workspace/results/ntuple.root'
 
-        nevents = self.__variables['nevents']
+        nevents = int(self.__variables['nevents'])
         dataset = self.__variables['dataset']
         campaign = self.__variables['campaign']
         input_file = self.__variables['file']
+        btag_calib_file = NTPROOT + '/data/BTagSF/CSVv2.csv'
 
         if input_file == '':
             LOG.info(
                 "Searching for a file of {0}/{1}".format(campaign, dataset))
             files = get_files(campaign, dataset)
             input_file = files[0]
+        if not input_file.startswith('/store') and not 'file://' in input_file:
+            if os.path.exists(input_file):
+                input_file = 'file://' + os.path.abspath(input_file)
+            else:
+                LOG.error('Could not find file "{0}"!'.format(input_file))
+                return False
         LOG.info("Using file {0} for NTP input".format(input_file))
 
         with open(pset, 'w+') as f:
             content = BASE.format(
-                nevents=nevents, input_file=input_file, output_file=output_file)
+                nevents=nevents,
+                input_file=input_file,
+                output_file=output_file,
+                btag_calib_file = btag_calib_file)
             f.write(content)
 
         commands = [
