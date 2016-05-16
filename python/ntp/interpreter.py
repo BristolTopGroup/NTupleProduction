@@ -81,7 +81,6 @@ def __get_commands(command_path):
         # If it's the current directory, ignore
         if relative_path == '.':
             continue
-
         # Convert directory structure to module path
         relative_path = relative_path.replace('/', '.')
         absolute_path = '{0}.{1}'.format(BASE_MODULE, relative_path)
@@ -93,8 +92,11 @@ def __get_commands(command_path):
             if hasattr(mod, 'Command'):
                 if type(mod.Command) is type(object):
                     commands[relative_path] = mod.Command
+                    LOG.debug('Adding new command: relative_path')
                     __build_hierarchy(hierarchy, relative_path, mod.Command)
         except ImportError, e:
+            LOG.error('Could not import {0}'.format(absolute_path))
+            LOG.error(e)
             continue
 
     return commands, hierarchy
@@ -182,7 +184,7 @@ def _convert(value):
         f = float(s)
         return f
     except ValueError:
-        pass
+        LOG.debug('Could not convert "{0}" to bool'.format(value))
 
     # otherwise assume string
     return value
