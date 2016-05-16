@@ -1,7 +1,4 @@
 from __future__ import absolute_import
-from .interpreter import run_cli
-from .interpreter import run_command
-
 import os
 import logging
 
@@ -23,8 +20,14 @@ LOG.addHandler(fh)
 # logging to the console
 formatter = logging.Formatter('%(message)s')
 ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
+if not os.environ.get("DEBUG", False):
+    ch.setLevel(logging.INFO)
+else:
+    ch.setLevel(logging.DEBUG)
 ch.setFormatter(formatter)
 LOG.addHandler(ch)
+
+from .interpreter import run_cli
+from .interpreter import run_command
 
 __all__ = ['interpreter', 'run_cli', 'run_command']
