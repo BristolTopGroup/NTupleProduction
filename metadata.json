@@ -7,7 +7,6 @@
 	"source": "https://github.com/BristolTopGroup/NTupleProduction.git",
 	"destination": "BristolAnalysis/NTupleTools",
 	"links": [ "BuildFile.xml",
-		"Configuration",
 		"data",
 		"interface",
 		"plugins",
