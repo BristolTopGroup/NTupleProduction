@@ -113,11 +113,3 @@ class Command(C):
 
     def __run_cmssw(self, workspace):
         pass
-
-    def __extract_params(self):
-        args = []
-        for var, value in self.__variables.items():
-            if var in self.DEFAULTS:
-                continue
-            args.append('{0}={1}'.format(var, value))
-        return ' '.join(args)
