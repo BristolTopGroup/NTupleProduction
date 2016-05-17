@@ -24,7 +24,7 @@ from __future__ import print_function
 import logging
 
 from .. import Command as C
-from ntp.commands.setup import get_cmssw_workspace
+from ntp.commands.setup import CMSSW_SRC
 from crab.util import get_files
 
 from ntp import NTPROOT

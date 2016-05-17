@@ -25,7 +25,8 @@ import os
 import logging
 
 from .. import Command as C
-from ntp.commands.setup import get_cmssw_workspace
+from ntp import NTPROOT
+from ntp.commands.setup import CMSSW_SRC
 from crab.util import get_files
 
 BASE = """
@@ -63,10 +64,9 @@ class Command(C):
         import resource
         self.__prepare(args, variables)
 
-        NTPROOT = os.environ['NTPROOT']
         tmp_folder = NTPROOT + '/workspace/tmp'
         pset = tmp_folder + '/pset.py'
-        workspace = get_cmssw_workspace()
+        workspace = CMSSW_SRC
         output_file = NTPROOT + '/workspace/results/ntuple.root'
 
         nevents = int(self.__variables['nevents'])
