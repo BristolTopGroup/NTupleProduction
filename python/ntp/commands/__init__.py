@@ -19,8 +19,8 @@ class Command(object):
         self.__text = ''
         self.__variables = self.DEFAULTS
 
-    def _execute(self):
-        pass
+    def __can_run(self):
+        return True
 
     def run(self, args, variables):
         """
