@@ -8,6 +8,9 @@
     Parameters:
         version: The version of CMSSW to set up (e.g. CMSSW_8_0_0)
                  Default: What is defined in metadata.json
+
+        init-git: Prepares the CMSSW area for merging of git branches.
+                  Default:true
 """
 import logging
 from .. import Command as C
@@ -20,6 +23,7 @@ from .. import CMSSW_VERSION, WORKSPACE, SCRAM_ARCH
 class Command(C):
     DEFAULTS = {
         'version': CMSSW_VERSION,
+        'init-git': True,
     }
 
     def __init__(self, path=__file__, doc=__doc__):
@@ -38,8 +42,10 @@ class Command(C):
             '/cvmfs/cms.cern.ch/common/scram project CMSSW {cmssw_version}',
             'cd {cmssw_version}/src',
             'eval `/cvmfs/cms.cern.ch/common/scram runtime -sh`',
-            'git cms-init'
         ]
+        if self.__variables['init-git']:
+            commands.append('git cms-init')
+
         all_in_one = ' && '.join(commands)
         all_in_one = all_in_one.format(
             workspace=WORKSPACE,

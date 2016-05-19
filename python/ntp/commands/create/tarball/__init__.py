@@ -28,18 +28,17 @@ class Command(C):
 
     def run(self, args, variables):
         from ntp import NTPROOT
-        from ntp.commands.setup import get_cmssw_workspace
+        from ntp.commands.setup import CMSSW_SRC
 
         WORKSPACE = NTPROOT + '/workspace'
         TMP = WORKSPACE + '/tmp/ntp'
-        CMSSW_WORKSPACE = get_cmssw_workspace()
 
         self.__prepare(args, variables)
         if os.path.exists(TMP):
             shutil.rmtree(TMP)
-        LOG.debug('Making snapshot of {0}'.format(CMSSW_WORKSPACE))
+        LOG.debug('Making snapshot of {0}'.format(CMSSW_SRC))
         ignore = self.__ignore('.git*', 'data/test')
-        shutil.copytree(CMSSW_WORKSPACE, TMP, ignore=ignore)
+        shutil.copytree(CMSSW_SRC, TMP, ignore=ignore)
 
         LOG.info("Creating workspace/tmp/ntp.tar.gz")
 
@@ -59,7 +58,7 @@ class Command(C):
             self.__text = "Created {0}.tar".format(TMP)
 
         if self.__variables['cleanup']:
-            LOG.debug('Cleaning up snapshot of {0}'.format(CMSSW_WORKSPACE))
+            LOG.debug('Cleaning up snapshot of {0}'.format(CMSSW_SRC))
             shutil.rmtree(TMP)
 
         return True

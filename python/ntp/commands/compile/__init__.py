@@ -14,6 +14,7 @@ from .. import Command as C
 
 LOG = logging.getLogger(__name__)
 
+
 class Command(C):
 
     DEFAULTS = {
@@ -50,10 +51,13 @@ class Command(C):
         if not os.path.exists(CMSSW_SRC):
             LOG.error('CMSSW is not set up: {0}'.format(CMSSW_SRC))
             return False
-        for link in LINKS:
-            path = '{cmssw_src}/{destination}/{link}'.format(
-                cmssw_src=CMSSW_SRC, destination=DESTINATION, link=link)
-            if not os.path.exists(path):
-                LOG.error('Link {0} is not set up.'.format(path))
-                return False
+
+        if not os.path.exists(CMSSW_SRC + '/.tarball_setup'):
+            # only needs links if it is not a tarball setup
+            for link in LINKS:
+                path = '{cmssw_src}/{destination}/{link}'.format(
+                    cmssw_src=CMSSW_SRC, destination=DESTINATION, link=link)
+                if not os.path.exists(path):
+                    LOG.error('Link {0} is not set up.'.format(path))
+                    return False
         return True

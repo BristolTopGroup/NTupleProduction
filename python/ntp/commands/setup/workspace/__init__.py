@@ -16,6 +16,7 @@ from .. import Command as C
 
 LOG = logging.getLogger(__name__)
 
+
 class Command(C):
 
     def __init__(self, path=__file__, doc=__doc__):
@@ -39,5 +40,6 @@ class Command(C):
         os.makedirs(WORKSPACE + '/log')
         os.makedirs(WORKSPACE + '/results')
         os.makedirs(WORKSPACE + '/tmp')
+        LOG.info('Created workspace {0}'.format(WORKSPACE))
 
         return True

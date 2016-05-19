@@ -10,12 +10,16 @@
 
         Usage:
             setup [ntp_tag] [force=true] [compile=true]
+                  [from_tarball=<path to file>]
 
         Parameters:
-            ntp_tag:  specifies which version of NTP to load. Default is
+            ntp_tag: specifies which version of NTP to load. Default is
                       'run2:latest' which is equal to 'master'
 
-            force:    forces workspace to be deleted if it already exists.
+            force: forces workspace to be deleted if it already exists.
+
+            from_tarball: Uses given tar file to create workspace.
+                          Default: NOT SET.
 """
 import json
 import shutil
@@ -61,11 +65,15 @@ class Command(C):
 
     def run(self, args, variables):
         self.__prepare(args, variables)
+        if 'from_tarball' in self.__variables:
+            return self.__tarball_setup(args, variables)
+        else:
+            ntp_tag = self.__variables['ntp_tag']
+            if args:
+                ntp_tag = args[0]
+            return self.__default_setup(ntp_tag)
 
-        ntp_tag = self.__variables['ntp_tag']
-        if args:
-            ntp_tag = args[0]
-
+    def __default_setup(self, args, variables, ntp_tag='master'):
         from .workspace import Command as SetupWorkspace
         c = SetupWorkspace()
         c.run(args, variables)
@@ -88,3 +96,46 @@ class Command(C):
             c.run(args, variables)
 
         return True
+
+    def __tarball_setup(self, args, variables):
+        tarball = self.__variables['from_tarball']
+        if not os.path.exists(tarball):
+            LOG.error('The given tarball {0} does not exist!'.format(tarball))
+            return False
+        tarball = os.path.abspath(tarball)
+        LOG.info('Using tarball {0} for setup.'.format(tarball))
+
+        variables['init-git'] = False
+
+        from .workspace import Command as SetupWorkspace
+        c = SetupWorkspace()
+        c.run(args, variables)
+
+        from .cmssw import Command as SetupCMSSW
+        c = SetupCMSSW()
+        c.run(args, variables)
+
+        self.__extract_tarball(tarball)
+
+        if self.__variables['compile']:
+            from ..compile import Command as Compile
+            c = Compile()
+            c.run(args, variables)
+
+        return True
+
+    def __extract_tarball(self, tarball):
+        commands = [
+            'cd {CMSSW_SRC}',
+            'tar xzf {tarball}',
+            'echo "{tarball}" > .tarball_setup'
+        ]
+
+        all_in_one = ' && '.join(commands)
+        all_in_one = all_in_one.format(
+            CMSSW_SRC=CMSSW_SRC,
+            tarball=tarball,
+        )
+
+        from ntp.interpreter import call
+        call(all_in_one, logger=LOG, shell=True)
