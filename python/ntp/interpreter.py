@@ -39,7 +39,7 @@ def time_function(name, logger):
 
             cpu_time = usage_end.ru_utime - usage_start.ru_utime
             # RSS = https://en.wikipedia.org/wiki/Resident_set_size
-            memory = usage_end.ru_maxrss / 1024. # now in MB
+            memory = usage_end.ru_maxrss / 1024.  # now in MB
             msg = "Ran '{name}' in {cpu_time:.1f}s and used {memory:.1f}MB of RAM"
             msg = msg.format(name=name, cpu_time=cpu_time, memory=memory)
             logger.info(msg)
@@ -301,11 +301,15 @@ def call(cmd_and_args, logger, stdout_log_level=logging.DEBUG, stderr_log_level=
     log_level = {child.stdout: stdout_log_level,
                  child.stderr: stderr_log_level}
 
+    outputs = {child.stdout: '',
+               child.stderr: ''}
+
     def check_io():
         ready_to_read = select.select(
             [child.stdout, child.stderr], [], [], 1000)[0]
         for io in ready_to_read:
             line = io.readline()
+            outputs[io] += line[:-1]
             logger.log(log_level[io], line[:-1])
 
     # keep checking stdout/stderr until the child exits
@@ -314,4 +318,7 @@ def call(cmd_and_args, logger, stdout_log_level=logging.DEBUG, stderr_log_level=
 
     check_io()  # check again to catch anything after the process exits
 
-    return child.wait()
+    return_code = child.wait()
+    stdout, stderr = outputs.values()
+
+    return return_code, stdout, stderr
