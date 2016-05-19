@@ -19,11 +19,14 @@ LOG.setLevel(logging.INFO)
 # logging to a file
 formatter = logging.Formatter(
     '%(asctime)s [%(name)s]  %(levelname)s: %(message)s')
+
+logfile = '/tmp/ntp_{0}.log'.format(os.geteuid())
 if os.path.exists(NTPROOT + '/workspace/log'):
-    fh = logging.FileHandler(NTPROOT + '/workspace/log/ntp.log')
-    fh.setFormatter(formatter)
-    fh.setLevel(logging.DEBUG)
-    LOG.addHandler(fh)
+    logfile = NTPROOT + '/workspace/log/ntp.log'
+fh = logging.FileHandler(logfile)
+fh.setFormatter(formatter)
+fh.setLevel(logging.DEBUG)
+LOG.addHandler(fh)
 
 # logging to the console
 formatter = logging.Formatter('%(message)s')
