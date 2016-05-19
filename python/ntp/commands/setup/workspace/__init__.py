@@ -14,6 +14,8 @@ import sys
 import shutil
 from .. import Command as C
 
+from .. import WORKSPACE, CACHEDIR, LOGDIR, RESULTDIR, TMPDIR
+
 LOG = logging.getLogger(__name__)
 
 
@@ -23,7 +25,6 @@ class Command(C):
         super(Command, self).__init__(path, doc)
 
     def run(self, args, variables):
-        from .. import WORKSPACE
         self.__prepare(args, variables)
         if os.path.exists(WORKSPACE):
             LOG.warning('Workspace already exists')
@@ -36,10 +37,10 @@ class Command(C):
                 sys.exit(-1)
 
         LOG.info('Creating workspace')
-        os.makedirs(WORKSPACE + '/cache')
-        os.makedirs(WORKSPACE + '/log')
-        os.makedirs(WORKSPACE + '/results')
-        os.makedirs(WORKSPACE + '/tmp')
+        os.makedirs(CACHEDIR)
+        os.makedirs(LOGDIR)
+        os.makedirs(RESULTDIR)
+        os.makedirs(TMPDIR)
         LOG.info('Created workspace {0}'.format(WORKSPACE))
 
         return True

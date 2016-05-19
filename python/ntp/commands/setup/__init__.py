@@ -34,18 +34,23 @@ from ntp.interpreter import time_function
 from ntp import NTPROOT
 
 LOG = logging.getLogger(__name__)
-WORKSPACE = NTPROOT + '/workspace'
+WORKSPACE = os.path.join(NTPROOT, 'workspace')
+CACHEDIR = os.path.join(WORKSPACE, 'cache')
+LOGDIR = os.path.join(WORKSPACE, 'log')
+RESULTDIR = os.path.join(WORKSPACE, 'results')
+TMPDIR = os.path.join(WORKSPACE, 'tmp')
 
 
 def get_metadata():
     metadata = {}
-    with open(NTPROOT + '/metadata.json') as metadata_file:
+    metadata_file = os.path.join(NTPROOT, 'metadata.json')
+    with open(metadata_file) as metadata_file:
         metadata = json.load(metadata_file)
     return metadata
 
 METADATA = get_metadata()
 CMSSW_VERSION = METADATA['cmssw_version']
-CMSSW_SRC = WORKSPACE + '/{0}/src'.format(CMSSW_VERSION)
+CMSSW_SRC = os.path.join(WORKSPACE, '{0}/src'.format(CMSSW_VERSION))
 DEPENDENCIES = METADATA['dependencies']
 LINKS = METADATA['links']
 SCRAM_ARCH = METADATA['scram_arch']

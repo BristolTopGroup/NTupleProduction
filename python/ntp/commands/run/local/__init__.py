@@ -27,7 +27,7 @@ import logging
 from .. import Command as C
 from ntp.interpreter import time_function
 from ntp import NTPROOT
-from ntp.commands.setup import CMSSW_SRC
+from ntp.commands.setup import CMSSW_SRC, TMPDIR, RESULTDIR
 from crab.util import get_files
 
 BASE = """
@@ -66,10 +66,10 @@ class Command(C):
         import resource
         self.__prepare(args, variables)
 
-        tmp_folder = NTPROOT + '/workspace/tmp'
+        tmp_folder = TMPDIR
         pset = tmp_folder + '/pset.py'
         workspace = CMSSW_SRC
-        output_file = NTPROOT + '/workspace/results/ntuple.root'
+        output_file = RESULTDIR + '/ntuple.root'
 
         nevents = int(self.__variables['nevents'])
         dataset = self.__variables['dataset']
@@ -99,7 +99,7 @@ class Command(C):
             f.write(content)
 
         commands = [
-            'cd {workspace}',
+            'cd {CMSSW_SRC}',
             'source /cvmfs/cms.cern.ch/cmsset_default.sh',
             'eval `/cvmfs/cms.cern.ch/common/scram runtime -sh`',
             'cmsRun {pset} {params}',
@@ -107,16 +107,16 @@ class Command(C):
 
         all_in_one = ' && '.join(commands)
         all_in_one = all_in_one.format(
-            workspace=workspace, pset=pset, params=self.__extract_params())
+            CMSSW_SRC=CMSSW_SRC, pset=pset, params=self.__extract_params())
 
         LOG.info("Executing cmsRun")
         call([all_in_one], LOG, stdout_log_level=logging.INFO, shell=True)
 
         self.__text = "Ran {pset}\n"
         self.__text = "Created ntuples: {output_file}\n"
-        self.__text += "Logging information can be found in {workspace}/log/ntp.log"
+        self.__text += "Logging information can be found in {LOGDIR}/ntp.log"
         self.__text = self.__text.format(
-            pset=pset, workspace=workspace, output_file=output_file)
+            pset=pset, LOGDIR=LOGDIR, output_file=output_file)
 
         return True
 
