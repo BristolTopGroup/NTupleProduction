@@ -13,6 +13,7 @@ import sys
 import shutil
 
 from .. import Command as C
+from ntp.interpreter import time_function
 
 LOG = logging.getLogger(__name__)
 
@@ -26,6 +27,7 @@ class Command(C):
     def __init__(self, path=__file__, doc=__doc__):
         super(Command, self).__init__(path, doc)
 
+    @time_function('create tarball', LOG)
     def run(self, args, variables):
         from ntp import NTPROOT
         from ntp.commands.setup import CMSSW_SRC

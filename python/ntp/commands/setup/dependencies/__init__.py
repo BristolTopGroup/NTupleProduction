@@ -8,6 +8,7 @@
 """
 import logging
 from .. import Command as C
+from ntp.interpreter import time_function
 
 LOG = logging.getLogger(__name__)
 
@@ -17,6 +18,7 @@ class Command(C):
     def __init__(self, path=__file__, doc=__doc__):
         super(Command, self).__init__(path, doc)
 
+    @time_function('setup dependencies', LOG)
     def run(self, args, variables):
         if not self.__can_run():
             return False

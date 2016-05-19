@@ -25,6 +25,7 @@ import os
 import logging
 
 from .. import Command as C
+from ntp.interpreter import time_function
 from ntp import NTPROOT
 from ntp.commands.setup import CMSSW_SRC
 from crab.util import get_files
@@ -59,6 +60,7 @@ class Command(C):
     def __init__(self, path=__file__, doc=__doc__):
         super(Command, self).__init__(path, doc)
 
+    @time_function('run local', LOG)
     def run(self, args, variables):
         from ntp.interpreter import call
         import resource
@@ -93,7 +95,7 @@ class Command(C):
                 nevents=nevents,
                 input_file=input_file,
                 output_file=output_file,
-                btag_calib_file = btag_calib_file)
+                btag_calib_file=btag_calib_file)
             f.write(content)
 
         commands = [
@@ -108,18 +110,13 @@ class Command(C):
             workspace=workspace, pset=pset, params=self.__extract_params())
 
         LOG.info("Executing cmsRun")
-        usage_start = resource.getrusage(resource.RUSAGE_CHILDREN)
         call([all_in_one], LOG, stdout_log_level=logging.INFO, shell=True)
-        usage_end = resource.getrusage(resource.RUSAGE_CHILDREN)
 
-        cpu_time = usage_end.ru_utime - usage_start.ru_utime
-        # RSS = https://en.wikipedia.org/wiki/Resident_set_size
-        memory = usage_end.ru_maxrss
-
-        self.__text = "Ran {pset} in {cpu_time:.1f}s and used {memory:.1f}MB of RAM\n"
-        self.__text += "Logs can be found in {workspace}/log/local.*"
-        self.__text = self.__text.format(pset=pset, workspace=workspace,
-                                         cpu_time=cpu_time, memory=memory / 1024)
+        self.__text = "Ran {pset}\n"
+        self.__text = "Created ntuples: {output_file}\n"
+        self.__text += "Logging information can be found in {workspace}/log/ntp.log"
+        self.__text = self.__text.format(
+            pset=pset, workspace=workspace, output_file=output_file)
 
         return True
 

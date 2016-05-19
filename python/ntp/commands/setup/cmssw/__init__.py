@@ -14,6 +14,7 @@
 """
 import logging
 from .. import Command as C
+from ntp.interpreter import time_function
 
 LOG = logging.getLogger(__name__)
 
@@ -29,6 +30,7 @@ class Command(C):
     def __init__(self, path=__file__, doc=__doc__):
         super(Command, self).__init__(path, doc)
 
+    @time_function('setup cmssw', LOG)
     def run(self, args, variables):
         self.__prepare(args, variables)
         self.__version = self.__variables['version']

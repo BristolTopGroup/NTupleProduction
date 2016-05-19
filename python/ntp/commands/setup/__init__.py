@@ -30,6 +30,7 @@ import subprocess
 import logging
 
 from .. import Command as C
+from ntp.interpreter import time_function
 from ntp import NTPROOT
 
 LOG = logging.getLogger(__name__)
@@ -63,6 +64,7 @@ class Command(C):
     def __init__(self, path=__file__, doc=__doc__):
         super(Command, self).__init__(path, doc)
 
+    @time_function('setup', LOG)
     def run(self, args, variables):
         self.__prepare(args, variables)
         if 'from_tarball' in self.__variables:
