@@ -31,6 +31,7 @@ class Command(C):
 
     def __init__(self, path=__file__, doc=__doc__):
         super(Command, self).__init__(path, doc)
+        self.__tar_files = []
 
     @time_function('create tarball', LOG)
     def run(self, args, variables):
@@ -92,6 +93,7 @@ class Command(C):
         archive_function(
             snapshot, archive_format, root_dir=snapshot, logger=LOG)
 
+        self.__tar_files.append("{0}.{1}".format(snapshot, file_suffix))
         LOG.info("Created {0}.{1}".format(snapshot, file_suffix))
 
     def __cleanup(self, *what):
@@ -102,3 +104,6 @@ class Command(C):
                     os.remove(item)
                 else:
                     shutil.rmtree(item)
+
+    def get_tar_files(self):
+        return self.__tar_files
