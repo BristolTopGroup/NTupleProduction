@@ -42,3 +42,9 @@ class Command(C):
                 continue
             args.append('{0}={1}'.format(var, value))
         return ' '.join(args)
+
+    def __format_input_files(self, input_files):
+        results = []
+        for f in input_files:
+            results.append('"{0}"'.format(f))
+        return ',\n'.join(results)
