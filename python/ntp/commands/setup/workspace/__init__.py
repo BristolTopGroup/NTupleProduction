@@ -31,7 +31,7 @@ class Command(C):
             if self.__variables['force']:
                 LOG.info('Deleting existing workspace')
                 if os.path.exists(WORKSPACE + '.save'):
-                    shutil.rmtree(WORKSPACE + '.save')
+                    shutil.rmtree(WORKSPACE + '.save', ignore_errors=True)
                 shutil.move(WORKSPACE, WORKSPACE + '.save')
             else:
                 sys.exit(-1)

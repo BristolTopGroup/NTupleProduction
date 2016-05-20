@@ -65,7 +65,8 @@ export CMSSW_GIT_REFERENCE=/cvmfs/cms.cern.ch/cmssw.git
 
 # CRAB submission
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3Releases#Improvements_enhancements_change
-source /cvmfs/cms.cern.ch/crab3/crab_light.sh
+source /cvmfs/cms.cern.ch/crab3/crab_light.sh #funky behaviour if not used within CMSSW
+#source /cvmfs/cms.cern.ch/crab3/crab.sh
 
 # for grid tools
 source /cvmfs/grid.cern.ch/etc/profile.d/setup-cvmfs-ui.sh

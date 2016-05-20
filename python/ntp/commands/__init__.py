@@ -70,7 +70,10 @@ class Command(object):
         if is_valid:
             _, stdout, _ = call(
                 'voms-proxy-info --timeleft', logger=LOG, shell=True)
-            time_left = int(stdout)
+            try:
+                time_left = int(stdout)
+            except:
+                time_left = 0
             LOG.info('Time left on proxy: {0} min'.format(time_left / 60))
             if time_left < (60 * 30):  # less than 30min
                 is_valid = False

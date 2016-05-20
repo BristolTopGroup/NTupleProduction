@@ -78,14 +78,14 @@ class Command(C):
             ntp_tag = self.__variables['ntp_tag']
             if args:
                 ntp_tag = args[0]
-            return self.__default_setup(ntp_tag)
+            return self.__default_setup(args, variables, ntp_tag)
 
     def __default_setup(self, args, variables, ntp_tag='master'):
         from .workspace import Command as SetupWorkspace
         c = SetupWorkspace()
         c.run(args, variables)
 
-        from .cmssw import Commmand as SetupCMSSW
+        from .cmssw import Command as SetupCMSSW
         c = SetupCMSSW()
         c.run(args, variables)
 

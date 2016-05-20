@@ -32,9 +32,14 @@ from .. import Command as C
 from crab.util import get_files
 from ntp import NTPROOT
 from ntp.commands.setup import WORKSPACE, LOGDIR, CACHEDIR
-import htcondenser as htc
 
 LOG = logging.getLogger(__name__)
+
+try:
+    import htcondenser as htc
+except:
+    LOG.error('Could not import htcondenser')
+
 
 CONDOR_LOGDIR = os.path.join(LOGDIR, 'condor')
 CONDOR_CACHE = os.path.join(CACHEDIR, 'condor')
@@ -46,9 +51,8 @@ HDFS_STORE_BASE = "/hdfs/TopQuarkGroup/{user}".format(
 
 SETUP_SCRIPT = """
 tar -xvf ntp.tar.gz
-cd NTupleProduction
 source bin/env.sh
-ntp setup from_tarball=../cmssw_src.tar.gz
+ntp setup from_tarball=cmssw_src.tar.gz
 
 """
 
@@ -57,7 +61,7 @@ ntp run local $@
 
 """
 
-LOG_STEM = 'ntp_jobless.$(cluster).$(process)'
+LOG_STEM = 'ntp_job.$(cluster).$(process)'
 
 
 class Command(C):
@@ -208,6 +212,7 @@ class Command(C):
             common_input_files=self.__input_files,
             transfer_hdfs_input=False,
             hdfs_store=self.__config['outLFNDirBase'],
+            certificate=self.REQUIRE_GRID_CERT,
             cpus=1,
             memory='1500MB'
         )
