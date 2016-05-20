@@ -1,11 +1,13 @@
 """
-    run condor: Runs the n-tuple production on the a condor batch syste,.
+    run condor: Runs the n-tuple production on the a condor batch system.
                 All run commands require a valid grid certificate as they
                 either read data from the grid via XRootD or run on grid
                 resources.
                 The command will use python/run/miniAODToNTuple_cfg.py.
+                All unknown parameters will be bassed to 'ntp run local'
+                inside the condor job.
         Usage:
-            run condor [campaign=<X>]  [dataset=<X>] [file=<path>] [nevents=<N>]
+            run condor [campaign=<X>]  [dataset=<X>] [file=<path>]
 
         Parameters:
             campaign: which campaign to run. Corresponds to the folder
@@ -16,39 +18,46 @@
                       Accepts wild-cards and comma-separated lists.
                       Default is 'TTJets_PowhegPythia8'.
                       This parameter is ignored if parameter file is given.
-            file:     Instead of running on a specific dataset, just run over the given file
-            nevents:  Number of events to process.
-                      Default is -1.
+            files:    Instead of running on a specific dataset, run over the
+                      given (comma-separated) list of files
+            noop:     'NO OPeration', will do everything except submitting jobs.
+                      Default: false
 """
 from __future__ import print_function
+import os
+import getpass
 import logging
 
 from .. import Command as C
-from ntp.commands.setup import CMSSW_SRC
 from crab.util import get_files
-
 from ntp import NTPROOT
+from ntp.commands.setup import WORKSPACE, LOGDIR, CACHEDIR
+import htcondenser as htc
 
-CACHE = NTPROOT + '/workspace/cache'
+LOG = logging.getLogger(__name__)
 
-BASE = """
-import FWCore.ParameterSet.Config as cms
-from run.miniAODToNTuple_cfg import process
+CONDOR_LOGDIR = os.path.join(LOGDIR, 'condor')
+CONDOR_CACHE = os.path.join(CACHEDIR, 'condor')
+CONDOR_SETUP_SCRIPT = os.path.join(CONDOR_CACHE, 'setup.sh')
+CONDOR_RUN_SCRIPT = os.path.join(CONDOR_CACHE, 'run.sh')
+CONDOR_RUN_CONFIG = os.path.join(CONDOR_CACHE, 'config.json')
+HDFS_STORE_BASE = "/hdfs/TopQuarkGroup/{user}".format(
+    user=getpass.getuser())
 
-process.maxEvents.input = cms.untracked.int32({nevents})
+SETUP_SCRIPT = """
+tar -xvf ntp.tar.gz
+cd NTupleProduction
+source bin/env.sh
+ntp setup from_tarball=../cmssw_src.tar.gz
 
-process.TFileService.fileName=cms.string('{output_file}')
-
-process.source.fileNames = cms.untracked.vstring(
-{input_files}
-)
-
-process.nTuplePFJets.btagCalibrationFile = cms.string('{btag_calib_file}')
 """
 
-from ntp import NTPROOT
-LOG_DIR = NTPROOT + '/workspace/log/condor'
-HDFS_OUTPUT_DIR = '/hdfs/user/{user}/ntuples/'
+RUN_SCRIPT = """
+ntp run local $@
+
+"""
+
+LOG_STEM = 'ntp_jobless.$(cluster).$(process)'
 
 
 class Command(C):
@@ -56,28 +65,165 @@ class Command(C):
     DEFAULTS = {
         'campaign': 'Spring16',
         'dataset': 'TTJets_PowhegPythia8',
-        'nevents': -1,
-        'file': '',
+        'files': '',
+        'noop': False,
     }
 
     def __init__(self, path=__file__, doc=__doc__):
         super(Command, self).__init__(path, doc)
+        self.__input_files = []
 
     def run(self, args, variables):
-        import htcondenser as ht
-        from ntp.commands.create.tarball import Command as TarCommand
         self.__prepare(args, variables)
+        self.__create_folders()
 
         # create tarball
-        tar = TarCommand()
-        result = tar.run(args=[], variables={})
-        self.__text = tar.__text
+        self.__create_tar_file(args, variables)
+        # which dataset, file, etc
+        self.__get_run_config()
+        self.__write_files()
         # create DAG for condor
+        self.__create_dag()
+
+        if not self.__variables['noop']:
+            self.__dag.submit(force=True)
+            self.__text += "\n Submitted {0} jobs".format(len(self.__dag))
+#             for job in self.__dag:
+#                 print(job.name, 'running:', job.manager.exe, ' '.join(job.args))
         # to check status:
         # ntp condor status
-        self.__text += "\n Rest is NOT IMPLEMENTED (yet) - but would be running condor"
 
-        return result
+        return True
 
-    def create_tar_file(self):
-        pass
+    def __create_folders(self):
+        dirs = [CONDOR_LOGDIR, CONDOR_CACHE]
+        for d in dirs:
+            if not os.path.exists(d):
+                os.makedirs(d)
+
+    def __create_tar_file(self, args, variables):
+        from ntp.commands.create.tarball import Command as TarCommand
+        c = TarCommand()
+        result = c.run(args, variables)
+        self.__text += c.__text
+        self.__input_files.extend(c.get_tar_files())
+
+    def __get_run_config(self):
+        from crab.util import find_input_files
+        from crab import get_config
+        run_config = {
+            'requestName': 'Test',
+            'outputDatasetTag': 'Test',
+            'inputDataset': 'Test',
+            'splitting': 'FileBased',
+            'unitsPerJob': 1,
+            'outLFNDirBase': os.path.join(HDFS_STORE_BASE, 'ntuple'),
+            'lumiMask': '',
+            'pyCfgParams': None,
+            'files': [],
+        }
+
+        using_local_files = self.__variables['files'] != ''
+        input_files = find_input_files(self.__variables, LOG)
+
+        if not using_local_files:
+            dataset = self.__variables['dataset']
+            campaign = self.__variables['campaign']
+            run_config = get_config(campaign, dataset)
+            run_config['outLFNDirBase'] = self.__replace_output_dir(run_config)
+            run_config['outLFNDirBase'] = os.path.join(
+                run_config['outLFNDirBase'], run_config['outputDatasetTag'])
+
+        run_config['files'] = input_files
+        parameters = self.__extract_params()
+        if run_config['pyCfgParams']:
+            params = '{parameters} {cfg_params}'.format(
+                parameters=parameters,
+                cfg_params=' '.join(run_config['pyCfgParams']),
+            )
+            run_config['pyCfgParams'] = params
+        else:
+            run_config['pyCfgParams'] = parameters
+
+        LOG.info('Retrieved CRAB config')
+
+        self.__config = run_config
+
+    def __replace_output_dir(self, run_config):
+        output = run_config['outLFNDirBase']
+        if output.startswith('/store/user'):
+            tokens = output.split('/')
+            output = os.path.join(HDFS_STORE_BASE, '/'.join(tokens[4:]))
+            output = os.path.join(output, run_config['outputDatasetTag'])
+        return output
+
+    def __write_files(self):
+        with open(CONDOR_SETUP_SCRIPT, 'w+') as f:
+            f.write(SETUP_SCRIPT)
+
+        with open(CONDOR_RUN_SCRIPT, 'w+') as f:
+            f.write(RUN_SCRIPT)
+
+        import json
+        with open(CONDOR_RUN_CONFIG, 'w+') as f:
+            f.write(json.dumps(self.__config, indent=4))
+
+    def __create_dag(self):
+        """ Creates a Directional Acyclic Grag (DAG) for condor """
+        dag_man = htc.DAGMan(
+            filename=os.path.join(CONDOR_LOGDIR, 'diamond.dag'),
+            status_file=os.path.join(CONDOR_LOGDIR, 'diamond.status'),
+            dot='diamond.dot'
+        )
+
+        layer_1_jobs = self.__create_layer1()
+        for job in layer_1_jobs:
+            dag_man.add_job(job)
+
+        layer_2_jobs = self.__create_layer2()
+        for job in layer_2_jobs:
+            dag_man.add_job(job, requires=layer_1_jobs)
+
+        self.__dag = dag_man
+
+    def __create_layer1(self):
+        jobs = []
+
+        run_config = self.__config
+        input_files = run_config['files']
+
+        job_set = htc.JobSet(
+            exe=CONDOR_RUN_SCRIPT,
+            copy_exe=True,
+            setup_script=CONDOR_SETUP_SCRIPT,
+            filename=os.path.join(
+                CONDOR_CACHE, 'ntuple_production.condor'),
+            out_dir=CONDOR_LOGDIR,
+            out_file=LOG_STEM + '.out',
+            err_dir=CONDOR_LOGDIR,
+            err_file=LOG_STEM + '.err',
+            log_dir=CONDOR_LOGDIR,
+            log_file=LOG_STEM + '.log',
+            share_exe_setup=True,
+            common_input_files=self.__input_files,
+            transfer_hdfs_input=False,
+            hdfs_store=self.__config['outLFNDirBase'],
+            cpus=1,
+            memory='1500MB'
+        )
+        parameters = 'files={files} output_file={output_file} {params}'
+        for i, f in enumerate(input_files):
+            output_file = 'ntuple_{0}.root'.format(i)
+            args = parameters.format(
+                files=f,
+                output_file=output_file,
+                params=run_config['pyCfgParams']
+            )
+            job = htc.Job(name='job_{0}'.format(i), args=args)
+            job_set.add_job(job)
+            jobs.append(job)
+        return jobs
+
+    def __create_layer2(self):
+        # reserved for hadd
+        return []
