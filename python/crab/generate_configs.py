@@ -1,14 +1,14 @@
-BASE = """
-from crab.base import config
-NAME = __file__.split('/')[-1]
-NAME = NAME.replace('.py', '')
+BASE = """from crab.base import config
+NAME = __file__.split('/')[-1].replace('.pyc', '')
+NAME = NAME.split('/')[-1].replace('.py', '')
+CAMPAIGN = __file__.split('/')[-2]
 
 config.General.requestName = NAME
 config.Data.outputDatasetTag = NAME
+config.Data.outLFNDirBase += '/' + CAMPAIGN
 config.Data.inputDataset = '{dataset}'
 config.Data.splitting = '{splitting}'
 config.Data.unitsPerJob = {unitsPerJob}
-config.Data.outLFNDirBase += '/{campaign}'
 {extras}
 
 """
