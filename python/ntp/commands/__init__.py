@@ -2,6 +2,7 @@ import os
 import pwd
 import subprocess
 import logging
+import copy
 
 LOG = logging.getLogger(__name__)
 
@@ -20,7 +21,7 @@ class Command(object):
             self.__name = parent_folder
         self.__doc = doc
         self.__text = ''
-        self.__variables = self.DEFAULTS
+        self.__variables = copy.deepcopy(self.DEFAULTS)
 
     def __can_run(self):
         return True
