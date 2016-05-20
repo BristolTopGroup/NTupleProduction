@@ -114,8 +114,9 @@ def __get_commands(command_path):
                     LOG.debug('Adding new command: relative_path')
                     __build_hierarchy(hierarchy, relative_path, mod.Command)
         except ImportError, e:
+            import traceback
             LOG.error('Could not import {0}'.format(absolute_path))
-            LOG.error(e)
+            LOG.error(traceback.format_exc())
             continue
 
     return commands, hierarchy
@@ -178,7 +179,8 @@ def __execute(command, parameters, variables):
     try:
         rc = command.run(parameters, variables)
     except Exception, e:
-        LOG.error('Command failed: ' + str(e))
+        import traceback
+        LOG.error('Command failed: ' + traceback.format_exc())
 
     text = command.get_text()
     if len(text) > 0:
@@ -276,16 +278,6 @@ def run_command(args):
     # log command
     # execute
     __execute(command, parameters, variables)
-
-
-def checkio(process, logger, log_levels):
-    ready_to_read = select.select(
-        [process.stdout, process.stderr],
-        [], [], 1000
-    )[0]
-    for io in ready_to_read:
-        line = io.readline()
-        logger.log(log_levels[io], line[:-1])
 
 
 def call(cmd_and_args, logger, stdout_log_level=logging.DEBUG, stderr_log_level=logging.ERROR, **kwargs):
