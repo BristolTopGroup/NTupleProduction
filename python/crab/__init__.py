@@ -25,7 +25,6 @@ def load_config(campaign, dataset):
     relative_path = 'crab.{campaign}.{dataset}'.format(
         campaign=campaign, dataset=dataset)
     LOG.debug('Trying to import {0}'.format(relative_path))
-    print(relative_path)
     if sys.version_info < (2, 7):
         mod = import_module(relative_path, fromlist=['config'])
     else:

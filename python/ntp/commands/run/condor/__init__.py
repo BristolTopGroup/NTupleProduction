@@ -50,7 +50,7 @@ HDFS_STORE_BASE = "/hdfs/TopQuarkGroup/{user}".format(
     user=getpass.getuser())
 
 SETUP_SCRIPT = """
-tar -xvf ntp.tar.gz
+tar -xf ntp.tar.gz
 source bin/env.sh
 ntp setup from_tarball=cmssw_src.tar.gz
 
