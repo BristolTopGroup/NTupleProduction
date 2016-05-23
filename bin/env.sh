@@ -71,5 +71,14 @@ source /cvmfs/cms.cern.ch/crab3/crab_light.sh #funky behaviour if not used withi
 # for grid tools
 source /cvmfs/grid.cern.ch/etc/profile.d/setup-cvmfs-ui.sh
 
+# for hadoop, needs to run after grid tools
+if [[ -d "/usr/java/jdk1.7.0_67-cloudera" ]]; then
+	export JAVA_HOME=/usr/java/jdk1.7.0_67-cloudera
+	export PATH=$JAVA_HOME/bin:$PATH
+else
+	# use system default
+	export JAVA_HOME=
+fi
+
 unset old_ntpbase
 unset envscript
