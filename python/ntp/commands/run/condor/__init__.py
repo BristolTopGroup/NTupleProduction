@@ -27,11 +27,12 @@ from __future__ import print_function
 import os
 import getpass
 import logging
+import glob
 
 from .. import Command as C
 from crab.util import get_files
 from ntp import NTPROOT
-from ntp.commands.setup import WORKSPACE, LOGDIR, CACHEDIR
+from ntp.commands.setup import WORKSPACE, LOGDIR, CACHEDIR, RESULTDIR
 
 LOG = logging.getLogger(__name__)
 
@@ -41,11 +42,7 @@ except:
     LOG.error('Could not import htcondenser')
 
 
-CONDOR_LOGDIR = os.path.join(LOGDIR, 'condor')
-CONDOR_CACHE = os.path.join(CACHEDIR, 'condor')
-CONDOR_SETUP_SCRIPT = os.path.join(CONDOR_CACHE, 'setup.sh')
-CONDOR_RUN_SCRIPT = os.path.join(CONDOR_CACHE, 'run.sh')
-CONDOR_RUN_CONFIG = os.path.join(CONDOR_CACHE, 'config.json')
+CONDOR_ROOT = os.path.join(WORKSPACE, 'condor')
 HDFS_STORE_BASE = "/hdfs/TopQuarkGroup/{user}".format(
     user=getpass.getuser())
 
@@ -79,6 +76,8 @@ class Command(C):
 
     def run(self, args, variables):
         self.__prepare(args, variables)
+        self.__set_job_dirs()
+
         self.__create_folders()
 
         # create tarball
@@ -99,8 +98,33 @@ class Command(C):
 
         return True
 
+    def __set_job_dirs(self):
+        campaign = self.__variables['campaign']
+        dataset = self.__variables['dataset']
+        out_dir = os.path.join(CONDOR_ROOT, campaign, dataset)
+
+        existing_dirs = glob.glob(out_dir + '_*')
+        latest = 1
+        if existing_dirs:
+            latest = self.__find_highest_numbering(existing_dirs)
+            latest += 1
+        out_dir += '_{0}'.format(latest)
+
+        self.__job_dir = out_dir
+        self.__job_log_dir = os.path.join(self.__job_dir, 'log')
+        self.__setup_script = os.path.join(self.__job_dir, 'setup.sh')
+        self.__run_script = os.path.join(self.__job_dir, 'run.sh')
+        self.__run_config = os.path.join(self.__job_dir, 'config.json')
+
+    def __find_highest_numbering(self, folders):
+        numbers = []
+        for f in folders:
+            number = int(f.split('_')[-1])
+            numbers.append(number)
+        return max(numbers)
+
     def __create_folders(self):
-        dirs = [CONDOR_LOGDIR, CONDOR_CACHE]
+        dirs = [CONDOR_ROOT, self.__job_dir, self.__job_log_dir]
         for d in dirs:
             if not os.path.exists(d):
                 os.makedirs(d)
@@ -162,21 +186,21 @@ class Command(C):
         return output
 
     def __write_files(self):
-        with open(CONDOR_SETUP_SCRIPT, 'w+') as f:
+        with open(self.__setup_script, 'w+') as f:
             f.write(SETUP_SCRIPT)
 
-        with open(CONDOR_RUN_SCRIPT, 'w+') as f:
+        with open(self.__run_script, 'w+') as f:
             f.write(RUN_SCRIPT)
 
         import json
-        with open(CONDOR_RUN_CONFIG, 'w+') as f:
+        with open(self.__run_config, 'w+') as f:
             f.write(json.dumps(self.__config, indent=4))
 
     def __create_dag(self):
         """ Creates a Directional Acyclic Grag (DAG) for condor """
         dag_man = htc.DAGMan(
-            filename=os.path.join(CONDOR_LOGDIR, 'diamond.dag'),
-            status_file=os.path.join(CONDOR_LOGDIR, 'diamond.status'),
+            filename=os.path.join(self.__job_dir, 'diamond.dag'),
+            status_file=os.path.join(self.__job_dir, 'diamond.status'),
             dot='diamond.dot'
         )
 
@@ -197,16 +221,16 @@ class Command(C):
         input_files = run_config['files']
 
         job_set = htc.JobSet(
-            exe=CONDOR_RUN_SCRIPT,
+            exe=self.__run_script,
             copy_exe=True,
-            setup_script=CONDOR_SETUP_SCRIPT,
+            setup_script=self.__setup_script,
             filename=os.path.join(
-                CONDOR_CACHE, 'ntuple_production.condor'),
-            out_dir=CONDOR_LOGDIR,
+                self.__job_dir, 'ntuple_production.condor'),
+            out_dir=self.__job_log_dir,
             out_file=LOG_STEM + '.out',
-            err_dir=CONDOR_LOGDIR,
+            err_dir=self.__job_log_dir,
             err_file=LOG_STEM + '.err',
-            log_dir=CONDOR_LOGDIR,
+            log_dir=self.__job_log_dir,
             log_file=LOG_STEM + '.log',
             share_exe_setup=True,
             common_input_files=self.__input_files,
@@ -224,7 +248,14 @@ class Command(C):
                 output_file=output_file,
                 params=run_config['pyCfgParams']
             )
-            job = htc.Job(name='job_{0}'.format(i), args=args)
+            rel_out_dir = os.path.relpath(RESULTDIR, NTPROOT)
+            rel_log_dir = os.path.relpath(LOGDIR, NTPROOT)
+            rel_out_file = os.path.join(rel_out_dir, output_file)
+            rel_log_file = os.path.join(rel_out_dir, 'ntp.log')
+            job = htc.Job(
+                name='job_{0}'.format(i),
+                args=args,
+                output_files=[rel_out_file, rel_log_file])
             job_set.add_job(job)
             jobs.append(job)
         return jobs

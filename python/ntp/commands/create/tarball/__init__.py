@@ -72,7 +72,7 @@ class Command(C):
                     if base == path:
                         ignored_names.extend(fnmatch.filter(names, name))
             if ignored_names:
-                LOG.info(
+                LOG.debug(
                     'Ignoring in path {path}:\n\t{ignored}'.format(path=path, ignored=ignored_names))
             return set(ignored_names)
         return _ignore_patterns
