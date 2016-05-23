@@ -42,9 +42,11 @@ class Command(C):
             CMSSW_TAR, CMSSW_TAR + '.tar', CMSSW_TAR + '.tar.gz',
             NTP_TAR, NTP_TAR + '.tar', NTP_TAR + '.tar.gz',
         )
-        self.__make_snapshot(CMSSW_SRC, CMSSW_TAR, '.git*', 'data/test')
         self.__make_snapshot(
-            NTPROOT, NTP_TAR, '.git*', 'data/test', 'workspace*', '*.root', '.*')
+            CMSSW_SRC, CMSSW_TAR, '.git*', NTPROOT + '/data/test')
+        self.__make_snapshot(
+            NTPROOT, NTP_TAR, '.git*', NTPROOT + '/data/test',
+            NTPROOT + '/workspace*',  NTPROOT + '/*.root', '.*')
 
         self.__create_tar(CMSSW_TAR)
         self.__create_tar(NTP_TAR)
@@ -65,10 +67,13 @@ class Command(C):
                 # now check for folder
                 if '/' in pattern:
                     tokens = pattern.split('/')
-                    base = '/'.join(tokens[:-2])
+                    base = '/'.join(tokens[:-1])
                     name = tokens[-1]
-                    if base in path:
+                    if base == path:
                         ignored_names.extend(fnmatch.filter(names, name))
+            if ignored_names:
+                LOG.info(
+                    'Ignoring in path {path}:\n\t{ignored}'.format(path=path, ignored=ignored_names))
             return set(ignored_names)
         return _ignore_patterns
 
