@@ -16,7 +16,9 @@
 
 from __future__ import print_function
 import logging
+import os
 from ntp import NTPROOT
+from ntp.commands.setup import CMSSW_SRC
 
 from .. import Command as C
 
@@ -46,7 +48,25 @@ class Command(C):
             campaign=campaign,
             dataset=dataset,
         )
-        code, stdout, stderr = call(
-            'crab submit {0}'.format(crab_config), logger=LOG)
+        if not os.path.exists(crab_config):
+            LOG.error(
+                'Requested config file ({0}) does not exist!'.format(crab_config))
+            return False
+
+        LOG.info('Submitting config file {0} to the grid'.format(crab_config))
+
+        commands = [
+            'cd {CMSSW_SRC}',
+            'source /cvmfs/cms.cern.ch/cmsset_default.sh',
+            'eval `/cvmfs/cms.cern.ch/common/scram runtime -sh`',
+            'crab submit {crab_config}',
+        ]
+
+        all_in_one = ' && '.join(commands)
+        all_in_one = all_in_one.format(
+            CMSSW_SRC=CMSSW_SRC,
+            crab_config=crab_config
+        )
+        code, stdout, stderr = call(all_in_one, logger=LOG)
 
         return True
