@@ -22,6 +22,8 @@
                       given (comma-separated) list of files
             noop:     'NO OPeration', will do everything except submitting jobs.
                       Default: false
+            nevents:  Number of events to process.
+                      Default is all (-1).
 """
 from __future__ import print_function
 import os
@@ -68,6 +70,7 @@ class Command(C):
         'dataset': 'TTJets_PowhegPythia8',
         'files': '',
         'noop': False,
+        'nevents': -1,
     }
 
     def __init__(self, path=__file__, doc=__doc__):
