@@ -17,8 +17,8 @@ if not 'NTPROOT' in os.environ:
 # this is the NTupleVersion!
 __version__ = '0.0.1'
 NTPROOT = os.environ['NTPROOT']
-WORKSPACE = NTPROOT + '/workspace'
-CRAB_WS = WORKSPACE + '/crab'
+WORKSPACE = os.path.join(NTPROOT, 'workspace')
+CRAB_WS = os.path.join(WORKSPACE, 'crab')
 TODAY = datetime.date.today().isoformat()
 PSET = NTPROOT + '/python/run/miniAODToNTuple_cfg.py'
 INPUT_FILES = [

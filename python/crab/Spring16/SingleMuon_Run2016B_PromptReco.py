@@ -9,5 +9,5 @@ config.Data.outLFNDirBase += '/' + CAMPAIGN
 config.Data.inputDataset = '/SingleElectron/Run2016B-PromptReco-v1/MINIAOD'
 config.Data.splitting = 'EventAwareLumiBased'
 config.Data.unitsPerJob = 500000
-
+config.JobType.pyCfgParams = ['isData=1']
 

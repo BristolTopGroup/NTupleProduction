@@ -45,8 +45,9 @@ def generate_crab_configs():
                 # data
                 unitsPerJob = 500000
                 splitting = 'EventAwareLumiBased'
+                extras = "config.JobType.pyCfgParams = ['isData=1']"
                 if campaign in LUMI_MASKS:
-                    extras = "config.Data.lumiMask = '{0}'".format(
+                    extras += "\nconfig.Data.lumiMask = '{0}'".format(
                         LUMI_MASKS[campaign])
 
             with open(file_path, 'w+') as f:
