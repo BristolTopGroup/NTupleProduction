@@ -1,6 +1,5 @@
 import os
 import pwd
-import subprocess
 import logging
 import copy
 
@@ -59,21 +58,37 @@ class Command(object):
     def __prepare(self, args, variables):
         self.__set_variables(variables)
         if self.REQUIRE_GRID_CERT:
-            proxy = '/tmp/x509up_u{0}'.format(pwd.getpwuid(os.getuid()).pw_uid)
-            if not self.__has_valid_proxy(proxy):
-                subprocess.call(
-                    ['voms-proxy-init', '-voms', 'cms'], shell=True)
+            if not self.__has_valid_proxy():
+                self.__create_proxy()
 
-    def __has_valid_proxy(self, proxy):
+    def __create_proxy(self):
+        import subprocess
+        vo = 'cms'
+        hours = str(24 * 7)
+        command = ['voms-proxy-init', '-voms', vo, '-hours', hours]
+        subprocess.call(command, shell=True)
+
+    def __has_valid_proxy(self):
         from ntp.interpreter import call
+        proxy = '/tmp/x509up_u{0}'.format(pwd.getpwuid(os.getuid()).pw_uid)
         is_valid = os.path.isfile(proxy)
         if is_valid:
-            _, stdout, _ = call(
-                'voms-proxy-info --timeleft', logger=LOG, shell=True)
+            _, stdout, stderr = call(
+                'voms-proxy-info --timeleft',
+                logger=LOG,
+                shell=True)
             try:
-                time_left = int(stdout)
+                # depending on the voms-proxy version
+                # the result might end up in either stdout or stderr
+                if stdout:
+                    time_left = int(stdout)
+                else:
+                    time_left = int(stderr)
             except:
                 time_left = 0
+                LOG.warning(
+                    'Proxy exists but could not read time left on proxy.')
+
             LOG.info('Time left on proxy: {0} min'.format(time_left / 60))
             if time_left < (60 * 30):  # less than 30min
                 is_valid = False
