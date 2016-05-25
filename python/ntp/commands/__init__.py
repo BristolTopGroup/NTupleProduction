@@ -73,17 +73,12 @@ class Command(object):
         proxy = '/tmp/x509up_u{0}'.format(pwd.getpwuid(os.getuid()).pw_uid)
         is_valid = os.path.isfile(proxy)
         if is_valid:
-            _, stdout, stderr = call(
+            _, stdout, _ = call(
                 'voms-proxy-info --timeleft',
                 logger=LOG,
                 shell=True)
             try:
-                # depending on the voms-proxy version
-                # the result might end up in either stdout or stderr
-                if stdout:
-                    time_left = int(stdout)
-                else:
-                    time_left = int(stderr)
+                time_left = int(stdout)
             except:
                 time_left = 0
                 LOG.warning(

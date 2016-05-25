@@ -264,13 +264,10 @@ def run_command(args):
     if not args:
         return
 
-    found_command = False
-    # loop (backwards) through all parameters and find the correct command
     command, arguments = _find_command_and_args(args)
     parameters, variables = _parse_args(arguments)
 
     if command is None:
-        LOG.error('Invalid command "{0}"'.format(args[0]))
         LOG.error('Invalid command "{0}"'.format(args[0]))
         LOG.info('Known commands:\n' + '\n '.join(COMMANDS.keys()))
         return -1
@@ -312,5 +309,13 @@ def call(cmd_and_args, logger, stdout_log_level=logging.DEBUG, stderr_log_level=
 
     return_code = child.wait()
     stdout, stderr = outputs.values()
+
+    # fix for stupid cmsenv behaviour
+    # (cmsenv will cause the stdout to go to stderr instead)
+    if 'CMSSW_BASE' in os.environ and stdout == '':
+        msg = 'CMSSW_BASE is set which causes stdout to '
+        msg += 'go to stderr instead. Copying stderr to stdout to fix this.'
+        logger.warning(msg)
+        stdout = stderr
 
     return return_code, stdout, stderr
