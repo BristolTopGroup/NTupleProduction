@@ -21,8 +21,8 @@ export CMSSW_GIT_REFERENCE=/cvmfs/cms.cern.ch/cmssw.git
 # Set up the CMSSW release
 export SCRAM_ARCH=slc6_amd64_gcc493
 
-cmsrel CMSSW_7_6_3_patch2
-cd CMSSW_7_6_3_patch2/src/
+cmsrel CMSSW_8_0_7_patch2
+cd CMSSW_8_0_7_patch2/src/
 cmsenv
 git cms-init
 # Do merge-topics and addpkgs first if needed
@@ -32,7 +32,7 @@ git-cms-merge-topic jhgoh:PseudoTop76
 
 
 # Clone our main ntuple producing software and checkout run2 branch
-git clone git@github.com:BristolTopGroup/NTupleProduction.git BristolAnalysis/NTupleTools
+git clone git@github.com:BristolTopGroup/NTupleProduction.git  
 cd BristolAnalysis/NTupleTools
 # optional for development
 git remote rename origin upstream
@@ -50,6 +50,8 @@ cd ../../
 
 # Compile
 scramv1 b -j 8
+cd BristolAnalysis/NTupleTools
+source bin/env.sh
 
 #test release
 ### Not yet available

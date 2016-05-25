@@ -1,14 +1,14 @@
-BASE = """
-from crab.base import config
-NAME = __file__.split('/')[-1]
-NAME = NAME.replace('.py', '')
+BASE = """from crab.base import config
+NAME = __file__.split('/')[-1].replace('.pyc', '')
+NAME = NAME.split('/')[-1].replace('.py', '')
+CAMPAIGN = __file__.split('/')[-2]
 
 config.General.requestName = NAME
 config.Data.outputDatasetTag = NAME
+config.Data.outLFNDirBase += '/' + CAMPAIGN
 config.Data.inputDataset = '{dataset}'
 config.Data.splitting = '{splitting}'
 config.Data.unitsPerJob = {unitsPerJob}
-config.Data.outLFNDirBase += '/{campaign}'
 {extras}
 
 """
@@ -45,8 +45,9 @@ def generate_crab_configs():
                 # data
                 unitsPerJob = 500000
                 splitting = 'EventAwareLumiBased'
+                extras = "config.JobType.pyCfgParams = ['isData=1']"
                 if campaign in LUMI_MASKS:
-                    extras = "config.Data.lumiMask = '{0}'".format(
+                    extras += "\nconfig.Data.lumiMask = '{0}'".format(
                         LUMI_MASKS[campaign])
 
             with open(file_path, 'w+') as f:

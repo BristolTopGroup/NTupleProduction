@@ -5,6 +5,12 @@ import os
 import shlex
 import types
 import sys
+import logging
+import select
+import subprocess
+import resource
+
+LOG = logging.getLogger(__name__)
 
 try:
     import importlib
@@ -22,6 +28,24 @@ COMMAND_PATH = os.path.join(CURRENT_PATH, 'commands')
 
 PATH_TO_BASE = os.path.join(CURRENT_PATH, '..')
 BASE_MODULE = 'ntp.commands'
+
+
+def time_function(name, logger):
+    def _time_function(function):
+        def __time_function(*args, **kwargs):
+            usage_start = resource.getrusage(resource.RUSAGE_CHILDREN)
+            result = function(*args, **kwargs)
+            usage_end = resource.getrusage(resource.RUSAGE_CHILDREN)
+
+            cpu_time = usage_end.ru_utime - usage_start.ru_utime
+            # RSS = https://en.wikipedia.org/wiki/Resident_set_size
+            memory = usage_end.ru_maxrss / 1024.  # now in MB
+            msg = "Ran '{name}' in {cpu_time:.1f}s and used {memory:.1f}MB of RAM"
+            msg = msg.format(name=name, cpu_time=cpu_time, memory=memory)
+            logger.info(msg)
+            return result
+        return __time_function
+    return _time_function
 
 
 def __build_hierarchy(hierarchy, path, command):
@@ -76,7 +100,6 @@ def __get_commands(command_path):
         # If it's the current directory, ignore
         if relative_path == '.':
             continue
-
         # Convert directory structure to module path
         relative_path = relative_path.replace('/', '.')
         absolute_path = '{0}.{1}'.format(BASE_MODULE, relative_path)
@@ -88,8 +111,12 @@ def __get_commands(command_path):
             if hasattr(mod, 'Command'):
                 if type(mod.Command) is type(object):
                     commands[relative_path] = mod.Command
+                    LOG.debug('Adding new command: relative_path')
                     __build_hierarchy(hierarchy, relative_path, mod.Command)
         except ImportError, e:
+            import traceback
+            LOG.error('Could not import {0}'.format(absolute_path))
+            LOG.error(traceback.format_exc())
             continue
 
     return commands, hierarchy
@@ -152,13 +179,12 @@ def __execute(command, parameters, variables):
     try:
         rc = command.run(parameters, variables)
     except Exception, e:
-        print('Command failed: ' + str(e), file=sys.stderr)
+        import traceback
+        LOG.error('Command failed: ' + traceback.format_exc())
 
     text = command.get_text()
     if len(text) > 0:
-        print(text, end='')
-        if text[len(text) - 1] != '\n':
-            print()
+        LOG.info(text)
     if rc is True:
         return 0
     return -1
@@ -179,7 +205,7 @@ def _convert(value):
         f = float(s)
         return f
     except ValueError:
-        pass
+        LOG.debug('Could not convert "{0}" to bool'.format(value))
 
     # otherwise assume string
     return value
@@ -244,10 +270,47 @@ def run_command(args):
     parameters, variables = _parse_args(arguments)
 
     if command is None:
-        print('Error - Invalid command "{0}"'.format(args[0]), file=sys.stderr)
-        print('Known commands:\n', '\n '.join(COMMANDS.keys()))
+        LOG.error('Invalid command "{0}"'.format(args[0]))
+        LOG.error('Invalid command "{0}"'.format(args[0]))
+        LOG.info('Known commands:\n' + '\n '.join(COMMANDS.keys()))
         return -1
 
     # log command
     # execute
     __execute(command, parameters, variables)
+
+
+def call(cmd_and_args, logger, stdout_log_level=logging.DEBUG, stderr_log_level=logging.ERROR, **kwargs):
+    """
+    Variant of subprocess.call that accepts a logger instead of stdout/stderr,
+    and logs stdout messages via logger.debug and stderr messages via
+    logger.error.
+    From: https://gist.github.com/bgreenlee/1402841
+    """
+    child = subprocess.Popen(cmd_and_args, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, **kwargs)
+
+    log_level = {child.stdout: stdout_log_level,
+                 child.stderr: stderr_log_level}
+
+    outputs = {child.stdout: '',
+               child.stderr: ''}
+
+    def check_io():
+        ready_to_read = select.select(
+            [child.stdout, child.stderr], [], [], 1000)[0]
+        for io in ready_to_read:
+            line = io.readline()
+            outputs[io] += line[:-1]
+            logger.log(log_level[io], line[:-1])
+
+    # keep checking stdout/stderr until the child exits
+    while child.poll() is None:
+        check_io()
+
+    check_io()  # check again to catch anything after the process exits
+
+    return_code = child.wait()
+    stdout, stderr = outputs.values()
+
+    return return_code, stdout, stderr

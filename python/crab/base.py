@@ -1,8 +1,12 @@
 import os
 import datetime
+import logging
 from WMCore.Configuration import Configuration
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRABClientLibraryAPI
-from CRABClient.UserUtilities import getUsernameFromSiteDB
+from CRABClient.UserUtilities import getUsernameFromSiteDB, UsernameException
+from crab.util import get_user
+LOG = logging.getLogger(__name__)
+USER = get_user()
 
 # env variables
 if not 'NTPROOT' in os.environ:
@@ -13,9 +17,9 @@ if not 'NTPROOT' in os.environ:
 # this is the NTupleVersion!
 __version__ = '0.0.1'
 NTPROOT = os.environ['NTPROOT']
-WORKSPACE = NTPROOT + '/workspace'
-CRAB_WS = WORKSPACE + '/crab'
-TODAY = date.today().isoformat()
+WORKSPACE = os.path.join(NTPROOT, 'workspace')
+CRAB_WS = os.path.join(WORKSPACE, 'crab')
+TODAY = datetime.date.today().isoformat()
 PSET = NTPROOT + '/python/run/miniAODToNTuple_cfg.py'
 INPUT_FILES = [
     'data/BTagSF/CSVv2.csv',
@@ -43,7 +47,7 @@ config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 10
 config.Data.outLFNDirBase = '/store/user/{user}/ntuple/v{version}'.format(
-    user=getUsernameFromSiteDB(), version=__version__)
+    user=USER, version=__version__)
 config.Data.publication = True
 # config.Data.ignoreLocality = True
 

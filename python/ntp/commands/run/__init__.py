@@ -34,3 +34,17 @@ class Command(C):
 
     def __prepare(self, args, variables):
         super(Command, self).__prepare(args, variables)
+
+    def __extract_params(self):
+        args = []
+        for var, value in self.__variables.items():
+            if var in self.DEFAULTS:
+                continue
+            args.append('{0}={1}'.format(var, value))
+        return ' '.join(args)
+
+    def __format_input_files(self, input_files):
+        results = []
+        for f in input_files:
+            results.append('"{0}"'.format(f))
+        return ',\n'.join(results)

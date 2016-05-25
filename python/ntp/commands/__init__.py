@@ -1,6 +1,10 @@
 import os
 import pwd
 import subprocess
+import logging
+import copy
+
+LOG = logging.getLogger(__name__)
 
 
 class Command(object):
@@ -17,10 +21,10 @@ class Command(object):
             self.__name = parent_folder
         self.__doc = doc
         self.__text = ''
-        self.__variables = self.DEFAULTS
+        self.__variables = copy.deepcopy(self.DEFAULTS)
 
-    def _execute(self):
-        pass
+    def __can_run(self):
+        return True
 
     def run(self, args, variables):
         """
@@ -56,6 +60,21 @@ class Command(object):
         self.__set_variables(variables)
         if self.REQUIRE_GRID_CERT:
             proxy = '/tmp/x509up_u{0}'.format(pwd.getpwuid(os.getuid()).pw_uid)
-            if not os.path.isfile(proxy):
+            if not self.__has_valid_proxy(proxy):
                 subprocess.call(
                     ['voms-proxy-init', '-voms', 'cms'], shell=True)
+
+    def __has_valid_proxy(self, proxy):
+        from ntp.interpreter import call
+        is_valid = os.path.isfile(proxy)
+        if is_valid:
+            _, stdout, _ = call(
+                'voms-proxy-info --timeleft', logger=LOG, shell=True)
+            try:
+                time_left = int(stdout)
+            except:
+                time_left = 0
+            LOG.info('Time left on proxy: {0} min'.format(time_left / 60))
+            if time_left < (60 * 30):  # less than 30min
+                is_valid = False
+        return is_valid

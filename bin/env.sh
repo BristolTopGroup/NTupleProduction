@@ -65,10 +65,20 @@ export CMSSW_GIT_REFERENCE=/cvmfs/cms.cern.ch/cmssw.git
 
 # CRAB submission
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3Releases#Improvements_enhancements_change
-source /cvmfs/cms.cern.ch/crab3/crab_light.sh
+#source /cvmfs/cms.cern.ch/crab3/crab_light.sh #funky behaviour if not used within CMSSW
+source /cvmfs/cms.cern.ch/crab3/crab.sh
 
 # for grid tools
-source /cvmfs/grid.cern.ch/etc/profile.d/setup-cvmfs-ui.sh
+#source /cvmfs/grid.cern.ch/etc/profile.d/setup-cvmfs-ui.sh
+
+# for hadoop, needs to run after grid tools
+#if [[ -d "/usr/java/jdk1.7.0_67-cloudera" ]]; then
+#	export JAVA_HOME=/usr/java/jdk1.7.0_67-cloudera
+#	export PATH=$JAVA_HOME/bin:$PATH
+#else
+#	# use system default
+#	export JAVA_HOME=
+#fi
 
 unset old_ntpbase
 unset envscript
