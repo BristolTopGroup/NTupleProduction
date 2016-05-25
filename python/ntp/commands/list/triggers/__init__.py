@@ -1,9 +1,8 @@
 """
-    list nevents:
-        Lists the number of events in a given file
-        
-    Usage:
-        list nevents <path to ROOT file>
+    list triggers:    lists all HLT triggers for a file
+
+        Usage:
+            list triggers <path to ROOT file>
 """
 import logging
 import os
@@ -14,14 +13,14 @@ from ntp.interpreter import time_function
 LOG = logging.getLogger(__name__)
 CURRENT_FOLDER = os.path.dirname(os.path.abspath(__file__))
 XROOTD_SERVER = 'xrootd-cms.infn.it'
-
+IDENTIFIER = '=============='
 
 class Command(C):
 
     def __init__(self, path=__file__, doc=__doc__):
         super(Command, self).__init__(path, doc)
 
-    @time_function('list nevents', LOG)
+    @time_function('list triggers', LOG)
     def run(self, args, variables):
         self.__prepare(args, variables)
         input_file = args[0]
@@ -34,7 +33,7 @@ class Command(C):
                 XROOTD_SERVER=XROOTD_SERVER,
                 input_file=input_file
             )
-
+        self.__input_file = input_file
         commands = [
             'cd {CMSSW_SRC}',
             'source /cvmfs/cms.cern.ch/cmsset_default.sh',
@@ -54,9 +53,47 @@ class Command(C):
             [all_in_one], LOG, stdout_log_level=logging.DEBUG, shell=True)
 
         if code == 0:
-            self.__text = 'Found {0} events in file {1}'.format(stdout, input_file)
+            self.__extract_triggers(stdout, stderr)
         else:
             LOG.error('An error occured: ' + stderr)
             return False
 
         return True
+
+    def __extract_triggers(self, stdout, stderr):
+        import json
+        stdout = self.__clean_stdout(stdout)
+        result = {}
+        try:
+            result = json.loads(stdout)
+        except ValueError:
+            import traceback
+            LOG.error('Could not read triggers')
+            LOG.error(traceback.format_exc())
+            
+
+        if result:
+            triggers = result['triggers']
+            self.__text = 'Found {0} triggers in file {1}:\n'.format(
+                len(triggers), self.__input_file)
+            self.__print_triggers(triggers)
+        else:
+            LOG.error('An error occured: ' + stderr)
+            
+    def __clean_stdout(self, stdout):
+        import re
+        regex = '({0})(.*?)({0})'.format(IDENTIFIER)
+        m = re.search(regex, stdout)
+        result = stdout
+        if m:
+            # 1st group == IDENTIFIER
+            # 2nd group json
+            # 3rd group == IDENTIFIER
+            result = m.group(2)
+            return result
+        return result
+        
+
+    def __print_triggers(self, triggers):
+        for t in triggers:
+            self.__text += '\t{name}, prescale={prescale}\n'.format(**t)
