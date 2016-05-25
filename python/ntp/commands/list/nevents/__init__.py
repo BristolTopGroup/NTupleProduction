@@ -54,6 +54,7 @@ class Command(C):
             [all_in_one], LOG, stdout_log_level=logging.DEBUG, shell=True)
 
         if code == 0:
+            stdout = stdout.replace('Welcome to rootlogon.C', '')
             self.__text = 'Found {0} events in file {1}'.format(stdout, input_file)
         else:
             LOG.error('An error occured: ' + stderr)
