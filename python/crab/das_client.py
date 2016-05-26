@@ -283,14 +283,18 @@ def get_data(host, query, idx, limit, debug, threshold=300, ckey=None,
     cookie_jar     = cookielib.CookieJar()
     cookie_handler = urllib2.HTTPCookieProcessor(cookie_jar)
 
+    handlers = [http_hdlr, proxy_handler, cookie_handler]
     # fix for <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed
-    import ssl
-    context = ssl.create_default_context()
-    context.check_hostname = False
-    context.verify_mode = ssl.CERT_NONE
-    https_handler = urllib2.HTTPSHandler(context = context)
+    # starting with python 2.7.9 urllib verifies every https request
+    if sys.version_info >= (2, 7, 9):
+        import ssl
+        context = ssl.create_default_context()
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
+        https_handler = urllib2.HTTPSHandler(context = context)
+        handlers.append(https_handler)
 
-    opener = urllib2.build_opener(http_hdlr, proxy_handler, cookie_handler, https_handler)
+    opener = urllib2.build_opener(*handlers)
     fdesc = opener.open(req)
     data = fdesc.read()
     fdesc.close()
