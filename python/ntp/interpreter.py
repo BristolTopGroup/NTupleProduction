@@ -178,7 +178,7 @@ def __execute(command, parameters, variables):
     rc = False
     try:
         rc = command.run(parameters, variables)
-    except Exception, e:
+    except Exception:
         import traceback
         LOG.error('Command failed: ' + traceback.format_exc())
 
@@ -274,7 +274,7 @@ def run_command(args):
 
     # log command
     # execute
-    __execute(command, parameters, variables)
+    return __execute(command, parameters, variables)
 
 
 def call(cmd_and_args, logger, stdout_log_level=logging.DEBUG, stderr_log_level=logging.ERROR, **kwargs):
