@@ -184,10 +184,15 @@ class Command(C):
 
     def __replace_output_dir(self, run_config):
         output = run_config['outLFNDirBase']
+        LOG.debug('Replacing output directory {0}'.format(output))
         if output.startswith('/store/user'):
             tokens = output.split('/')
-            output = os.path.join(HDFS_STORE_BASE, '/'.join(tokens[4:]))
+            base = '/'.join(tokens[4:])
+            LOG.debug('Taking base of {0}'.format(base))
+            LOG.debug('and replacing with '.format(HDFS_STORE_BASE))
+            output = os.path.join(HDFS_STORE_BASE, base)
             output = os.path.join(output, run_config['outputDatasetTag'])
+            LOG.debug('Final output directory: {0}'.format(output))
         return output
 
     def __write_files(self):
