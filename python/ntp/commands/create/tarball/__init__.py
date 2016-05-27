@@ -14,7 +14,7 @@ import shutil
 
 from .. import Command as C
 from ntp.interpreter import time_function
-from ntp.commands.setup import CMSSW_SRC, TMPDIR
+from ntp.commands.setup import CMSSW_SRC, TMPDIR, DESTINATION
 from ntp import NTPROOT
 
 CMSSW_TAR = os.path.join(TMPDIR, 'cmssw_src')
@@ -42,8 +42,9 @@ class Command(C):
             CMSSW_TAR, CMSSW_TAR + '.tar', CMSSW_TAR + '.tar.gz',
             NTP_TAR, NTP_TAR + '.tar', NTP_TAR + '.tar.gz',
         )
+        test_data = os.path.join(CMSSW_SRC, DESTINATION, 'data/test')
         self.__make_snapshot(
-            CMSSW_SRC, CMSSW_TAR, '.git*', NTPROOT + '/data/test')
+            CMSSW_SRC, CMSSW_TAR, '.git*', test_data)
         self.__make_snapshot(
             NTPROOT, NTP_TAR, '.git*', NTPROOT + '/data/test',
             NTPROOT + '/workspace*',  NTPROOT + '/*.root', '.*')
