@@ -4,7 +4,7 @@ from shutil import move
 from os import remove
 import os
 
-version = '11'
+version = '13'
 crabWorkArea = 'workdirCrab/v'+version+'/'+str(date.today())
 print 'Using workdir ',crabWorkArea
 miniAodDir = 'BristolAnalysis/NTupleTools/python/crab/FALL15/'
@@ -22,16 +22,16 @@ miniAodDir + 'TTJets_PowhegPythia8.py',
 
 # Backgrounds and Tunes/Generators
 miniAodDir + 'DYJetsToLL_M50.py',
-miniAodDir + 'GJets_100to200.py',
-miniAodDir + 'GJets_200to400.py',
-miniAodDir + 'GJets_400to600.py',
-miniAodDir + 'GJets_600toInf.py',
+# miniAodDir + 'GJets_100to200.py',
+# miniAodDir + 'GJets_200to400.py',
+# miniAodDir + 'GJets_400to600.py',
+# miniAodDir + 'GJets_600toInf.py',
 miniAodDir + 'QCD_EMEnriched_120to170.py',
 miniAodDir + 'QCD_EMEnriched_15to20.py',
 miniAodDir + 'QCD_EMEnriched_170to300.py',
 miniAodDir + 'QCD_EMEnriched_20to30.py',
 miniAodDir + 'QCD_EMEnriched_300toInf.py',
-# miniAodDir + 'QCD_EMEnriched_30to50.py',
+miniAodDir + 'QCD_EMEnriched_30to50.py',
 miniAodDir + 'QCD_EMEnriched_50to80.py',
 miniAodDir + 'QCD_EMEnriched_80to120.py',
 miniAodDir + 'QCD_MuEnriched_1000toInf.py',
