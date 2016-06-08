@@ -24,6 +24,7 @@
                       Default: false
             nevents:  Number of events to process.
                       Default is all (-1).
+            test:     Run just one job for testing. Default: false.
 """
 from __future__ import print_function
 import os
@@ -71,6 +72,7 @@ class Command(C):
         'files': '',
         'noop': False,
         'nevents': -1,
+        'test': False,
     }
 
     def __init__(self, path=__file__, doc=__doc__):
@@ -222,6 +224,8 @@ class Command(C):
 
         run_config = self.__config
         input_files = run_config['files']
+        if self.__variables['test']:
+            input_files = [input_files[0]]
 
         job_set = htc.JobSet(
             exe=self.__run_script,

@@ -93,12 +93,20 @@ class Command(C):
         self.__write_pset(input_files)
 
         if not self.__variables['noop']:
-            self.__run_cmssw()
+            code = self.__run_cmssw()
             self.__text = "Ran {PSET}\n"
-            self.__text += "Created ntuples: {OUTPUT_FILE}\n"
-            self.__text += "Logging information can be found in {LOGDIR}/ntp.log"
-            self.__text = self.__text.format(
-                PSET=PSET, LOGDIR=LOGDIR, OUTPUT_FILE=self.__output_file)
+            self.__text += "Logging information can be found in {LOGDIR}/ntp.log\n"
+            if code == 0:
+                self.__text += "Created ntuples: {OUTPUT_FILE}\n"
+                self.__text = self.__text.format(
+                    PSET=PSET, LOGDIR=LOGDIR, OUTPUT_FILE=self.__output_file)
+            else:
+                self.__text += "CMSSW experienced an error,"
+                self.__text += " return code: {code}\n"
+                self.__text = self.__text.format(
+                    PSET=PSET, LOGDIR=LOGDIR, code=code)
+                return False
+
         else:
             LOG.info('Found "noop", not running CMSSW')
 
@@ -131,4 +139,7 @@ class Command(C):
 
         LOG.info("Executing cmsRun")
         from ntp.interpreter import call
-        call([all_in_one], LOG, stdout_log_level=logging.INFO, shell=True)
+        code, _, _ = call(
+            [all_in_one], LOG, stdout_log_level=logging.INFO, shell=True)
+
+        return code
