@@ -118,7 +118,9 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "medium_btagSF" + suffix);
 	produces < std::vector<double> > (prefix + "medium_btagSFUp" + suffix);
 	produces < std::vector<double> > (prefix + "medium_btagSFDown" + suffix);
-
+	produces < std::vector<double> > (prefix + "tight_btagSF" + suffix);
+	produces < std::vector<double> > (prefix + "tight_btagSFUp" + suffix);
+	produces < std::vector<double> > (prefix + "tight_btagSFDown" + suffix);
 	// JER information
 	// produces < std::vector<double> > (prefix + "jer" + suffix);
 	// produces < std::vector<double> > (prefix + "jerSF" + suffix);
@@ -209,6 +211,9 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<double> > medium_btagSF(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > medium_btagSF_up(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > medium_btagSF_down(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > tight_btagSF(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > tight_btagSF_up(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > tight_btagSF_down(new std::vector<double>());
 
 	// std::auto_ptr < std::vector<double> > jer(new std::vector<double>());
 	// std::auto_ptr < std::vector<double> > jerSF(new std::vector<double>());
@@ -595,6 +600,23 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				medium_btagSF->push_back( jet_weight );
 				medium_btagSF_up->push_back( jet_weight_up );
 				medium_btagSF_down->push_back( jet_weight_down );
+
+				jet_weight = 999;
+				jet_weight_up = 999;
+				jet_weight_down = 999;	
+				if (jet_flavour == 5 || jet_flavour == 4) {
+					jet_weight = returnBTagSF(it, tight_reader_bc, bTagEntryJetFlavour);
+					jet_weight_up = returnBTagSF(it, tight_reader_bc_up, bTagEntryJetFlavour);
+					jet_weight_down = returnBTagSF(it, tight_reader_bc_down, bTagEntryJetFlavour);
+				}
+				else{
+					jet_weight = returnBTagSF(it, tight_reader_udsg, bTagEntryJetFlavour);
+					jet_weight_up = returnBTagSF(it, tight_reader_udsg_up, bTagEntryJetFlavour);
+					jet_weight_down = returnBTagSF(it, tight_reader_udsg_down, bTagEntryJetFlavour);			
+				}
+				tight_btagSF->push_back( jet_weight );
+				tight_btagSF_up->push_back( jet_weight_up );
+				tight_btagSF_down->push_back( jet_weight_down );
 			}
 
 			//jet-vertex association
@@ -686,6 +708,9 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(medium_btagSF_up, prefix + "medium_btagSFUp" + suffix);
 	iEvent.put(medium_btagSF_down, prefix + "medium_btagSFDown" + suffix);
 
+	iEvent.put(tight_btagSF, prefix + "tight_btagSF" + suffix);
+	iEvent.put(tight_btagSF_up, prefix + "tight_btagSFUp" + suffix);
+	iEvent.put(tight_btagSF_down, prefix + "tight_btagSFDown" + suffix);
 	// iEvent.put(jer, prefix + "jer" + suffix);
 	// iEvent.put(jerSF, prefix + "jerSF" + suffix);
 	// iEvent.put(jerSF_up, prefix + "jerSFUp" + suffix);
