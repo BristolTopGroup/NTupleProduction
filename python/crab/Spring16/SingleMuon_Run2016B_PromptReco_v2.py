@@ -6,8 +6,8 @@ CAMPAIGN = __file__.split('/')[-2]
 config.General.requestName = NAME
 config.Data.outputDatasetTag = NAME
 config.Data.outLFNDirBase += '/' + CAMPAIGN
-config.Data.inputDataset = '/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
-config.Data.splitting = 'FileBased'
-config.Data.unitsPerJob = 10
-
+config.Data.inputDataset = '/SingleElectron/Run2016B-PromptReco-v2/MINIAOD'
+config.Data.splitting = 'EventAwareLumiBased'
+config.Data.unitsPerJob = 500000
+config.JobType.pyCfgParams = ['isData=1']
 
