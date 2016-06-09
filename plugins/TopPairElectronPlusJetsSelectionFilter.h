@@ -96,6 +96,7 @@ public:
     virtual bool hasExactlyOneGoodBJet() const;
 	virtual bool hasAtLeastOneGoodBJet() const;
 	virtual bool hasAtLeastTwoGoodBJets() const;
+	virtual bool hasAtLeastTwoGoodTightBJets() const;
 
 private:
 	virtual void setupEventContent(edm::Event& iEvent, const edm::EventSetup& iSetup);
@@ -131,6 +132,7 @@ private:
 
 	std::string bJetDiscriminator_;
 	double minBJetDiscriminator_;
+	double tightBJetDiscriminator_;
 
 	double tightElectronIso_EB_, tightElectronIso_EE_, controlElectronIso_;
 
@@ -150,7 +152,7 @@ private:
 	boost::array<bool, TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS> passes_;
 	unsigned int runNumber_, signalElectronIndex_;
 	bool isRealData_, hasSignalElectron_;
-	std::vector< unsigned int> cleanedJetIndex_, cleanedBJetIndex_;
+	std::vector< unsigned int> cleanedJetIndex_, cleanedBJetIndex_,  cleanedTightBJetIndex_;
 	pat::JetCollection jets_, cleanedJets_, cleanedBJets_;
     edm::Handle<edm::View<pat::Electron> > electrons_;
 	pat::ElectronCollection goodIsolatedElectrons_, looseElectrons_;
