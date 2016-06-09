@@ -563,16 +563,11 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			// Read and store b tagging scale factors for MC
 			if (!iEvent.isRealData()) {
 
+				unsigned int flav = it->hadronFlavour()
 				unsigned int bTagEntryJetFlavour = 999;
-				if ( fabs( it->partonFlavour() ) == 5 ) {
-					bTagEntryJetFlavour = 0;
-				}
-				else if ( fabs( it->partonFlavour() ) == 4 ) {
-					bTagEntryJetFlavour = 1;
-				}
-				else if ( fabs( it->partonFlavour() ) == 21 || ( fabs( it->partonFlavour() ) <= 3 && fabs( it->partonFlavour() ) >= 0 ) ) {
-					bTagEntryJetFlavour = 2;
-				}
+				if ( flav == 5 ) bTagEntryJetFlavour = 0;
+				else if ( flav == 4 ) bTagEntryJetFlavour = 1;
+				else if ( flav == 0 ) ) bTagEntryJetFlavour = 2;
 
 				double jet_weight = 999;
 				double jet_weight_up = 999;
