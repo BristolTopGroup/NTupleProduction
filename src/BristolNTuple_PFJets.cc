@@ -112,12 +112,12 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	//b-tagging information
 	produces < std::vector<double> > (prefix + "combinedInclusiveSecondaryVertexV2BJetTags" + suffix);
 	produces < std::vector<bool> > (prefix + "passesMediumCSV" + suffix);
-	produces < std::vector<double> > (prefix + "medium_btagSF" + suffix);
-	produces < std::vector<double> > (prefix + "medium_btagSFUp" + suffix);
-	produces < std::vector<double> > (prefix + "medium_btagSFDown" + suffix);
-	produces < std::vector<double> > (prefix + "tight_btagSF" + suffix);
-	produces < std::vector<double> > (prefix + "tight_btagSFUp" + suffix);
-	produces < std::vector<double> > (prefix + "tight_btagSFDown" + suffix);
+	produces < std::vector<double> > (prefix + "mediumBTagSF" + suffix);
+	produces < std::vector<double> > (prefix + "mediumBTagSFUp" + suffix);
+	produces < std::vector<double> > (prefix + "mediumBTagSFDown" + suffix);
+	produces < std::vector<double> > (prefix + "tightBTagSF" + suffix);
+	produces < std::vector<double> > (prefix + "tightBTagSFUp" + suffix);
+	produces < std::vector<double> > (prefix + "tightBTagSFDown" + suffix);
 	// JER information
 	// produces < std::vector<double> > (prefix + "jer" + suffix);
 	// produces < std::vector<double> > (prefix + "jerSF" + suffix);
@@ -701,13 +701,13 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(combinedInclusiveSecondaryVertexV2BJetTags, prefix + "combinedInclusiveSecondaryVertexV2BJetTags" + suffix);
 	iEvent.put(passesMediumCSV, prefix + "passesMediumCSV" + suffix);
 	
-	iEvent.put(medium_btagSF, prefix + "medium_btagSF" + suffix);
-	iEvent.put(medium_btagSF_up, prefix + "medium_btagSFUp" + suffix);
-	iEvent.put(medium_btagSF_down, prefix + "medium_btagSFDown" + suffix);
+	iEvent.put(medium_btagSF, prefix + "mediumBTagSF" + suffix);
+	iEvent.put(medium_btagSF_up, prefix + "mediumBTagSFUp" + suffix);
+	iEvent.put(medium_btagSF_down, prefix + "mediumBTagSFDown" + suffix);
 
-	iEvent.put(tight_btagSF, prefix + "tight_btagSF" + suffix);
-	iEvent.put(tight_btagSF_up, prefix + "tight_btagSFUp" + suffix);
-	iEvent.put(tight_btagSF_down, prefix + "tight_btagSFDown" + suffix);
+	iEvent.put(tight_btagSF, prefix + "tightBTagSF" + suffix);
+	iEvent.put(tight_btagSF_up, prefix + "tightBTagSFUp" + suffix);
+	iEvent.put(tight_btagSF_down, prefix + "tightBTagSFDown" + suffix);
 	// iEvent.put(jer, prefix + "jer" + suffix);
 	// iEvent.put(jerSF, prefix + "jerSF" + suffix);
 	// iEvent.put(jerSF_up, prefix + "jerSFUp" + suffix);
@@ -738,9 +738,7 @@ double BristolNTuple_PFJets::returnBTagSF(std::vector<pat::Jet>::const_iterator 
 	else if ( ptToUse >= 670 ) {
 		ptToUse = 669;
 	}
-
 	weight = reader.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), etaToUse, ptToUse);
-	std::cout << "BTag SF : " << weight << std::endl;
 	return weight;
 }
 

@@ -96,6 +96,7 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 	}
 	produces<bool>(prefix_ + "FullSelection");
 	produces<bool>(prefix_ + "FullSelectionNoB");
+	produces<bool>(prefix_ + "FullSelection2Tight");
 	produces<unsigned int>(prefix_ + "NumberOfBtags");
 	produces<unsigned int>(prefix_ + "NumberOfJets");
 	produces<std::vector<unsigned int> >(prefix_ + "cleanedJetIndex");
@@ -135,7 +136,8 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 	desc.add<std::string>("JetCorrectionService", "");
 
 	desc.add < std::string > ("bJetDiscriminator", "combinedSecondaryVertexBJetTags");
-	desc.add<double>("minBJetDiscriminator", 0.679 );
+	desc.add<double>("minBJetDiscriminator", 0.800 );
+	desc.add<double>("tightBJetDiscriminator", 0.935 );
 
 	desc.add<double>("tightMuonIsolation", 0.12);
 	desc.add<double>("controlMuonIsolation1", 0.3);
@@ -196,12 +198,13 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 		if ( step < TTbarMuPlusJetsReferenceSelection::AtLeastOneBtag )
 			passesSelectionExceptBtagging = passesSelectionExceptBtagging && passesStep;
 
-		if ( step == TTbarMuPlusJetsReferenceSelection::AtLeastTwoBtags)
-			passesSelectionWithTightBtagging = hasAtLeastTwoGoodTightBJets();
-
 		// if doesn't pass selection and not in tagging mode, stop here to save CPU time
 		if ( !(taggingMode_ || passesSelection) )
 			break;
+	}
+
+	if ( passesSelection ){
+		passesSelectionWithTightBtagging = hasAtLeastTwoGoodTightBJets();
 	}
 
 	// Store info in event

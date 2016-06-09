@@ -102,6 +102,7 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 	}
 	produces<bool>(prefix_ + "FullSelection");
 	produces<bool>(prefix_ + "FullSelectionNoB");
+	produces<bool>(prefix_ + "FullSelection2Tight");
 	produces<unsigned int>(prefix_ + "NumberOfJets");
 	produces<unsigned int>(prefix_ + "NumberOfBtags");
 	produces<std::vector<unsigned int> >(prefix_ + "cleanedJetIndex");
@@ -143,7 +144,8 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 	desc.add<std::string>("JetCorrectionService", "");
 
 	desc.add < std::string > ("bJetDiscriminator", "combinedSecondaryVertexBJetTags");
-	desc.add<double>("minBJetDiscriminator", 0.679 );
+	desc.add<double>("minBJetDiscriminator", 0.800 );
+	desc.add<double>("tightBJetDiscriminator", 0.935 );
 
 	desc.add<double>("tightElectronIsolation_EB", 0.14);
 	desc.add<double>("tightElectronIsolation_EE", 0.1649);
@@ -179,7 +181,7 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 	bool passesSelection(true);
 	bool passesSelectionExceptJetRequirements(true);
 	bool passesSelectionExceptBtagging(true);
-	bool passesSelectionWithTightBtagging(true);
+	bool passesSelectionWithTightBtagging(false);
 
 	for (unsigned int step = 0; step < TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
 		TTbarEPlusJetsReferenceSelection::Step stepName = TTbarEPlusJetsReferenceSelection::Step(step);
@@ -205,13 +207,15 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 		if ( step < TTbarEPlusJetsReferenceSelection::AtLeastOneBtag )
 			passesSelectionExceptBtagging = passesSelectionExceptBtagging && passesStep;
 
-		if ( step == TTbarEPlusJetsReferenceSelection::AtLeastTwoBtags)
-			passesSelectionWithTightBtagging = hasAtLeastTwoGoodTightBJets();
-
 		// if doesn't pass selection and not in tagging mode, stop here to save CPU time
 		if ( !(taggingMode_ || passesSelection) )
 			break;
 	}
+
+	if ( passesSelection ){
+		passesSelectionWithTightBtagging = hasAtLeastTwoGoodTightBJets();
+	}
+
 	for (unsigned int step = 0; step < TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
 		std::auto_ptr<bool> passesStep(new bool(passes_.at(step)));
 		iEvent.put(passesStep, prefix_ + TTbarEPlusJetsReferenceSelection::StringSteps[step]);
