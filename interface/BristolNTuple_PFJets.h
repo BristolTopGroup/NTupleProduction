@@ -30,12 +30,12 @@ class BristolNTuple_PFJets : public edm::EDProducer {
 
   const std::string btagCalibrationFile_;
   BTagCalibration calib;
-  BTagCalibrationReader reader_bc;
-  BTagCalibrationReader reader_bc_up;
-  BTagCalibrationReader reader_bc_down;
-  BTagCalibrationReader reader_l;
-  BTagCalibrationReader reader_l_up;
-  BTagCalibrationReader reader_l_down;
+  BTagCalibrationReader medium_reader_bc;
+  BTagCalibrationReader medium_reader_bc_up;
+  BTagCalibrationReader medium_reader_bc_down;
+  BTagCalibrationReader medium_reader_udsg;
+  BTagCalibrationReader medium_reader_udsg_up;
+  BTagCalibrationReader medium_reader_udsg_down;
 
   double returnBTagSF(std::vector<pat::Jet>::const_iterator jet, BTagCalibrationReader reader, uint bTagEntryJetFlavour);
 };
