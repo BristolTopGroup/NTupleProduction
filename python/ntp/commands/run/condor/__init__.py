@@ -61,7 +61,21 @@ ntp run local $@
 
 """
 
+MERGE_SCRIPT = """
+ntp merge $@
+
+"""
+
 LOG_STEM = 'ntp_job.$(cluster).$(process)'
+
+# file splitting for datasets containing 'key'
+SPLITTING_BY_FILE = {
+    'SingleElectron': 20,
+    'SingleMuon': 20,
+    'TTJet': 5,
+    'TT_': 5,
+    'DEFAULT': 10,
+}
 
 
 class Command(C):
@@ -119,6 +133,7 @@ class Command(C):
         self.__job_log_dir = os.path.join(self.__job_dir, 'log')
         self.__setup_script = os.path.join(self.__job_dir, 'setup.sh')
         self.__run_script = os.path.join(self.__job_dir, 'run.sh')
+        self.__merge_script = os.path.join(self.__job_dir, 'merge.sh')
         self.__run_config = os.path.join(self.__job_dir, 'config.json')
 
     def __find_highest_numbering(self, folders):
@@ -137,7 +152,7 @@ class Command(C):
     def __create_tar_file(self, args, variables):
         from ntp.commands.create.tarball import Command as TarCommand
         c = TarCommand()
-        result = c.run(args, variables)
+        c.run(args, variables)
         self.__text += c.__text
         self.__input_files.extend(c.get_tar_files())
 
@@ -164,8 +179,6 @@ class Command(C):
             campaign = self.__variables['campaign']
             run_config = get_config(campaign, dataset)
             run_config['outLFNDirBase'] = self.__replace_output_dir(run_config)
-            run_config['outLFNDirBase'] = os.path.join(
-                run_config['outLFNDirBase'], run_config['outputDatasetTag'])
 
         run_config['files'] = input_files
         parameters = self.__extract_params()
@@ -202,6 +215,9 @@ class Command(C):
         with open(self.__run_script, 'w+') as f:
             f.write(RUN_SCRIPT)
 
+        with open(self.__merge_script, 'w+') as f:
+            f.write(MERGE_SCRIPT)
+
         import json
         with open(self.__run_config, 'w+') as f:
             f.write(json.dumps(self.__config, indent=4))
@@ -218,7 +234,7 @@ class Command(C):
         for job in layer_1_jobs:
             dag_man.add_job(job)
 
-        layer_2_jobs = self.__create_layer2()
+        layer_2_jobs = self.__create_layer2(layer_1_jobs)
         for job in layer_2_jobs:
             dag_man.add_job(job, requires=layer_1_jobs)
 
@@ -247,23 +263,30 @@ class Command(C):
             share_exe_setup=True,
             common_input_files=self.__input_files,
             transfer_hdfs_input=False,
-            hdfs_store=self.__config['outLFNDirBase'],
+            hdfs_store=run_config['outLFNDirBase'] + '/tmp',
             certificate=self.REQUIRE_GRID_CERT,
             cpus=1,
             memory='1500MB'
         )
         parameters = 'files={files} output_file={output_file} {params}'
-        for i, f in enumerate(input_files):
+        n_files_per_group = SPLITTING_BY_FILE['DEFAULT']
+        for name, value in SPLITTING_BY_FILE.items():
+            if name in run_config['inputDataset']:
+                n_files_per_group = value
+
+        grouped_files = self.__group_files(
+            input_files, n_files_per_group)
+        for i, f in enumerate(grouped_files):
             output_file = 'ntuple_{0}.root'.format(i)
             args = parameters.format(
-                files=f,
+                files=','.join(f),
                 output_file=output_file,
                 params=run_config['pyCfgParams']
             )
             rel_out_dir = os.path.relpath(RESULTDIR, NTPROOT)
             rel_log_dir = os.path.relpath(LOGDIR, NTPROOT)
             rel_out_file = os.path.join(rel_out_dir, output_file)
-            rel_log_file = os.path.join(rel_out_dir, 'ntp.log')
+            rel_log_file = os.path.join(rel_log_dir, 'ntp.log')
             job = htc.Job(
                 name='job_{0}'.format(i),
                 args=args,
@@ -272,6 +295,54 @@ class Command(C):
             jobs.append(job)
         return jobs
 
-    def __create_layer2(self):
-        # reserved for hadd
-        return []
+    def __create_layer2(self, layer1_jobs):
+        run_config = self.__config
+
+        job_set = htc.JobSet(
+            exe=self.__merge_script,
+            copy_exe=True,
+            setup_script=self.__setup_script,
+            filename=os.path.join(
+                self.__job_dir, 'ntuple_merge.condor'),
+            out_dir=self.__job_log_dir,
+            out_file=LOG_STEM + '.out',
+            err_dir=self.__job_log_dir,
+            err_file=LOG_STEM + '.err',
+            log_dir=self.__job_log_dir,
+            log_file=LOG_STEM + '.log',
+            share_exe_setup=True,
+            common_input_files=self.__input_files,
+            transfer_hdfs_input=False,
+            hdfs_store=run_config['outLFNDirBase'],
+            certificate=self.REQUIRE_GRID_CERT,
+            cpus=1,
+            memory='1500MB'
+        )
+
+        parameters = '{files} output_file={output_file}'
+        output_file = '{0}.root'.format(run_config['outputDatasetTag'])
+
+        all_output_files = [
+            f for job in layer1_jobs for f in job.output_file_mirrors]
+        root_output_files = [
+            f.hdfs for f in all_output_files if f.hdfs.endswith('.root')]
+
+        args = parameters.format(
+            files=' '.join(root_output_files),
+            output_file=output_file,
+        )
+        rel_log_dir = os.path.relpath(LOGDIR, NTPROOT)
+        rel_log_file = os.path.join(rel_log_dir, 'ntp.log')
+        job = htc.Job(
+            name='merge',
+            args=args,
+            output_files=[output_file, rel_log_file])
+        job_set.add_job(job)
+
+        return [job]
+
+    def __group_files(self, input_files, n_files_per_group):
+        N = n_files_per_group
+        grouped_files = [input_files[n:n + N]
+                         for n in range(0, len(input_files), N)]
+        return grouped_files
