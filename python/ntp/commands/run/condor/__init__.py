@@ -244,11 +244,11 @@ class Command(C):
 
         layer_1_jobs = self.__create_layer1()
         for job in layer_1_jobs:
-            dag_man.add_job(job)
+            dag_man.add_job(job, retry=3)
 
         layer_2_jobs = self.__create_layer2(layer_1_jobs)
         for job in layer_2_jobs:
-            dag_man.add_job(job, requires=layer_1_jobs)
+            dag_man.add_job(job, requires=layer_1_jobs, retry=2)
 
         self.__dag = dag_man
 
