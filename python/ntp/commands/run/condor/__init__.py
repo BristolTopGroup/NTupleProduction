@@ -61,6 +61,13 @@ ntp run local $@
 
 """
 
+MERGE_SETUP_SCRIPT = """
+tar -xf ntp.tar.gz
+source bin/env.sh
+ntp setup from_tarball=cmssw_src.tar.gz compile=0
+
+"""
+
 MERGE_SCRIPT = """
 ntp merge $@
 
@@ -133,6 +140,8 @@ class Command(C):
         self.__job_log_dir = os.path.join(self.__job_dir, 'log')
         self.__setup_script = os.path.join(self.__job_dir, 'setup.sh')
         self.__run_script = os.path.join(self.__job_dir, 'run.sh')
+        self.__merge_setup_script = os.path.join(
+            self.__job_dir, 'merge_setup.sh')
         self.__merge_script = os.path.join(self.__job_dir, 'merge.sh')
         self.__run_config = os.path.join(self.__job_dir, 'config.json')
 
@@ -218,6 +227,9 @@ class Command(C):
         with open(self.__merge_script, 'w+') as f:
             f.write(MERGE_SCRIPT)
 
+        with open(self.__merge_setup_script, 'w+') as f:
+            f.write(MERGE_SETUP_SCRIPT)
+
         import json
         with open(self.__run_config, 'w+') as f:
             f.write(json.dumps(self.__config, indent=4))
@@ -301,7 +313,7 @@ class Command(C):
         job_set = htc.JobSet(
             exe=self.__merge_script,
             copy_exe=True,
-            setup_script=self.__setup_script,
+            setup_script=self.__merge_setup_script,
             filename=os.path.join(
                 self.__job_dir, 'ntuple_merge.condor'),
             out_dir=self.__job_log_dir,
