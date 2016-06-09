@@ -57,7 +57,7 @@ ntp setup from_tarball=cmssw_src.tar.gz
 """
 
 RUN_SCRIPT = """
-ntp run local $@
+ntp run local $@ nevents=-1
 
 """
 
