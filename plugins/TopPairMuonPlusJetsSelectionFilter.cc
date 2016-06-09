@@ -51,6 +51,7 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 
 		bJetDiscriminator_(iConfig.getParameter<std::string>("bJetDiscriminator")), //
 		minBJetDiscriminator_(iConfig.getParameter<double>("minBJetDiscriminator")), //
+		tightBJetDiscriminator_(iConfig.getParameter<double>("tightBJetDiscriminator")), //
 
 		tightMuonIso_(iConfig.getParameter<double>("tightMuonIsolation")), //
         controlMuonIso1_(iConfig.getParameter<double>("controlMuonIsolation1")), //
@@ -76,6 +77,7 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 		hasGoodPV_(false), //
 		cleanedJetIndex_(),
 		cleanedBJetIndex_(),
+		cleanedTightBJetIndex_(),
 		jets_(), //,
 		cleanedJets_(), //
 		cleanedBJets_(), //
@@ -98,6 +100,7 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 	produces<unsigned int>(prefix_ + "NumberOfJets");
 	produces<std::vector<unsigned int> >(prefix_ + "cleanedJetIndex");
 	produces<std::vector<unsigned int> >(prefix_ + "cleanedBJetIndex");
+	produces<std::vector<unsigned int> >(prefix_ + "cleanedTightBJetIndex");
 	// produces < pat::JetCollection > (prefix_ + "cleanedJets");
 	produces<unsigned int>(prefix_ + "signalMuonIndex");
 }
@@ -165,6 +168,8 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 	// Loop through each selection step in order and check if event satisfies each criterion
 	bool passesSelection(true);
 	bool passesSelectionExceptBtagging(true);
+	bool passesSelectionWithTightBtagging(true);
+
 	for (unsigned int step = 0; step < TTbarMuPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
 		TTbarMuPlusJetsReferenceSelection::Step stepName = TTbarMuPlusJetsReferenceSelection::Step(step);
 		if (debug_)
@@ -191,6 +196,9 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 		if ( step < TTbarMuPlusJetsReferenceSelection::AtLeastOneBtag )
 			passesSelectionExceptBtagging = passesSelectionExceptBtagging && passesStep;
 
+		if ( step == TTbarMuPlusJetsReferenceSelection::AtLeastTwoBtags)
+			passesSelectionWithTightBtagging = hasAtLeastTwoGoodTightBJets();
+
 		// if doesn't pass selection and not in tagging mode, stop here to save CPU time
 		if ( !(taggingMode_ || passesSelection) )
 			break;
@@ -203,6 +211,7 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 	}
 	iEvent.put(std::auto_ptr<bool>(new bool(passesSelection)), prefix_ + "FullSelection");
 	iEvent.put(std::auto_ptr<bool>(new bool(passesSelectionExceptBtagging)), prefix_ + "FullSelectionNoB");
+	iEvent.put(std::auto_ptr<bool>(new bool(passesSelectionWithTightBtagging)), prefix_ + "FullSelection2Tight");
 
 	// Store number of cleaned jets in event
 	unsigned int numberOfJets(cleanedJets_.size());
@@ -215,6 +224,7 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 	unsigned int numberOfBtags(cleanedBJets_.size());
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfBtags)), prefix_ + "NumberOfBtags");
 	iEvent.put(std::auto_ptr<std::vector<unsigned int> >(new std::vector<unsigned int>(cleanedBJetIndex_)), prefix_ + "cleanedBJetIndex");
+	iEvent.put(std::auto_ptr<std::vector<unsigned int> >(new std::vector<unsigned int>(cleanedTightBJetIndex_)), prefix_ + "cleanedTightBJetIndex");
 
 	// Store index of signal muon
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(signalMuonIndex_)),prefix_ + "signalMuonIndex");
@@ -453,7 +463,8 @@ void TopPairMuonPlusJetsSelectionFilter::cleanedJets() {
 void TopPairMuonPlusJetsSelectionFilter::cleanedBJets() {
 	cleanedBJets_.clear();
 	cleanedBJetIndex_.clear();
-	
+	cleanedTightBJetIndex_.clear();
+
 	// Loop over cleaned jets
 	for (unsigned index = 0; index < cleanedJets_.size(); ++index) {
 		const pat::Jet jet = cleanedJets_.at(index);
@@ -466,6 +477,9 @@ void TopPairMuonPlusJetsSelectionFilter::cleanedBJets() {
 			// Keep if it does
 			cleanedBJets_.push_back(jet);
 			cleanedBJetIndex_.push_back(index);
+			if (jet.bDiscriminator(bJetDiscriminator_) > tightBJetDiscriminator_) {
+				cleanedTightBJetIndex_.push_back(index);
+			}
 		}
 	}
 }
@@ -640,6 +654,10 @@ bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastOneGoodBJet() const {
 
 bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastTwoGoodBJets() const {
 	return cleanedBJets_.size() >= 2;
+}
+
+bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastTwoGoodTightBJets() const {
+	return cleanedTightBJetIndex_.size() > 1;
 }
 
 // ------------ method called once each job just before starting event loop  ------------

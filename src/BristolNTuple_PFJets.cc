@@ -38,10 +38,7 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		medium_reader_udsg_up(&calib, BTagEntry::OP_MEDIUM, "incl", "up"),  // sys down
 		medium_reader_udsg_down(&calib, BTagEntry::OP_MEDIUM, "incl", "down"),  // sys down
 
-		tight_reader_bc(	&calib,               // calibration instance
-					BTagEntry::OP_TIGHT,  // operating point
-					"mujets",               // measurement type
-					"central"),           // systematics type
+		tight_reader_bc(&calib, BTagEntry::OP_TIGHT, "mujets", "central"),
 		tight_reader_bc_up(&calib, BTagEntry::OP_TIGHT, "mujets", "up"),  // sys up
 		tight_reader_bc_down(&calib, BTagEntry::OP_TIGHT, "mujets", "down"),  // sys down
 		tight_reader_udsg(&calib, BTagEntry::OP_TIGHT, "incl", "central"),  // sys down
