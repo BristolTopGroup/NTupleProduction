@@ -36,8 +36,17 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		medium_reader_bc_down(&calib, BTagEntry::OP_MEDIUM, "mujets", "down"),  // sys down
 		medium_reader_udsg(&calib, BTagEntry::OP_MEDIUM, "incl", "central"),  // sys down
 		medium_reader_udsg_up(&calib, BTagEntry::OP_MEDIUM, "incl", "up"),  // sys down
-		medium_reader_udsg_down(&calib, BTagEntry::OP_MEDIUM, "incl", "down")  // sys down
+		medium_reader_udsg_down(&calib, BTagEntry::OP_MEDIUM, "incl", "down"),  // sys down
 
+		tight_reader_bc(	&calib,               // calibration instance
+					BTagEntry::OP_TIGHT,  // operating point
+					"mujets",               // measurement type
+					"central"),           // systematics type
+		tight_reader_bc_up(&calib, BTagEntry::OP_TIGHT, "mujets", "up"),  // sys up
+		tight_reader_bc_down(&calib, BTagEntry::OP_TIGHT, "mujets", "down"),  // sys down
+		tight_reader_udsg(&calib, BTagEntry::OP_TIGHT, "incl", "central"),  // sys down
+		tight_reader_udsg_up(&calib, BTagEntry::OP_TIGHT, "incl", "up"),  // sys down
+		tight_reader_udsg_down(&calib, BTagEntry::OP_TIGHT, "incl", "down")  // sys down
 		{
 	//kinematic variables
 	produces < std::vector<double> > (prefix + "Px" + suffix);
@@ -563,11 +572,11 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			// Read and store b tagging scale factors for MC
 			if (!iEvent.isRealData()) {
 
-				unsigned int jet_flavour = it->hadronFlavour()
+				unsigned int jet_flavour = it->hadronFlavour();
 				unsigned int bTagEntryJetFlavour = 999;
 				if ( jet_flavour == 5 ) bTagEntryJetFlavour = 0; // b
 				else if ( jet_flavour == 4 ) bTagEntryJetFlavour = 1; // c
-				else if ( jet_flavour == 0 ) ) bTagEntryJetFlavour = 2; // udsg / undefined
+				else if ( jet_flavour == 0 ) bTagEntryJetFlavour = 2; // udsg / undefined
 
 				double jet_weight = 999;
 				double jet_weight_up = 999;
