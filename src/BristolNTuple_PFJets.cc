@@ -38,7 +38,7 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		reader_l_up(&calib, BTagEntry::OP_MEDIUM, "incl", "up"),  // sys down
 		reader_l_down(&calib, BTagEntry::OP_MEDIUM, "incl", "down")  // sys down
 
-		 {
+		{
 	//kinematic variables
 	produces < std::vector<double> > (prefix + "Px" + suffix);
 	produces < std::vector<double> > (prefix + "Py" + suffix);
@@ -574,46 +574,20 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 					bTagEntryJetFlavour = 2;
 				}
 
-				double ptToUse = it->pt();
-				if ( ptToUse <= 30 ) {
-					ptToUse = 30;
-				}
-				else if ( ptToUse >= 670 ) {
-					ptToUse = 669;
-				}
-
 				double jet_weight = 999;
 				double jet_weight_up = 999;
 				double jet_weight_down = 999;			
 
 				if (bTagEntryJetFlavour == 0 || bTagEntryJetFlavour == 1) {
-
-					jet_weight = reader_bc.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
-		                                      it->eta(), 
-		                                      ptToUse);
-
-					jet_weight_up = reader_bc_up.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
-		                                      it->eta(), 
-		                                      ptToUse);
-
-					jet_weight_down = reader_bc_down.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
-		                                      it->eta(), 
-		                                      ptToUse);
+					jet_weight = returnBTagSF(it, reader_bc, bTagEntryJetFlavour);
+					jet_weight_up = returnBTagSF(it, reader_bc_up, bTagEntryJetFlavour);
+					jet_weight_down = returnBTagSF(it, reader_bc_down, bTagEntryJetFlavour);
 				}
 				else{
-					jet_weight = reader_l.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
-		                                      it->eta(), 
-		                                      ptToUse);
-
-					jet_weight_up = reader_l_up.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
-		                                      it->eta(), 
-		                                      ptToUse);
-
-					jet_weight_down = reader_l_down.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
-		                                      it->eta(), 
-		                                      ptToUse);					
+					jet_weight = returnBTagSF(it, reader_l, bTagEntryJetFlavour);
+					jet_weight_up = returnBTagSF(it, reader_l_up, bTagEntryJetFlavour);
+					jet_weight_down = returnBTagSF(it, reader_l_down, bTagEntryJetFlavour);			
 				}
-
 				btagSF->push_back( jet_weight );
 				btagSF_up->push_back( jet_weight_up );
 				btagSF_down->push_back( jet_weight_down );
@@ -726,3 +700,21 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	}
 
 }
+
+double BristolNTuple_PFJets::returnBTagSF(std::vector<pat::Jet>::const_iterator jet, BTagCalibrationReader reader, uint bTagEntryJetFlavour) {
+	double weight = 999;
+	double etaToUse = jet->eta();
+	double ptToUse = jet->pt();
+
+	if ( ptToUse <= 30 ) {
+		ptToUse = 30;
+	}
+	else if ( ptToUse >= 670 ) {
+		ptToUse = 669;
+	}
+
+	weight = reader.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), etaToUse, ptToUse);
+	std::cout << "BTag SF : " << weight << std::endl;
+	return weight;
+}
+
