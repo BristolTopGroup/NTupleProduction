@@ -49,6 +49,8 @@ CONDOR_ROOT = os.path.join(WORKSPACE, 'condor')
 HDFS_STORE_BASE = "/hdfs/TopQuarkGroup/{user}".format(
     user=getpass.getuser())
 
+RETRY_COUNT = 10
+
 SETUP_SCRIPT = """
 tar -xf ntp.tar.gz
 source bin/env.sh
@@ -77,8 +79,8 @@ LOG_STEM = 'ntp_job.$(cluster).$(process)'
 
 # file splitting for datasets containing 'key'
 SPLITTING_BY_FILE = {
-    'SingleElectron': 20,
-    'SingleMuon': 20,
+    'SingleElectron': 3,
+    'SingleMuon': 3,
     'TTJet': 5,
     'TT_': 5,
     'DEFAULT': 10,
@@ -244,7 +246,7 @@ class Command(C):
 
         layer_1_jobs = self.__create_layer1()
         for job in layer_1_jobs:
-            dag_man.add_job(job, retry=3)
+            dag_man.add_job(job, retry=RETRY_COUNT)
 
         layer_2_jobs = self.__create_layer2(layer_1_jobs)
         for job in layer_2_jobs:
