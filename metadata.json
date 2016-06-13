@@ -29,13 +29,14 @@
 			"provider": "git-cms-merge-topic"
 		},{
 			"name": "htcondenser",
-			"source": "https://github.com/raggleton/htcondenser.git",
-			"destination": "BristolAnalysis/NTupleTools/python/tmp",
-			"provider": "git",
-			"setup-cmds": [
-				"mv BristolAnalysis/NTupleTools/python/tmp/htcondenser BristolAnalysis/NTupleTools/python/htcondenser",
-				"rm -fr BristolAnalysis/NTupleTools/python/tmp"
-			]
+			"source": "git+https://github.com/kreczko/htcondenser.git@setup",
+			"destination": "",
+			"provider": "pip"
+		},{
+			"name": "ganga",
+			"source": "ganga",
+			"destination": "",
+			"provider": "pip"
 		}
 	]
 }

@@ -40,9 +40,11 @@ class Command(C):
                     source=source, destination=destination)
             elif provider == 'git-cms-merge-topic':
                 command = 'git-cms-merge-topic {source}'.format(source=source)
+            elif provider == 'pip':
+                command = 'pip install -U --user {source}'.format(source=source)
             else:
                 LOG.error('Unknown provider "{0}"'.format(provider))
-                sys.exit()
+                return False
             commands.append(command)
             if 'setup-cmds' in dep:
                 commands.extend(dep['setup-cmds'])
