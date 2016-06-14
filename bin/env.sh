@@ -62,6 +62,7 @@ fi
 # for external dependencies
 PYTHONUSERBASE=$NTPROOT/external; export PYTHONUSERBASE
 NEWPP=$(echo "$PYTHONUSERBASE"/lib/python*/site-packages)
+NEWPP=$(echo ${NEWPP// /:})
 PYTHONPATH=$NEWPP:$PYTHONPATH; export PYTHONPATH
 PATH=$PYTHONUSERBASE/bin:$PATH; export PATH
 
