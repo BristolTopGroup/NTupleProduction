@@ -15,7 +15,7 @@ if not 'NTPROOT' in os.environ:
 NTPROOT = os.environ['NTPROOT']
 
 LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.INFO)
+LOG.setLevel(logging.DEBUG)
 # logging to a file
 formatter = logging.Formatter(
     '%(asctime)s [%(name)s]  %(levelname)s: %(message)s')
