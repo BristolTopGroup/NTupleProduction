@@ -53,6 +53,10 @@ https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePythonTips
 
 
 Filtering with JSON: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideGoodLumiSectionsJSONFile#filterJSON_py
+1) curl https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ to get available JSONs
+2) regex for JSONs and 'last modified'
+3) pick latest JSON.txt
+
 
 import FWCore.PythonUtilities.LumiList as LumiList
 process.source.lumisToProcess = LumiList.LumiList(filename = 'goodList.json').getVLuminosityBlockRange()
