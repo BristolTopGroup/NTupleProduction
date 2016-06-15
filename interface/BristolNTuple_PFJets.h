@@ -27,6 +27,9 @@ class BristolNTuple_PFJets : public edm::EDProducer {
   const bool readJECuncertainty, doVertexAssociation;
   const edm::EDGetTokenT<std::vector<reco::Vertex>> vtxInputTag;
   const bool isRealData;
+  const double looseBTagWP;
+  const double mediumBTagWP;
+  const double tightBTagWP;
 
   const std::string btagCalibrationFile_;
   BTagCalibration calib;

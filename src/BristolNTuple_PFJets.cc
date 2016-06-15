@@ -26,25 +26,28 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		doVertexAssociation(iConfig.getParameter<bool>("DoVertexAssociation")), //
 		vtxInputTag(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))), //		
 		isRealData(iConfig.getParameter<bool>("isRealData")),
+	    looseBTagWP(iConfig.getParameter<double>("looseBTagWP")),
+	    mediumBTagWP(iConfig.getParameter<double>("mediumBTagWP")),
+	    tightBTagWP(iConfig.getParameter<double>("tightBTagWP")),
 		btagCalibrationFile_(iConfig.getParameter<std::string>("btagCalibrationFile")), //
 		calib("csvv2", btagCalibrationFile_.c_str()), //
-		reader_bc(	&calib,               // calibration instance
-					BTagEntry::OP_MEDIUM,  // operating point
-					"mujets",               // measurement type
-					"central"),           // systematics type
-		medium_reader_bc_up(&calib, BTagEntry::OP_MEDIUM, "mujets", "up"),  // sys up
+		medium_reader_bc(	&calib,               	// calibration instance
+							BTagEntry::OP_MEDIUM,  	// operating point
+							"mujets",               // measurement type
+							"central"),           	// systematics type
+		medium_reader_bc_up(&calib, BTagEntry::OP_MEDIUM, "mujets", "up"),  	// sys up
 		medium_reader_bc_down(&calib, BTagEntry::OP_MEDIUM, "mujets", "down"),  // sys down
-		medium_reader_udsg(&calib, BTagEntry::OP_MEDIUM, "incl", "central"),  // sys down
-		medium_reader_udsg_up(&calib, BTagEntry::OP_MEDIUM, "incl", "up"),  // sys down
+		medium_reader_udsg(&calib, BTagEntry::OP_MEDIUM, "incl", "central"),  	// sys down
+		medium_reader_udsg_up(&calib, BTagEntry::OP_MEDIUM, "incl", "up"),  	// sys down
 		medium_reader_udsg_down(&calib, BTagEntry::OP_MEDIUM, "incl", "down"),  // sys down
 
 		tight_reader_bc(&calib, BTagEntry::OP_TIGHT, "mujets", "central"),
-		tight_reader_bc_up(&calib, BTagEntry::OP_TIGHT, "mujets", "up"),  // sys up
-		tight_reader_bc_down(&calib, BTagEntry::OP_TIGHT, "mujets", "down"),  // sys down
-		tight_reader_udsg(&calib, BTagEntry::OP_TIGHT, "incl", "central"),  // sys down
-		tight_reader_udsg_up(&calib, BTagEntry::OP_TIGHT, "incl", "up"),  // sys down
-		tight_reader_udsg_down(&calib, BTagEntry::OP_TIGHT, "incl", "down")  // sys down
-		{
+		tight_reader_bc_up(&calib, BTagEntry::OP_TIGHT, "mujets", "up"),
+		tight_reader_bc_down(&calib, BTagEntry::OP_TIGHT, "mujets", "down"),
+		tight_reader_udsg(&calib, BTagEntry::OP_TIGHT, "incl", "central"),
+		tight_reader_udsg_up(&calib, BTagEntry::OP_TIGHT, "incl", "up"),
+		tight_reader_udsg_down(&calib, BTagEntry::OP_TIGHT, "incl", "down") {
+			
 	//kinematic variables
 	produces < std::vector<double> > (prefix + "Px" + suffix);
 	produces < std::vector<double> > (prefix + "Py" + suffix);
@@ -111,7 +114,9 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<int> > (prefix + "PassTightID" + suffix);
 	//b-tagging information
 	produces < std::vector<double> > (prefix + "combinedInclusiveSecondaryVertexV2BJetTags" + suffix);
+	produces < std::vector<bool> > (prefix + "passesLooseCSV" + suffix);
 	produces < std::vector<bool> > (prefix + "passesMediumCSV" + suffix);
+	produces < std::vector<bool> > (prefix + "passesTightCSV" + suffix);
 	produces < std::vector<double> > (prefix + "mediumBTagSF" + suffix);
 	produces < std::vector<double> > (prefix + "mediumBTagSFUp" + suffix);
 	produces < std::vector<double> > (prefix + "mediumBTagSFDown" + suffix);
@@ -204,7 +209,9 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<int> > passTightID(new std::vector<int>());
 	//b-tagging information
 	std::auto_ptr < std::vector<double> > combinedInclusiveSecondaryVertexV2BJetTags(new std::vector<double>());
+	std::auto_ptr < std::vector<bool> > passesLooseCSV(new std::vector<bool>());
 	std::auto_ptr < std::vector<bool> > passesMediumCSV(new std::vector<bool>());
+	std::auto_ptr < std::vector<bool> > passesTightCSV(new std::vector<bool>());
 	std::auto_ptr < std::vector<double> > medium_btagSF(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > medium_btagSF_up(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > medium_btagSF_down(new std::vector<double>());
@@ -569,7 +576,9 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			//b-tagging information
 			//names are changing between major software releases
 			combinedInclusiveSecondaryVertexV2BJetTags->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
-			passesMediumCSV->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.800 );
+			passesLooseCSV->push_back(combinedInclusiveSecondaryVertexV2BJetTags > looseBTagWP );
+			passesMediumCSV->push_back(combinedInclusiveSecondaryVertexV2BJetTags > mediumBTagWP );
+			passesTightCSV->push_back(combinedInclusiveSecondaryVertexV2BJetTags > tightBTagWP );
 			
 			// Read and store b tagging scale factors for MC
 			if (!iEvent.isRealData()) {
@@ -699,7 +708,9 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
 	//b-tagging information
 	iEvent.put(combinedInclusiveSecondaryVertexV2BJetTags, prefix + "combinedInclusiveSecondaryVertexV2BJetTags" + suffix);
+	iEvent.put(passesLooseCSV, prefix + "passesLooseCSV" + suffix);
 	iEvent.put(passesMediumCSV, prefix + "passesMediumCSV" + suffix);
+	iEvent.put(passesTightCSV, prefix + "passesTightCSV" + suffix);
 	
 	iEvent.put(medium_btagSF, prefix + "mediumBTagSF" + suffix);
 	iEvent.put(medium_btagSF_up, prefix + "mediumBTagSFUp" + suffix);
