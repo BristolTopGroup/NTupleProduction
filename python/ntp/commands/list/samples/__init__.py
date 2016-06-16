@@ -17,11 +17,11 @@ def get_text_lenghts(samples):
     aliases = []
     datasets = []
 
-    for campaign, sample in samples.items():
+    for _, sample in samples.items():
         aliases.extend(sample.keys())
-        datasets.extend(samples.values())
+        datasets.extend(sample.values())
 
-    len_campaigns = [len(c) for c in campaign]
+    len_campaigns = [len(c) for c in campaigns]
     len_aliases = [len(a) for a in aliases]
     len_datasets = [len(d) for d in datasets]
 
