@@ -178,7 +178,7 @@ def __execute(command, parameters, variables):
     rc = False
     try:
         rc = command.run(parameters, variables)
-    except Exception, e:
+    except Exception:
         import traceback
         LOG.error('Command failed: ' + traceback.format_exc())
 
@@ -274,7 +274,7 @@ def run_command(args):
 
     # log command
     # execute
-    __execute(command, parameters, variables)
+    return __execute(command, parameters, variables)
 
 
 def call(cmd_and_args, logger, stdout_log_level=logging.DEBUG, stderr_log_level=logging.ERROR, **kwargs):
@@ -284,6 +284,7 @@ def call(cmd_and_args, logger, stdout_log_level=logging.DEBUG, stderr_log_level=
     logger.error.
     From: https://gist.github.com/bgreenlee/1402841
     """
+    logger.debug('executing: {0}'.format(cmd_and_args))
     child = subprocess.Popen(cmd_and_args, stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE, **kwargs)
 
@@ -295,7 +296,7 @@ def call(cmd_and_args, logger, stdout_log_level=logging.DEBUG, stderr_log_level=
 
     def check_io():
         ready_to_read = select.select(
-            [child.stdout, child.stderr], [], [], 1000)[0]
+            [child.stdout, child.stderr], [], [], 1)[0]
         for io in ready_to_read:
             line = io.readline()
             outputs[io] += line[:-1]

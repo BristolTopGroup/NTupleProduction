@@ -29,6 +29,9 @@ class Command(C):
             'eval `/cvmfs/cms.cern.ch/common/scram runtime -sh`',
         ]
         from .. import DEPENDENCIES, CMSSW_SRC
+        from ntp.interpreter import call
+
+        rcs = []
         for dep in DEPENDENCIES:
             LOG.info('Setting up dependency "{0}"'.format(dep['name']))
             provider = dep['provider']
@@ -40,20 +43,22 @@ class Command(C):
                     source=source, destination=destination)
             elif provider == 'git-cms-merge-topic':
                 command = 'git-cms-merge-topic {source}'.format(source=source)
+            elif provider == 'pip':
+                command = 'pip install -U --user {source}'.format(source=source)
             else:
                 LOG.error('Unknown provider "{0}"'.format(provider))
-                sys.exit()
-            commands.append(command)
+                return False
             if 'setup-cmds' in dep:
-                commands.extend(dep['setup-cmds'])
+                additional_commands = ' && '.join(dep['setup-cmds'])
+                command = command + ' && ' + additional_commands
 
-        all_in_one = ' && '.join(commands)
-        all_in_one = all_in_one.format(CMSSW_SRC=CMSSW_SRC)
+            all_in_one = ' && '.join(commands)
+            all_in_one = all_in_one + ' && ' + command + ' \n'
+            all_in_one = all_in_one.format(CMSSW_SRC=CMSSW_SRC)
+            rc = call(all_in_one, logger=LOG, shell=True)
+            rcs.append(rc)
 
-        from ntp.interpreter import call
-        call(all_in_one, logger=LOG, shell=True)
-
-        return True
+        return all(rcs)
 
     def __can_run(self):
         import os

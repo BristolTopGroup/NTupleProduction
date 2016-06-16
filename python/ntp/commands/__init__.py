@@ -64,7 +64,7 @@ class Command(object):
     def __create_proxy(self):
         import subprocess
         vo = 'cms'
-        hours = str(24 * 7)
+        hours = str(80)
         command = ['voms-proxy-init', '-voms', vo, '-hours', hours]
         subprocess.call(command, shell=True)
 
