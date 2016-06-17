@@ -111,7 +111,6 @@ def __get_commands(command_path):
             if hasattr(mod, 'Command'):
                 if type(mod.Command) is type(object):
                     commands[relative_path] = mod.Command
-                    LOG.debug('Adding new command: relative_path')
                     __build_hierarchy(hierarchy, relative_path, mod.Command)
         except ImportError, e:
             import traceback

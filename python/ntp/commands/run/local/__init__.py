@@ -70,6 +70,7 @@ class Command(C):
         'files': '',
         'noop': False,
         'output_file': OUTPUT_FILE,
+        'pset_template': BASE,
     }
 
     def __init__(self, path=__file__, doc=__doc__):
@@ -117,7 +118,7 @@ class Command(C):
         input_files = self.__format_input_files(input_files)
 
         with open(PSET, 'w+') as f:
-            content = BASE.format(
+            content = self.__variables['pset_template'].format(
                 nevents=nevents,
                 input_files=input_files,
                 OUTPUT_FILE=self.__output_file,
