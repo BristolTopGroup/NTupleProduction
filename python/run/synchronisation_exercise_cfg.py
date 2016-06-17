@@ -124,6 +124,7 @@ process.makingNTuples = cms.Path(
     process.makePseudoTop *
 #     process.printEventContent *
 #     process.nTuples *
+    process.nTupleEvent*
     process.nTupleTree
 )
 

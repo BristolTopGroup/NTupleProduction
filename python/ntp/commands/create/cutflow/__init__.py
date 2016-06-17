@@ -162,9 +162,9 @@ class Command(C):
                 }
             }
         '''
-        run_number = 1
-        lumi_section = 2
-        event_number = 3
+        run_number = getattr(event, 'Event.Run')
+        lumi_section = getattr(event, 'Event.LumiSection')
+        event_number = getattr(event, 'Event.Number')
         passing = getattr(event, branch)
         if not passing:
             return
