@@ -22,5 +22,14 @@ Feel free to contribute
  4. develop your code
  5. push the changes into your for
  6. create a new pull request: https://github.com/BristolTopGroup/NTupleProduction/pulls
+ 
+ 
+# Changing NTuple version
+The NTP uses the version number (string) stored in `python/ntp/__init__.py` (`__version__ = X`).
+This number is stored in the ntuple as well as represented in the output paths for the ntuple production.
+
+# Debug messages
+The recommended way to print messages is to use the CMSSW Message Logger (https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMessageLogger)
+and the output level needs to be controlled in the run configuration (`process.MessageLogger`, e.g. https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMessageLoggerDebug). `couts` are discouraged as they cannot be turned on/off without re-compilation.
    
  
