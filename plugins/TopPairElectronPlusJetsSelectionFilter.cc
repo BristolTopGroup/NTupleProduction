@@ -57,6 +57,7 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 
 		bJetDiscriminator_(iConfig.getParameter<std::string>("bJetDiscriminator")), //
 		minBJetDiscriminator_(iConfig.getParameter<double>("minBJetDiscriminator")), //
+		tightBJetDiscriminator_(iConfig.getParameter<double>("tightBJetDiscriminator")), //
 
 		tightElectronIso_EB_(iConfig.getParameter<double>("tightElectronIsolation_EB")), //
 		tightElectronIso_EE_(iConfig.getParameter<double>("tightElectronIsolation_EE")), //
@@ -82,6 +83,7 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		hasSignalElectron_(false), //
 		cleanedJetIndex_(),
 		cleanedBJetIndex_(),
+		cleanedTightBJetIndex_(),
 		jets_(), //,
 		cleanedJets_(), //
 		cleanedBJets_(), //
@@ -100,10 +102,12 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 	}
 	produces<bool>(prefix_ + "FullSelection");
 	produces<bool>(prefix_ + "FullSelectionNoB");
+	produces<bool>(prefix_ + "FullSelection2Tight");
 	produces<unsigned int>(prefix_ + "NumberOfJets");
 	produces<unsigned int>(prefix_ + "NumberOfBtags");
 	produces<std::vector<unsigned int> >(prefix_ + "cleanedJetIndex");
 	produces<std::vector<unsigned int> >(prefix_ + "cleanedBJetIndex");
+	produces<std::vector<unsigned int> >(prefix_ + "cleanedTightBJetIndex");
 	// produces < pat::JetCollection > (prefix_ + "cleanedJets");
 	produces<unsigned int>(prefix_ + "signalElectronIndex");
 }
@@ -140,7 +144,8 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 	desc.add<std::string>("JetCorrectionService", "");
 
 	desc.add < std::string > ("bJetDiscriminator", "combinedSecondaryVertexBJetTags");
-	desc.add<double>("minBJetDiscriminator", 0.679 );
+	desc.add<double>("minBJetDiscriminator", 0.800 );
+	desc.add<double>("tightBJetDiscriminator", 0.935 );
 
 	desc.add<double>("tightElectronIsolation_EB", 0.14);
 	desc.add<double>("tightElectronIsolation_EE", 0.1649);
@@ -176,6 +181,7 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 	bool passesSelection(true);
 	bool passesSelectionExceptJetRequirements(true);
 	bool passesSelectionExceptBtagging(true);
+	bool passesSelectionWithTightBtagging(false);
 
 	for (unsigned int step = 0; step < TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
 		TTbarEPlusJetsReferenceSelection::Step stepName = TTbarEPlusJetsReferenceSelection::Step(step);
@@ -205,12 +211,18 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 		if ( !(taggingMode_ || passesSelection) )
 			break;
 	}
+
+	if ( passesSelection ){
+		passesSelectionWithTightBtagging = hasAtLeastTwoGoodTightBJets();
+	}
+
 	for (unsigned int step = 0; step < TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
 		std::auto_ptr<bool> passesStep(new bool(passes_.at(step)));
 		iEvent.put(passesStep, prefix_ + TTbarEPlusJetsReferenceSelection::StringSteps[step]);
 	}
 	iEvent.put(std::auto_ptr<bool>(new bool(passesSelection)), prefix_ + "FullSelection");
 	iEvent.put(std::auto_ptr<bool>(new bool(passesSelectionExceptBtagging)), prefix_ + "FullSelectionNoB");
+	iEvent.put(std::auto_ptr<bool>(new bool(passesSelectionWithTightBtagging)), prefix_ + "FullSelection2Tight");
 
 	// Store number of cleaned jets in events
 	unsigned int numberOfJets(cleanedJets_.size());
@@ -222,6 +234,7 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 	unsigned int numberOfBtags(cleanedBJets_.size());
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfBtags)), prefix_ + "NumberOfBtags");
 	iEvent.put(std::auto_ptr<std::vector<unsigned int> >(new std::vector<unsigned int>(cleanedBJetIndex_)), prefix_ + "cleanedBJetIndex");
+	iEvent.put(std::auto_ptr<std::vector<unsigned int> >(new std::vector<unsigned int>(cleanedTightBJetIndex_)), prefix_ + "cleanedTightBJetIndex");
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(signalElectronIndex_)),prefix_ + "signalElectronIndex");
 
 	if ( bSelectionInTaggingMode_ )
@@ -395,12 +408,14 @@ bool TopPairElectronPlusJetsSelectionFilter::isGoodElectron(const edm::Ptr<pat::
 	//   11  : GsfEleMissingHitsCut
 
 	if ( nonIsolatedElectronSelection_ ) {
-		if ( returnInvertedSelection(electron, 9) ) {
+		std::vector<uint> idCutsToInvert {9};
+		if ( returnInvertedSelection(electron, idCutsToInvert) ) {
 			passesID = true;
 		}
 	}
 	else if ( invertedConversionSelection_ ) {
-		if ( returnInvertedSelection(electron, 10) ){
+		std::vector<uint> idCutsToInvert {10, 11};
+		if ( returnInvertedSelection(electron, idCutsToInvert) ){
 			passesID = true;
 		}
 	}
@@ -419,7 +434,7 @@ double TopPairElectronPlusJetsSelectionFilter::electronIsolation(const pat::Elec
 	return absiso/electron.pt();
 }
 
-bool TopPairElectronPlusJetsSelectionFilter::returnInvertedSelection(const edm::Ptr<pat::Electron>& electron, uint invertedSelection) const {
+bool TopPairElectronPlusJetsSelectionFilter::returnInvertedSelection(const edm::Ptr<pat::Electron>& electron, std::vector<uint> invertedSelection) const {
 
 	vid::CutFlowResult fullCutFlowData = medium_id_cutflow_data_[electron];
 	bool passesFullSelection = true;
@@ -430,7 +445,9 @@ bool TopPairElectronPlusJetsSelectionFilter::returnInvertedSelection(const edm::
         // printf("  %2d      %50s    %d        %f          %d\n", 
 		// icut, fullCutFlowData.getNameAtIndex(icut).c_str(), (int)fullCutFlowData.isCutMasked(icut), fullCutFlowData.getValueCutUpon(icut), (int)fullCutFlowData.getCutResultByIndex(icut));
     	bool passesThisCut = fullCutFlowData.getCutResultByIndex(icut);
-    	if ( icut==invertedSelection ) passesThisCut = !passesThisCut;
+ 		for ( auto invertedCut = invertedSelection.begin(); invertedCut != invertedSelection.end(); invertedCut++ ) {
+    		if ( icut== *invertedCut ) passesThisCut = !passesThisCut;
+		}
     	if ( !passesThisCut ) {
             passesFullSelection = false;
             break;
@@ -490,6 +507,7 @@ void TopPairElectronPlusJetsSelectionFilter::cleanedJets() {
 void TopPairElectronPlusJetsSelectionFilter::cleanedBJets() {
 	cleanedBJets_.clear();
 	cleanedBJetIndex_.clear();
+	cleanedTightBJetIndex_.clear();
 
 	// Loop over cleaned jets
 	for (unsigned index = 0; index < cleanedJets_.size(); ++index) {
@@ -503,6 +521,9 @@ void TopPairElectronPlusJetsSelectionFilter::cleanedBJets() {
 			// Keep if it does
 			cleanedBJets_.push_back(jet);
 			cleanedBJetIndex_.push_back(index);
+			if (jet.bDiscriminator(bJetDiscriminator_) > tightBJetDiscriminator_) {
+				cleanedTightBJetIndex_.push_back(index);
+			}
 		}
 	}
 }
@@ -701,11 +722,9 @@ bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastTwoGoodBJets() const {
 	return cleanedBJets_.size() > 1;
 }
 
-
-
-
-
-
+bool TopPairElectronPlusJetsSelectionFilter::hasAtLeastTwoGoodTightBJets() const {
+	return cleanedTightBJetIndex_.size() > 1;
+}
 
 // ------------ method called once each job just before starting event loop  ------------
 void TopPairElectronPlusJetsSelectionFilter::beginJob() {

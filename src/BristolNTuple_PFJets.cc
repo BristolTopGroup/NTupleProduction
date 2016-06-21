@@ -26,19 +26,28 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		doVertexAssociation(iConfig.getParameter<bool>("DoVertexAssociation")), //
 		vtxInputTag(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))), //		
 		isRealData(iConfig.getParameter<bool>("isRealData")),
+	    looseBTagWP(iConfig.getParameter<double>("looseBTagWP")),
+	    mediumBTagWP(iConfig.getParameter<double>("mediumBTagWP")),
+	    tightBTagWP(iConfig.getParameter<double>("tightBTagWP")),
 		btagCalibrationFile_(iConfig.getParameter<std::string>("btagCalibrationFile")), //
 		calib("csvv2", btagCalibrationFile_.c_str()), //
-		reader_bc(		&calib,               // calibration instance
-					BTagEntry::OP_MEDIUM,  // operating point
-					"mujets",               // measurement type
-					"central"),           // systematics type
-		reader_bc_up(&calib, BTagEntry::OP_MEDIUM, "mujets", "up"),  // sys up
-		reader_bc_down(&calib, BTagEntry::OP_MEDIUM, "mujets", "down"),  // sys down
-		reader_l(&calib, BTagEntry::OP_MEDIUM, "incl", "central"),  // sys down
-		reader_l_up(&calib, BTagEntry::OP_MEDIUM, "incl", "up"),  // sys down
-		reader_l_down(&calib, BTagEntry::OP_MEDIUM, "incl", "down")  // sys down
+		medium_reader_bc(	&calib,               	// calibration instance
+							BTagEntry::OP_MEDIUM,  	// operating point
+							"mujets",               // measurement type
+							"central"),           	// systematics type
+		medium_reader_bc_up(&calib, BTagEntry::OP_MEDIUM, "mujets", "up"),  	// sys up
+		medium_reader_bc_down(&calib, BTagEntry::OP_MEDIUM, "mujets", "down"),  // sys down
+		medium_reader_udsg(&calib, BTagEntry::OP_MEDIUM, "incl", "central"),  	// sys down
+		medium_reader_udsg_up(&calib, BTagEntry::OP_MEDIUM, "incl", "up"),  	// sys down
+		medium_reader_udsg_down(&calib, BTagEntry::OP_MEDIUM, "incl", "down"),  // sys down
 
-		 {
+		tight_reader_bc(&calib, BTagEntry::OP_TIGHT, "mujets", "central"),
+		tight_reader_bc_up(&calib, BTagEntry::OP_TIGHT, "mujets", "up"),
+		tight_reader_bc_down(&calib, BTagEntry::OP_TIGHT, "mujets", "down"),
+		tight_reader_udsg(&calib, BTagEntry::OP_TIGHT, "incl", "central"),
+		tight_reader_udsg_up(&calib, BTagEntry::OP_TIGHT, "incl", "up"),
+		tight_reader_udsg_down(&calib, BTagEntry::OP_TIGHT, "incl", "down") {
+			
 	//kinematic variables
 	produces < std::vector<double> > (prefix + "Px" + suffix);
 	produces < std::vector<double> > (prefix + "Py" + suffix);
@@ -53,6 +62,7 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "Charge" + suffix);
 	produces < std::vector<double> > (prefix + "Mass" + suffix);
 	produces < std::vector<int> > (prefix + "PartonFlavour" + suffix);
+	produces < std::vector<int> > (prefix + "HadronFlavour" + suffix);
 	//generated jet properties
     if (!isRealData) {
         produces < std::vector<double> > (prefix + "GenJet.Energy" + suffix);
@@ -104,11 +114,15 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<int> > (prefix + "PassTightID" + suffix);
 	//b-tagging information
 	produces < std::vector<double> > (prefix + "combinedInclusiveSecondaryVertexV2BJetTags" + suffix);
+	produces < std::vector<bool> > (prefix + "passesLooseCSV" + suffix);
 	produces < std::vector<bool> > (prefix + "passesMediumCSV" + suffix);
-	produces < std::vector<double> > (prefix + "btagSF" + suffix);
-	produces < std::vector<double> > (prefix + "btagSFUp" + suffix);
-	produces < std::vector<double> > (prefix + "btagSFDown" + suffix);
-
+	produces < std::vector<bool> > (prefix + "passesTightCSV" + suffix);
+	produces < std::vector<double> > (prefix + "mediumBTagSF" + suffix);
+	produces < std::vector<double> > (prefix + "mediumBTagSFUp" + suffix);
+	produces < std::vector<double> > (prefix + "mediumBTagSFDown" + suffix);
+	produces < std::vector<double> > (prefix + "tightBTagSF" + suffix);
+	produces < std::vector<double> > (prefix + "tightBTagSFUp" + suffix);
+	produces < std::vector<double> > (prefix + "tightBTagSFDown" + suffix);
 	// JER information
 	// produces < std::vector<double> > (prefix + "jer" + suffix);
 	// produces < std::vector<double> > (prefix + "jerSF" + suffix);
@@ -145,6 +159,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<double> > charge(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > mass(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > partonFlavour(new std::vector<int>());
+	std::auto_ptr < std::vector<int> > hadronFlavour(new std::vector<int>());
 	//generated jet properties
 	std::auto_ptr < std::vector<double> > genJet_energy(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > genJet_pt(new std::vector<double>());
@@ -194,10 +209,15 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<int> > passTightID(new std::vector<int>());
 	//b-tagging information
 	std::auto_ptr < std::vector<double> > combinedInclusiveSecondaryVertexV2BJetTags(new std::vector<double>());
+	std::auto_ptr < std::vector<bool> > passesLooseCSV(new std::vector<bool>());
 	std::auto_ptr < std::vector<bool> > passesMediumCSV(new std::vector<bool>());
-	std::auto_ptr < std::vector<double> > btagSF(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > btagSF_up(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > btagSF_down(new std::vector<double>());
+	std::auto_ptr < std::vector<bool> > passesTightCSV(new std::vector<bool>());
+	std::auto_ptr < std::vector<double> > medium_btagSF(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > medium_btagSF_up(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > medium_btagSF_down(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > tight_btagSF(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > tight_btagSF_up(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > tight_btagSF_down(new std::vector<double>());
 
 	// std::auto_ptr < std::vector<double> > jer(new std::vector<double>());
 	// std::auto_ptr < std::vector<double> > jerSF(new std::vector<double>());
@@ -501,6 +521,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			charge->push_back(it->jetCharge());
 			mass->push_back(it->mass());
 			partonFlavour->push_back(it->partonFlavour());
+			hadronFlavour->push_back(it->hadronFlavour());
 
 			//jet energy correction and uncertainties
 			if (readJECuncertainty){
@@ -555,65 +576,53 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			//b-tagging information
 			//names are changing between major software releases
 			combinedInclusiveSecondaryVertexV2BJetTags->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
-			passesMediumCSV->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.800 );
+			passesLooseCSV->push_back(combinedInclusiveSecondaryVertexV2BJetTags > looseBTagWP );
+			passesMediumCSV->push_back(combinedInclusiveSecondaryVertexV2BJetTags > mediumBTagWP );
+			passesTightCSV->push_back(combinedInclusiveSecondaryVertexV2BJetTags > tightBTagWP );
 			
 			// Read and store b tagging scale factors for MC
 			if (!iEvent.isRealData()) {
 
+				unsigned int jet_flavour = it->hadronFlavour();
 				unsigned int bTagEntryJetFlavour = 999;
-				if ( fabs( it->partonFlavour() ) == 5 ) {
-					bTagEntryJetFlavour = 0;
-				}
-				else if ( fabs( it->partonFlavour() ) == 4 ) {
-					bTagEntryJetFlavour = 1;
-				}
-				else if ( fabs( it->partonFlavour() ) == 21 || ( fabs( it->partonFlavour() ) <= 3 && fabs( it->partonFlavour() ) >= 0 ) ) {
-					bTagEntryJetFlavour = 2;
-				}
-
-				double ptToUse = it->pt();
-				if ( ptToUse <= 30 ) {
-					ptToUse = 30;
-				}
-				else if ( ptToUse >= 670 ) {
-					ptToUse = 669;
-				}
+				if ( jet_flavour == 5 ) bTagEntryJetFlavour = 0; // b
+				else if ( jet_flavour == 4 ) bTagEntryJetFlavour = 1; // c
+				else if ( jet_flavour == 0 ) bTagEntryJetFlavour = 2; // udsg / undefined
 
 				double jet_weight = 999;
 				double jet_weight_up = 999;
 				double jet_weight_down = 999;			
 
-				if (bTagEntryJetFlavour == 0 || bTagEntryJetFlavour == 1) {
-
-					jet_weight = reader_bc.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
-		                                      it->eta(), 
-		                                      ptToUse);
-
-					jet_weight_up = reader_bc_up.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
-		                                      it->eta(), 
-		                                      ptToUse);
-
-					jet_weight_down = reader_bc_down.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
-		                                      it->eta(), 
-		                                      ptToUse);
+				if (jet_flavour == 5 || jet_flavour == 4) {
+					jet_weight = returnBTagSF(it, medium_reader_bc, bTagEntryJetFlavour);
+					jet_weight_up = returnBTagSF(it, medium_reader_bc_up, bTagEntryJetFlavour);
+					jet_weight_down = returnBTagSF(it, medium_reader_bc_down, bTagEntryJetFlavour);
 				}
 				else{
-					jet_weight = reader_l.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
-		                                      it->eta(), 
-		                                      ptToUse);
-
-					jet_weight_up = reader_l_up.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
-		                                      it->eta(), 
-		                                      ptToUse);
-
-					jet_weight_down = reader_l_down.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), 
-		                                      it->eta(), 
-		                                      ptToUse);					
+					jet_weight = returnBTagSF(it, medium_reader_udsg, bTagEntryJetFlavour);
+					jet_weight_up = returnBTagSF(it, medium_reader_udsg_up, bTagEntryJetFlavour);
+					jet_weight_down = returnBTagSF(it, medium_reader_udsg_down, bTagEntryJetFlavour);			
 				}
+				medium_btagSF->push_back( jet_weight );
+				medium_btagSF_up->push_back( jet_weight_up );
+				medium_btagSF_down->push_back( jet_weight_down );
 
-				btagSF->push_back( jet_weight );
-				btagSF_up->push_back( jet_weight_up );
-				btagSF_down->push_back( jet_weight_down );
+				jet_weight = 999;
+				jet_weight_up = 999;
+				jet_weight_down = 999;	
+				if (jet_flavour == 5 || jet_flavour == 4) {
+					jet_weight = returnBTagSF(it, tight_reader_bc, bTagEntryJetFlavour);
+					jet_weight_up = returnBTagSF(it, tight_reader_bc_up, bTagEntryJetFlavour);
+					jet_weight_down = returnBTagSF(it, tight_reader_bc_down, bTagEntryJetFlavour);
+				}
+				else{
+					jet_weight = returnBTagSF(it, tight_reader_udsg, bTagEntryJetFlavour);
+					jet_weight_up = returnBTagSF(it, tight_reader_udsg_up, bTagEntryJetFlavour);
+					jet_weight_down = returnBTagSF(it, tight_reader_udsg_down, bTagEntryJetFlavour);			
+				}
+				tight_btagSF->push_back( jet_weight );
+				tight_btagSF_up->push_back( jet_weight_up );
+				tight_btagSF_down->push_back( jet_weight_down );
 			}
 
 			//jet-vertex association
@@ -646,6 +655,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(charge, prefix + "Charge" + suffix);
 	iEvent.put(mass, prefix + "Mass" + suffix);
 	iEvent.put(partonFlavour, prefix + "PartonFlavour" + suffix);
+	iEvent.put(hadronFlavour, prefix + "HadronFlavour" + suffix);
 	//generated jet properties
     if (!iEvent.isRealData()) {
 		iEvent.put(genJet_energy, prefix + "GenJet.Energy" + suffix);
@@ -698,12 +708,17 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
 	//b-tagging information
 	iEvent.put(combinedInclusiveSecondaryVertexV2BJetTags, prefix + "combinedInclusiveSecondaryVertexV2BJetTags" + suffix);
+	iEvent.put(passesLooseCSV, prefix + "passesLooseCSV" + suffix);
 	iEvent.put(passesMediumCSV, prefix + "passesMediumCSV" + suffix);
+	iEvent.put(passesTightCSV, prefix + "passesTightCSV" + suffix);
 	
-	iEvent.put(btagSF, prefix + "btagSF" + suffix);
-	iEvent.put(btagSF_up, prefix + "btagSFUp" + suffix);
-	iEvent.put(btagSF_down, prefix + "btagSFDown" + suffix);
+	iEvent.put(medium_btagSF, prefix + "mediumBTagSF" + suffix);
+	iEvent.put(medium_btagSF_up, prefix + "mediumBTagSFUp" + suffix);
+	iEvent.put(medium_btagSF_down, prefix + "mediumBTagSFDown" + suffix);
 
+	iEvent.put(tight_btagSF, prefix + "tightBTagSF" + suffix);
+	iEvent.put(tight_btagSF_up, prefix + "tightBTagSFUp" + suffix);
+	iEvent.put(tight_btagSF_down, prefix + "tightBTagSFDown" + suffix);
 	// iEvent.put(jer, prefix + "jer" + suffix);
 	// iEvent.put(jerSF, prefix + "jerSF" + suffix);
 	// iEvent.put(jerSF_up, prefix + "jerSFUp" + suffix);
@@ -722,3 +737,19 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	}
 
 }
+
+double BristolNTuple_PFJets::returnBTagSF(std::vector<pat::Jet>::const_iterator jet, BTagCalibrationReader reader, uint bTagEntryJetFlavour) {
+	double weight = 999;
+	double etaToUse = jet->eta();
+	double ptToUse = jet->pt();
+
+	if ( ptToUse <= 30 ) {
+		ptToUse = 30;
+	}
+	else if ( ptToUse >= 670 ) {
+		ptToUse = 669;
+	}
+	weight = reader.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), etaToUse, ptToUse);
+	return weight;
+}
+

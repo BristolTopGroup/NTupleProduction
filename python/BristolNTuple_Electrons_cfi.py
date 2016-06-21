@@ -11,5 +11,4 @@ nTupleElectrons = cms.EDProducer("BristolNTuple_Electrons",
     BeamSpotInputTag = cms.InputTag('offlineBeamSpot'),
     ConversionsInputTag = cms.InputTag('reducedEgamma','reducedConversions'),
     mediumElectronIDMap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-medium'),
-    mediumElectronIDMap_bitmap=cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-mediumBitmap'),
 )

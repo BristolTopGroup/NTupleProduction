@@ -2,7 +2,7 @@ import os
 import glob
 from mergeROOTFilesWithCompression import getGroupedFilesToUse
 
-pathOfCrabWorkdirs = '/storage/db0268/TopCrossSections/NTupleProduction/CMSSW_7_6_3_patch2/src/workdirCrab/v7/2016-02-11'
+pathOfCrabWorkdirs = '/storage/db0268/TopCrossSections/NTupleProduction/CMSSW_7_6_3_patch2/src/workdirCrab/v13/2016-05-16'
 
 version = pathOfCrabWorkdirs.split('/')[-2]
 

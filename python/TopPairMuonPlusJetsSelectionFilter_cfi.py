@@ -45,6 +45,7 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     # Working points taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation74X50ns
     bJetDiscriminator=cms.string('pfCombinedInclusiveSecondaryVertexV2BJetTags'),
     minBJetDiscriminator=cms.double(0.800),
+    tightBJetDiscriminator=cms.double(0.935),
 
     prefix=cms.untracked.string('TopPairMuonPlusJetsSelection.'),
 

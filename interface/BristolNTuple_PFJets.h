@@ -27,15 +27,18 @@ class BristolNTuple_PFJets : public edm::EDProducer {
   const bool readJECuncertainty, doVertexAssociation;
   const edm::EDGetTokenT<std::vector<reco::Vertex>> vtxInputTag;
   const bool isRealData;
+  const double looseBTagWP;
+  const double mediumBTagWP;
+  const double tightBTagWP;
 
   const std::string btagCalibrationFile_;
   BTagCalibration calib;
-  BTagCalibrationReader reader_bc;
-  BTagCalibrationReader reader_bc_up;
-  BTagCalibrationReader reader_bc_down;
-  BTagCalibrationReader reader_l;
-  BTagCalibrationReader reader_l_up;
-  BTagCalibrationReader reader_l_down;
+  BTagCalibrationReader medium_reader_bc, medium_reader_bc_up, medium_reader_bc_down;
+  BTagCalibrationReader medium_reader_udsg, medium_reader_udsg_up, medium_reader_udsg_down;
+  BTagCalibrationReader tight_reader_bc, tight_reader_bc_up, tight_reader_bc_down;
+  BTagCalibrationReader tight_reader_udsg, tight_reader_udsg_up, tight_reader_udsg_down;
+
+  double returnBTagSF(std::vector<pat::Jet>::const_iterator jet, BTagCalibrationReader reader, uint bTagEntryJetFlavour);
 };
 
 #endif

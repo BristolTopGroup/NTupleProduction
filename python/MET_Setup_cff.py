@@ -4,6 +4,7 @@ def setup_MET(process, cms, options, postfix="PFlow"):
     print '=' * 60
     print "Re-running MET on MiniAOD"
     print '=' * 60
+    usePrivateSQlite = options.useJECFromFile
     runOnData = options.isData
     '''
     application of residual corrections. Have to be set to True once the 13 TeV
@@ -11,35 +12,67 @@ def setup_MET(process, cms, options, postfix="PFlow"):
     to False
     '''
     applyResiduals = options.applyResiduals
+    
+    if usePrivateSQlite:
+        from CondCore.DBCommon.CondDBSetup_cfi import *
+        import os
+        era = "Fall15_25nsV2_"
+        if runOnData:
+            era += 'DATA'
+        else:
+            era += 'MC'
+        dBFile = os.path.expandvars(
+            era + ".db")
+           # "$CMSSW_BASE/src/BristolAnalysis/NTupleTools/data/JEC/" + era + ".db")
+        process.jec = cms.ESSource( "PoolDBESSource",CondDBSetup,
+                                    connect = cms.string( "sqlite_file:"+dBFile ),
+                                    toGet =  cms.VPSet(
+                                        cms.PSet(
+                                            record = cms.string("JetCorrectionsRecord"),
+                                            tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK4PF"),
+                                            label= cms.untracked.string("AK4PF")
+                                            ),
+                                        cms.PSet(
+                                            record = cms.string("JetCorrectionsRecord"),
+                                            tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK4PFchs"),
+                                            label= cms.untracked.string("AK4PFchs")
+                                            ),
+                                        )
+                                    )
+        process.es_prefer_jec = cms.ESPrefer("PoolDBESSource",'jec')
 
 
+    #     getattr(process,'patPFMet'+postfix).addGenMET = cms.bool(not options.isData)
+    #     process.patPFMet.addGenMET = cms.bool(not options.useData)
+    #
+    #     process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
+    #     process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
+    #
+    #     setup_MET_uncertainties(process, cms, options, postfix)
+    #
+    #     if options.applyType0METcorrection:
+    #         getattr(process,'patType1CorrectedPFMet'+postfix).srcType1Corrections = cms.VInputTag(
+    #                 cms.InputTag("patPFJetMETtype1p2Corr"+postfix,"type1"),
+    #                 cms.InputTag("patPFMETtype0Corr"+postfix)
+    #                 )
+    #         getattr(process,'patType1p2CorrectedPFMet'+postfix).srcType1Corrections = cms.VInputTag(
+    #                 cms.InputTag("patPFJetMETtype1p2Corr"+postfix,"type1"),
+    #                 cms.InputTag("patPFMETtype0Corr"+postfix)
+    #                 )
 
-#     getattr(process,'patPFMet'+postfix).addGenMET = cms.bool(not options.isData)
-#     process.patPFMet.addGenMET = cms.bool(not options.useData)
-#
-#     process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
-#     process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
-#
-#     setup_MET_uncertainties(process, cms, options, postfix)
-#
-#     if options.applyType0METcorrection:
-#         getattr(process,'patType1CorrectedPFMet'+postfix).srcType1Corrections = cms.VInputTag(
-#                 cms.InputTag("patPFJetMETtype1p2Corr"+postfix,"type1"),
-#                 cms.InputTag("patPFMETtype0Corr"+postfix)
-#                 )
-#         getattr(process,'patType1p2CorrectedPFMet'+postfix).srcType1Corrections = cms.VInputTag(
-#                 cms.InputTag("patPFJetMETtype1p2Corr"+postfix,"type1"),
-#                 cms.InputTag("patPFMETtype0Corr"+postfix)
-#                 )
+        # these flags are false for '+postfix' mets by default, but true for non-postfix ones!
+    #     getattr(process,'patPFJetMETtype1p2Corr'+postfix).skipEM = cms.bool(False)
+    #     getattr(process,'patPFJetMETtype1p2Corr'+postfix).skipMuons = cms.bool(False)
 
-    # these flags are false for '+postfix' mets by default, but true for non-postfix ones!
-#     getattr(process,'patPFJetMETtype1p2Corr'+postfix).skipEM = cms.bool(False)
-#     getattr(process,'patPFJetMETtype1p2Corr'+postfix).skipMuons = cms.bool(False)
-
-#     if options.applySysShiftCorrection:
-#         getattr(process,'patType1CorrectedPFMet'+postfix).srcType1Corrections.append(cms.InputTag('pfMEtSysShiftCorr'))
-#         getattr(process,'patType1p2CorrectedPFMet'+postfix).srcType1Corrections.append(cms.InputTag('pfMEtSysShiftCorr'))
-
+    #     if options.applySysShiftCorrection:
+    #         getattr(process,'patType1CorrectedPFMet'+postfix).srcType1Corrections.append(cms.InputTag('pfMEtSysShiftCorr'))
+    #         getattr(process,'patType1p2CorrectedPFMet'+postfix).srcType1Corrections.append(cms.InputTag('pfMEtSysShiftCorr'))
+    
+    # recalculate MET with JEC
+    runMetCorAndUncFromMiniAOD(
+        process,
+        isData=runOnData,
+    )
 
     # if not applyResiduals:
     # process.patPFMetT1T2CorrCustomJEC.jetCorrLabelRes = cms.InputTag("L3Absolute")

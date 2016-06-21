@@ -13,7 +13,10 @@ nTuplePFJets = cms.EDProducer("BristolNTuple_PFJets",
     DoVertexAssociation = cms.bool(True),
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices'),
     isRealData = cms.bool(False),
-    btagCalibrationFile = cms.string('CSVv2.csv'),
+    looseBTagWP = cms.double(0.460),
+    mediumBTagWP = cms.double(0.800),
+    tightBTagWP = cms.double(0.935),    
+    btagCalibrationFile = cms.string('CSVv2.csv')
 #     btagCalibrationFile = cms.string)'BristolAnalysis/NTupleTools/data/BTagSF/CSVv2.csv'),
 #     btagCalibrationFile = cms.string('/vagrant/data/BTagSF/CSVv2.csv'),
 )

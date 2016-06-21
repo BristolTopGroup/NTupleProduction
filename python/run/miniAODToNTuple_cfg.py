@@ -26,12 +26,12 @@ process.printEventContent = cms.EDAnalyzer("EventContentAnalyzer")
 ## Source
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        # 'root://xrootd.unl.edu//store/mc/RunIIFall15MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext3-v1/00000/00DF0A73-17C2-E511-B086-E41D2D08DE30.root',
+        'root://xrootd.unl.edu//store/mc/RunIIFall15MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext3-v1/00000/00DF0A73-17C2-E511-B086-E41D2D08DE30.root',
         # 'root://xrootd.unl.edu//store/mc/RunIIFall15MiniAODv2/TT_TuneEE5C_13TeV-amcatnlo-herwigpp/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/10000/0047D532-93B8-E511-AEF5-C4346BC8D568.root'
 
         # 'root://xrootd.unl.edu//store/data/Run2015C_25ns/SingleMuon/MINIAOD/16Dec2015-v1/00000/002C22D4-E1AF-E511-AE8E-001E673971CA.root'
         # 'file:/storage/db0268/TopCrossSections/NTupleProduction/CMSSW_7_6_3/src/testSingleMuon.root'
-        'file:/storage/db0268/TopCrossSections/NTupleProduction/CMSSW_7_6_3/src/testMC.root'
+        # 'file:/storage/db0268/TopCrossSections/NTupleProduction/CMSSW_7_6_3/src/testMC.root'
 
     )
 )
@@ -181,6 +181,9 @@ else :
 
 # 76X datasets are all ReReco so far
 process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults','','PAT')
+
+if options.isLocalRunning:
+  process.nTuplePFJets.csvToUse = cms.string('BristolAnalysis/NTupleTools/data/BTagSF/CSVv2.csv')
 
 # if options.isData and options.isReReco:
 #   process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults','','PAT')

@@ -12,7 +12,7 @@
 class BristolNTuple_Electrons : public edm::EDProducer {
  public:
   explicit BristolNTuple_Electrons(const edm::ParameterSet&);
-  virtual bool returnInvertedSelection(const vid::CutFlowResult fullCutFlowData, uint invertedSelection) const;
+  virtual bool returnInvertedSelection(const vid::CutFlowResult fullCutFlowData, std::vector<uint> invertedSelection) const;
 
  private:
   void produce( edm::Event &, const edm::EventSetup & );
