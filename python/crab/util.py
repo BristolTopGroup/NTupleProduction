@@ -56,8 +56,8 @@ def get_files(campaign, dataset_alias):
     for row in data:
         drop_das_fields(row)
         if 'file' in row:
-            file = row['file'][0]['name']
-            files.append(file)
+            f = row['file'][0]['name']
+            files.append(f)
     # TODO: cache the response
     LOG.info("Found {0} files".format(len(files)))
     return files
