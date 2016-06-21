@@ -41,7 +41,7 @@ BTAG_CALIB_FILE = os.path.join(NTPROOT, 'data/BTagSF/CSVv2.csv')
 
 BASE = """
 import FWCore.ParameterSet.Config as cms
-from run.miniAODToNTuple_cfg import process
+from run.miniAODToNTuple_cfg_v2 import process
 
 process.maxEvents.input = cms.untracked.int32({nevents})
 
