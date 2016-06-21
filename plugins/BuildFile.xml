@@ -2,3 +2,11 @@
 	<use name="BristolAnalysis/NTupleTools"/>
 </library>
 
+<library name = "BristolAnalysisNTupleProductionPlugins_userdata" file="userdata/*.cc">
+	<use name="BristolAnalysis/NTupleTools"/>
+	<!--<use name="boost"/>
+	<use name="rootcore"/>
+	<use name="FWCore/PluginManager"/>
+	<use name="CLHEP"/>
+	<use name="DataFormats/PatCandidates"/>-->
+</library>
