@@ -1,12 +1,4 @@
-<use name="CondCore/PluginSystem"/>
-<use name="AnalysisDataFormats/TopObjects"/>
-<use name="DataFormats/PatCandidates"/>
-<use name="FWCore/ServiceRegistry"/>
-<use name="FWCore/MessageLogger"/>
-<use name="FWCore/ParameterSet"/>
-<use name="FWCore/Framework"/>
-<use name="FWCore/Utilities"/>
-<use name="PhysicsTools/PatUtils"/>
-<use name="BristolAnalysis/NTupleTools"/>
-<use name="SimDataFormats/GeneratorProducts"/>
-<use name="root"/>
+<library name = "BristolAnalysisNTupleProductionPlugins" file="*.cc">
+	<use name="BristolAnalysis/NTupleTools"/>
+</library>
+
