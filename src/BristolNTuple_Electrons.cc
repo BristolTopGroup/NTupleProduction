@@ -21,10 +21,7 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 		storePFIsolation_(iConfig.getParameter<bool>("storePFIsolation")), //
 		debugRelease_(iConfig.getParameter<bool>("debugRelease")), //
 		vtxInputTag(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))), //		
-		beamSpotInputTag(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"))), //
-		conversionsInputTag(consumes<std::vector<reco::Conversion>>(iConfig.getParameter<edm::InputTag>("ConversionsInputTag"))), // 		
-  		mediumElectronIDMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("mediumElectronIDMap"))), //
-  		eleMediumIdFullInfoMapToken_(consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("mediumElectronIDMap")))	 
+		beamSpotInputTag(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotInputTag")))
 {
 
 	//kinematic variables
@@ -230,22 +227,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
     edm::Handle<edm::View<pat::Electron> > electrons;
     iEvent.getByToken(inputTag,electrons);
 
-	edm::Handle< reco::BeamSpot > bsHandle;
-	iEvent.getByToken(beamSpotInputTag, bsHandle);
-
-	edm::Handle< std::vector< reco::Conversion > > hConversions;
-	iEvent.getByToken(conversionsInputTag, hConversions);
-
 	edm::Handle< std::vector< reco::Vertex > > primaryVertices;
 	iEvent.getByToken(vtxInputTag, primaryVertices);
-
-	edm::Handle<edm::ValueMap<bool> > medium_id_decisions;
-	iEvent.getByToken(mediumElectronIDMapToken_,medium_id_decisions);
-	mediumElectronIDDecisions_ = *medium_id_decisions;
-
-  	edm::Handle<edm::ValueMap<vid::CutFlowResult> > medium_id_cutflow_data;
-  	iEvent.getByToken(eleMediumIdFullInfoMapToken_, medium_id_cutflow_data);
-	medium_id_cutflow_data_ = *medium_id_cutflow_data;
 
 	if (electrons.isValid()) {
 
@@ -253,40 +236,15 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 		for (size_t index = 0; index < electrons->size(); ++index){
 			const auto it = electrons->ptrAt(index);
-			std::vector<uint> idCutsToInvert {99};
 			// exit from loop when you reach the required number of electrons (99)
 			if (px->size() >= maxSize) break;
 
-			vid::CutFlowResult fullCutFlowData = medium_id_cutflow_data_[it];
 			// Check ID
-			isMediumElectron->push_back( mediumElectronIDDecisions_[it] );
-
-			idCutsToInvert = {9};
-			if ( returnInvertedSelection(fullCutFlowData, idCutsToInvert) ){
-				isMediumNonIsoElectron->push_back( true );
-			}
-			else {
-				isMediumNonIsoElectron->push_back( false );
-			}
-
-			idCutsToInvert = {10, 11};
-			if ( returnInvertedSelection(fullCutFlowData, idCutsToInvert) ){
-				isMediumConversionElectron->push_back( true );
-			}
-			else {
-				isMediumConversionElectron->push_back( false );
-			}
-			PFRelIsoWithEA->push_back( fullCutFlowData.getValueCutUpon(9) );
-
-			/* Conversion (fit)
-			 * See https://indico.cern.ch/getFile.py/access?contribId=12&sessionId=0&resId=0&materialId=slides&confId=133587
-			 * and
-			 * https://hypernews.cern.ch/HyperNews/CMS/get/egamma/999.html ( N.1 )
-			 */
-			bool matchesConv = false;
-			if (hConversions.isValid() && bsHandle.isValid()) {
-				matchesConv = ConversionTools::hasMatchedConversion(*it, hConversions, bsHandle->position());
-			} 
+			isMediumElectron->push_back( it->userInt("passesMediumId") );
+			isMediumNonIsoElectron->push_back( it->userInt("passesMediumNonIsoId")  );
+			isMediumConversionElectron->push_back( it->userInt("passesMediumConversionId") );
+			hasMatchedConvPhot->push_back(it->userInt("hasMatchedConvPhot"));
+			PFRelIsoWithEA->push_back( it->userFloat("PFRelIsoWithEA") );
 			// Vertex association
 			double minVtxDist3D = 9999.;
 			int vtxIndex_ = -1;
@@ -395,7 +353,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			dist_vec->push_back(it->convDist());
 			dCotTheta->push_back(it->convDcot());
 			conversionRadius->push_back(it->convRadius());
-			hasMatchedConvPhot->push_back(matchesConv);
 			shFracInnerHits->push_back(it->shFracInnerHits());
 //			bool passesConversionVeto = !ConversionTools::hasMatchedConversion(it,hConversions,beamspot.position());
 			passConversionVeto->push_back(it->passConversionVeto());
@@ -518,20 +475,4 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	iEvent.put(vtxDistZCorr, prefix + "VtxDistZCorr" + suffix);
 	iEvent.put(primaryVertexDXYCorr, prefix + "PrimaryVertexDXYCorr" + suffix);
 
-}
-
-bool BristolNTuple_Electrons::returnInvertedSelection(const vid::CutFlowResult fullCutFlowData, std::vector<uint> invertedSelection) const {
-
-	bool passesFullSelection = true;
-	for(uint icut = 0; icut < fullCutFlowData.cutFlowSize(); icut++){
-   	bool passesThisCut = fullCutFlowData.getCutResultByIndex(icut);
- 		for ( auto invertedCut = invertedSelection.begin(); invertedCut != invertedSelection.end(); invertedCut++ ) {
-    		if ( icut== *invertedCut ) passesThisCut = !passesThisCut;
-    	}
-    	if ( !passesThisCut ) {
-            passesFullSelection = false;
-            break;
-        }		
-	}
-	return passesFullSelection;
 }

@@ -38,6 +38,8 @@
 
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
+#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
+
 namespace ntp {
 namespace userdata {
 
@@ -62,19 +64,21 @@ private:
 	bool passIDWP(std::string WP, bool isEB, float dEtaIn, float dPhiIn, float full5x5, float hoe, float d0, float dz,
 			float ooemoop, bool conv, int missHits);
 
-	bool passesInvertedIDCuts(const vid::CutFlowResult fullCutFlowData, std::vector<uint> invertedSelection);
+	bool passesInvertedIDCuts(const vid::CutFlowResult fullCutFlowData, std::vector<uint> invertedSelection) const;
+	bool isLoose(const edm::Ptr<pat::Electron>& electron) const;
 
 	// inputs
-	const edm::EDGetToken electronInputTag_;
+	edm::EDGetToken electronInputTag_;
 	const edm::EDGetTokenT<std::vector<reco::Vertex> > vtxInputTag_;
 	const edm::EDGetTokenT<reco::BeamSpot> beamSpotInputTag_;
 	const edm::EDGetTokenT<std::vector<reco::Conversion> > conversionsInputTag_;
 
+	const edm::EDGetTokenT<edm::ValueMap<bool> > looseElectronIDMapToken_;
 	const edm::EDGetTokenT<edm::ValueMap<bool> > mediumElectronIDMapToken_;
 	const edm::EDGetTokenT<edm::ValueMap<vid::CutFlowResult> > eleMediumIdFullInfoMapToken_;
 
-	edm::ValueMap<bool> mediumElectronIDDecisions_;
-	edm::ValueMap<vid::CutFlowResult> medium_id_cutflow_data_;
+	edm::ValueMap<bool> mediumElectronIDDecisions_, looseElectronIDDecisions_;
+	edm::ValueMap<vid::CutFlowResult> mediumIdCutFlowData_;
 
 	// cuts
 	double maxLooseElectronEta_, minLooseElectronPt_;
@@ -105,6 +109,9 @@ ElectronUserData::ElectronUserData(const edm::ParameterSet& iConfig) :
 				conversionsInputTag_(
 						consumes < std::vector
 								< reco::Conversion >> (iConfig.getParameter < edm::InputTag > ("conversionInput"))), //
+				looseElectronIDMapToken_(
+						consumes < edm::ValueMap<bool>
+								> (iConfig.getParameter < edm::InputTag > ("looseElectronIDMap"))), //
 				mediumElectronIDMapToken_(
 						consumes < edm::ValueMap<bool>
 								> (iConfig.getParameter < edm::InputTag > ("mediumElectronIDMap"))), //
@@ -140,13 +147,18 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 
 	edm::Handle < std::vector<reco::Vertex> > primaryVertices;
 	iEvent.getByToken(vtxInputTag_, primaryVertices);
+
+	edm::Handle < edm::ValueMap<bool> > loose_id_decisions;
+	iEvent.getByToken(looseElectronIDMapToken_, loose_id_decisions);
+	looseElectronIDDecisions_ = *loose_id_decisions;
+
 	edm::Handle < edm::ValueMap<bool> > medium_id_decisions;
 	iEvent.getByToken(mediumElectronIDMapToken_, medium_id_decisions);
 	mediumElectronIDDecisions_ = *medium_id_decisions;
 
 	edm::Handle < edm::ValueMap<vid::CutFlowResult> > medium_id_cutflow_data;
 	iEvent.getByToken(eleMediumIdFullInfoMapToken_, medium_id_cutflow_data);
-	medium_id_cutflow_data_ = *medium_id_cutflow_data;
+	mediumIdCutFlowData_ = *medium_id_cutflow_data;
 
 	if (electrons.isValid()) {
 		std::auto_ptr < std::vector<pat::Electron> > electronCollection(new std::vector<pat::Electron>(*electrons));
@@ -155,7 +167,30 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 
 		for (size_t index = 0; index < nElectrons; ++index) {
 			pat::Electron & el = electronCollection->at(index);
-			el.addUserInt("isLoose", 0);
+			const edm::Ptr<pat::Electron> elPtr(electrons, index);
+			std::vector < uint > idCutsToInvert { 99 };
+
+			vid::CutFlowResult fullCutFlowDataMedium = mediumIdCutFlowData_[elPtr];
+			el.addUserInt("isLoose", looseElectronIDDecisions_[elPtr]);
+			el.addUserInt("passesMediumId", mediumElectronIDDecisions_[elPtr]);
+			idCutsToInvert = {9};
+			// (*HEEP_id_cutflow_data)[ elPtr ].getCutFlowResultMasking(maskCuts).cutFlowPassed();
+			el.addUserInt("passesMediumNonIsoId", passesInvertedIDCuts(fullCutFlowDataMedium, idCutsToInvert));
+			idCutsToInvert = {10, 11};
+			el.addUserInt("passesMediumConversionId", passesInvertedIDCuts(fullCutFlowDataMedium, idCutsToInvert));
+			el.addUserFloat("PFRelIsoWithEA", fullCutFlowDataMedium.getValueCutUpon(9));
+
+			bool matchesConv = false;
+			if (hConversions.isValid() && bsHandle.isValid()) {
+				/* Conversion (fit)
+				 * See https://indico.cern.ch/getFile.py/access?contribId=12&sessionId=0&resId=0&materialId=slides&confId=133587
+				 * and
+				 * https://hypernews.cern.ch/HyperNews/CMS/get/egamma/999.html ( N.1 )
+				 */
+				matchesConv = ConversionTools::hasMatchedConversion(*elPtr, hConversions, bsHandle->position());
+			}
+			el.addUserInt("hasMatchedConvPhot", matchesConv);
+
 		}
 		iEvent.put(electronCollection);
 	}
@@ -176,6 +211,31 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 	 ESHandle<SetupData> pSetup;
 	 iSetup.get<SetupRecord>().get(pSetup);
 	 */
+}
+
+bool ElectronUserData::passesInvertedIDCuts(const vid::CutFlowResult fullCutFlowData,
+		std::vector<uint> invertedSelection) const {
+
+	bool passesFullSelection = true;
+	for (uint icut = 0; icut < fullCutFlowData.cutFlowSize(); icut++) {
+		bool passesThisCut = fullCutFlowData.getCutResultByIndex(icut);
+		for (auto invertedCut = invertedSelection.begin(); invertedCut != invertedSelection.end(); invertedCut++) {
+			if (icut == *invertedCut)
+				passesThisCut = !passesThisCut;
+		}
+		if (!passesThisCut) {
+			passesFullSelection = false;
+			break;
+		}
+	}
+	return passesFullSelection;
+}
+
+bool ElectronUserData::isLoose(const edm::Ptr<pat::Electron>& electron) const {
+	bool passesPtAndEta = electron->pt() > minLooseElectronPt_ && fabs(electron->eta()) < maxLooseElectronEta_;
+	bool passesId = looseElectronIDDecisions_[electron];
+	bool passesIso = true; // FIXME Iso already applied in ID (check in AT)
+	return passesPtAndEta && passesId && passesIso;
 }
 
 // ------------ method called once each stream before processing any runs, lumis or events  ------------

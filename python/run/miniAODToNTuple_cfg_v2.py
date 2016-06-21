@@ -118,7 +118,7 @@ if options.tagAndProbe:
 process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(-1))
 
 from BristolAnalysis.NTupleTools.NTupler_cff import setup_ntupler
-setup_ntupler(process, cms )
+setup_ntupler(process, cms)
 
 if isTTbarMC:
     process.makingNTuples = cms.Path(
@@ -237,25 +237,27 @@ process.TFileService = cms.Service(
 )
 
 # new
-process.skimmedPatElectrons = cms.EDFilter(
-    "PATElectronSelector",
-    src=cms.InputTag('slimmedElectrons'),
-    cut=cms.string("pt > 10 && abs(eta) < 2.5")
-)
+# process.skimmedPatElectrons = cms.EDFilter(
+#     "PATElectronSelector",
+#     src=cms.InputTag('slimmedElectrons'),
+#     cut=cms.string("pt > 10 && abs(eta) < 2.5")
+# )
 
 process.electronUserData = cms.EDProducer(
     'ElectronUserData',
     vertexCollection=cms.InputTag('offlineSlimmedPrimaryVertices'),
-    electronCollection=cms.InputTag("skimmedPatElectrons"),
+    electronCollection=cms.InputTag("slimmedElectrons"),
     beamSpotCollection=cms.InputTag('offlineBeamSpot'),
     conversionInput=cms.InputTag('reducedEgamma', 'reducedConversions'),
     mediumElectronIDMap=cms.InputTag(
         'egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-medium'),
     mediumElectronIDMap_bitmap=cms.InputTag(
         'egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-mediumBitmap'),
-    #     looseElectronIDMap=cms.InputTag(
-    #         'egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-loose'),
-
+    looseElectronIDMap=cms.InputTag(
+        "egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-loose"),
+#     electronTightIdMap=cms.InputTag(
+#         "egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-tight"),
+#     electronHEEPIdMap=cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV60"),
 
     #     rho        = cms.InputTag(rhoLabel),
     #     triggerResults = cms.InputTag(triggerResultsLabel),
