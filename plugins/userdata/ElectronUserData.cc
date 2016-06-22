@@ -66,6 +66,7 @@ private:
 
 	bool passesInvertedIDCuts(const vid::CutFlowResult fullCutFlowData, std::vector<uint> invertedSelection) const;
 	bool isLoose(const edm::Ptr<pat::Electron>& electron) const;
+	bool isGood(const edm::Ptr<pat::Electron>& electron) const;
 	void fillVertexVariables(const edm::Event&, pat::Electron& el) const;
 
 	// inputs
@@ -82,7 +83,8 @@ private:
 	edm::ValueMap<vid::CutFlowResult> mediumIdCutFlowData_;
 
 	// cuts
-	double maxLooseElectronEta_, minLooseElectronPt_;
+	double minLooseElectronPt_, maxLooseElectronEta_;
+	double minSignalElectronPt_, maxSignalElectronEta_;
 
 	// ----------member data ---------------------------
 };
@@ -112,13 +114,17 @@ ElectronUserData::ElectronUserData(const edm::ParameterSet& iConfig) :
 								< reco::Conversion >> (iConfig.getParameter < edm::InputTag > ("conversionInput"))), //
 				looseElectronIDMapToken_(
 						consumes < edm::ValueMap<bool>
-								> (iConfig.getParameter < edm::InputTag > ("looseElectronIDMap"))), //
+								> (iConfig.getParameter < edm::InputTag > ("electronLooseIdMap"))), //
 				mediumElectronIDMapToken_(
 						consumes < edm::ValueMap<bool>
-								> (iConfig.getParameter < edm::InputTag > ("mediumElectronIDMap"))), //
+								> (iConfig.getParameter < edm::InputTag > ("electronMediumIdMap"))), //
 				eleMediumIdFullInfoMapToken_(
 						consumes < edm::ValueMap<vid::CutFlowResult>
-								> (iConfig.getParameter < edm::InputTag > ("mediumElectronIDMap"))) {
+								> (iConfig.getParameter < edm::InputTag > ("electronMediumIdMap"))), //
+				minLooseElectronPt_(iConfig.getParameter<double>("minLooseElectronPt")), //
+				maxLooseElectronEta_(iConfig.getParameter<double>("maxLooseElectronEta")), //
+				minSignalElectronPt_(iConfig.getParameter<double>("minSignalElectronPt")), //
+				maxSignalElectronEta_(iConfig.getParameter<double>("maxSignalElectronEta")) {
 	//register your products
 	produces<std::vector<pat::Electron> >();
 	//now do what ever other initialization is needed
@@ -195,6 +201,12 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 			// vertex association
 			fillVertexVariables(iEvent, el);
 
+			// Top Object Definitions
+			el.addUserInt("isLoose", isLoose(elPtr));
+			el.addUserInt("isGood", isGood(elPtr) && el.userInt("passesMediumId"));
+			el.addUserInt("isGoodNonIso", isGood(elPtr) && el.userInt("passesMediumNonIsoId"));
+			el.addUserInt("isGoodConversion", isGood(elPtr) && el.userInt("passesMediumConversionId"));
+
 		}
 		iEvent.put(electronCollection);
 	}
@@ -217,6 +229,30 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 	 */
 }
 
+/**
+ *
+ * @param fullCutFlowData: The versioned id (VID) cutflow result
+ * @param invertedSelection a vector of ID steps to invert
+ * @return
+ *
+ * Electron ID steps
+ *  // ID Cuts
+ *  // Index : Name
+ *  //-----------------------------------------
+ *  //   0   : MinPtCut
+ *  //   1   : GsfEleSCEtaMultiRangeCut
+ *  //   2   : GsfEleDEtaInCut
+ *  //   3   : GsfEleDPhiInCut
+ *  //   4   : GsfEleFull5x5SigmaIEtaIEtaCut
+ *  //   5   : GsfEleHadronicOverEMCut
+ *  //   6   : GsfEleDxyCut
+ *  //   7   : GsfEleDzCut
+ *  //   8   : GsfEleEInverseMinusPInverseCut
+ *  //   9   : GsfEleEffAreaPFIsoCut
+ *  //   10  : GsfEleConversionVetoCut
+ *  //   11  : GsfEleMissingHitsCut
+ */
+
 bool ElectronUserData::passesInvertedIDCuts(const vid::CutFlowResult fullCutFlowData,
 		std::vector<uint> invertedSelection) const {
 
@@ -236,10 +272,18 @@ bool ElectronUserData::passesInvertedIDCuts(const vid::CutFlowResult fullCutFlow
 }
 
 bool ElectronUserData::isLoose(const edm::Ptr<pat::Electron>& electron) const {
-	bool passesPtAndEta = electron->pt() > minLooseElectronPt_ && fabs(electron->eta()) < maxLooseElectronEta_;
+	bool passesPt = electron->pt() > minLooseElectronPt_;
+	bool passesEta = fabs(electron->eta()) < maxLooseElectronEta_;
 	bool passesId = looseElectronIDDecisions_[electron];
-	bool passesIso = true; // FIXME Iso already applied in ID (check in AT)
-	return passesPtAndEta && passesId && passesIso;
+	return passesPt && passesEta && passesId;
+}
+
+bool ElectronUserData::isGood(const edm::Ptr<pat::Electron>& electron) const {
+	bool passesPtAndEta = electron->pt() > minSignalElectronPt_ && fabs(electron->eta()) < maxSignalElectronEta_;
+	bool notInCrack = fabs(electron->superCluster()->eta()) < 1.4442 || fabs(electron->superCluster()->eta()) > 1.5660;
+	bool inECAL = fabs(electron->superCluster()->eta()) < 2.5;
+
+	return passesPtAndEta && notInCrack && inECAL;
 }
 
 void ElectronUserData::fillVertexVariables(const edm::Event& iEvent, pat::Electron& el) const {

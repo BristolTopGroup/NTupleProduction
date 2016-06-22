@@ -68,10 +68,8 @@ public:
 	virtual bool isGoodJet(const pat::Jet& jet) const;
 	virtual bool isGoodElectron(const edm::Ptr<pat::Electron>&) const;
 	virtual double electronIsolation(const pat::Electron& electron) const;
-	virtual	bool returnInvertedSelection(const edm::Ptr<pat::Electron>& , std::vector<uint> invertedSelection) const;
 
 	//definitions of loose objects
-	virtual bool isLooseElectron(const edm::Ptr<pat::Electron>& electron) const;
 	virtual bool isLooseMuon(const pat::Muon& muon) const;
 	//isolation definitions
 	virtual void getLooseElectrons();
@@ -112,14 +110,7 @@ private:
 	edm::EDGetTokenT<edm::TriggerResults> hltInputTag_;
 	edm::EDGetTokenT<reco::VertexCollection> vertexInputTag_;
 
-	double minSignalElectronPt_, maxSignalElectronEta_;
-	edm::EDGetTokenT<edm::ValueMap<bool> > signalElectronIDMapToken_;
-	edm::EDGetTokenT<edm::ValueMap<vid::CutFlowResult> > eleMediumIdFullInfoMapToken_;
-
-	double minSignalElectronID_;
-	double minLooseMuonPt_, maxLooseMuonEta_, minLooseElectronPt_, maxLooseElectronEta_;
-	edm::EDGetTokenT<edm::ValueMap<bool> > looseElectronIDMapToken_;
-	double minLooseElectronID_;
+	double minLooseMuonPt_, maxLooseMuonEta_;
 	double min1JetPt_, min2JetPt_, min3JetPt_, min4JetPt_;
 	double minBJetPt_;
 	double minJetPtInNtuples_;

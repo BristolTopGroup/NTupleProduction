@@ -64,7 +64,6 @@ public:
 	virtual bool isGoodJet(const pat::Jet& jet) const;
 	virtual bool isGoodMuon(const pat::Muon& muon) const;
 	//definitions of loose objects
-	virtual bool isLooseElectron(const edm::Ptr<pat::Electron>& electron) const;
 	virtual bool isLooseMuon(const pat::Muon& muon) const;
 	virtual void getLooseElectrons();
 	virtual void getLooseMuons();
@@ -96,15 +95,12 @@ private:
 	edm::EDGetTokenT<pat::JetCollection> jetInput_;
 	edm::EDGetToken electronInput_;
 
-	// edm::EDGetTokenT<pat::ElectronCollection> electronInput_;
 	edm::EDGetTokenT<pat::MuonCollection> muonInput_;
 	edm::EDGetTokenT<edm::TriggerResults> hltInputTag_;
 	edm::EDGetTokenT<reco::VertexCollection> VertexInput_;
 
 	double minSignalMuonPt_, maxSignalMuonEta_;
-	double minLooseMuonPt_, maxLooseMuonEta_, minLooseElectronPt_, maxLooseElectronEta_;
-	edm::EDGetTokenT<edm::ValueMap<bool> > looseElectronIDMapToken_;
-	double minLooseElectronID_;
+	double minLooseMuonPt_, maxLooseMuonEta_;
 	double min1JetPt_, min2JetPt_, min3JetPt_, min4JetPt_;
 	double minBJetPt_;
 	double minJetPtInNtuples_;
@@ -138,7 +134,6 @@ private:
 	pat::JetCollection jets_, cleanedJets_, cleanedBJets_;
 	edm::Handle <edm::View<pat::Electron> > electrons_;
 	pat::ElectronCollection looseElectrons_;
-    edm::ValueMap<bool> looseElectronIDDecisions_;
 	pat::MuonCollection muons_, goodIsolatedMuons_, looseMuons_;
 	pat::Muon signalMuon_;
 	HLTConfigProvider hltConfig_;
