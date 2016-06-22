@@ -575,10 +575,11 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
 			//b-tagging information
 			//names are changing between major software releases
-			combinedInclusiveSecondaryVertexV2BJetTags->push_back(it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
-			passesLooseCSV->push_back(combinedInclusiveSecondaryVertexV2BJetTags > looseBTagWP );
-			passesMediumCSV->push_back(combinedInclusiveSecondaryVertexV2BJetTags > mediumBTagWP );
-			passesTightCSV->push_back(combinedInclusiveSecondaryVertexV2BJetTags > tightBTagWP );
+			double bDisc = it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags");
+			combinedInclusiveSecondaryVertexV2BJetTags->push_back(bDisc);
+			passesLooseCSV->push_back(bDisc > looseBTagWP );
+			passesMediumCSV->push_back(bDisc > mediumBTagWP );
+			passesTightCSV->push_back(bDisc > tightBTagWP );
 			
 			// Read and store b tagging scale factors for MC
 			if (!iEvent.isRealData()) {
