@@ -31,7 +31,7 @@ OUTPUT_FILE = os.path.join(RESULTDIR, 'sync_exercise.root')
 
 BASE = """
 import FWCore.ParameterSet.Config as cms
-from run.synchronisation_exercise_cfg import process
+from run.miniAODToNTuple_cfg import process
 
 process.maxEvents.input = cms.untracked.int32({nevents})
 

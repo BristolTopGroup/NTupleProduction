@@ -113,10 +113,6 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 	desc.add<double>("maxSignalMuonEta",10.);
 	desc.add<double>("minLooseMuonPt",0.);
 	desc.add<double>("maxLooseMuonEta",10.);
-	desc.add<double>("minLooseElectronPt",0.);
-	desc.add<double>("maxLooseElectronEta",10.);
-	desc.add < InputTag > ("looseElectronIDMap");
-	desc.add<double>("minLooseElectronID",0);
 
 	desc.add<double>("min1JetPt", 30.0);
 	desc.add<double>("min2JetPt", 30.0);

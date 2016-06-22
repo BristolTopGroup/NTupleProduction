@@ -1,6 +1,11 @@
 from __future__ import print_function
 from FWCore.ParameterSet.VarParsing import VarParsing
+import os
 
+# get CMSSW version
+CMSSW_VERSION = os.environ['CMSSW_VERSION']
+varray = CMSSW_VERSION.split('_')
+CMSSW_MAJOR_VERSION, CMSSW_MINOR_VERSION = int(varray[1]), int(varray[2])
 
 def registerOptions(options):
     options.register('tagAndProbe',
