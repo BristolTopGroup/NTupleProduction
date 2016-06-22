@@ -66,6 +66,7 @@ private:
 
 	bool passesInvertedIDCuts(const vid::CutFlowResult fullCutFlowData, std::vector<uint> invertedSelection) const;
 	bool isLoose(const edm::Ptr<pat::Electron>& electron) const;
+	void fillVertexVariables(const edm::Event&, pat::Electron& el) const;
 
 	// inputs
 	edm::EDGetToken electronInputTag_;
@@ -171,7 +172,7 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 			std::vector < uint > idCutsToInvert { 99 };
 
 			vid::CutFlowResult fullCutFlowDataMedium = mediumIdCutFlowData_[elPtr];
-			el.addUserInt("isLoose", looseElectronIDDecisions_[elPtr]);
+			el.addUserInt("passesLooseId", looseElectronIDDecisions_[elPtr]);
 			el.addUserInt("passesMediumId", mediumElectronIDDecisions_[elPtr]);
 			idCutsToInvert = {9};
 			// (*HEEP_id_cutflow_data)[ elPtr ].getCutFlowResultMasking(maskCuts).cutFlowPassed();
@@ -190,6 +191,9 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 				matchesConv = ConversionTools::hasMatchedConversion(*elPtr, hConversions, bsHandle->position());
 			}
 			el.addUserInt("hasMatchedConvPhot", matchesConv);
+
+			// vertex association
+			fillVertexVariables(iEvent, el);
 
 		}
 		iEvent.put(electronCollection);
@@ -236,6 +240,51 @@ bool ElectronUserData::isLoose(const edm::Ptr<pat::Electron>& electron) const {
 	bool passesId = looseElectronIDDecisions_[electron];
 	bool passesIso = true; // FIXME Iso already applied in ID (check in AT)
 	return passesPtAndEta && passesId && passesIso;
+}
+
+void ElectronUserData::fillVertexVariables(const edm::Event& iEvent, pat::Electron& el) const {
+	edm::Handle < std::vector<reco::Vertex> > primaryVertices;
+	iEvent.getByToken(vtxInputTag_, primaryVertices);
+
+	size_t index = 9999;
+	double minVtxDist3D = 9999.;
+	double vtxDistZ = -9999.;
+	double vtxDistXY_Corr = -9999.;
+	double vtxDistZ_Corr = -9999.;
+
+	if (primaryVertices.isValid()) {
+		LogDebug("ElectronUserData") << "Total # Primary Vertices: " << primaryVertices->size();
+		// this is only for the primary vertex
+		reco::Vertex pv = primaryVertices->front();
+		vtxDistXY_Corr = el.gsfTrack()->d0() - pv.x() * sin(el.gsfTrack()->phi()) + pv.y() * cos(el.gsfTrack()->phi());
+		vtxDistZ_Corr = (el.vz() - pv.z())
+				- ((el.vx() - pv.x()) * el.px() + (el.vy() - pv.y()) * el.py()) / el.pt() / el.pt() * el.pz();
+
+		for (reco::VertexCollection::const_iterator v_it = primaryVertices->begin(); v_it != primaryVertices->end();
+				++v_it) {
+
+			double distXY = el.gsfTrack()->dxy(v_it->position());
+			double distZ = el.gsfTrack()->dz(v_it->position());
+			double dist3D = sqrt(pow(distXY, 2) + pow(distZ, 2));
+
+			if (dist3D < minVtxDist3D) {
+				minVtxDist3D = dist3D;
+				index = size_t(std::distance(primaryVertices->begin(), v_it));
+				vtxDistZ = distZ;
+			}
+		}
+	}
+	// closest vertex
+	el.addUserInt("vtxIndex", index);
+	el.addUserFloat("vtxDistZ", vtxDistZ);
+	// primary vertex
+	el.addUserFloat("primaryVertexDXY", el.dB());
+	el.addUserFloat("primaryVertexDXYError", el.edB());
+	el.addUserFloat("vtxDistXY_Corr", vtxDistXY_Corr);
+	el.addUserFloat("vtxDistZ_Corr", vtxDistZ_Corr);
+	// beamspot
+	el.addUserFloat("beamSpotDXY", el.dB(pat::Electron::BS2D));
+	el.addUserFloat("beamSpotDXYError", el.edB(pat::Electron::BS2D));
 }
 
 // ------------ method called once each stream before processing any runs, lumis or events  ------------

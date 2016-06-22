@@ -1,5 +1,4 @@
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_Electrons.h"
-#include "BristolAnalysis/NTupleTools/interface/DirectionalIsolation.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -8,10 +7,6 @@
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/Scalers/interface/DcsStatus.h"
 #include "FWCore/Framework/interface/ESHandle.h"
-#include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/VertexReco/interface/VertexFwd.h"
-#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
-#include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
 
 BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfig) :
   		inputTag(consumes<edm::View<pat::Electron>>(iConfig.getParameter<edm::InputTag>("InputTag"))),			
@@ -19,9 +14,7 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 		suffix(iConfig.getParameter < std::string > ("Suffix")), //
 		maxSize(iConfig.getParameter<unsigned int>("MaxSize")), //
 		storePFIsolation_(iConfig.getParameter<bool>("storePFIsolation")), //
-		debugRelease_(iConfig.getParameter<bool>("debugRelease")), //
-		vtxInputTag(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))), //		
-		beamSpotInputTag(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotInputTag")))
+		debugRelease_(iConfig.getParameter<bool>("debugRelease"))
 {
 
 	//kinematic variables
@@ -114,7 +107,8 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 	//electron vertex variables
 	produces < std::vector<int> > (prefix + "VtxIndex" + suffix);
 	produces < std::vector<double> > (prefix + "VtxDistZ" + suffix);
-	produces < std::vector<double> > (prefix + "PrimaryVertexDXY" + suffix); //2D impact parameter, XY distance to vertex
+	//2D impact parameter, XY distance to vertex
+	produces < std::vector<double> > (prefix + "PrimaryVertexDXY" + suffix);
 	produces < std::vector<double> > (prefix + "PrimaryVertexDXYError" + suffix);
 	produces < std::vector<double> > (prefix + "BeamSpotDXY" + suffix);
 	produces < std::vector<double> > (prefix + "BeamSpotDXYError" + suffix);
@@ -177,7 +171,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > PFRelIso04DeltaBeta(new std::vector<double>());
 
 	std::auto_ptr < std::vector<double> > PFRelIsoWithEA(new std::vector<double>());
-//    std::auto_ptr < std::vector<double> > dB(new std::vector<double>());
 
 	// Electron ID variables
 	std::auto_ptr < std::vector<bool> > isMediumElectron(new std::vector<bool>());
@@ -227,9 +220,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
     edm::Handle<edm::View<pat::Electron> > electrons;
     iEvent.getByToken(inputTag,electrons);
 
-	edm::Handle< std::vector< reco::Vertex > > primaryVertices;
-	iEvent.getByToken(vtxInputTag, primaryVertices);
-
 	if (electrons.isValid()) {
 
 		edm::LogInfo("BristolNTuple_ElectronsExtraInfo") << "Total # Electrons: " << electrons->size();
@@ -245,39 +235,18 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			isMediumConversionElectron->push_back( it->userInt("passesMediumConversionId") );
 			hasMatchedConvPhot->push_back(it->userInt("hasMatchedConvPhot"));
 			PFRelIsoWithEA->push_back( it->userFloat("PFRelIsoWithEA") );
-			// Vertex association
-			double minVtxDist3D = 9999.;
-			int vtxIndex_ = -1;
-//			double vtxDistXY_ = -9999.;
-			double vtxDistZ_ = -9999.;
-			double vtxDistXY_Corr = -9999.;
-			double vtxDistZ_Corr = -9999.;
-
-			if (primaryVertices.isValid()) {
-				edm::LogInfo("RootTupleMakerV2_ElectronsInfo") << "Total # Primary Vertices: "
-						<< primaryVertices->size();
-				reco::Vertex pv = primaryVertices->front();
-				vtxDistXY_Corr = it->gsfTrack()->d0() - pv.x() * sin(it->gsfTrack()->phi())
-						+ pv.y() * cos(it->gsfTrack()->phi());
-				vtxDistZ_Corr = (it->vz() - pv.z())
-						- ((it->vx() - pv.x()) * it->px() + (it->vy() - pv.y()) * it->py()) / it->pt() / it->pt()
-								* it->pz();
-
-				for (reco::VertexCollection::const_iterator v_it = primaryVertices->begin();
-						v_it != primaryVertices->end(); ++v_it) {
-
-					double distXY = it->gsfTrack()->dxy(v_it->position());
-					double distZ = it->gsfTrack()->dz(v_it->position());
-					double dist3D = sqrt(pow(distXY, 2) + pow(distZ, 2));
-
-					if (dist3D < minVtxDist3D) {
-						minVtxDist3D = dist3D;
-						vtxIndex_ = int(std::distance(primaryVertices->begin(), v_it));
-//						vtxDistXY_ = distXY;
-						vtxDistZ_ = distZ;
-					}
-				}
-			}
+			// Vertex association variables
+			// closest vertex
+			vtxIndex->push_back(it->userInt("vtxIndex"));
+			vtxDistZ->push_back(it->userFloat("vtxDistZ"));
+			// primary vertex
+			primaryVertexDXY->push_back(it->userFloat("primaryVertexDXY"));
+			primaryVertexDXYError->push_back(it->userFloat("primaryVertexDXYError"));
+			vtxDistZCorr->push_back(it->userFloat("vtxDistZ_Corr"));
+			primaryVertexDXYCorr->push_back(it->userFloat("vtxDistXY_Corr"));
+			// beamspot
+			beamSpotDXY->push_back(it->userFloat("beamSpotDXY"));
+			beamSpotDXYError->push_back(it->userFloat("beamSpotDXYError"));
 
 			//kinematic variables
 			px->push_back(it->px());
@@ -348,13 +317,11 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			trkIsoHeep04->push_back(it->dr04TkSumPt());
 
 			// Conversion variables
-			// missingHits->push_back(it->gsfTrack()->numberOfLostTrackerHits(HitPattern::MISSING_INNER_HITS));
 			missingHits->push_back(0);
 			dist_vec->push_back(it->convDist());
 			dCotTheta->push_back(it->convDcot());
 			conversionRadius->push_back(it->convRadius());
 			shFracInnerHits->push_back(it->shFracInnerHits());
-//			bool passesConversionVeto = !ConversionTools::hasMatchedConversion(it,hConversions,beamspot.position());
 			passConversionVeto->push_back(it->passConversionVeto());
 
 			// SC associated with electron
@@ -364,16 +331,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			scP->push_back(it->eSuperClusterOverP() / it->superCluster()->energy());
 			scEnergy->push_back(it->superCluster()->energy());
 			scRawEnergy->push_back(it->superCluster()->rawEnergy());
-
-			// Vertex association variables
-			vtxIndex->push_back(vtxIndex_);
-			vtxDistZ->push_back(vtxDistZ_);
-			primaryVertexDXY->push_back(it->dB());
-			primaryVertexDXYError->push_back(it->edB());
-			beamSpotDXY->push_back(it->dB(pat::Electron::BS2D));
-			beamSpotDXYError->push_back(it->edB(pat::Electron::BS2D));
-			vtxDistZCorr->push_back(vtxDistZ_Corr);
-			primaryVertexDXYCorr->push_back(vtxDistXY_Corr);
 
 		}
 	}
