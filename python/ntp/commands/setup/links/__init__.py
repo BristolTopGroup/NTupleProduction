@@ -7,6 +7,7 @@
         setup links
 """
 import logging
+import os
 from .. import Command as C
 
 LOG = logging.getLogger(__name__)
@@ -24,29 +25,23 @@ class Command(C):
         from .. import CMSSW_SRC, DESTINATION, LINKS
         from ntp import NTPROOT
 
-        c1 = 'mkdir -p {cmssw_src}/{destination}'.format(
+        destination = '{cmssw_src}/{destination}'.format(
             cmssw_src=CMSSW_SRC,
             destination=DESTINATION
         )
-        commands = [c1]
-
+        if not os.path.exists(destination):
+            os.makedirs(destination)
         for l in LINKS:
-            command = 'ln -s {NTPROOT}/{link} {cmssw_src}/{destination}/{link}'
-            command = command.format(NTPROOT=NTPROOT,
-                                     link=l,
-                                     cmssw_src=CMSSW_SRC,
-                                     destination=DESTINATION)
-            commands.append(command)
-
-        all_in_one = ' && '.join(commands)
-
-        from ntp.interpreter import call
-        call(all_in_one, logger=LOG, shell=True)
+            src = os.path.join(NTPROOT, l)
+            dst = os.path.join(CMSSW_SRC, DESTINATION, l)
+            if not os.path.exists(dst):
+                os.symlink(src, dst)
+            else:
+                LOG.warn('Link {0} already exists...skipping.'.format(dst))
 
         return True
 
     def __can_run(self):
-        import os
         from .. import CMSSW_VERSION, WORKSPACE
 
         if not os.path.exists(WORKSPACE):
