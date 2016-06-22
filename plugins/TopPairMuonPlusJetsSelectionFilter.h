@@ -62,9 +62,9 @@ public:
 	static void fillDescriptions(edm::ConfigurationDescriptions & descriptions);
 
 	virtual bool isGoodJet(const pat::Jet& jet) const;
-	virtual bool isGoodMuon(const pat::Muon& muon) const;
+//	virtual bool isGoodMuon(const pat::Muon& muon) const;
 	//definitions of loose objects
-	virtual bool isLooseMuon(const pat::Muon& muon) const;
+//	virtual bool isLooseMuon(const pat::Muon& muon) const;
 	virtual void getLooseElectrons();
 	virtual void getLooseMuons();
 	virtual void goodIsolatedMuons();
@@ -97,10 +97,7 @@ private:
 
 	edm::EDGetTokenT<pat::MuonCollection> muonInput_;
 	edm::EDGetTokenT<edm::TriggerResults> hltInputTag_;
-	edm::EDGetTokenT<reco::VertexCollection> VertexInput_;
 
-	double minSignalMuonPt_, maxSignalMuonEta_;
-	double minLooseMuonPt_, maxLooseMuonEta_;
 	double min1JetPt_, min2JetPt_, min3JetPt_, min4JetPt_;
 	double minBJetPt_;
 	double minJetPtInNtuples_;
@@ -115,8 +112,6 @@ private:
 	double minBJetDiscriminator_;
 	double tightBJetDiscriminator_;
 
-	double tightMuonIso_, controlMuonIso1_, controlMuonIso2_, looseMuonIso_;
-
 	bool tagAndProbeStudies_, dropTriggerSelection_;
 
 	std::string prefix_, MCSampleTag_;
@@ -129,7 +124,7 @@ private:
 	//internal
 	boost::array<bool, TTbarMuPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS> passes_;
 	unsigned int runNumber_, signalMuonIndex_;
-	bool isRealData_, hasSignalMuon_, hasGoodPV_;
+	bool isRealData_, hasSignalMuon_;//, hasGoodPV_;
 	std::vector< unsigned int> cleanedJetIndex_, cleanedBJetIndex_,  cleanedTightBJetIndex_;
 	pat::JetCollection jets_, cleanedJets_, cleanedBJets_;
 	edm::Handle <edm::View<pat::Electron> > electrons_;
@@ -138,7 +133,7 @@ private:
 	pat::Muon signalMuon_;
 	HLTConfigProvider hltConfig_;
 	edm::TriggerResults triggerResults_;
-	reco::Vertex primaryVertex_;
+//	reco::Vertex primaryVertex_;
 
 };
 
