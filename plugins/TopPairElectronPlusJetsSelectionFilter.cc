@@ -22,14 +22,13 @@ using namespace pat;
 TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(const edm::ParameterSet& iConfig) :
 		jetInput_(consumes<pat::JetCollection>(iConfig.getParameter < edm::InputTag > ("jetInput"))), //
 		// electronInput_(consumes<pat::ElectronCollection>(iConfig.getParameter < edm::InputTag > ("electronInput"))), //
-  		electronInput_(consumes<edm::View<pat::Electron>>(iConfig.getParameter < edm::InputTag > ("electronInput"))),			
+  		electronInput_(consumes<edm::View<pat::Electron>>(iConfig.getParameter < edm::InputTag > ("electronInput"))),
 		muonInput_(consumes<pat::MuonCollection>(iConfig.getParameter < edm::InputTag > ("muonInput"))), //
 		hltInputTag_(consumes<edm::TriggerResults>(iConfig.getParameter < edm::InputTag > ("HLTInput"))), //
-		vertexInputTag_(consumes<reco::VertexCollection>(iConfig.getParameter < edm::InputTag > ("VertexInputTag"))), //
 
 		// Selection criteria
-		minLooseMuonPt_(iConfig.getParameter<double>("minLooseMuonPt")), //
-		maxLooseMuonEta_(iConfig.getParameter<double>("maxLooseMuonEta")), //
+//		minLooseMuonPt_(iConfig.getParameter<double>("minLooseMuonPt")), //
+//		maxLooseMuonEta_(iConfig.getParameter<double>("maxLooseMuonEta")), //
 
 		min1JetPt_(iConfig.getParameter<double>("min1JetPt")), //
 		min2JetPt_(iConfig.getParameter<double>("min2JetPt")), //
@@ -48,7 +47,7 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		minBJetDiscriminator_(iConfig.getParameter<double>("minBJetDiscriminator")), //
 		tightBJetDiscriminator_(iConfig.getParameter<double>("tightBJetDiscriminator")), //
 
-        looseMuonIso_(iConfig.getParameter<double>("looseMuonIsolation")), //
+//        looseMuonIso_(iConfig.getParameter<double>("looseMuonIsolation")), //
 
 		tagAndProbeStudies_(iConfig.getParameter<bool>("tagAndProbeStudies")), //
 		dropTriggerSelection_(iConfig.getParameter<bool>("dropTriggerSelection")), //
@@ -78,7 +77,6 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		muons_(), //
 		looseMuons_(), //
 		signalElectron_(), //
-		vertices_(), //
 		hltConfig_(), //
 		triggerResults_() {
 	for (unsigned int step = 0; step < TTbarEPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
@@ -103,10 +101,9 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 	desc.add < InputTag > ("electronInput");
 	desc.add < InputTag > ("muonInput");
 	desc.add < InputTag > ("HLTInput");
-	desc.add < InputTag > ("VertexInputTag");
 
-	desc.add<double>("minLooseMuonPt",0.);
-	desc.add<double>("maxLooseMuonEta",10.);
+//	desc.add<double>("minLooseMuonPt",0.);
+//	desc.add<double>("maxLooseMuonEta",10.);
 
 	desc.add<double>("min1JetPt", 30.0);
 	desc.add<double>("min2JetPt", 30.0);
@@ -124,12 +121,12 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 	desc.add<double>("minBJetDiscriminator", 0.800 );
 	desc.add<double>("tightBJetDiscriminator", 0.935 );
 
-	desc.add<double>("tightElectronIsolation_EB", 0.14);
-	desc.add<double>("tightElectronIsolation_EE", 0.1649);
+//	desc.add<double>("tightElectronIsolation_EB", 0.14);
+//	desc.add<double>("tightElectronIsolation_EE", 0.1649);
 
-	desc.add<double>("controlElectronIsolation", 0.3);
+//	desc.add<double>("controlElectronIsolation", 0.3);
 
-	desc.add<double>("looseMuonIsolation", 0.2);
+//	desc.add<double>("looseMuonIsolation", 0.2);
 
 	desc.add<bool>("tagAndProbeStudies", false);
 	desc.add<bool>("dropTriggerSelection", false);
@@ -154,7 +151,7 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 	// Get content from event
 	// Including selecting a signal electron, loose leptons, jets and bjets
 	setupEventContent(iEvent, iSetup);
-	
+
 	bool passesSelection(true);
 	bool passesSelectionExceptJetRequirements(true);
 	bool passesSelectionExceptBtagging(true);
@@ -207,7 +204,7 @@ bool TopPairElectronPlusJetsSelectionFilter::filter(edm::Event& iEvent, const ed
 
 	// Store indices of cleaned jets in event
 	iEvent.put(std::auto_ptr<std::vector<unsigned int> >(new std::vector<unsigned int>(cleanedJetIndex_)), prefix_ + "cleanedJetIndex");
-	
+
 	unsigned int numberOfBtags(cleanedBJets_.size());
 	iEvent.put(std::auto_ptr<unsigned int>(new unsigned int(numberOfBtags)), prefix_ + "NumberOfBtags");
 	iEvent.put(std::auto_ptr<std::vector<unsigned int> >(new std::vector<unsigned int>(cleanedBJetIndex_)), prefix_ + "cleanedBJetIndex");
@@ -230,13 +227,6 @@ void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEven
 	runNumber_ = iEvent.run();
 	isRealData_ = iEvent.isRealData();
 
-	// Vertices (for re calculating electron ID)
-	if ( nonIsolatedElectronSelection_ || invertedConversionSelection_ ) {
-		edm::Handle < reco::VertexCollection > verticesHandle;
-	   	iEvent.getByToken(vertexInputTag_, verticesHandle);
-	   	vertices_ = *verticesHandle;
-	}
-	
 	// Trigger info
 	edm::Handle < edm::TriggerResults > triggerResults;
 	iEvent.getByToken(hltInputTag_, triggerResults);
@@ -298,7 +288,7 @@ void TopPairElectronPlusJetsSelectionFilter::getLooseElectrons() {
 
 	// Loop through electrons and store those that pass a loose selection
 	for (size_t index = 0; index < electrons_->size(); ++index){
-		const auto electron = electrons_->ptrAt(index);		
+		const auto electron = electrons_->ptrAt(index);
 		if (electron->userInt("isLoose"))
 			looseElectrons_.push_back(*electron);
 	}
@@ -310,19 +300,19 @@ void TopPairElectronPlusJetsSelectionFilter::getLooseMuons() {
 	// Loop through muons and store those that pass a loose selection
 	for (unsigned index = 0; index < muons_.size(); ++index) {
 		const pat::Muon muon = muons_.at(index);
-		if (isLooseMuon(muon))
+		if (muon.userInt("isLoose"))
 			looseMuons_.push_back(muon);
 	}
 }
 
-bool TopPairElectronPlusJetsSelectionFilter::isLooseMuon(const pat::Muon& muon) const {
-	bool passesPtAndEta = muon.pt() > minLooseMuonPt_ && fabs(muon.eta()) < maxLooseMuonEta_;
-	bool passesID = muon.isLooseMuon();
-	bool passesIso = getRelativeIsolation(muon, 0.4, true) < looseMuonIso_;
-	// bool passesIso = muon.trackIso() / muon.pt() < 0.1;;
-
-	return passesPtAndEta && passesID && passesIso;
-}
+//bool TopPairElectronPlusJetsSelectionFilter::isLooseMuon(const pat::Muon& muon) const {
+//	bool passesPtAndEta = muon.pt() > minLooseMuonPt_ && fabs(muon.eta()) < maxLooseMuonEta_;
+//	bool passesID = muon.isLooseMuon();
+//	bool passesIso = getRelativeIsolation(muon, 0.4, true) < looseMuonIso_;
+//	// bool passesIso = muon.trackIso() / muon.pt() < 0.1;;
+//
+//	return passesPtAndEta && passesID && passesIso;
+//}
 
 void TopPairElectronPlusJetsSelectionFilter::goodIsolatedElectrons() {
 	goodIsolatedElectrons_.clear();
@@ -359,7 +349,7 @@ bool TopPairElectronPlusJetsSelectionFilter::isGoodElectron(const edm::Ptr<pat::
 double TopPairElectronPlusJetsSelectionFilter::electronIsolation(const pat::Electron& electron) const {
 	reco::GsfElectron::PflowIsolationVariables pfIso = electron.pfIsolationVariables();
 	// Compute isolation with delta beta correction for PU
-	float absiso = pfIso.sumChargedHadronPt 
+	float absiso = pfIso.sumChargedHadronPt
 	  + std::max(0.0 , pfIso.sumNeutralHadronEt + pfIso.sumPhotonEt - 0.5 * pfIso.sumPUPt );
 	return absiso/electron.pt();
 }

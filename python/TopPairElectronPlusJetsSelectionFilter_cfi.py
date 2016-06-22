@@ -6,11 +6,10 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     electronInput=cms.InputTag("slimmedElectrons"),
     muonInput=cms.InputTag("slimmedMuons"),
     HLTInput=cms.InputTag('TriggerResults', '', 'HLT'),
-    VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices'),
 
     # Lepton cuts
-    minLooseMuonPt=cms.double(10.),
-    maxLooseMuonEta=cms.double(2.5),
+#     minLooseMuonPt=cms.double(10.),
+#     maxLooseMuonEta=cms.double(2.5),
 
     #jet cuts
     min1JetPt=cms.double(20.),
@@ -33,12 +32,12 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     minBJetDiscriminator=cms.double(0.800),
     tightBJetDiscriminator=cms.double(0.935),
     
-    tightElectronIsolation_EB=cms.double(0.14),
-    tightElectronIsolation_EE=cms.double(0.1649),
+#     tightElectronIsolation_EB=cms.double(0.14),
+#     tightElectronIsolation_EE=cms.double(0.1649),
 
-    controlElectronIsolation=cms.double(0.),
+#     controlElectronIsolation=cms.double(0.),
 
-    looseMuonIsolation=cms.double(0.25),
+#     looseMuonIsolation=cms.double(0.25),
    
     prefix=cms.untracked.string('TopPairElectronPlusJetsSelection.'),
     MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12 or Summer11Leg
