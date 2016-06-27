@@ -114,10 +114,10 @@ class Command(C):
         self.__create_tar_file(args, variables)
 
         datasets = [chosen_dataset]
-        if dataset.lower() == 'all':
+        if chosen_dataset.lower() == 'all':
             from crab.datasets import create_sample_list
             samples = create_sample_list()
-            if campaign in datasets:
+            if campaign in samples:
                 datasets = samples[campaign]
             else:
                 LOG.error(
@@ -203,7 +203,7 @@ class Command(C):
         }
 
         using_local_files = self.__variables['files'] != ''
-        input_files = find_input_files(self.__variables, LOG)
+        input_files = find_input_files(campaign, dataset, self.__variables, LOG)
 
         if not using_local_files:
             run_config = get_config(campaign, dataset)
