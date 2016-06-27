@@ -68,9 +68,6 @@ public:
 	virtual bool isGoodElectron(const edm::Ptr<pat::Electron>&) const;
 	virtual double electronIsolation(const pat::Electron& electron) const;
 
-	//definitions of loose objects
-//	virtual bool isLooseMuon(const pat::Muon& muon) const;
-	//isolation definitions
 	virtual void getLooseElectrons();
 	virtual void getLooseMuons();
 	virtual void goodIsolatedElectrons();
