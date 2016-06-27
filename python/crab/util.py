@@ -63,9 +63,7 @@ def get_files(campaign, dataset_alias):
     return files
 
 
-def find_input_files(variables, logger):
-    dataset = variables['dataset']
-    campaign = variables['campaign']
+def find_input_files(campaign, dataset, variables, logger):
     input_files = []
     if variables['files'] != "":
         input_files = variables['files'].split(',')

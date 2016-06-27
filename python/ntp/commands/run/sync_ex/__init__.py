@@ -66,7 +66,11 @@ class Command(C):
     @time_function('run sync_ex', LOG)
     def run(self, args, variables):
         self.__prepare(args, variables)
-        input_files = find_input_files(self.__variables, logger=LOG)
+        campaign = self.__variables['campaign']
+        chosen_dataset = self.__variables['dataset']
+        input_files = find_input_files(
+            campaign, chosen_dataset, self.__variables, logger=LOG
+        )
         # take only first file
         self.__variables['files'] = str(input_files[0])
         self.__variables['isTTbarMC'] = 1

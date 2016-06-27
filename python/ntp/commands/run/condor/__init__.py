@@ -17,6 +17,8 @@
                       to the file names (without extension) in crab/*/*.py.
                       Accepts wild-cards and comma-separated lists.
                       Default is 'TTJets_PowhegPythia8'.
+                      Special value 'all' will submit all datasets for a given
+                      campaign.
                       This parameter is ignored if parameter file is given.
             files:    Instead of running on a specific dataset, run over the
                       given (comma-separated) list of files
@@ -104,14 +106,38 @@ class Command(C):
 
     def run(self, args, variables):
         self.__prepare(args, variables)
-        self.__set_job_dirs()
 
-        self.__create_folders()
+        campaign = self.__variables['campaign']
+        chosen_dataset = self.__variables['dataset']
 
         # create tarball
         self.__create_tar_file(args, variables)
+
+        datasets = [chosen_dataset]
+        if chosen_dataset.lower() == 'all':
+            from crab.datasets import create_sample_list
+            samples = create_sample_list()
+            if campaign in samples:
+                datasets = samples[campaign]
+            else:
+                LOG.error(
+                    'Cannot find datasets for campaign {0}'.format(campaign))
+                return False
+
+        for dataset in datasets:
+            self.__run_dataset(campaign, dataset)
+        # to check status:
+        # ntp condor status
+
+        return True
+
+    def __run_dataset(self, campaign, dataset):
+        self.__set_job_dirs(campaign, dataset)
+
+        self.__create_folders()
+
         # which dataset, file, etc
-        self.__get_run_config()
+        self.__get_run_config(campaign, dataset)
         self.__write_files()
         # create DAG for condor
         self.__create_dag()
@@ -121,14 +147,8 @@ class Command(C):
             self.__text += "\n Submitted {0} jobs".format(len(self.__dag))
 #             for job in self.__dag:
 #                 print(job.name, 'running:', job.manager.exe, ' '.join(job.args))
-        # to check status:
-        # ntp condor status
 
-        return True
-
-    def __set_job_dirs(self):
-        campaign = self.__variables['campaign']
-        dataset = self.__variables['dataset']
+    def __set_job_dirs(self, campaign, dataset):
         out_dir = os.path.join(CONDOR_ROOT, campaign, dataset)
 
         existing_dirs = glob.glob(out_dir + '_*')
@@ -167,7 +187,7 @@ class Command(C):
         self.__text += c.__text
         self.__input_files.extend(c.get_tar_files())
 
-    def __get_run_config(self):
+    def __get_run_config(self, campaign, dataset):
         from crab.util import find_input_files
         from crab import get_config
         run_config = {
@@ -183,11 +203,9 @@ class Command(C):
         }
 
         using_local_files = self.__variables['files'] != ''
-        input_files = find_input_files(self.__variables, LOG)
+        input_files = find_input_files(campaign, dataset, self.__variables, LOG)
 
         if not using_local_files:
-            dataset = self.__variables['dataset']
-            campaign = self.__variables['campaign']
             run_config = get_config(campaign, dataset)
             run_config['outLFNDirBase'] = self.__replace_output_dir(run_config)
 
