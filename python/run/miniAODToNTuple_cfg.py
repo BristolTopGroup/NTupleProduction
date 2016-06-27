@@ -51,7 +51,7 @@ globalTags = {
     },
     'MC': {
         7: '76X_mcRun2_asymptotic_RunIIFall15DR76_v1',  # 25ns MC
-        8: '80X_mcRun2_asymptotic_2016_v3',
+        8: '80X_mcRun2_asymptotic_2016_miniAODv2',
     }
 }
 

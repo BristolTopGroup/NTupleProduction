@@ -305,15 +305,6 @@ void TopPairElectronPlusJetsSelectionFilter::getLooseMuons() {
 	}
 }
 
-//bool TopPairElectronPlusJetsSelectionFilter::isLooseMuon(const pat::Muon& muon) const {
-//	bool passesPtAndEta = muon.pt() > minLooseMuonPt_ && fabs(muon.eta()) < maxLooseMuonEta_;
-//	bool passesID = muon.isLooseMuon();
-//	bool passesIso = getRelativeIsolation(muon, 0.4, true) < looseMuonIso_;
-//	// bool passesIso = muon.trackIso() / muon.pt() < 0.1;;
-//
-//	return passesPtAndEta && passesID && passesIso;
-//}
-
 void TopPairElectronPlusJetsSelectionFilter::goodIsolatedElectrons() {
 	goodIsolatedElectrons_.clear();
 
