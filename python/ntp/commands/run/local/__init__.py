@@ -85,7 +85,11 @@ class Command(C):
             variables['output_file'] = output_file
 
         self.__prepare(args, variables)
-        input_files = find_input_files(self.__variables, logger=LOG)
+        campaign = self.__variables['campaign']
+        chosen_dataset = self.__variables['dataset']
+        input_files = find_input_files(
+            campaign, chosen_dataset, self.__variables, logger=LOG
+        )
         LOG.info(
             "Using files for NTP input:\n{0}".format('\n'.join(input_files)))
 
