@@ -114,6 +114,8 @@ process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(-1))
 from BristolAnalysis.NTupleTools.NTupler_cff import setup_ntupler
 setup_ntupler(process, cms)
 
+process.nTupleGenEventInfo.isTTbarMC = cms.bool(isTTbarMC)
+
 if isTTbarMC:
     process.makingNTuples = cms.Path(
         # process.metFilters *
@@ -218,8 +220,6 @@ if not options.isTTbarMC:
 # 76X datasets are all ReReco so far
 process.nTupleEvent.metFiltersInputTag = cms.InputTag(
     'TriggerResults', '', 'PAT')
-
-process.nTupleGenEventInfo.isTTbarMC = cms.bool(isTTbarMC)
 
 if not options.printEventContent:
     process.makingNTuples.remove(process.printEventContent)
