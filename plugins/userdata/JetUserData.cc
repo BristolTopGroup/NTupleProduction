@@ -58,9 +58,11 @@ private:
 	virtual void produce(edm::Event&, const edm::EventSetup&) override;
 	virtual void endStream() override;
 
-	bool isGood(const pat::Jet& jet) const;
 	void fillVertexVariables(const edm::Event&, pat::Jet& jet) const;
 	void fillUncertainties(pat::Jet& jet, JetCorrectionUncertainty& jecUnc) const;
+	void fillJetIds(pat::Jet& jet) const;
+	void fillBtagging(pat::Jet& jet) const;
+	void fillJER(pat::Jet& jet) const;
 
 	// inputs
 	edm::EDGetToken jetInputTag_;
@@ -87,15 +89,17 @@ private:
 // constructors and destructor
 //
 JetUserData::JetUserData(const edm::ParameterSet& iConfig) :
-		jetInputTag_(consumes < std::vector < pat::Jet >> (iConfig.getParameter < edm::InputTag > ("jetCollection"))), //
-		vtxInputTag_(
-				consumes < std::vector < reco::Vertex >> (iConfig.getParameter < edm::InputTag > ("vertexCollection"))), //
-		beamSpotInputTag_(consumes < reco::BeamSpot > (iConfig.getParameter < edm::InputTag > ("beamSpotCollection"))), //
-		jecUncertainty_(iConfig.getParameter < std::string > ("jecUncertainty")), //
-		minLooseJetPt_(iConfig.getParameter<double>("minLooseJetPt")), //
-		maxLooseJetEta_(iConfig.getParameter<double>("maxLooseJetEta")), //
-		minSignalJetPt_(iConfig.getParameter<double>("minSignalJetPt")), //
-		maxSignalJetEta_(iConfig.getParameter<double>("maxSignalJetEta")) {
+				jetInputTag_(
+						consumes < std::vector
+								< pat::Jet >> (iConfig.getParameter < edm::InputTag > ("jetCollection"))), //
+				vtxInputTag_(
+						consumes < std::vector
+								< reco::Vertex >> (iConfig.getParameter < edm::InputTag > ("vertexCollection"))), //
+				beamSpotInputTag_(
+						consumes < reco::BeamSpot > (iConfig.getParameter < edm::InputTag > ("beamSpotCollection"))), //
+				jecUncertainty_(iConfig.getParameter < std::string > ("jecUncertainty")), //
+				minSignalJetPt_(iConfig.getParameter<double>("minSignalJetPt")), //
+				maxSignalJetEta_(iConfig.getParameter<double>("maxSignalJetEta")) {
 	//register your products
 	produces<std::vector<pat::Jet> >();
 	//now do what ever other initialization is needed
@@ -148,50 +152,15 @@ void JetUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 			// vertex association
 			fillVertexVariables(iEvent, jet);
 
-			// Top Object Definitions
-			jet.addUserInt("isGood", isGood(jet) && jet.pt() > minSignalJetPt_);
-			jet.addUserInt("isGoodPtUp", isGood(jet) && jet.userFloat("ptUp") > minSignalJetPt_);
-			jet.addUserInt("isGoodPtDown", isGood(jet) && jet.userFloat("ptDown") > minSignalJetPt_);
+			//IDs
+			fillJetIds(jet);
 
+			// b-tagging
+
+			// JER
 		}
 		iEvent.put(jetCollection);
 	}
-
-	/* This is an event example
-	 //Read 'ExampleData' from the Event
-	 Handle<ExampleData> pIn;
-	 iEvent.getByLabel("example",pIn);
-
-	 //Use the ExampleData to create an ExampleData2 which
-	 // is put into the Event
-	 std::unique_ptr<ExampleData2> pOut(new ExampleData2(*pIn));
-	 iEvent.put(std::move(pOut));
-	 */
-
-	/* this is an EventSetup example
-	 //Read SetupData from the SetupRecord in the EventSetup
-	 ESHandle<SetupData> pSetup;
-	 iSetup.get<SetupRecord>().get(pSetup);
-	 */
-}
-
-bool JetUserData::isGood(const pat::Jet& jet) const {
-	bool passesEta(fabs(jet.eta()) < maxSignalJetEta_);
-	bool passesJetID(false);
-	bool passNOD = jet.numberOfDaughters() > 1;
-	bool passNHF = jet.neutralHadronEnergyFraction() + jet.HFHadronEnergyFraction() < 0.99;
-	bool passNEF = jet.neutralEmEnergyFraction() < 0.99;
-	bool passCHF = true;
-	bool passNCH = true;
-	bool passCEF = true;
-	if (fabs(jet.eta()) < 2.4) {
-		passCEF = jet.chargedEmEnergyFraction() < 0.99;
-		passCHF = jet.chargedHadronEnergyFraction() > 0;
-		passNCH = jet.chargedMultiplicity() > 0;
-	}
-	passesJetID = passNOD && passCEF && passNHF && passNEF && passCHF && passNCH;
-
-	return passesEta && passesJetID;
 }
 
 void JetUserData::fillUncertainties(pat::Jet& jet, JetCorrectionUncertainty& jecUnc) const {
@@ -208,16 +177,157 @@ void JetUserData::fillUncertainties(pat::Jet& jet, JetCorrectionUncertainty& jec
 void JetUserData::fillVertexVariables(const edm::Event& iEvent, pat::Jet& jet) const {
 	edm::Handle < std::vector<reco::Vertex> > primaryVertices;
 	iEvent.getByToken(vtxInputTag_, primaryVertices);
-
 	if (primaryVertices.isValid()) {
 		LogDebug("JetUserData") << "Total # Primary Vertices: " << primaryVertices->size();
 		// this is only for the primary vertex
 		reco::Vertex pv = primaryVertices->front();
+		int bestVtxIndex3Ddist = -1;
+		int bestVtxIndexXYdist = -1;
+		int bestVtxIndexZdist = -1;
+
+		int bestVtxIndexSharedTracks = -1;
+
+		double minVtxDist3D = 999999.;
+		double minVtxDistXY = -99999.;
+		double minVtxDistZ = -99999.;
+		double maxTrackAssocRatio = -9999.;
 
 		for (reco::VertexCollection::const_iterator v_it = primaryVertices->begin(); v_it != primaryVertices->end();
 				++v_it) {
+
+			double sumweights = 0.0;
+			double dist3Dweighted = 0.0;
+			double distXYweighted = 0.0;
+			double distZweighted = 0.0;
+			double assocsumpttracks = 0.0;
+			double trackassociationratio = 0.000001;
+
+			// Loop on tracks in jet, calculate PT weighted 3D distance to vertex and PT weighted shared track ratio
+			const reco::TrackRefVector &jtracks = jet.associatedTracks();
+			for (reco::TrackRefVector::const_iterator jtIt = jtracks.begin(); jtIt != jtracks.end(); ++jtIt) {
+				if (jtIt->isNull())
+					continue;
+				const reco::Track *jtrack = jtIt->get();
+				double trackptweight = jtrack->pt();
+				sumweights += trackptweight;
+
+				// Weighted Distance Calculation
+				double distXY = jtrack->dxy(v_it->position());
+				double distZ = jtrack->dz(v_it->position());
+				dist3Dweighted = trackptweight * (sqrt(pow(distXY, 2) + pow(distZ, 2)));
+				distXYweighted = trackptweight * distXY;
+				distZweighted = trackptweight * distZ;
+
+				// Loop on vertex tracks, find PT weighted shared tracks.
+				for (reco::Vertex::trackRef_iterator vtIt = v_it->tracks_begin(); vtIt != v_it->tracks_end(); ++vtIt) {
+					if (vtIt->isNull())
+						continue;
+					const reco::Track *vtrack = vtIt->get();
+					if (vtrack != jtrack)
+						continue;
+					assocsumpttracks += jtrack->pt();
+					break;
+				}
+
+				trackassociationratio = assocsumpttracks / sumweights;
+
+			}
+
+			// Divide distances by sum of weights.
+			dist3Dweighted = dist3Dweighted / sumweights;
+			distXYweighted = distXYweighted / sumweights;
+			distZweighted = distZweighted / sumweights;
+
+			// Find vertex with minimum weighted distance.
+			if (dist3Dweighted < minVtxDist3D) {
+				minVtxDist3D = dist3Dweighted;
+				bestVtxIndex3Ddist = int(std::distance(primaryVertices->begin(), v_it));
+
+			}
+
+			if (distXYweighted < minVtxDistXY) {
+				minVtxDistXY = distXYweighted;
+				bestVtxIndexXYdist = int(std::distance(primaryVertices->begin(), v_it));
+			}
+
+			if (distZweighted < minVtxDistZ) {
+				minVtxDistZ = distZweighted;
+				bestVtxIndexZdist = int(std::distance(primaryVertices->begin(), v_it));
+			}
+
+			// Find vertex with minimum weighted distance.
+			if (trackassociationratio > maxTrackAssocRatio) {
+				maxTrackAssocRatio = trackassociationratio;
+				bestVtxIndexSharedTracks = int(std::distance(primaryVertices->begin(), v_it));
+			}
+
 		}
+		jet.addUserFloat("bestVertexTrackAssociationFactor", maxTrackAssocRatio);
+		jet.addUserInt("bestVertexTrackAssociationIndex", bestVtxIndexSharedTracks);
+		jet.addUserFloat("closestVertexWeighted3DSeparation", minVtxDist3D);
+		jet.addUserFloat("closestVertexWeightedXYSeparation", minVtxDistXY);
+		jet.addUserFloat("closestVertexWeightedZSeparation", minVtxDistZ);
+		jet.addUserInt("closestVertex3DIndex", bestVtxIndex3Ddist);
+		jet.addUserInt("closestVertexXYIndex", bestVtxIndexXYdist);
+		jet.addUserInt("closestVertexZIndex", bestVtxIndexZdist);
 	}
+}
+
+void JetUserData::fillJetIds(pat::Jet& jet) const {
+	double NHF = jet.neutralHadronEnergyFraction();
+	double NEMF = jet.neutralEmEnergyFraction();
+	double CHF = jet.chargedHadronEnergyFraction();
+	double MUF = jet.muonEnergyFraction();
+	double CEMF = jet.chargedEmEnergyFraction();
+	size_t NumConst = jet.chargedMultiplicity() + jet.neutralMultiplicity();
+	size_t NumNeutralParticle = jet.neutralMultiplicity();
+	size_t CHM = jet.chargedMultiplicity();
+
+	double eta = jet.eta();
+
+	bool looseJetId(false);
+	bool tightJetId(false);
+	bool tightLepVetoJetId(false);
+	// from https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetID
+	if (abs(eta) <= 3.0) {
+		looseJetId = (NHF < 0.99 && NEMF < 0.99 && NumConst > 1)
+				&& ((abs(eta) <= 2.4 && CHF > 0 && CHM > 0 && CEMF < 0.99) || abs(eta) > 2.4);
+		tightJetId = (NHF < 0.90 && NEMF < 0.90 && NumConst > 1)
+				&& ((abs(eta) <= 2.4 && CHF > 0 && CHM > 0 && CEMF < 0.99) || abs(eta) > 2.4);
+		tightLepVetoJetId = (NHF < 0.90 && NEMF < 0.90 && NumConst > 1 && MUF < 0.8)
+				&& ((abs(eta) <= 2.4 && CHF > 0 && CHM > 0 && CEMF < 0.90) || abs(eta) > 2.4);
+	} else {
+		looseJetId = (NEMF < 0.90 && NumNeutralParticle > 10);
+		tightJetId = (NEMF < 0.90 && NumNeutralParticle > 10);
+	}
+
+	jet.addUserInt("looseJetId", looseJetId);
+	jet.addUserInt("tightJetId", tightJetId);
+	jet.addUserInt("tightLepVetoJetId", tightLepVetoJetId);
+
+	bool passesEta(fabs(jet.eta()) < maxSignalJetEta_);
+	bool passesPt(jet.pt() > minSignalJetPt_);
+	bool passesPtDown(jet.userFloat("ptDown") > minSignalJetPt_);
+	bool passesPtUp(jet.userFloat("ptUp") > minSignalJetPt_);
+
+	bool passesIdAndEta = looseJetId && passesEta;
+	jet.addUserInt("passesEta", passesEta);
+	jet.addUserInt("passesPt", passesPt);
+	jet.addUserInt("passesPtDown", passesPtDown);
+	jet.addUserInt("passesPtUp", passesPtUp);
+
+	jet.addUserInt("isGood", passesIdAndEta && passesPt);
+	jet.addUserInt("isGoodPtDown", passesIdAndEta && passesPtDown);
+	jet.addUserInt("isGoodPtUp", passesIdAndEta && passesPtUp);
+
+}
+
+void JetUserData::fillBtagging(pat::Jet& jet) const {
+
+}
+
+void JetUserData::fillJER(pat::Jet& jet) const {
+
 }
 
 // ------------ method called once each stream before processing any runs, lumis or events  ------------
