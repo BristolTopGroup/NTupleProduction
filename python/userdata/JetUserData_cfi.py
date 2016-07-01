@@ -10,11 +10,7 @@ jetUserData = cms.EDProducer(
     maxSignalJetEta=cms.double(2.4),
     
     jecUncertainty = cms.string('AK4PFchs'),
-#     
-#     ReadJECuncertainty = cms.bool(True),
-#     ReadJEC = cms.bool(False),
     JetCorrectionService = cms.string('ak4PFCHSL1FastL2L3'),    
-    DoVertexAssociation = cms.bool(True),
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices'),
     isRealData = cms.bool(False),
     looseBTagWP = cms.double(0.460),

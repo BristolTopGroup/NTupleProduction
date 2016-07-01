@@ -64,7 +64,6 @@ public:
 
 	static void fillDescriptions(edm::ConfigurationDescriptions & descriptions);
 
-	virtual bool isGoodJet(const pat::Jet& jet) const;
 	virtual bool isGoodElectron(const edm::Ptr<pat::Electron>&) const;
 	virtual double electronIsolation(const pat::Electron& electron) const;
 
@@ -101,10 +100,6 @@ private:
 
 	edm::EDGetTokenT<pat::MuonCollection> muonInput_;
 	edm::EDGetTokenT<edm::TriggerResults> hltInputTag_;
-
-	double min1JetPt_, min2JetPt_, min3JetPt_, min4JetPt_;
-	double minBJetPt_;
-	double minJetPtInNtuples_;
 
 	double cleaningDeltaR_;
 

@@ -27,14 +27,6 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 				hltInputTag_(consumes < edm::TriggerResults > (iConfig.getParameter < edm::InputTag > ("HLTInput"))), //
 
 				// Selection criteria
-
-				min1JetPt_(iConfig.getParameter<double>("min1JetPt")), //
-				min2JetPt_(iConfig.getParameter<double>("min2JetPt")), //
-				min3JetPt_(iConfig.getParameter<double>("min3JetPt")), //
-				min4JetPt_(iConfig.getParameter<double>("min4JetPt")), //
-				minBJetPt_(iConfig.getParameter<double>("minBJetPt")), //
-				minJetPtInNtuples_(iConfig.getParameter<double>("minJetPtInNtuples")), //
-
 				cleaningDeltaR_(iConfig.getParameter<double>("cleaningDeltaR")), //
 
 				applyJEC_(iConfig.getParameter<bool>("applyJEC")), //
@@ -305,15 +297,6 @@ void TopPairMuonPlusJetsSelectionFilter::getLooseMuons() {
 	}
 }
 
-//bool TopPairMuonPlusJetsSelectionFilter::isLooseMuon(const pat::Muon& muon) const {
-//	bool passesPtAndEta = muon.pt() > minLooseMuonPt_ && fabs(muon.eta()) < maxLooseMuonEta_;
-//	bool passesID = muon.isLooseMuon();
-//	bool passesIso = getRelativeIsolation(muon, 0.4, true) < looseMuonIso_;
-//	// bool passesIso = muon.trackIso() / muon.pt() < 0.1;;
-//
-//	return passesPtAndEta && passesID && passesIso;
-//}
-
 void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
 	goodIsolatedMuons_.clear();
 
@@ -349,20 +332,6 @@ void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
 	}
 }
 
-//bool TopPairMuonPlusJetsSelectionFilter::isGoodMuon(const pat::Muon& muon) const {
-//
-//	// Pt and eta selection
-//	bool passesPtAndEta = muon.pt() > minSignalMuonPt_ && fabs(muon.eta()) < maxSignalMuonEta_;
-//
-//	// Passes ID Selection
-//	bool passesID = false;
-//	if (hasGoodPV_) {
-//		passesID = muon.isTightMuon(primaryVertex_);
-//	}
-//
-//	return passesPtAndEta && passesID;
-//}
-
 void TopPairMuonPlusJetsSelectionFilter::cleanedJets() {
 	cleanedJets_.clear();
 	cleanedJetIndex_.clear();
@@ -375,12 +344,12 @@ void TopPairMuonPlusJetsSelectionFilter::cleanedJets() {
 		// Only jets with pt> ~20 end up in the ntuple
 		// isGoodJet also requires other selection, so have to check pt here first
 		// to get index of cleaned jets in jets that end up in ntuple
-		if (jet.pt() <= minJetPtInNtuples_) {
+		if (!jet.userInt("passesPt")) {
 			continue;
 		}
 
 		// Check jet passes selection criteria
-		if (!isGoodJet(jet)) {
+		if (!jet.userInt("isGood")) {
 			indexInNtuple++;
 			continue;
 		}
@@ -420,7 +389,7 @@ void TopPairMuonPlusJetsSelectionFilter::cleanedBJets() {
 		const pat::Jet jet = cleanedJets_.at(index);
 
 		// Check b jet passes pt requirement (probably same as min jet pt unless assymmetric)
-		if (jet.pt() <= minBJetPt_)
+		if (!jet.userInt("passesPt"))
 			continue;
 
 		// Does jet pass b tag selection
@@ -433,28 +402,6 @@ void TopPairMuonPlusJetsSelectionFilter::cleanedBJets() {
 			}
 		}
 	}
-}
-
-bool TopPairMuonPlusJetsSelectionFilter::isGoodJet(const pat::Jet& jet) const {
-	//both cuts are done at PAT config level (selectedPATJets) this is just for safety
-	// double smearFactor = getSmearedJetPtScale(jet, 0);
-	// bool passesPtAndEta(smearFactor*jet.pt() > 20. && fabs(jet.eta()) < 2.5);
-	bool passesPtAndEta(jet.pt() > minJetPtInNtuples_ && fabs(jet.eta()) < 2.4);
-	bool passesJetID(false);
-	bool passNOD = jet.numberOfDaughters() > 1;
-	bool passNHF = jet.neutralHadronEnergyFraction() + jet.HFHadronEnergyFraction() < 0.99;
-	bool passNEF = jet.neutralEmEnergyFraction() < 0.99;
-	bool passCHF = true;
-	bool passNCH = true;
-	bool passCEF = true;
-	if (fabs(jet.eta()) < 2.4) {
-		passCEF = jet.chargedEmEnergyFraction() < 0.99;
-		passCHF = jet.chargedHadronEnergyFraction() > 0;
-		passNCH = jet.chargedMultiplicity() > 0;
-	}
-	passesJetID = passNOD && passCEF && passNHF && passNEF && passCHF && passNCH;
-
-	return passesPtAndEta && passesJetID;
 }
 
 bool TopPairMuonPlusJetsSelectionFilter::passesSelectionStep(edm::Event& iEvent, unsigned int selectionStep) const {
@@ -558,8 +505,7 @@ bool TopPairMuonPlusJetsSelectionFilter::passesLooseMuonVeto() const {
 
 bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastOneGoodJet() const {
 	if (cleanedJets_.size() > 0)
-		return cleanedJets_.at(0).pt() > min1JetPt_;
-	// return getSmearedJetPtScale(cleanedJets_.at(0), 0)*cleanedJets_.at(0).pt() > min1JetPt_;
+		return cleanedJets_.at(0).userInt("passesPt");
 
 	return false;
 
@@ -567,24 +513,21 @@ bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastOneGoodJet() const {
 
 bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastTwoGoodJets() const {
 	if (cleanedJets_.size() > 1)
-		return cleanedJets_.at(1).pt() > min2JetPt_;
-	// return getSmearedJetPtScale(cleanedJets_.at(1), 0)*cleanedJets_.at(1).pt() > min2JetPt_;
+		return cleanedJets_.at(1).userInt("passesPt");
 
 	return false;
 }
 
 bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastThreeGoodJets() const {
 	if (cleanedJets_.size() > 2)
-		return cleanedJets_.at(2).pt() > min3JetPt_;
-	// return getSmearedJetPtScale(cleanedJets_.at(2), 0)*cleanedJets_.at(2).pt() > min3JetPt_;
+		return cleanedJets_.at(2).userInt("passesPt");
 
 	return false;
 }
 
 bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastFourGoodJets() const {
 	if (cleanedJets_.size() > 3)
-		return cleanedJets_.at(3).pt() > min4JetPt_;
-	// return getSmearedJetPtScale(cleanedJets_.at(3), 0)*cleanedJets_.at(3).pt() > min4JetPt_;
+		return cleanedJets_.at(3).userInt("passesPt");
 
 	return false;
 }

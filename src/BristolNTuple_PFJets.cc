@@ -257,17 +257,8 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 		// jecUnc = new JetCorrectionUncertainty("BristolAnalysis/NTupleTools/data/JEC/Summer15_50nsV2_DATA_Uncertainty_AK4PFchs.txt");
 	}
 
-	PFJetIDSelectionFunctor pfjetIDLoose(PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE);
-	PFJetIDSelectionFunctor pfjetIDTight(PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT);
-
-	pat::strbitset retpf = pfjetIDLoose.getBitTemplate();
-
 	edm::Handle < std::vector<pat::Jet> > jets;
 	iEvent.getByToken(inputTag, jets);
-
-	edm::Handle < reco::VertexCollection > primaryVertices; // DB
-	iEvent.getByToken(vtxInputTag, primaryVertices); // DB
-
 
 	// JME::JetResolution resolution = JME::JetResolution::get(iSetup, "AK4PFchs_pt");
 	// JME::JetResolutionScaleFactor resolution_sf = JME::JetResolutionScaleFactor::get(iSetup, "AK4PFchs");
@@ -312,17 +303,6 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				if ( it->pt() <= minJetPtToStore )
 					continue;
 			}
-
-
-			retpf.set(false);
-			int passjetLoose = 0;
-			if (pfjetIDLoose(*it, retpf))
-				passjetLoose = 1;
-
-			retpf.set(false);
-			int passjetTight = 0;
-			if (pfjetIDTight(*it, retpf))
-				passjetTight = 1;
 
 			if (!iEvent.isRealData()) {
 				// Store generated jet resolutions for monte carlo
@@ -400,102 +380,6 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			// jer->push_back(resolution.getResolution(jetParams));
 
 
-			// Vertex association
-
-			int bestVtxIndex3Ddist = -1;
-			int bestVtxIndexXYdist = -1;
-			int bestVtxIndexZdist = -1;
-
-			int bestVtxIndexSharedTracks = -1;
-
-			double minVtxDist3D = 999999.;
-			double minVtxDistXY = -99999.;
-			double minVtxDistZ = -99999.;
-			double maxTrackAssocRatio = -9999.;
-
-			// Loop on primary Vertices and jets and perform associations
-
-			if (primaryVertices.isValid()) {
-				if (doVertexAssociation) {
-					// Main Vertex Loop
-					for (reco::VertexCollection::const_iterator v_it = primaryVertices->begin();
-							v_it != primaryVertices->end(); ++v_it) {
-
-						double sumweights = 0.0;
-						double dist3Dweighted = 0.0;
-						double distXYweighted = 0.0;
-						double distZweighted = 0.0;
-						double assocsumpttracks = 0.0;
-						double trackassociationratio = 0.000001;
-
-						// Loop on tracks in jet, calculate PT weighted 3D distance to vertex and PT weighted shared track ratio
-						const reco::TrackRefVector &jtracks = it->associatedTracks();
-						for (reco::TrackRefVector::const_iterator jtIt = jtracks.begin(); jtIt != jtracks.end();
-								++jtIt) {
-							if (jtIt->isNull())
-								continue;
-							const reco::Track *jtrack = jtIt->get();
-							double trackptweight = jtrack->pt();
-							sumweights += trackptweight;
-
-							// Weighted Distance Calculation
-							double distXY = jtrack->dxy(v_it->position());
-							double distZ = jtrack->dz(v_it->position());
-							dist3Dweighted = trackptweight * (sqrt(pow(distXY, 2) + pow(distZ, 2)));
-							distXYweighted = trackptweight * distXY;
-							distZweighted = trackptweight * distZ;
-
-							// Loop on vertex tracks, find PT weighted shared tracks.
-							for (reco::Vertex::trackRef_iterator vtIt = v_it->tracks_begin();
-									vtIt != v_it->tracks_end(); ++vtIt) {
-								if (vtIt->isNull())
-									continue;
-								const reco::Track *vtrack = vtIt->get();
-								if (vtrack != jtrack)
-									continue;
-								assocsumpttracks += jtrack->pt();
-								break;
-							}
-
-							trackassociationratio = assocsumpttracks / sumweights;
-
-						}
-
-						// Divide distances by sum of weights.
-						dist3Dweighted = dist3Dweighted / sumweights;
-						distXYweighted = distXYweighted / sumweights;
-						distZweighted = distZweighted / sumweights;
-
-						// Find vertex with minimum weighted distance.
-						if (dist3Dweighted < minVtxDist3D) {
-							minVtxDist3D = dist3Dweighted;
-							bestVtxIndex3Ddist = int(std::distance(primaryVertices->begin(), v_it));
-
-						}
-
-						if (distXYweighted < minVtxDistXY) {
-							minVtxDistXY = distXYweighted;
-							bestVtxIndexXYdist = int(std::distance(primaryVertices->begin(), v_it));
-						}
-
-						if (distZweighted < minVtxDistZ) {
-							minVtxDistZ = distZweighted;
-							bestVtxIndexZdist = int(std::distance(primaryVertices->begin(), v_it));
-						}
-
-						// Find vertex with minimum weighted distance.
-						if (trackassociationratio > maxTrackAssocRatio) {
-							maxTrackAssocRatio = trackassociationratio;
-							bestVtxIndexSharedTracks = int(std::distance(primaryVertices->begin(), v_it));
-						}
-
-						//std::cout<<dist3Dweighted<<"  "<<distXYweighted<<"  "<<distZweighted<<"  "<<trackassociationratio<<"  "<<int(std::distance(primaryVertices->begin(),v_it))<<std::endl;
-
-					}
-				}
-				//std::cout<<"---------------------"<<std::endl;
-			} 
-
 			// fill in all the vectors
 			//kinematic variables
 			if ( readJEC ) {
@@ -570,8 +454,10 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			chargedHadronEnergyFractionRAW->push_back(it->correctedJet("Uncorrected").chargedHadronEnergyFraction());
 			neutralEmEnergyFractionRAW->push_back(it->correctedJet("Uncorrected").neutralEmEnergyFraction());
 			neutralHadronEnergyFractionRAW->push_back(it->correctedJet("Uncorrected").neutralHadronEnergyFraction());
-			passLooseID->push_back(passjetLoose);
-			passTightID->push_back(passjetTight);
+			passLooseID->push_back(it->userInt("looseJetId"));
+			passTightID->push_back(it->userInt("tightJetId"));
+			// PU jet ID:
+			// it->userInt("pileupJetId:fullId");
 
 			//b-tagging information
 			//names are changing between major software releases
@@ -628,14 +514,14 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
 			//jet-vertex association
 			if (doVertexAssociation) {
-				bestVertexTrackAssociationFactor->push_back(maxTrackAssocRatio);
-				bestVertexTrackAssociationIndex->push_back(bestVtxIndexSharedTracks);
-				closestVertexWeighted3DSeparation->push_back(minVtxDist3D);
-				closestVertexWeightedXYSeparation->push_back(minVtxDistXY);
-				closestVertexWeightedZSeparation->push_back(minVtxDistZ);
-				closestVertex3DIndex->push_back(bestVtxIndex3Ddist);
-				closestVertexXYIndex->push_back(bestVtxIndexXYdist);
-				closestVertexZIndex->push_back(bestVtxIndexZdist);
+				bestVertexTrackAssociationFactor->push_back(it->userFloat("bestVertexTrackAssociationFactor"));
+				bestVertexTrackAssociationIndex->push_back(it->userInt("bestVertexTrackAssociationIndex"));
+				closestVertexWeighted3DSeparation->push_back(it->userFloat("closestVertexWeighted3DSeparation"));
+				closestVertexWeightedXYSeparation->push_back(it->userFloat("closestVertexWeightedXYSeparation"));
+				closestVertexWeightedZSeparation->push_back(it->userFloat("closestVertexWeightedZSeparation"));
+				closestVertex3DIndex->push_back(it->userInt("closestVertex3DIndex"));
+				closestVertexXYIndex->push_back(it->userInt("closestVertexXYIndex"));
+				closestVertexZIndex->push_back(it->userInt("closestVertexZIndex"));
 			}
 		}
 	} 

@@ -8,12 +8,12 @@ topPairMuPlusJetsSelection = cms.EDFilter('TopPairMuonPlusJetsSelectionFilter',
     HLTInput=cms.InputTag('TriggerResults', '', 'HLT'),
 
     #jet cuts
-    min1JetPt=cms.double(20.),
-    min2JetPt=cms.double(20.),
-    min3JetPt=cms.double(20.),
-    min4JetPt=cms.double(20.),
-    minBJetPt=cms.double(20.),
-    minJetPtInNtuples=cms.double(20.),
+#     min1JetPt=cms.double(20.),
+#     min2JetPt=cms.double(20.),
+#     min3JetPt=cms.double(20.),
+#     min4JetPt=cms.double(20.),
+#     minBJetPt=cms.double(20.),
+#     minJetPtInNtuples=cms.double(20.),
 
     # Jet cleaning delta R
     cleaningDeltaR=cms.double(0.4),

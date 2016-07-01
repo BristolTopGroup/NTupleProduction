@@ -239,6 +239,7 @@ process.TFileService = cms.Service(
 
 process.load('BristolAnalysis.NTupleTools.userdata.ElectronUserData_cfi')
 process.load('BristolAnalysis.NTupleTools.userdata.MuonUserData_cfi')
+process.load('BristolAnalysis.NTupleTools.userdata.JetUserData_cfi')
 
 process.nTupleElectrons.InputTag = 'electronUserData'
 process.topPairEPlusJetsSelection.electronInput = 'electronUserData'
@@ -257,6 +258,15 @@ process.topPairEPlusJetsQCDSelectionTagging.muonInput = 'muonUserData'
 process.topPairMuPlusJetsSelectionTagging.muonInput = 'muonUserData'
 process.topPairMuPlusJetsQCDSelectionTagging1.muonInput = 'muonUserData'
 process.topPairMuPlusJetsQCDSelectionTagging2.muonInput = 'muonUserData'
+
+process.nTuplePFJets.InputTag = 'jetUserData'
+process.topPairEPlusJetsSelection.jetInput = 'jetUserData'
+process.topPairEPlusJetsSelectionTagging.jetInput = 'jetUserData'
+process.topPairEPlusJetsConversionSelectionTagging.jetInput = 'jetUserData'
+process.topPairEPlusJetsQCDSelectionTagging.jetInput = 'jetUserData'
+process.topPairMuPlusJetsSelectionTagging.jetInput = 'jetUserData'
+process.topPairMuPlusJetsQCDSelectionTagging1.jetInput = 'jetUserData'
+process.topPairMuPlusJetsQCDSelectionTagging2.jetInput = 'jetUserData'
 
 # EDM NTuples
 # process.load('BristolAnalysis.NTupleTools.content')
