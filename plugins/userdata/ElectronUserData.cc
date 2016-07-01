@@ -59,10 +59,7 @@ private:
 	virtual void produce(edm::Event&, const edm::EventSetup&) override;
 	virtual void endStream() override;
 
-	float getEA(float);
 	bool isMatchedWithTrigger(const pat::Electron, trigger::TriggerObjectCollection, int&);
-	bool passIDWP(std::string WP, bool isEB, float dEtaIn, float dPhiIn, float full5x5, float hoe, float d0, float dz,
-			float ooemoop, bool conv, int missHits);
 
 	bool passesInvertedIDCuts(const vid::CutFlowResult fullCutFlowData, std::vector<uint> invertedSelection) const;
 	bool isLoose(const edm::Ptr<pat::Electron>& electron) const;
