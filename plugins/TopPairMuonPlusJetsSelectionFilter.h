@@ -96,9 +96,9 @@ private:
 
 	double cleaningDeltaR_;
 
-	const bool applyJEC_;
-	const std::string jetCorrectionService_;
-	const JetCorrector* corrector_;
+//	const bool applyJEC_;
+//	const std::string jetCorrectionService_;
+//	const JetCorrector* corrector_;
 	
 	double minBJetDiscriminator_;
 	double tightBJetDiscriminator_;

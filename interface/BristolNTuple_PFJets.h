@@ -7,9 +7,6 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 
-#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
-#include "CondFormats/BTauObjects/interface/BTagCalibrationReader.h"
-
 class BristolNTuple_PFJets : public edm::EDProducer {
 
  public:
@@ -21,10 +18,8 @@ class BristolNTuple_PFJets : public edm::EDProducer {
   const std::string     prefix,suffix;
   const unsigned int    maxSize;
   const double      minJetPtToStore;
-  const std::string jecUncPath;
   const bool readJEC;
-  const std::string jetCorrectionService;
-  const bool readJECuncertainty, doVertexAssociation;
+  const bool doVertexAssociation;
   const bool isRealData;
 };
 

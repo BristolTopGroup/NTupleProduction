@@ -74,6 +74,8 @@ private:
 	void fillJetIds(pat::Jet& jet) const;
 	void fillBtagging(pat::Jet& jet) const;
 	void fillBtagWeights(pat::Jet& jet) const;
+	void fillJEC(pat::Jet& jet, const edm::Event& iEvent, const edm::EventSetup& iSetup,
+			const JetCorrector* jetCorrector) const;
 	void fillJER(pat::Jet& jet) const;
 	std::vector<double> returnBTagSFs(const pat::Jet& jet, const BTagCalibrationReader& reader,
 			const BTagCalibrationReader& readerUp, const BTagCalibrationReader& readerDown) const;
@@ -84,6 +86,7 @@ private:
 	const edm::EDGetTokenT<std::vector<reco::Vertex> > vtxInputTag_;
 	const edm::EDGetTokenT<reco::BeamSpot> beamSpotInputTag_;
 	std::string jecUncertainty_;
+	const std::string jetCorrectionService_;
 	std::string bJetDiscriminator_, btagCalibrationFile_;
 	BTagCalibration btagCalibration_;
 	std::vector<BTagCalibrationReader> btagReaders_;
@@ -122,6 +125,7 @@ JetUserData::JetUserData(const edm::ParameterSet& iConfig) :
 				beamSpotInputTag_(
 						consumes < reco::BeamSpot > (iConfig.getParameter < edm::InputTag > ("beamSpotCollection"))), //
 				jecUncertainty_(iConfig.getParameter < std::string > ("jecUncertainty")), //
+				jetCorrectionService_(iConfig.getParameter < std::string > ("jetCorrectionService")), //
 				bJetDiscriminator_(iConfig.getParameter < std::string > ("bJetDiscriminator")), //
 				btagCalibrationFile_(iConfig.getParameter < std::string > ("btagCalibrationFile")), //
 				btagCalibration_("csvv2", btagCalibrationFile_.c_str()), //
@@ -162,6 +166,8 @@ JetUserData::JetUserData(const edm::ParameterSet& iConfig) :
 		btagUdsgReadersDown_.push_back(
 				BTagCalibrationReader(&btagCalibration_, (BTagEntry::OperatingPoint) index, "incl", "down"));
 	}
+
+	consumes<double>(edm::InputTag("fixedGridRhoFastjetAll"));
 }
 
 JetUserData::~JetUserData() {
@@ -188,8 +194,9 @@ void JetUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
 	edm::ESHandle < JetCorrectorParametersCollection > jetCorrectorCollection;
 	iSetup.get<JetCorrectionsRecord>().get(jecUncertainty_, jetCorrectorCollection);
-	JetCorrectorParameters const & jetCorrector = (*jetCorrectorCollection)["Uncertainty"];
-	JetCorrectionUncertainty jecUnc(jetCorrector);
+	JetCorrectorParameters const & jetCorrectorParams = (*jetCorrectorCollection)["Uncertainty"];
+	JetCorrectionUncertainty jecUnc(jetCorrectorParams);
+	const JetCorrector* jetCorrector(JetCorrector::getJetCorrector(jetCorrectionService_, iSetup));
 
 //	bool isSimulation = !iEvent.isRealData();
 
@@ -203,6 +210,7 @@ void JetUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
 		for (size_t index = 0; index < nJets; ++index) {
 			pat::Jet & jet = jetCollection->at(index);
+
 			fillUncertainties(jet, jecUnc);
 			// we need to be able to add 4 vector with different
 			// JEC and JER
@@ -216,6 +224,9 @@ void JetUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
 			// b-tagging
 			fillBtagging(jet);
+
+			// JEC
+			fillJEC(jet, iEvent, iSetup, jetCorrector);
 
 			// only for simulation
 			if (!iEvent.isRealData()) {
@@ -235,8 +246,23 @@ void JetUserData::fillUncertainties(pat::Jet& jet, JetCorrectionUncertainty& jec
 	double unc = jecUnc.getUncertainty(true);
 	double ptUp = jet.pt() * (1 + unc);
 	double ptDown = jet.pt() * (1 - unc);
+	jet.addUserFloat("JECUncertainty", unc);
 	jet.addUserFloat("ptUp", ptUp);
 	jet.addUserFloat("ptDown", ptDown);
+
+	//TODO: add absolute JEC factor:
+	/*// get a copy of the uncorrected p4
+	 reco::Candidate::LorentzVector uncorrJet = ijet->correctedP4(0);
+	 // Then get the correction (L1+L2+L3 [+L2L3 for data])
+	 jec_->setJetEta( uncorrJet.eta() );
+	 jec_->setJetPt ( uncorrJet.pt() );
+	 jec_->setJetE  ( uncorrJet.energy() );
+	 jec_->setJetA  ( ijet->jetArea() );
+	 jec_->setRho   ( *(rhoHandle.product()) );
+	 jec_->setNPV   ( pvHandle->size() );
+	 double corr = jec_->getCorrection();
+	 // Here will be the working variable for all the jet energy effects
+	 reco::Candidate::LorentzVector scaledJetP4 = uncorrJet * corr; */
 }
 
 void JetUserData::fillVertexVariables(const edm::Event& iEvent, pat::Jet& jet) const {
@@ -457,6 +483,16 @@ std::vector<double> JetUserData::returnBTagSFs(const pat::Jet& jet, const BTagCa
 	}
 
 	return {weight, weightUp, weightDown};
+}
+
+void JetUserData::fillJEC(pat::Jet& jet, const edm::Event& iEvent, const edm::EventSetup& iSetup,
+		const JetCorrector* jetCorrector) const {
+	double jec = jetCorrector->correction(jet.correctedJet("Uncorrected"), iEvent, iSetup);
+	jet.addUserFloat("JEC", jec);
+	jet.addUserFloat("L2L3ResJEC", jet.pt() / jet.correctedJet("L3Absolute").pt());
+	jet.addUserFloat("L3AbsJEC", jet.correctedJet("L3Absolute").pt() / jet.correctedJet("L2Relative").pt());
+	jet.addUserFloat("L2RelJEC", jet.correctedJet("L2Relative").pt() / jet.correctedJet("L1FastJet").pt());
+	jet.addUserFloat("L1OffJEC", jet.correctedJet("L1FastJet").pt() / jet.correctedJet("Uncorrected").pt());
 }
 
 void JetUserData::fillJER(pat::Jet& jet) const {

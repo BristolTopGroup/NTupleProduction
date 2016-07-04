@@ -29,13 +29,8 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 				// Selection criteria
 				cleaningDeltaR_(iConfig.getParameter<double>("cleaningDeltaR")), //
 
-				applyJEC_(iConfig.getParameter<bool>("applyJEC")), //
-				jetCorrectionService_(iConfig.getParameter < std::string > ("JetCorrectionService")), //
-				corrector_(0), //
-
 				minBJetDiscriminator_(iConfig.getParameter<double>("minBJetDiscriminator")), //
 				tightBJetDiscriminator_(iConfig.getParameter<double>("tightBJetDiscriminator")), //
-
 
 				// Flags and labels
 				tagAndProbeStudies_(iConfig.getParameter<bool>("tagAndProbeStudies")), //
@@ -92,9 +87,6 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 	desc.add < InputTag > ("HLTInput");
 
 	desc.add<double>("cleaningDeltaR", 0.3);
-
-	desc.add<bool>("applyJEC", false);
-	desc.add < std::string > ("JetCorrectionService", "");
 
 	desc.add<double>("minBJetDiscriminator", 0.800);
 	desc.add<double>("tightBJetDiscriminator", 0.935);
@@ -216,11 +208,6 @@ void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent, c
 	edm::Handle < pat::JetCollection > jets;
 	iEvent.getByToken(jetInput_, jets);
 	jets_ = *jets;
-
-	if (applyJEC_) {
-		corrector_ = JetCorrector::getJetCorrector(jetCorrectionService_, iSetup);
-		jets_ = applyNewJec(jets_, corrector_, iEvent, iSetup);
-	}
 
 	// Electrons (for veto)
 	iEvent.getByToken(electronInput_, electrons_);
