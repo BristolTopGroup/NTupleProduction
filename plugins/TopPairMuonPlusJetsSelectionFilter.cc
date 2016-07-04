@@ -8,7 +8,6 @@
 #include "DataFormats/RecoCandidate/interface/IsoDeposit.h"
 #include "DataFormats/RecoCandidate/interface/IsoDepositVetos.h"
 #include "DataFormats/PatCandidates/interface/Isolation.h"
-#include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "DataFormats/METReco/interface/BeamHaloSummary.h"
 
@@ -21,7 +20,7 @@ using namespace pat;
 TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm::ParameterSet& iConfig) :
 		// Input tags
 		jetInput_(consumes< pat::JetCollection > (iConfig.getParameter < edm::InputTag > ("jetInput"))), //
-		electronInput_(consumes<edm::View<pat::Electron>> (iConfig.getParameter < edm::InputTag > ("electronInput"))), //
+		electronInput_(consumes<edm::View<pat::Electron> > (iConfig.getParameter < edm::InputTag > ("electronInput"))), //
 		muonInput_(consumes< pat::MuonCollection > (iConfig.getParameter < edm::InputTag > ("muonInput"))), //
 		hltInputTag_(consumes< edm::TriggerResults > (iConfig.getParameter < edm::InputTag > ("HLTInput"))), //
 		VertexInput_(consumes< reco::VertexCollection > (iConfig.getParameter < edm::InputTag > ("VertexInput"))), //
@@ -31,10 +30,6 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 		maxSignalMuonEta_(iConfig.getParameter<double>("maxSignalMuonEta")), //
 		minLooseMuonPt_(iConfig.getParameter<double>("minLooseMuonPt")), //
 		maxLooseMuonEta_(iConfig.getParameter<double>("maxLooseMuonEta")), //
-		minLooseElectronPt_(iConfig.getParameter<double>("minLooseElectronPt")), //
-		maxLooseElectronEta_(iConfig.getParameter<double>("maxLooseElectronEta")), //
-		looseElectronIDMapToken_(consumes<ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("looseElectronIDMap"))),
-		minLooseElectronID_(iConfig.getParameter<double>("minLooseElectronID")), //
 
 		min1JetPt_(iConfig.getParameter<double>("min1JetPt")), //
 		min2JetPt_(iConfig.getParameter<double>("min2JetPt")), //
@@ -118,10 +113,6 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 	desc.add<double>("maxSignalMuonEta",10.);
 	desc.add<double>("minLooseMuonPt",0.);
 	desc.add<double>("maxLooseMuonEta",10.);
-	desc.add<double>("minLooseElectronPt",0.);
-	desc.add<double>("maxLooseElectronEta",10.);
-	desc.add < InputTag > ("looseElectronIDMap");
-	desc.add<double>("minLooseElectronID",0);
 
 	desc.add<double>("min1JetPt", 30.0);
 	desc.add<double>("min2JetPt", 30.0);
@@ -276,11 +267,6 @@ void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent, c
 	// Electrons (for veto)
 	iEvent.getByToken(electronInput_, electrons_);
 
-	// Electron VID Decisions
-	Handle<edm::ValueMap<bool> > loose_id_decisions;
-	iEvent.getByToken(looseElectronIDMapToken_,loose_id_decisions);
-	looseElectronIDDecisions_ = *loose_id_decisions;
-
 	// Muons
 	edm::Handle < pat::MuonCollection > muons;
 	iEvent.getByToken(muonInput_, muons);
@@ -328,20 +314,9 @@ void TopPairMuonPlusJetsSelectionFilter::getLooseElectrons() {
 	// Loop through electrons and store those that pass a loose selection
 	for (size_t index = 0; index < electrons_->size(); ++index){
 		const auto electron = electrons_->ptrAt(index);		
-		if (isLooseElectron(electron))
+		if (electron->userInt("isLoose"))
 			looseElectrons_.push_back(*electron);
 	}
-}
-
-bool TopPairMuonPlusJetsSelectionFilter::isLooseElectron(const edm::Ptr<pat::Electron>& electron) const {
-	bool passesPtAndEta = electron->pt() > minLooseElectronPt_ && fabs(electron->eta()) < maxLooseElectronEta_;
-	// bool notInCrack = fabs(electron.superCluster()->eta()) < 1.4442 || fabs(electron.superCluster()->eta()) > 1.5660;
-	// bool passesID = electron.electronID("mvaTrigV0") > 0.5;
-
-	bool passesID = looseElectronIDDecisions_[electron];
-	bool passesIso = true;
-
-	return passesPtAndEta && passesID && passesIso;
 }
 
 void TopPairMuonPlusJetsSelectionFilter::getLooseMuons() {

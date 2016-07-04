@@ -6,7 +6,7 @@
         
         
     Usage:
-            run sync_ex [campaign=<X>]  [dataset=<X>]
+            run sync_ex [campaign=<X>]  [dataset=<X>] [output_file=<X>]
         
     Parameters:
             campaign: which campaign to run. Corresponds to the folder
@@ -16,6 +16,7 @@
                       to the file names (without extension) in crab/*/*.py.
                       Accepts wild-cards and comma-separated lists.
                       Default is 'TTJets_PowhegPythia8'.
+            output_file: Name of the output file. Default: sync_exercise.root
 """
 import logging
 import os
@@ -30,7 +31,7 @@ OUTPUT_FILE = os.path.join(RESULTDIR, 'sync_exercise.root')
 
 BASE = """
 import FWCore.ParameterSet.Config as cms
-from run.synchronisation_exercise_cfg import process
+from run.miniAODToNTuple_cfg import process
 
 process.maxEvents.input = cms.untracked.int32({nevents})
 

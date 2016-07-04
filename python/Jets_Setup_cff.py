@@ -6,7 +6,7 @@ from RecoJets.JetProducers.PFJetParameters_cfi import *
 from RecoJets.JetProducers.CaloJetParameters_cfi import *
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 from RecoJets.JetProducers.GenJetParameters_cfi import *
-from BristolAnalysis.NTupleTools.NTupleOptions_cff import CMSSW_MAJOR_VERSION, CMSSW_MINOR_VERSION
+from BristolAnalysis.NTupleTools.options import CMSSW_MAJOR_VERSION
 # this has to run AFTER setup_PF2PAT
 
 

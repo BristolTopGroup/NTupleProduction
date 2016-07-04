@@ -28,19 +28,8 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		vertexInputTag_(consumes<reco::VertexCollection>(iConfig.getParameter < edm::InputTag > ("VertexInputTag"))), //
 
 		// Selection criteria
-		minSignalElectronPt_(iConfig.getParameter<double>("minSignalElectronPt")), //
-		maxSignalElectronEta_(iConfig.getParameter<double>("maxSignalElectronEta")), //
-  		signalElectronIDMapToken_(consumes<ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("signalElectronIDMap"))),
-  		eleMediumIdFullInfoMapToken_(consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("signalElectronIDMap"))),		 
-
-		minSignalElectronID_(iConfig.getParameter<double>("minSignalElectronID")), //
 		minLooseMuonPt_(iConfig.getParameter<double>("minLooseMuonPt")), //
 		maxLooseMuonEta_(iConfig.getParameter<double>("maxLooseMuonEta")), //
-		minLooseElectronPt_(iConfig.getParameter<double>("minLooseElectronPt")), //
-		maxLooseElectronEta_(iConfig.getParameter<double>("maxLooseElectronEta")), //
-  		looseElectronIDMapToken_(consumes<ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("looseElectronIDMap"))),
-
-		minLooseElectronID_(iConfig.getParameter<double>("minLooseElectronID")), //
 
 		min1JetPt_(iConfig.getParameter<double>("min1JetPt")), //
 		min2JetPt_(iConfig.getParameter<double>("min2JetPt")), //
@@ -58,10 +47,6 @@ TopPairElectronPlusJetsSelectionFilter::TopPairElectronPlusJetsSelectionFilter(c
 		bJetDiscriminator_(iConfig.getParameter<std::string>("bJetDiscriminator")), //
 		minBJetDiscriminator_(iConfig.getParameter<double>("minBJetDiscriminator")), //
 		tightBJetDiscriminator_(iConfig.getParameter<double>("tightBJetDiscriminator")), //
-
-		tightElectronIso_EB_(iConfig.getParameter<double>("tightElectronIsolation_EB")), //
-		tightElectronIso_EE_(iConfig.getParameter<double>("tightElectronIsolation_EE")), //
-		controlElectronIso_(iConfig.getParameter<double>("controlElectronIsolation")), //
 
         looseMuonIso_(iConfig.getParameter<double>("looseMuonIsolation")), //
 
@@ -120,16 +105,8 @@ void TopPairElectronPlusJetsSelectionFilter::fillDescriptions(edm::Configuration
 	desc.add < InputTag > ("HLTInput");
 	desc.add < InputTag > ("VertexInputTag");
 
-	desc.add<double>("minSignalElectronPt",0.);
-	desc.add<double>("maxSignalElectronEta",10.);
-	desc.add<double>("minSignalElectronID",0);
-	desc.add < InputTag > ("signalElectronIDMap");
-	desc.add < InputTag > ("looseElectronIDMap");
 	desc.add<double>("minLooseMuonPt",0.);
 	desc.add<double>("maxLooseMuonEta",10.);
-	desc.add<double>("minLooseElectronPt",0.);
-	desc.add<double>("maxLooseElectronEta",10.);
-	desc.add<double>("minLooseElectronID",0);
 
 	desc.add<double>("min1JetPt", 30.0);
 	desc.add<double>("min2JetPt", 30.0);
@@ -278,19 +255,6 @@ void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEven
 	// Electrons
 	iEvent.getByToken(electronInput_, electrons_);
 
-	// Electron VID Decisions
-	Handle<edm::ValueMap<bool> > medium_id_decisions;
-	iEvent.getByToken(signalElectronIDMapToken_,medium_id_decisions);
-	signalElectronIDDecisions_ = *medium_id_decisions;
-
-	Handle<edm::ValueMap<bool> > loose_id_decisions;
-	iEvent.getByToken(looseElectronIDMapToken_,loose_id_decisions);
-	looseElectronIDDecisions_ = *loose_id_decisions;
-
-  	edm::Handle<edm::ValueMap<vid::CutFlowResult> > medium_id_cutflow_data;
-  	iEvent.getByToken(eleMediumIdFullInfoMapToken_, medium_id_cutflow_data);
-	medium_id_cutflow_data_ = *medium_id_cutflow_data;
-
 	// Muons (for veto)
 	edm::Handle < pat::MuonCollection > muons;
 	iEvent.getByToken(muonInput_, muons);
@@ -335,16 +299,9 @@ void TopPairElectronPlusJetsSelectionFilter::getLooseElectrons() {
 	// Loop through electrons and store those that pass a loose selection
 	for (size_t index = 0; index < electrons_->size(); ++index){
 		const auto electron = electrons_->ptrAt(index);		
-		if (isLooseElectron(electron))
+		if (electron->userInt("isLoose"))
 			looseElectrons_.push_back(*electron);
 	}
-}
-
-bool TopPairElectronPlusJetsSelectionFilter::isLooseElectron(const edm::Ptr<pat::Electron>& electron) const {
-	bool passesPtAndEta = electron->pt() > minLooseElectronPt_ && fabs(electron->eta()) < maxLooseElectronEta_;
-	bool passesID = looseElectronIDDecisions_[electron];
-	bool passesIso = true; // FIXME Iso already applied in ID (check in AT)
-	return passesPtAndEta && passesID && passesIso;
 }
 
 void TopPairElectronPlusJetsSelectionFilter::getLooseMuons() {
@@ -386,44 +343,17 @@ void TopPairElectronPlusJetsSelectionFilter::goodIsolatedElectrons() {
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::isGoodElectron(const edm::Ptr<pat::Electron>& electron) const {
-	bool passesPtAndEta = electron->pt() > minSignalElectronPt_ && fabs(electron->eta()) < maxSignalElectronEta_;
-	bool notInCrack = fabs(electron->superCluster()->eta()) < 1.4442 || fabs(electron->superCluster()->eta()) > 1.5660;
-	bool inECAL = fabs(electron->superCluster()->eta()) < 2.5;
-	bool passesID = false;
+	bool isGood = false;
 
-	// ID Cuts
-	// Index : Name
-	//----------------------------------------- 
-	//   0   : MinPtCut
-	//   1   : GsfEleSCEtaMultiRangeCut
-	//   2   : GsfEleDEtaInCut
-	//   3   : GsfEleDPhiInCut
-	//   4   : GsfEleFull5x5SigmaIEtaIEtaCut
-	//   5   : GsfEleHadronicOverEMCut
-	//   6   : GsfEleDxyCut
-	//   7   : GsfEleDzCut 
-	//   8   : GsfEleEInverseMinusPInverseCut
-	//   9   : GsfEleEffAreaPFIsoCut
-	//   10  : GsfEleConversionVetoCut
-	//   11  : GsfEleMissingHitsCut
-
-	if ( nonIsolatedElectronSelection_ ) {
-		std::vector<uint> idCutsToInvert {9};
-		if ( returnInvertedSelection(electron, idCutsToInvert) ) {
-			passesID = true;
-		}
-	}
-	else if ( invertedConversionSelection_ ) {
-		std::vector<uint> idCutsToInvert {10, 11};
-		if ( returnInvertedSelection(electron, idCutsToInvert) ){
-			passesID = true;
-		}
-	}
-	else {
-		passesID = signalElectronIDDecisions_[electron];
+	if (nonIsolatedElectronSelection_) {
+		isGood = electron->userInt("isGoodNonIso");
+	} else if (invertedConversionSelection_) {
+		isGood = electron->userInt("isGoodConversion");
+	} else {
+		isGood = electron->userInt("isGood");
 	}
 
-	return passesPtAndEta && notInCrack && inECAL && passesID;
+	return isGood;
 }
 
 double TopPairElectronPlusJetsSelectionFilter::electronIsolation(const pat::Electron& electron) const {
@@ -432,28 +362,6 @@ double TopPairElectronPlusJetsSelectionFilter::electronIsolation(const pat::Elec
 	float absiso = pfIso.sumChargedHadronPt 
 	  + std::max(0.0 , pfIso.sumNeutralHadronEt + pfIso.sumPhotonEt - 0.5 * pfIso.sumPUPt );
 	return absiso/electron.pt();
-}
-
-bool TopPairElectronPlusJetsSelectionFilter::returnInvertedSelection(const edm::Ptr<pat::Electron>& electron, std::vector<uint> invertedSelection) const {
-
-	vid::CutFlowResult fullCutFlowData = medium_id_cutflow_data_[electron];
-	bool passesFullSelection = true;
-	// printf("\nDEBUG CutFlow, full info for cand with pt=%f:\n", electron->pt());
-	// printf("    CutFlow name= %s    decision is %d\n", fullCutFlowData.cutFlowName().c_str(), (int) fullCutFlowData.cutFlowPassed());
-	// printf(" Index                               cut name              isMasked    value-cut-upon     pass?\n");
-	for(uint icut = 0; icut < fullCutFlowData.cutFlowSize(); icut++){
-        // printf("  %2d      %50s    %d        %f          %d\n", 
-		// icut, fullCutFlowData.getNameAtIndex(icut).c_str(), (int)fullCutFlowData.isCutMasked(icut), fullCutFlowData.getValueCutUpon(icut), (int)fullCutFlowData.getCutResultByIndex(icut));
-    	bool passesThisCut = fullCutFlowData.getCutResultByIndex(icut);
- 		for ( auto invertedCut = invertedSelection.begin(); invertedCut != invertedSelection.end(); invertedCut++ ) {
-    		if ( icut== *invertedCut ) passesThisCut = !passesThisCut;
-		}
-    	if ( !passesThisCut ) {
-            passesFullSelection = false;
-            break;
-        }		
-	}
-	return passesFullSelection;
 }
 
 void TopPairElectronPlusJetsSelectionFilter::cleanedJets() {

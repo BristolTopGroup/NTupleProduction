@@ -60,3 +60,47 @@ Filtering with JSON: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideGoodL
 
 import FWCore.PythonUtilities.LumiList as LumiList
 process.source.lumisToProcess = LumiList.LumiList(filename = 'goodList.json').getVLuminosityBlockRange()
+
+
+# EDFilter
+Can use applyfilter = False to enable tagging mode.
+```
+process.physdecl = cms.EDFilter(
+  "Selection",
+  applyfilter = cms.untracked.bool(False),
+  debugOn = cms.untracked.bool(True),
+)
+```
+
+
+
+
+# user data
+https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATUserData
+## Electrons
+TopPairElectronSelection uses the following inputs:
+ - egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-medium
+ - egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-loose
+ - slimmedElectrons
+ - cms.InputTag('TriggerResults', '', 'HLT'),
+Additional in ElectronProducer
+ - egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-mediumBitmap
+ - 'reducedEgamma','reducedConversions'
+ - offlineSlimmedPrimaryVertices
+ - offlineBeamSpot
+// ID Cuts
+	// Index : Name
+	//-----------------------------------------
+	//   0   : MinPtCut
+	//   1   : GsfEleSCEtaMultiRangeCut
+	//   2   : GsfEleDEtaInCut
+	//   3   : GsfEleDPhiInCut
+	//   4   : GsfEleFull5x5SigmaIEtaIEtaCut
+	//   5   : GsfEleHadronicOverEMCut
+	//   6   : GsfEleDxyCut
+	//   7   : GsfEleDzCut
+	//   8   : GsfEleEInverseMinusPInverseCut
+	//   9   : GsfEleEffAreaPFIsoCut
+	//   10  : GsfEleConversionVetoCut
+	//   11  : GsfEleMissingHitsCut
+

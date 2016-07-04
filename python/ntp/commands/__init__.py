@@ -62,11 +62,15 @@ class Command(object):
                 self.__create_proxy()
 
     def __create_proxy(self):
-        import subprocess
+        from ntp.interpreter import call
         vo = 'cms'
         hours = str(80)
         command = ['voms-proxy-init', '-voms', vo, '-hours', hours]
-        subprocess.call(command, shell=True)
+        call(
+            ' '.join(command),
+            logger=LOG,
+            shell=True,
+        )
 
     def __has_valid_proxy(self):
         from ntp.interpreter import call
@@ -81,8 +85,10 @@ class Command(object):
                 time_left = int(stdout)
             except:
                 time_left = 0
-                LOG.warning(
-                    'Proxy exists but could not read time left on proxy.')
+                msg = 'Proxy exists ({0}) but '.format(proxy)
+                msg + 'could not read time left on proxy.'
+                LOG.warning(msg)
+                LOG.debug("Command output: {0}".format(stdout.encode('string-excape')))
 
             LOG.info('Time left on proxy: {0} min'.format(time_left / 60))
             if time_left < (60 * 30):  # less than 30min

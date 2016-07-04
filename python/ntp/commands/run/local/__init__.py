@@ -45,7 +45,7 @@ from run.miniAODToNTuple_cfg import process
 
 process.maxEvents.input = cms.untracked.int32({nevents})
 
-process.TFileService.fileName=cms.string('{OUTPUT_FILE}')
+process.TFileService.fileName='{OUTPUT_FILE}'
 
 # In order to work around the limitation of 255 parameters to a python function
 # we pass 1 tuple of all the files to the vstring function
@@ -90,7 +90,7 @@ class Command(C):
         input_files = find_input_files(
             campaign, chosen_dataset, self.__variables, logger=LOG
         )
-        LOG.info(
+        LOG.debug(
             "Using files for NTP input:\n{0}".format('\n'.join(input_files)))
 
         self.__output_file = self.__variables['output_file']
