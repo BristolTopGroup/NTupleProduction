@@ -33,7 +33,6 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 				jetCorrectionService_(iConfig.getParameter < std::string > ("JetCorrectionService")), //
 				corrector_(0), //
 
-				bJetDiscriminator_(iConfig.getParameter < std::string > ("bJetDiscriminator")), //
 				minBJetDiscriminator_(iConfig.getParameter<double>("minBJetDiscriminator")), //
 				tightBJetDiscriminator_(iConfig.getParameter<double>("tightBJetDiscriminator")), //
 
@@ -92,19 +91,11 @@ void TopPairMuonPlusJetsSelectionFilter::fillDescriptions(edm::ConfigurationDesc
 	desc.add < InputTag > ("muonInput");
 	desc.add < InputTag > ("HLTInput");
 
-	desc.add<double>("min1JetPt", 30.0);
-	desc.add<double>("min2JetPt", 30.0);
-	desc.add<double>("min3JetPt", 30.0);
-	desc.add<double>("min4JetPt", 30.0);
-	desc.add<double>("minBJetPt", 30.0);
-	desc.add<double>("minJetPtInNtuples", 30.0);
-
 	desc.add<double>("cleaningDeltaR", 0.3);
 
 	desc.add<bool>("applyJEC", false);
 	desc.add < std::string > ("JetCorrectionService", "");
 
-	desc.add < std::string > ("bJetDiscriminator", "combinedSecondaryVertexBJetTags");
 	desc.add<double>("minBJetDiscriminator", 0.800);
 	desc.add<double>("tightBJetDiscriminator", 0.935);
 
@@ -393,11 +384,11 @@ void TopPairMuonPlusJetsSelectionFilter::cleanedBJets() {
 			continue;
 
 		// Does jet pass b tag selection
-		if (jet.bDiscriminator(bJetDiscriminator_) > minBJetDiscriminator_) {
+		if (jet.userFloat("btagDiscriminator") > minBJetDiscriminator_) {
 			// Keep if it does
 			cleanedBJets_.push_back(jet);
 			cleanedBJetIndex_.push_back(index);
-			if (jet.bDiscriminator(bJetDiscriminator_) > tightBJetDiscriminator_) {
+			if (jet.userFloat("btagDiscriminator") > tightBJetDiscriminator_) {
 				cleanedTightBJetIndex_.push_back(index);
 			}
 		}

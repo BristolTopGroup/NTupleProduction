@@ -107,7 +107,6 @@ private:
 	const std::string jetCorrectionService_;
 	const JetCorrector* corrector_;
 
-	std::string bJetDiscriminator_;
 	double minBJetDiscriminator_;
 	double tightBJetDiscriminator_;
 

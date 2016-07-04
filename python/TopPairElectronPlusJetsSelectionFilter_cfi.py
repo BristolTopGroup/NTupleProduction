@@ -7,18 +7,6 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     muonInput=cms.InputTag("slimmedMuons"),
     HLTInput=cms.InputTag('TriggerResults', '', 'HLT'),
 
-    # Lepton cuts
-#     minLooseMuonPt=cms.double(10.),
-#     maxLooseMuonEta=cms.double(2.5),
-
-    #jet cuts
-#     min1JetPt=cms.double(20.),
-#     min2JetPt=cms.double(20.),
-#     min3JetPt=cms.double(20.),
-#     min4JetPt=cms.double(20.),
-#     minBJetPt=cms.double(20.),
-#     minJetPtInNtuples=cms.double(20.),
-    
     # Jet cleaning delta R
     cleaningDeltaR=cms.double(0.4),
 
@@ -27,18 +15,10 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     JetCorrectionService = cms.string('ak4PFCHSL1FastL2L3'),
 
     # B Jet Selection
-    # Working points taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation74X50ns
-    bJetDiscriminator=cms.string('pfCombinedInclusiveSecondaryVertexV2BJetTags'),
+    # Working points taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X
     minBJetDiscriminator=cms.double(0.800),
     tightBJetDiscriminator=cms.double(0.935),
     
-#     tightElectronIsolation_EB=cms.double(0.14),
-#     tightElectronIsolation_EE=cms.double(0.1649),
-
-#     controlElectronIsolation=cms.double(0.),
-
-#     looseMuonIsolation=cms.double(0.25),
-   
     prefix=cms.untracked.string('TopPairElectronPlusJetsSelection.'),
     MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12 or Summer11Leg
 
