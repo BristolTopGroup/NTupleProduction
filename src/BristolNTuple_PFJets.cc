@@ -24,7 +24,6 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		jetCorrectionService(iConfig.getParameter<std::string> ("JetCorrectionService")), //
 		readJECuncertainty(iConfig.getParameter<bool>("ReadJECuncertainty")), //
 		doVertexAssociation(iConfig.getParameter<bool>("DoVertexAssociation")), //
-		vtxInputTag(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))), //		
 		isRealData(iConfig.getParameter<bool>("isRealData")) {
 	//kinematic variables
 	produces < std::vector<double> > (prefix + "Px" + suffix);

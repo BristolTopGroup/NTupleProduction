@@ -198,36 +198,6 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 			if (!(it->isGlobalMuon() || it->isTrackerMuon()))
 				continue;
 
-//			double trkd0 = it->track()->d0();
-//
-//			if (beamSpotCorr && beamSpot.isValid()) {
-//				trkd0 = -(it->track()->dxy(beamSpot->position()));
-//			}
-
-//			double minVtxDist3D = 9999.;
-//			int vtxIndex_ = -1;
-////			double vtxDistXY_ = -9999.;
-//			double vtxDistZ_ = -9999.;
-//
-//			if (primaryVertices.isValid()) {
-//				edm::LogInfo("RootTupleMakerV2_MuonsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
-//
-//				for (reco::VertexCollection::const_iterator v_it = primaryVertices->begin();
-//						v_it != primaryVertices->end(); ++v_it) {
-//
-//					double distXY = it->track()->dxy(v_it->position());
-//					double distZ = it->track()->dz(v_it->position());
-//					double dist3D = sqrt(pow(distXY, 2) + pow(distZ, 2));
-//
-//					if (dist3D < minVtxDist3D) {
-//						minVtxDist3D = dist3D;
-//						vtxIndex_ = int(std::distance(primaryVertices->begin(), v_it));
-////						vtxDistXY_ = distXY;
-//						vtxDistZ_ = distZ;
-//					}
-//				}
-//			}
-
 			//kinematic variables
 			px->push_back(it->px());
 			py->push_back(it->py());
