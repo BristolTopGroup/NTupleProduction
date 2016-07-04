@@ -1,0 +1,3 @@
+# Jet corrections
+Jet corrections are defined in `python/Jets_Setup_cff.py` only. The setup allows either reading from the global tag or from a SQLite DB file.
+The newest recommendations can be found on the [JERC twiki](https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC) and instructions for the python configuration can be found on the [WorkBookJetEnergyCorrections twiki](https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections).
