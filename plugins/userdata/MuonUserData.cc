@@ -39,8 +39,6 @@
 
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
-#include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
-
 namespace ntp {
 namespace userdata {
 
@@ -63,6 +61,7 @@ private:
 	bool isLoose(const pat::Muon& muon) const;
 	bool isGood(const pat::Muon& muon) const;
 	void fillVertexVariables(const edm::Event&, pat::Muon& el) const;
+	double getRelativeIsolation(const pat::Muon& muon, double cone, bool useDeltaBetaCorrections);
 
 	// inputs
 	edm::EDGetToken muonInputTag_;
@@ -261,6 +260,34 @@ void MuonUserData::fillDescriptions(edm::ConfigurationDescriptions& descriptions
 	edm::ParameterSetDescription desc;
 	desc.setUnknown();
 	descriptions.addDefault(desc);
+}
+
+double MuonUserData::getRelativeIsolation(const pat::Muon& muon, double cone, bool useDeltaBetaCorrections) {
+	double chIso = 0;
+	double nhIso = 0;
+	double phIso = 0;
+	double puChIso = 0;
+
+	if (cone == 0.3) {
+		chIso = muon.pfIsolationR03().sumChargedHadronPt;
+		nhIso = muon.pfIsolationR03().sumNeutralHadronEt;
+		phIso = muon.pfIsolationR03().sumPhotonEt;
+		puChIso = muon.pfIsolationR03().sumPUPt;
+	} else {
+		chIso = muon.pfIsolationR04().sumChargedHadronPt;
+		nhIso = muon.pfIsolationR04().sumNeutralHadronEt;
+		phIso = muon.pfIsolationR04().sumPhotonEt;
+		puChIso = muon.pfIsolationR04().sumPUPt;
+
+	}
+
+	const double relIso = (chIso + nhIso + phIso) / muon.pt();
+	const double relIsodb = (chIso + std::max(0.0, nhIso + phIso - 0.5 * puChIso)) / muon.pt();
+
+	if (useDeltaBetaCorrections)
+		return relIsodb;
+
+	return relIso;
 }
 
 //define this as a plug-in

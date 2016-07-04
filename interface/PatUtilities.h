@@ -24,10 +24,6 @@ bool triggerFired(const std::string& triggerWildCard, const HLTConfigProvider& h
 		const edm::TriggerResults& triggerResults);
 unsigned int findTrigger(const std::string& triggerWildCard, const HLTConfigProvider& hltConfig);
 
-double getRelativeIsolation(const pat::Electron& electron, double cone, double rho, bool isRealData,
-		bool useDeltaBetaCorrections, bool useRhoActiveAreaCorrections);
-double getRelativeIsolation(const pat::Muon& muon, double cone, bool useDeltaBetaCorrections);
-
 double getSmearedJetPtScale(const pat::Jet& jet, int jet_smearing_systematic);
 
 pat::JetCollection applyNewJec( pat::JetCollection jets, const JetCorrector* corrector, edm::Event& iEvent, const edm::EventSetup& iSetup );
