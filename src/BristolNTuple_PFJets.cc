@@ -2,13 +2,6 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
-#include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
-#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
-#include "JetMETCorrections/Objects/interface/JetCorrector.h"
-#include "JetMETCorrections/Modules/interface/JetResolution.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 
 using namespace std;
@@ -19,10 +12,7 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		suffix(iConfig.getParameter < std::string > ("Suffix")), //
 		maxSize(iConfig.getParameter<unsigned int>("MaxSize")), //
 		minJetPtToStore(iConfig.getParameter<double>("minJetPtToStore")), //
-		jecUncPath(iConfig.getParameter < std::string > ("JECUncertainty")), //
 		readJEC(iConfig.getParameter < bool > ("ReadJEC")), //
-		jetCorrectionService(iConfig.getParameter<std::string> ("JetCorrectionService")), //
-		readJECuncertainty(iConfig.getParameter<bool>("ReadJECuncertainty")), //
 		doVertexAssociation(iConfig.getParameter<bool>("DoVertexAssociation")), //
 		isRealData(iConfig.getParameter<bool>("isRealData")) {
 	//kinematic variables
@@ -211,29 +201,6 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<int> > closestVertexXYIndex(new std::vector<int>());
 	std::auto_ptr < std::vector<int> > closestVertexZIndex(new std::vector<int>());
 
-	const JetCorrector* corrector = 0;
-	// if ( readJEC ) {
-		corrector = JetCorrector::getJetCorrector (jetCorrectionService,iSetup);
-	// }
-
-	JetCorrectionUncertainty *jecUnc = 0;
-	if (readJECuncertainty ) {
-		// //(See https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1075/1.html
-		// // and https://hypernews.cern.ch/HyperNews/CMS/get/physTools/2367/1.html)
-		// // handle the jet corrector parameters collection
-		edm::ESHandle < JetCorrectorParametersCollection > JetCorParColl;
-		// get the jet corrector parameters collection from the global tag
-		iSetup.get<JetCorrectionsRecord>().get(jecUncPath, JetCorParColl);
-		// get the uncertainty parameters from the collection
-		JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
-		// instantiate the jec uncertainty object
-		jecUnc = new JetCorrectionUncertainty(JetCorPar);
-
-		// Or read from a file
-		// Only need this one line
-		// jecUnc = new JetCorrectionUncertainty("BristolAnalysis/NTupleTools/data/JEC/Summer15_50nsV2_DATA_Uncertainty_AK4PFchs.txt");
-	}
-
 	edm::Handle < std::vector<pat::Jet> > jets;
 	iEvent.getByToken(inputTag, jets);
 
@@ -266,20 +233,12 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			if (px->size() >= maxSize)
 				break;
 
-			double JEC = 1;
-			if ( readJEC ) {
-				JEC = corrector->correction( it->correctedJet("Uncorrected"), iEvent, iSetup );
- 			}
-
-			// Only consider jets above minimum pt
-			if ( readJEC ) {
-				if ( it->correctedJet("Uncorrected").pt() * JEC <= minJetPtToStore )
-					continue;
-			}
-			else {
-				if ( it->pt() <= minJetPtToStore )
-					continue;
-			}
+			double pt = it->pt();
+			double ptUp = it->userFloat("ptUp");
+			double ptDown = it->userFloat("ptUp");
+			// do not store any jets below a pt threshold
+			if (pt <=minJetPtToStore && ptUp <= minJetPtToStore && ptDown <= minJetPtToStore)
+				continue;
 
 			if (!iEvent.isRealData()) {
 				// Store generated jet resolutions for monte carlo
@@ -360,11 +319,12 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			// fill in all the vectors
 			//kinematic variables
 			if ( readJEC ) {
-				px->push_back(it->correctedJet("Uncorrected").px() * JEC );
-				py->push_back(it->correctedJet("Uncorrected").py() * JEC );
-				pz->push_back(it->correctedJet("Uncorrected").pz() * JEC );
-				energy->push_back(it->correctedJet("Uncorrected").energy() * JEC);
-				jec_vec->push_back(JEC);
+				double jec = it->userFloat("JEC");
+				px->push_back(it->correctedJet("Uncorrected").px() * jec );
+				py->push_back(it->correctedJet("Uncorrected").py() * jec );
+				pz->push_back(it->correctedJet("Uncorrected").pz() * jec );
+				energy->push_back(it->correctedJet("Uncorrected").energy() * jec);
+				jec_vec->push_back(jec);
 			}
 			else {
 				px->push_back(it->px());
@@ -385,30 +345,11 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			hadronFlavour->push_back(it->hadronFlavour());
 
 			//jet energy correction and uncertainties
-			if (readJECuncertainty){
-				jecUnc->setJetEta(it->eta());
-				jecUnc->setJetPt(it->pt()); // the uncertainty is a function of the corrected pt
-				jecUnc_vec->push_back(jecUnc->getUncertainty(true));
-			}
-			else
-				jecUnc_vec->push_back(-999);
-			l2l3resJEC_vec->push_back(it->pt() / it->correctedJet("L3Absolute").pt());
-			l3absJEC_vec->push_back(it->correctedJet("L3Absolute").pt() / it->correctedJet("L2Relative").pt());
-			l2relJEC_vec->push_back(it->correctedJet("L2Relative").pt() / it->correctedJet("L1FastJet").pt());
-			l1offJEC_vec->push_back(it->correctedJet("L1FastJet").pt() / it->correctedJet("Uncorrected").pt());
-			//TODO: add absolute JEC factor:
-			/*// get a copy of the uncorrected p4
-			 reco::Candidate::LorentzVector uncorrJet = ijet->correctedP4(0);
-			 // Then get the correction (L1+L2+L3 [+L2L3 for data])
-			 jec_->setJetEta( uncorrJet.eta() );
-			 jec_->setJetPt ( uncorrJet.pt() );
-			 jec_->setJetE  ( uncorrJet.energy() );
-			 jec_->setJetA  ( ijet->jetArea() );
-			 jec_->setRho   ( *(rhoHandle.product()) );
-			 jec_->setNPV   ( pvHandle->size() );
-			 double corr = jec_->getCorrection();
-			 // Here will be the working variable for all the jet energy effects
-			 reco::Candidate::LorentzVector scaledJetP4 = uncorrJet * corr; */
+			jecUnc_vec->push_back(it->userFloat("JECUncertainty"));
+			l2l3resJEC_vec->push_back(it->userFloat("L2L3ResJEC"));
+			l3absJEC_vec->push_back(it->userFloat("L3AbsJEC"));
+			l2relJEC_vec->push_back(it->userFloat("L2RelJEC"));
+			l1offJEC_vec->push_back(it->userFloat("L1OffJEC"));
 
 			//jet ID variables
 			chargedEmEnergyFraction->push_back(it->chargedEmEnergyFraction());
@@ -438,7 +379,6 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
 			//b-tagging information
 			//names are changing between major software releases
-//			double bDisc = it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags");
 			combinedInclusiveSecondaryVertexV2BJetTags->push_back(it->userFloat("btagDiscriminator"));
 			passesLooseCSV->push_back( it->userInt("passesLooseBtagWP") );
 			passesMediumCSV->push_back(it->userInt("passesMediumBtagWP") );
@@ -467,7 +407,6 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			}
 		}
 	} 
-	delete jecUnc;
 	//-----------------------------------------------------------------
 	// put vectors in the event
 	//kinematic variables

@@ -10,10 +10,6 @@ topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter
     # Jet cleaning delta R
     cleaningDeltaR=cms.double(0.4),
 
-    # Apply different JEC
-    applyJEC = cms.bool(False),
-    JetCorrectionService = cms.string('ak4PFCHSL1FastL2L3'),
-
     # B Jet Selection
     # Working points taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X
     minBJetDiscriminator=cms.double(0.800),

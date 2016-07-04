@@ -10,8 +10,8 @@ jetUserData = cms.EDProducer(
     maxSignalJetEta=cms.double(2.4),
 
     jecUncertainty=cms.string('AK4PFchs'),
-    JetCorrectionService=cms.string('ak4PFCHSL1FastL2L3'),
-    VertexInputTag=cms.InputTag('offlineSlimmedPrimaryVertices'),
+    jetCorrectionService=cms.string('ak4PFCHSL1FastL2L3'),
+#     jetCorrectorInputTag=cms.InputTag("ak4PFCHSL1FastL2L3CorrectorChain"),
     # from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X
     bJetDiscriminator=cms.string(
         'pfCombinedInclusiveSecondaryVertexV2BJetTags'),
