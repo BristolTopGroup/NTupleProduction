@@ -62,9 +62,10 @@ process.GlobalTag.globaltag = cms.string(globaltag)
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 # process.load('JetMETCorrections.Configuration.CorrectedJetProducersDefault_cff')
 
-# TT Gen Event configuration
-from BristolAnalysis.NTupleTools.ttGenConfig_cff import setupTTGenEvent 
-setupTTGenEvent( process, cms )
+if isTTbarMC:
+    # TT Gen Event configuration
+    from BristolAnalysis.NTupleTools.ttGenConfig_cff import setupTTGenEvent
+    setupTTGenEvent( process, cms )
 
 # Particle level definitions
 from BristolAnalysis.NTupleTools.pseudoTopConfig_cff import setupPseudoTop
@@ -189,9 +190,8 @@ if options.isLocalRunning:
 #   process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults','','PAT')
 
 if not options.isTTbarMC:
-  process.makingNTuples.remove( process.ttGenEvent )
-  process.selectionCriteriaAnalyzer.genSelectionCriteriaInput = cms.VInputTag()
-  del process.ttGenEvent
+    print('Not a ttbar MC - removing TTbar specific modules')
+    process.selectionCriteriaAnalyzer.genSelectionCriteriaInput = cms.VInputTag()
 
 else:
   process.nTupleGenEventInfo.isTTbarMC = cms.bool( True )
