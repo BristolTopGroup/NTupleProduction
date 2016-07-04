@@ -25,29 +25,7 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		readJECuncertainty(iConfig.getParameter<bool>("ReadJECuncertainty")), //
 		doVertexAssociation(iConfig.getParameter<bool>("DoVertexAssociation")), //
 		vtxInputTag(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))), //		
-		isRealData(iConfig.getParameter<bool>("isRealData")),
-	    looseBTagWP(iConfig.getParameter<double>("looseBTagWP")),
-	    mediumBTagWP(iConfig.getParameter<double>("mediumBTagWP")),
-	    tightBTagWP(iConfig.getParameter<double>("tightBTagWP")),
-		btagCalibrationFile_(iConfig.getParameter<std::string>("btagCalibrationFile")), //
-		calib("csvv2", btagCalibrationFile_.c_str()), //
-		medium_reader_bc(	&calib,               	// calibration instance
-							BTagEntry::OP_MEDIUM,  	// operating point
-							"mujets",               // measurement type
-							"central"),           	// systematics type
-		medium_reader_bc_up(&calib, BTagEntry::OP_MEDIUM, "mujets", "up"),  	// sys up
-		medium_reader_bc_down(&calib, BTagEntry::OP_MEDIUM, "mujets", "down"),  // sys down
-		medium_reader_udsg(&calib, BTagEntry::OP_MEDIUM, "incl", "central"),  	// sys down
-		medium_reader_udsg_up(&calib, BTagEntry::OP_MEDIUM, "incl", "up"),  	// sys down
-		medium_reader_udsg_down(&calib, BTagEntry::OP_MEDIUM, "incl", "down"),  // sys down
-
-		tight_reader_bc(&calib, BTagEntry::OP_TIGHT, "mujets", "central"),
-		tight_reader_bc_up(&calib, BTagEntry::OP_TIGHT, "mujets", "up"),
-		tight_reader_bc_down(&calib, BTagEntry::OP_TIGHT, "mujets", "down"),
-		tight_reader_udsg(&calib, BTagEntry::OP_TIGHT, "incl", "central"),
-		tight_reader_udsg_up(&calib, BTagEntry::OP_TIGHT, "incl", "up"),
-		tight_reader_udsg_down(&calib, BTagEntry::OP_TIGHT, "incl", "down") {
-			
+		isRealData(iConfig.getParameter<bool>("isRealData")) {
 	//kinematic variables
 	produces < std::vector<double> > (prefix + "Px" + suffix);
 	produces < std::vector<double> > (prefix + "Py" + suffix);
@@ -461,55 +439,20 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
 			//b-tagging information
 			//names are changing between major software releases
-			double bDisc = it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags");
-			combinedInclusiveSecondaryVertexV2BJetTags->push_back(bDisc);
-			passesLooseCSV->push_back(bDisc > looseBTagWP );
-			passesMediumCSV->push_back(bDisc > mediumBTagWP );
-			passesTightCSV->push_back(bDisc > tightBTagWP );
+//			double bDisc = it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags");
+			combinedInclusiveSecondaryVertexV2BJetTags->push_back(it->userFloat("btagDiscriminator"));
+			passesLooseCSV->push_back( it->userInt("passesLooseBtagWP") );
+			passesMediumCSV->push_back(it->userInt("passesMediumBtagWP") );
+			passesTightCSV->push_back(it->userInt("passesTightBtagWP") );
 			
 			// Read and store b tagging scale factors for MC
 			if (!iEvent.isRealData()) {
-
-				unsigned int jet_flavour = it->hadronFlavour();
-				unsigned int bTagEntryJetFlavour = 999;
-				if ( jet_flavour == 5 ) bTagEntryJetFlavour = 0; // b
-				else if ( jet_flavour == 4 ) bTagEntryJetFlavour = 1; // c
-				else if ( jet_flavour == 0 ) bTagEntryJetFlavour = 2; // udsg / undefined
-
-				double jet_weight = 999;
-				double jet_weight_up = 999;
-				double jet_weight_down = 999;			
-
-				if (jet_flavour == 5 || jet_flavour == 4) {
-					jet_weight = returnBTagSF(it, medium_reader_bc, bTagEntryJetFlavour);
-					jet_weight_up = returnBTagSF(it, medium_reader_bc_up, bTagEntryJetFlavour);
-					jet_weight_down = returnBTagSF(it, medium_reader_bc_down, bTagEntryJetFlavour);
-				}
-				else{
-					jet_weight = returnBTagSF(it, medium_reader_udsg, bTagEntryJetFlavour);
-					jet_weight_up = returnBTagSF(it, medium_reader_udsg_up, bTagEntryJetFlavour);
-					jet_weight_down = returnBTagSF(it, medium_reader_udsg_down, bTagEntryJetFlavour);			
-				}
-				medium_btagSF->push_back( jet_weight );
-				medium_btagSF_up->push_back( jet_weight_up );
-				medium_btagSF_down->push_back( jet_weight_down );
-
-				jet_weight = 999;
-				jet_weight_up = 999;
-				jet_weight_down = 999;	
-				if (jet_flavour == 5 || jet_flavour == 4) {
-					jet_weight = returnBTagSF(it, tight_reader_bc, bTagEntryJetFlavour);
-					jet_weight_up = returnBTagSF(it, tight_reader_bc_up, bTagEntryJetFlavour);
-					jet_weight_down = returnBTagSF(it, tight_reader_bc_down, bTagEntryJetFlavour);
-				}
-				else{
-					jet_weight = returnBTagSF(it, tight_reader_udsg, bTagEntryJetFlavour);
-					jet_weight_up = returnBTagSF(it, tight_reader_udsg_up, bTagEntryJetFlavour);
-					jet_weight_down = returnBTagSF(it, tight_reader_udsg_down, bTagEntryJetFlavour);			
-				}
-				tight_btagSF->push_back( jet_weight );
-				tight_btagSF_up->push_back( jet_weight_up );
-				tight_btagSF_down->push_back( jet_weight_down );
+				medium_btagSF->push_back(it->userFloat("mediumBTagWeight"));
+				medium_btagSF_up->push_back(it->userFloat("mediumBTagWeightUp"));
+				medium_btagSF_down->push_back(it->userFloat("mediumBTagWeightDown"));
+				tight_btagSF->push_back(it->userFloat("tightBTagWeight"));
+				tight_btagSF_up->push_back(it->userFloat("tightBTagWeightUp"));
+				tight_btagSF_down->push_back(it->userFloat("tightBTagWeightDown"));
 			}
 
 			//jet-vertex association
@@ -624,19 +567,3 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	}
 
 }
-
-double BristolNTuple_PFJets::returnBTagSF(std::vector<pat::Jet>::const_iterator jet, BTagCalibrationReader reader, uint bTagEntryJetFlavour) {
-	double weight = 999;
-	double etaToUse = jet->eta();
-	double ptToUse = jet->pt();
-
-	if ( ptToUse <= 30 ) {
-		ptToUse = 30;
-	}
-	else if ( ptToUse >= 670 ) {
-		ptToUse = 669;
-	}
-	weight = reader.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), etaToUse, ptToUse);
-	return weight;
-}
-
