@@ -15,7 +15,7 @@ if not 'NTPROOT' in os.environ:
     sys.exit(-1)
 
 # this is the NTupleVersion!
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 NTPROOT = os.environ['NTPROOT']
 WORKSPACE = os.path.join(NTPROOT, 'workspace')
 CRAB_WS = os.path.join(WORKSPACE, 'crab')
