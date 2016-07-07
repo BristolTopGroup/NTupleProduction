@@ -12,4 +12,3 @@ python/external
 workspace*
 .vagrant
 *.cmsgit-cache*
-docs/_build
