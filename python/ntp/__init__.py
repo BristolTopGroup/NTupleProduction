@@ -3,7 +3,7 @@ import os
 import sys
 import logging
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 current_path = os.path.split(__file__)[0]
 path_to_base = os.path.join(current_path, '..')
 __path__.append(path_to_base)
