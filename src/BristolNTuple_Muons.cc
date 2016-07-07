@@ -1,5 +1,4 @@
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_Muons.h"
-#include "BristolAnalysis/NTupleTools/interface/PatUtilities.h"
 #include "BristolAnalysis/NTupleTools/interface/DirectionalIsolation.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
@@ -10,15 +9,18 @@
 #include "DataFormats/PatCandidates/interface/Isolation.h"
 
 BristolNTuple_Muons::BristolNTuple_Muons(const edm::ParameterSet& iConfig) :
-  		inputTag(consumes<std::vector<pat::Muon>>(iConfig.getParameter<edm::InputTag>("InputTag"))),			
-		prefix(iConfig.getParameter < std::string > ("Prefix")), //
-		suffix(iConfig.getParameter < std::string > ("Suffix")), //
-		maxSize(iConfig.getParameter<unsigned int>("MaxSize")), //
-		muonID(iConfig.getParameter < std::string > ("MuonID")), //
-		beamSpotCorr(iConfig.getParameter<bool>("BeamSpotCorr")), //
-		storePFIsolation(iConfig.getParameter<bool>("storePFIsolation")), //
-		vtxInputTag(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))), //		
-		beamSpotInputTag(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"))) //
+				inputTag(consumes < std::vector < pat::Muon >> (iConfig.getParameter < edm::InputTag > ("InputTag"))),
+				prefix(iConfig.getParameter < std::string > ("Prefix")), //
+				suffix(iConfig.getParameter < std::string > ("Suffix")), //
+				maxSize(iConfig.getParameter<unsigned int>("MaxSize")), //
+				muonID(iConfig.getParameter < std::string > ("MuonID")), //
+				beamSpotCorr(iConfig.getParameter<bool>("BeamSpotCorr")), //
+				storePFIsolation(iConfig.getParameter<bool>("storePFIsolation")), //
+				vtxInputTag(
+						consumes < std::vector
+								< reco::Vertex >> (iConfig.getParameter < edm::InputTag > ("VertexInputTag"))), //
+				beamSpotInputTag(
+						consumes < reco::BeamSpot > (iConfig.getParameter < edm::InputTag > ("BeamSpotInputTag"))) //
 {
 
 	//kinematic variables
@@ -52,7 +54,7 @@ BristolNTuple_Muons::BristolNTuple_Muons(const edm::ParameterSet& iConfig) :
 		produces < std::vector<double> > (prefix + "PFRelIso03" + suffix);
 
 		produces < std::vector<double> > (prefix + "PFRelIso04" + suffix);
-		
+
 		//new variable for pf delta beta corrected reliso
 		produces < std::vector<double> > (prefix + "sumChargedHadronPt03" + suffix);
 		produces < std::vector<double> > (prefix + "sumChargedHadronPt04" + suffix);
@@ -62,10 +64,10 @@ BristolNTuple_Muons::BristolNTuple_Muons(const edm::ParameterSet& iConfig) :
 		produces < std::vector<double> > (prefix + "sumPhotonPt04" + suffix);
 		produces < std::vector<double> > (prefix + "sumPUPt03" + suffix);
 		produces < std::vector<double> > (prefix + "sumPUPt04" + suffix);
-		
+
 		produces < std::vector<double> > (prefix + "PFRelIso03DeltaBeta" + suffix);
 		produces < std::vector<double> > (prefix + "PFRelIso04DeltaBeta" + suffix);
-		
+
 	}
 
 	//associated track
@@ -125,7 +127,7 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	//muonn PF isolation variables
 	std::auto_ptr < std::vector<double> > PFRelIso03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PFRelIso04(new std::vector<double>());
-	
+
 	//new iso vars
 	std::auto_ptr < std::vector<double> > sumChargedHadronPt03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > sumChargedHadronPt04(new std::vector<double>());
@@ -135,10 +137,10 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	std::auto_ptr < std::vector<double> > sumPhotonPt04(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > sumPUPt03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > sumPUPt04(new std::vector<double>());
-	
+
 	std::auto_ptr < std::vector<double> > PFRelIso03DeltaBeta(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PFRelIso04DeltaBeta(new std::vector<double>());
-	
+
 	//associated track
 	std::auto_ptr < std::vector<double> > trkD0(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > trkD0Error(new std::vector<double>());
@@ -193,38 +195,8 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 			// exit from loop when you reach the required number of muons
 			if (px->size() >= maxSize)
 				break;
-			if (!( it->isGlobalMuon() || it->isTrackerMuon() ) )
+			if (!(it->isGlobalMuon() || it->isTrackerMuon()))
 				continue;
-
-			double trkd0 = it->track()->d0();
-
-			if (beamSpotCorr && beamSpot.isValid()) {
-				trkd0 = -(it->track()->dxy(beamSpot->position()));
-			} 
-
-			double minVtxDist3D = 9999.;
-			int vtxIndex_ = -1;
-//			double vtxDistXY_ = -9999.;
-			double vtxDistZ_ = -9999.;
-
-			if (primaryVertices.isValid()) {
-				edm::LogInfo("RootTupleMakerV2_MuonsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
-
-				for (reco::VertexCollection::const_iterator v_it = primaryVertices->begin();
-						v_it != primaryVertices->end(); ++v_it) {
-
-					double distXY = it->track()->dxy(v_it->position());
-					double distZ = it->track()->dz(v_it->position());
-					double dist3D = sqrt(pow(distXY, 2) + pow(distZ, 2));
-
-					if (dist3D < minVtxDist3D) {
-						minVtxDist3D = dist3D;
-						vtxIndex_ = int(std::distance(primaryVertices->begin(), v_it));
-//						vtxDistXY_ = distXY;
-						vtxDistZ_ = distZ;
-					}
-				}
-			} 
 
 			//kinematic variables
 			px->push_back(it->px());
@@ -259,7 +231,7 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 			if (storePFIsolation) {
 				sumChargedHadronPt03->push_back(it->pfIsolationR03().sumChargedHadronPt);
 				sumChargedHadronPt04->push_back(it->pfIsolationR04().sumChargedHadronPt);
-			
+
 				sumNeutralHadronPt03->push_back(it->pfIsolationR03().sumNeutralHadronEt);
 				sumNeutralHadronPt04->push_back(it->pfIsolationR04().sumNeutralHadronEt);
 
@@ -268,29 +240,27 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
 				sumPUPt03->push_back(it->pfIsolationR03().sumPUPt);
 				sumPUPt04->push_back(it->pfIsolationR04().sumPUPt);
-				
-				
-				PFRelIso03->push_back(getRelativeIsolation(*it, 0.3, false));
-				PFRelIso04->push_back(getRelativeIsolation(*it, 0.4, false));
 
-				PFRelIso03DeltaBeta->push_back(getRelativeIsolation(*it, 0.3, true));
-				PFRelIso04DeltaBeta->push_back(getRelativeIsolation(*it, 0.4, true));
+				PFRelIso03->push_back(it->userFloat("PFRelIso03"));
+				PFRelIso04->push_back(it->userFloat("PFRelIso04"));
+
+				PFRelIso03DeltaBeta->push_back(it->userFloat("PFRelIso03DeltaBeta"));
+				PFRelIso04DeltaBeta->push_back(it->userFloat("PFRelIso04DeltaBeta"));
 
 			}
 
 			//associated track
-			trkD0->push_back(trkd0);
+			trkD0->push_back(it->userFloat("trkd0"));
 			trkD0Error->push_back(it->track()->d0Error());
 			trkDz->push_back(it->track()->dz());
 			trkDzError->push_back(it->track()->dzError());
 			trackValidFractionOfHits->push_back(it->track()->validFraction());
 
 			//associated global track
-			if ( !( it->globalTrack().isNull() ) ) {
+			if (!(it->globalTrack().isNull())) {
 				globalChi2->push_back(it->globalTrack()->normalizedChi2());
 				globalTrackNumberOfValidMuonHits->push_back(it->globalTrack()->hitPattern().numberOfValidMuonHits());
-			}
-			else {
+			} else {
 				globalChi2->push_back(99999);
 				globalTrackNumberOfValidMuonHits->push_back(-1);
 			}
@@ -303,14 +273,14 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 					it->innerTrack()->hitPattern().trackerLayersWithMeasurement());
 			innerTrackNumberOfValidPixelHits->push_back(it->innerTrack()->hitPattern().numberOfValidPixelHits());
 			//muon vertex variables
-			vtxIndex->push_back(vtxIndex_);
-			vtxDistZ->push_back(vtxDistZ_);
-			primaryVertexDXY->push_back(it->dB());
-			primaryVertexDXYError->push_back(it->edB());
+			vtxIndex->push_back(it->userInt("vtxIndex"));
+			vtxDistZ->push_back(it->userFloat("vtxDistZ"));
+			primaryVertexDXY->push_back(it->userFloat("primaryVertexDXY"));
+			primaryVertexDXYError->push_back(it->userFloat("primaryVertexDXYError"));
 			beamSpotDXY->push_back(it->dB(pat::Muon::BS2D));
 			beamSpotDXYError->push_back(it->edB(pat::Muon::BS2D));
 		}
-	} 
+	}
 
 	//-----------------------------------------------------------------
 	// put vectors in the event
@@ -345,7 +315,7 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
 		iEvent.put(PFRelIso03, prefix + "PFRelIso03" + suffix);
 		iEvent.put(PFRelIso04, prefix + "PFRelIso04" + suffix);
-		
+
 		//new iso vars
 		iEvent.put(sumChargedHadronPt03, prefix + "sumChargedHadronPt03" + suffix);
 		iEvent.put(sumChargedHadronPt04, prefix + "sumChargedHadronPt04" + suffix);
@@ -355,7 +325,7 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 		iEvent.put(sumPhotonPt04, prefix + "sumPhotonPt04" + suffix);
 		iEvent.put(sumPUPt03, prefix + "sumPUPt03" + suffix);
 		iEvent.put(sumPUPt04, prefix + "sumPUPt04" + suffix);
-		
+
 		iEvent.put(PFRelIso03DeltaBeta, prefix + "PFRelIso03DeltaBeta" + suffix);
 		iEvent.put(PFRelIso04DeltaBeta, prefix + "PFRelIso04DeltaBeta" + suffix);
 	}

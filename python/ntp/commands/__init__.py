@@ -21,6 +21,7 @@ class Command(object):
         self.__doc = doc
         self.__text = ''
         self.__variables = copy.deepcopy(self.DEFAULTS)
+        self.__results = {}
 
     def __can_run(self):
         return True
@@ -61,36 +62,20 @@ class Command(object):
             if not self.__has_valid_proxy():
                 self.__create_proxy()
 
+    def results(self):
+        return self.__results
+
     def __create_proxy(self):
-        from ntp.interpreter import call
-        vo = 'cms'
-        hours = str(80)
-        command = ['voms-proxy-init', '-voms', vo, '-hours', hours]
-        call(
-            ' '.join(command),
-            logger=LOG,
-            shell=True,
-        )
+        from .create.grid_proxy import Command as CP
+        create_proxy = CP()
+        create_proxy.run([], {'vo': 'cms', 'hours': '80'})
 
     def __has_valid_proxy(self):
-        from ntp.interpreter import call
-        proxy = '/tmp/x509up_u{0}'.format(pwd.getpwuid(os.getuid()).pw_uid)
-        is_valid = os.path.isfile(proxy)
-        if is_valid:
-            _, stdout, _ = call(
-                'voms-proxy-info --timeleft',
-                logger=LOG,
-                shell=True)
-            try:
-                time_left = int(stdout)
-            except:
-                time_left = 0
-                msg = 'Proxy exists ({0}) but '.format(proxy)
-                msg + 'could not read time left on proxy.'
-                LOG.warning(msg)
-                LOG.debug("Command output: {0}".format(stdout.encode('string-excape')))
-
-            LOG.info('Time left on proxy: {0} min'.format(time_left / 60))
-            if time_left < (60 * 30):  # less than 30min
-                is_valid = False
+        from .check.grid_proxy import Command as CP
+        check_proxy = CP()
+        is_valid = check_proxy.run([], {})
+        results = check_proxy.results()
+        timeleft_in_minutes = results['timeleft_in_minutes']
+        # more than 30min time left
+        is_valid = is_valid and timeleft_in_minutes > 30
         return is_valid

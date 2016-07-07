@@ -2,13 +2,6 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
-#include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
-#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
-#include "JetMETCorrections/Objects/interface/JetCorrector.h"
-#include "JetMETCorrections/Modules/interface/JetResolution.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 
 using namespace std;
@@ -19,35 +12,9 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 		suffix(iConfig.getParameter < std::string > ("Suffix")), //
 		maxSize(iConfig.getParameter<unsigned int>("MaxSize")), //
 		minJetPtToStore(iConfig.getParameter<double>("minJetPtToStore")), //
-		jecUncPath(iConfig.getParameter < std::string > ("JECUncertainty")), //
 		readJEC(iConfig.getParameter < bool > ("ReadJEC")), //
-		jetCorrectionService(iConfig.getParameter<std::string> ("JetCorrectionService")), //
-		readJECuncertainty(iConfig.getParameter<bool>("ReadJECuncertainty")), //
 		doVertexAssociation(iConfig.getParameter<bool>("DoVertexAssociation")), //
-		vtxInputTag(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))), //		
-		isRealData(iConfig.getParameter<bool>("isRealData")),
-	    looseBTagWP(iConfig.getParameter<double>("looseBTagWP")),
-	    mediumBTagWP(iConfig.getParameter<double>("mediumBTagWP")),
-	    tightBTagWP(iConfig.getParameter<double>("tightBTagWP")),
-		btagCalibrationFile_(iConfig.getParameter<std::string>("btagCalibrationFile")), //
-		calib("csvv2", btagCalibrationFile_.c_str()), //
-		medium_reader_bc(	&calib,               	// calibration instance
-							BTagEntry::OP_MEDIUM,  	// operating point
-							"mujets",               // measurement type
-							"central"),           	// systematics type
-		medium_reader_bc_up(&calib, BTagEntry::OP_MEDIUM, "mujets", "up"),  	// sys up
-		medium_reader_bc_down(&calib, BTagEntry::OP_MEDIUM, "mujets", "down"),  // sys down
-		medium_reader_udsg(&calib, BTagEntry::OP_MEDIUM, "incl", "central"),  	// sys down
-		medium_reader_udsg_up(&calib, BTagEntry::OP_MEDIUM, "incl", "up"),  	// sys down
-		medium_reader_udsg_down(&calib, BTagEntry::OP_MEDIUM, "incl", "down"),  // sys down
-
-		tight_reader_bc(&calib, BTagEntry::OP_TIGHT, "mujets", "central"),
-		tight_reader_bc_up(&calib, BTagEntry::OP_TIGHT, "mujets", "up"),
-		tight_reader_bc_down(&calib, BTagEntry::OP_TIGHT, "mujets", "down"),
-		tight_reader_udsg(&calib, BTagEntry::OP_TIGHT, "incl", "central"),
-		tight_reader_udsg_up(&calib, BTagEntry::OP_TIGHT, "incl", "up"),
-		tight_reader_udsg_down(&calib, BTagEntry::OP_TIGHT, "incl", "down") {
-			
+		isRealData(iConfig.getParameter<bool>("isRealData")) {
 	//kinematic variables
 	produces < std::vector<double> > (prefix + "Px" + suffix);
 	produces < std::vector<double> > (prefix + "Py" + suffix);
@@ -234,40 +201,8 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<int> > closestVertexXYIndex(new std::vector<int>());
 	std::auto_ptr < std::vector<int> > closestVertexZIndex(new std::vector<int>());
 
-	const JetCorrector* corrector = 0;
-	// if ( readJEC ) {
-		corrector = JetCorrector::getJetCorrector (jetCorrectionService,iSetup);
-	// }
-
-	JetCorrectionUncertainty *jecUnc = 0;
-	if (readJECuncertainty ) {
-		// //(See https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1075/1.html
-		// // and https://hypernews.cern.ch/HyperNews/CMS/get/physTools/2367/1.html)
-		// // handle the jet corrector parameters collection
-		edm::ESHandle < JetCorrectorParametersCollection > JetCorParColl;
-		// get the jet corrector parameters collection from the global tag
-		iSetup.get<JetCorrectionsRecord>().get(jecUncPath, JetCorParColl);
-		// get the uncertainty parameters from the collection
-		JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
-		// instantiate the jec uncertainty object
-		jecUnc = new JetCorrectionUncertainty(JetCorPar);
-
-		// Or read from a file
-		// Only need this one line
-		// jecUnc = new JetCorrectionUncertainty("BristolAnalysis/NTupleTools/data/JEC/Summer15_50nsV2_DATA_Uncertainty_AK4PFchs.txt");
-	}
-
-	PFJetIDSelectionFunctor pfjetIDLoose(PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE);
-	PFJetIDSelectionFunctor pfjetIDTight(PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT);
-
-	pat::strbitset retpf = pfjetIDLoose.getBitTemplate();
-
 	edm::Handle < std::vector<pat::Jet> > jets;
 	iEvent.getByToken(inputTag, jets);
-
-	edm::Handle < reco::VertexCollection > primaryVertices; // DB
-	iEvent.getByToken(vtxInputTag, primaryVertices); // DB
-
 
 	// JME::JetResolution resolution = JME::JetResolution::get(iSetup, "AK4PFchs_pt");
 	// JME::JetResolutionScaleFactor resolution_sf = JME::JetResolutionScaleFactor::get(iSetup, "AK4PFchs");
@@ -298,31 +233,12 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			if (px->size() >= maxSize)
 				break;
 
-			double JEC = 1;
-			if ( readJEC ) {
-				JEC = corrector->correction( it->correctedJet("Uncorrected"), iEvent, iSetup );
- 			}
-
-			// Only consider jets above minimum pt
-			if ( readJEC ) {
-				if ( it->correctedJet("Uncorrected").pt() * JEC <= minJetPtToStore )
-					continue;
-			}
-			else {
-				if ( it->pt() <= minJetPtToStore )
-					continue;
-			}
-
-
-			retpf.set(false);
-			int passjetLoose = 0;
-			if (pfjetIDLoose(*it, retpf))
-				passjetLoose = 1;
-
-			retpf.set(false);
-			int passjetTight = 0;
-			if (pfjetIDTight(*it, retpf))
-				passjetTight = 1;
+			double pt = it->pt();
+			double ptUp = it->userFloat("ptUp");
+			double ptDown = it->userFloat("ptUp");
+			// do not store any jets below a pt threshold
+			if (pt <=minJetPtToStore && ptUp <= minJetPtToStore && ptDown <= minJetPtToStore)
+				continue;
 
 			if (!iEvent.isRealData()) {
 				// Store generated jet resolutions for monte carlo
@@ -400,110 +316,15 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			// jer->push_back(resolution.getResolution(jetParams));
 
 
-			// Vertex association
-
-			int bestVtxIndex3Ddist = -1;
-			int bestVtxIndexXYdist = -1;
-			int bestVtxIndexZdist = -1;
-
-			int bestVtxIndexSharedTracks = -1;
-
-			double minVtxDist3D = 999999.;
-			double minVtxDistXY = -99999.;
-			double minVtxDistZ = -99999.;
-			double maxTrackAssocRatio = -9999.;
-
-			// Loop on primary Vertices and jets and perform associations
-
-			if (primaryVertices.isValid()) {
-				if (doVertexAssociation) {
-					// Main Vertex Loop
-					for (reco::VertexCollection::const_iterator v_it = primaryVertices->begin();
-							v_it != primaryVertices->end(); ++v_it) {
-
-						double sumweights = 0.0;
-						double dist3Dweighted = 0.0;
-						double distXYweighted = 0.0;
-						double distZweighted = 0.0;
-						double assocsumpttracks = 0.0;
-						double trackassociationratio = 0.000001;
-
-						// Loop on tracks in jet, calculate PT weighted 3D distance to vertex and PT weighted shared track ratio
-						const reco::TrackRefVector &jtracks = it->associatedTracks();
-						for (reco::TrackRefVector::const_iterator jtIt = jtracks.begin(); jtIt != jtracks.end();
-								++jtIt) {
-							if (jtIt->isNull())
-								continue;
-							const reco::Track *jtrack = jtIt->get();
-							double trackptweight = jtrack->pt();
-							sumweights += trackptweight;
-
-							// Weighted Distance Calculation
-							double distXY = jtrack->dxy(v_it->position());
-							double distZ = jtrack->dz(v_it->position());
-							dist3Dweighted = trackptweight * (sqrt(pow(distXY, 2) + pow(distZ, 2)));
-							distXYweighted = trackptweight * distXY;
-							distZweighted = trackptweight * distZ;
-
-							// Loop on vertex tracks, find PT weighted shared tracks.
-							for (reco::Vertex::trackRef_iterator vtIt = v_it->tracks_begin();
-									vtIt != v_it->tracks_end(); ++vtIt) {
-								if (vtIt->isNull())
-									continue;
-								const reco::Track *vtrack = vtIt->get();
-								if (vtrack != jtrack)
-									continue;
-								assocsumpttracks += jtrack->pt();
-								break;
-							}
-
-							trackassociationratio = assocsumpttracks / sumweights;
-
-						}
-
-						// Divide distances by sum of weights.
-						dist3Dweighted = dist3Dweighted / sumweights;
-						distXYweighted = distXYweighted / sumweights;
-						distZweighted = distZweighted / sumweights;
-
-						// Find vertex with minimum weighted distance.
-						if (dist3Dweighted < minVtxDist3D) {
-							minVtxDist3D = dist3Dweighted;
-							bestVtxIndex3Ddist = int(std::distance(primaryVertices->begin(), v_it));
-
-						}
-
-						if (distXYweighted < minVtxDistXY) {
-							minVtxDistXY = distXYweighted;
-							bestVtxIndexXYdist = int(std::distance(primaryVertices->begin(), v_it));
-						}
-
-						if (distZweighted < minVtxDistZ) {
-							minVtxDistZ = distZweighted;
-							bestVtxIndexZdist = int(std::distance(primaryVertices->begin(), v_it));
-						}
-
-						// Find vertex with minimum weighted distance.
-						if (trackassociationratio > maxTrackAssocRatio) {
-							maxTrackAssocRatio = trackassociationratio;
-							bestVtxIndexSharedTracks = int(std::distance(primaryVertices->begin(), v_it));
-						}
-
-						//std::cout<<dist3Dweighted<<"  "<<distXYweighted<<"  "<<distZweighted<<"  "<<trackassociationratio<<"  "<<int(std::distance(primaryVertices->begin(),v_it))<<std::endl;
-
-					}
-				}
-				//std::cout<<"---------------------"<<std::endl;
-			} 
-
 			// fill in all the vectors
 			//kinematic variables
 			if ( readJEC ) {
-				px->push_back(it->correctedJet("Uncorrected").px() * JEC );
-				py->push_back(it->correctedJet("Uncorrected").py() * JEC );
-				pz->push_back(it->correctedJet("Uncorrected").pz() * JEC );
-				energy->push_back(it->correctedJet("Uncorrected").energy() * JEC);
-				jec_vec->push_back(JEC);
+				double jec = it->userFloat("JEC");
+				px->push_back(it->correctedJet("Uncorrected").px() * jec );
+				py->push_back(it->correctedJet("Uncorrected").py() * jec );
+				pz->push_back(it->correctedJet("Uncorrected").pz() * jec );
+				energy->push_back(it->correctedJet("Uncorrected").energy() * jec);
+				jec_vec->push_back(jec);
 			}
 			else {
 				px->push_back(it->px());
@@ -524,30 +345,11 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			hadronFlavour->push_back(it->hadronFlavour());
 
 			//jet energy correction and uncertainties
-			if (readJECuncertainty){
-				jecUnc->setJetEta(it->eta());
-				jecUnc->setJetPt(it->pt()); // the uncertainty is a function of the corrected pt
-				jecUnc_vec->push_back(jecUnc->getUncertainty(true));
-			}
-			else
-				jecUnc_vec->push_back(-999);
-			l2l3resJEC_vec->push_back(it->pt() / it->correctedJet("L3Absolute").pt());
-			l3absJEC_vec->push_back(it->correctedJet("L3Absolute").pt() / it->correctedJet("L2Relative").pt());
-			l2relJEC_vec->push_back(it->correctedJet("L2Relative").pt() / it->correctedJet("L1FastJet").pt());
-			l1offJEC_vec->push_back(it->correctedJet("L1FastJet").pt() / it->correctedJet("Uncorrected").pt());
-			//TODO: add absolute JEC factor:
-			/*// get a copy of the uncorrected p4
-			 reco::Candidate::LorentzVector uncorrJet = ijet->correctedP4(0);
-			 // Then get the correction (L1+L2+L3 [+L2L3 for data])
-			 jec_->setJetEta( uncorrJet.eta() );
-			 jec_->setJetPt ( uncorrJet.pt() );
-			 jec_->setJetE  ( uncorrJet.energy() );
-			 jec_->setJetA  ( ijet->jetArea() );
-			 jec_->setRho   ( *(rhoHandle.product()) );
-			 jec_->setNPV   ( pvHandle->size() );
-			 double corr = jec_->getCorrection();
-			 // Here will be the working variable for all the jet energy effects
-			 reco::Candidate::LorentzVector scaledJetP4 = uncorrJet * corr; */
+			jecUnc_vec->push_back(it->userFloat("JECUncertainty"));
+			l2l3resJEC_vec->push_back(it->userFloat("L2L3ResJEC"));
+			l3absJEC_vec->push_back(it->userFloat("L3AbsJEC"));
+			l2relJEC_vec->push_back(it->userFloat("L2RelJEC"));
+			l1offJEC_vec->push_back(it->userFloat("L1OffJEC"));
 
 			//jet ID variables
 			chargedEmEnergyFraction->push_back(it->chargedEmEnergyFraction());
@@ -570,76 +372,41 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			chargedHadronEnergyFractionRAW->push_back(it->correctedJet("Uncorrected").chargedHadronEnergyFraction());
 			neutralEmEnergyFractionRAW->push_back(it->correctedJet("Uncorrected").neutralEmEnergyFraction());
 			neutralHadronEnergyFractionRAW->push_back(it->correctedJet("Uncorrected").neutralHadronEnergyFraction());
-			passLooseID->push_back(passjetLoose);
-			passTightID->push_back(passjetTight);
+			passLooseID->push_back(it->userInt("looseJetId"));
+			passTightID->push_back(it->userInt("tightJetId"));
+			// PU jet ID:
+			// it->userInt("pileupJetId:fullId");
 
 			//b-tagging information
 			//names are changing between major software releases
-			double bDisc = it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags");
-			combinedInclusiveSecondaryVertexV2BJetTags->push_back(bDisc);
-			passesLooseCSV->push_back(bDisc > looseBTagWP );
-			passesMediumCSV->push_back(bDisc > mediumBTagWP );
-			passesTightCSV->push_back(bDisc > tightBTagWP );
+			combinedInclusiveSecondaryVertexV2BJetTags->push_back(it->userFloat("btagDiscriminator"));
+			passesLooseCSV->push_back( it->userInt("passesLooseBtagWP") );
+			passesMediumCSV->push_back(it->userInt("passesMediumBtagWP") );
+			passesTightCSV->push_back(it->userInt("passesTightBtagWP") );
 			
 			// Read and store b tagging scale factors for MC
 			if (!iEvent.isRealData()) {
-
-				unsigned int jet_flavour = it->hadronFlavour();
-				unsigned int bTagEntryJetFlavour = 999;
-				if ( jet_flavour == 5 ) bTagEntryJetFlavour = 0; // b
-				else if ( jet_flavour == 4 ) bTagEntryJetFlavour = 1; // c
-				else if ( jet_flavour == 0 ) bTagEntryJetFlavour = 2; // udsg / undefined
-
-				double jet_weight = 999;
-				double jet_weight_up = 999;
-				double jet_weight_down = 999;			
-
-				if (jet_flavour == 5 || jet_flavour == 4) {
-					jet_weight = returnBTagSF(it, medium_reader_bc, bTagEntryJetFlavour);
-					jet_weight_up = returnBTagSF(it, medium_reader_bc_up, bTagEntryJetFlavour);
-					jet_weight_down = returnBTagSF(it, medium_reader_bc_down, bTagEntryJetFlavour);
-				}
-				else{
-					jet_weight = returnBTagSF(it, medium_reader_udsg, bTagEntryJetFlavour);
-					jet_weight_up = returnBTagSF(it, medium_reader_udsg_up, bTagEntryJetFlavour);
-					jet_weight_down = returnBTagSF(it, medium_reader_udsg_down, bTagEntryJetFlavour);			
-				}
-				medium_btagSF->push_back( jet_weight );
-				medium_btagSF_up->push_back( jet_weight_up );
-				medium_btagSF_down->push_back( jet_weight_down );
-
-				jet_weight = 999;
-				jet_weight_up = 999;
-				jet_weight_down = 999;	
-				if (jet_flavour == 5 || jet_flavour == 4) {
-					jet_weight = returnBTagSF(it, tight_reader_bc, bTagEntryJetFlavour);
-					jet_weight_up = returnBTagSF(it, tight_reader_bc_up, bTagEntryJetFlavour);
-					jet_weight_down = returnBTagSF(it, tight_reader_bc_down, bTagEntryJetFlavour);
-				}
-				else{
-					jet_weight = returnBTagSF(it, tight_reader_udsg, bTagEntryJetFlavour);
-					jet_weight_up = returnBTagSF(it, tight_reader_udsg_up, bTagEntryJetFlavour);
-					jet_weight_down = returnBTagSF(it, tight_reader_udsg_down, bTagEntryJetFlavour);			
-				}
-				tight_btagSF->push_back( jet_weight );
-				tight_btagSF_up->push_back( jet_weight_up );
-				tight_btagSF_down->push_back( jet_weight_down );
+				medium_btagSF->push_back(it->userFloat("mediumBTagWeight"));
+				medium_btagSF_up->push_back(it->userFloat("mediumBTagWeightUp"));
+				medium_btagSF_down->push_back(it->userFloat("mediumBTagWeightDown"));
+				tight_btagSF->push_back(it->userFloat("tightBTagWeight"));
+				tight_btagSF_up->push_back(it->userFloat("tightBTagWeightUp"));
+				tight_btagSF_down->push_back(it->userFloat("tightBTagWeightDown"));
 			}
 
 			//jet-vertex association
 			if (doVertexAssociation) {
-				bestVertexTrackAssociationFactor->push_back(maxTrackAssocRatio);
-				bestVertexTrackAssociationIndex->push_back(bestVtxIndexSharedTracks);
-				closestVertexWeighted3DSeparation->push_back(minVtxDist3D);
-				closestVertexWeightedXYSeparation->push_back(minVtxDistXY);
-				closestVertexWeightedZSeparation->push_back(minVtxDistZ);
-				closestVertex3DIndex->push_back(bestVtxIndex3Ddist);
-				closestVertexXYIndex->push_back(bestVtxIndexXYdist);
-				closestVertexZIndex->push_back(bestVtxIndexZdist);
+				bestVertexTrackAssociationFactor->push_back(it->userFloat("bestVertexTrackAssociationFactor"));
+				bestVertexTrackAssociationIndex->push_back(it->userInt("bestVertexTrackAssociationIndex"));
+				closestVertexWeighted3DSeparation->push_back(it->userFloat("closestVertexWeighted3DSeparation"));
+				closestVertexWeightedXYSeparation->push_back(it->userFloat("closestVertexWeightedXYSeparation"));
+				closestVertexWeightedZSeparation->push_back(it->userFloat("closestVertexWeightedZSeparation"));
+				closestVertex3DIndex->push_back(it->userInt("closestVertex3DIndex"));
+				closestVertexXYIndex->push_back(it->userInt("closestVertexXYIndex"));
+				closestVertexZIndex->push_back(it->userInt("closestVertexZIndex"));
 			}
 		}
 	} 
-	delete jecUnc;
 	//-----------------------------------------------------------------
 	// put vectors in the event
 	//kinematic variables
@@ -738,19 +505,3 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	}
 
 }
-
-double BristolNTuple_PFJets::returnBTagSF(std::vector<pat::Jet>::const_iterator jet, BTagCalibrationReader reader, uint bTagEntryJetFlavour) {
-	double weight = 999;
-	double etaToUse = jet->eta();
-	double ptToUse = jet->pt();
-
-	if ( ptToUse <= 30 ) {
-		ptToUse = 30;
-	}
-	else if ( ptToUse >= 670 ) {
-		ptToUse = 669;
-	}
-	weight = reader.eval(BTagEntry::JetFlavor( bTagEntryJetFlavour ), etaToUse, ptToUse);
-	return weight;
-}
-

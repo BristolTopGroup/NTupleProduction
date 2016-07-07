@@ -90,86 +90,57 @@ unsigned int findTrigger(const std::string& triggerWildCard, const HLTConfigProv
 	return found;
 }
 
-double getRelativeIsolation(const pat::Electron& electron, double cone, double rho, bool isRealData, bool useDeltaBetaCorrections,
-		bool useRhoActiveAreaCorrections) {
-	//code from: https://twiki.cern.ch/twiki/bin/view/CMS/PfIsolation
-	float AEff = 0.00;
-	//so far this is only for 0.3. 0.4 is available but not 0.5
-
-// 	  std::cout << "ElectronEffectiveArea::kEleEAData2011: " << ElectronEffectiveArea::kEleEAData2011 << std::endl;
-//        std::cout << "ElectronEffectiveArea::kEleEAData2012: " << ElectronEffectiveArea::kEleEAData2012<< std::endl;
-
-//        std::cout << "ElectronEffectiveArea::kEleEAFall1MC: " << ElectronEffectiveArea::kEleEAFall11MC << std::endl;
-//        std::cout << "ElectronEffectiveArea::kEleEASummer12MC: " << ElectronEffectiveArea::kEleEASummer12MC<< std::endl;
-
-        if (isRealData) {
-		AEff = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
-				electron.superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
-        } else {
-		AEff = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
-				electron.superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
-	}
-
-	AbsVetos vetos_ch;
-	AbsVetos vetos_nh;
-	AbsVetos vetos_ph;
-
-	Direction Dir = Direction(electron.superCluster()->eta(), electron.superCluster()->phi());
-
-	//pf isolation veto setup EGM recommendation
-	if (fabs(electron.superCluster()->eta()) > 1.479) {
-		vetos_ch.push_back(new ConeVeto(Dir, 0.015));
-		vetos_ph.push_back(new ConeVeto(Dir, 0.08));
-	}
-
-	const double chIso = electron.isoDeposit(pat::PfChargedHadronIso)->depositAndCountWithin(cone, vetos_ch).first;
-	const double nhIso = electron.isoDeposit(pat::PfNeutralHadronIso)->depositAndCountWithin(cone, vetos_nh).first;
-	const double phIso = electron.isoDeposit(pat::PfGammaIso)->depositAndCountWithin(cone, vetos_ph).first;
-
-	const double puChIso = electron.isoDeposit(pat::PfPUChargedHadronIso)->depositAndCountWithin(cone, vetos_ch).first;
-
-	const double relIso = (chIso + nhIso + phIso) / electron.pt();
-	const double relIsodb = (chIso + max(0.0, nhIso + phIso - 0.5 * puChIso)) / electron.pt();
-	const double relIsorho = (chIso + max(0.0, nhIso + phIso - rho * AEff)) / electron.pt();
-	
-	if (useRhoActiveAreaCorrections)
-		return relIsorho;
-	
-	if (useDeltaBetaCorrections)
-		return relIsodb;
-	
-
-	return relIso;
-}
-
-double getRelativeIsolation(const pat::Muon& muon, double cone, bool useDeltaBetaCorrections) {
-	double chIso = 0;
-	double nhIso = 0; 
-	double phIso = 0;
-	double puChIso = 0;
-	
-	if(cone==0.3){
- 	chIso = muon.pfIsolationR03().sumChargedHadronPt;
- 	nhIso = muon.pfIsolationR03().sumNeutralHadronEt;
- 	phIso = muon.pfIsolationR03().sumPhotonEt;
-	puChIso = muon.pfIsolationR03().sumPUPt;
-	}else{
-	chIso = muon.pfIsolationR04().sumChargedHadronPt;
- 	nhIso = muon.pfIsolationR04().sumNeutralHadronEt;
- 	phIso = muon.pfIsolationR04().sumPhotonEt;
-	puChIso = muon.pfIsolationR04().sumPUPt;
-	
-	}
-	
-	
-	const double relIso = (chIso + nhIso + phIso) / muon.pt();
-	const double relIsodb = (chIso + max(0.0, nhIso + phIso - 0.5 * puChIso)) / muon.pt();
-
-	if (useDeltaBetaCorrections)
-		return relIsodb;
-
-	return relIso;
-}
+//double getRelativeIsolation(const pat::Electron& electron, double cone, double rho, bool isRealData, bool useDeltaBetaCorrections,
+//		bool useRhoActiveAreaCorrections) {
+//	//code from: https://twiki.cern.ch/twiki/bin/view/CMS/PfIsolation
+//	float AEff = 0.00;
+//	//so far this is only for 0.3. 0.4 is available but not 0.5
+//
+//// 	  std::cout << "ElectronEffectiveArea::kEleEAData2011: " << ElectronEffectiveArea::kEleEAData2011 << std::endl;
+////        std::cout << "ElectronEffectiveArea::kEleEAData2012: " << ElectronEffectiveArea::kEleEAData2012<< std::endl;
+//
+////        std::cout << "ElectronEffectiveArea::kEleEAFall1MC: " << ElectronEffectiveArea::kEleEAFall11MC << std::endl;
+////        std::cout << "ElectronEffectiveArea::kEleEASummer12MC: " << ElectronEffectiveArea::kEleEASummer12MC<< std::endl;
+//
+//        if (isRealData) {
+//		AEff = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
+//				electron.superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
+//        } else {
+//		AEff = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
+//				electron.superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
+//	}
+//
+//	AbsVetos vetos_ch;
+//	AbsVetos vetos_nh;
+//	AbsVetos vetos_ph;
+//
+//	Direction Dir = Direction(electron.superCluster()->eta(), electron.superCluster()->phi());
+//
+//	//pf isolation veto setup EGM recommendation
+//	if (fabs(electron.superCluster()->eta()) > 1.479) {
+//		vetos_ch.push_back(new ConeVeto(Dir, 0.015));
+//		vetos_ph.push_back(new ConeVeto(Dir, 0.08));
+//	}
+//
+//	const double chIso = electron.isoDeposit(pat::PfChargedHadronIso)->depositAndCountWithin(cone, vetos_ch).first;
+//	const double nhIso = electron.isoDeposit(pat::PfNeutralHadronIso)->depositAndCountWithin(cone, vetos_nh).first;
+//	const double phIso = electron.isoDeposit(pat::PfGammaIso)->depositAndCountWithin(cone, vetos_ph).first;
+//
+//	const double puChIso = electron.isoDeposit(pat::PfPUChargedHadronIso)->depositAndCountWithin(cone, vetos_ch).first;
+//
+//	const double relIso = (chIso + nhIso + phIso) / electron.pt();
+//	const double relIsodb = (chIso + max(0.0, nhIso + phIso - 0.5 * puChIso)) / electron.pt();
+//	const double relIsorho = (chIso + max(0.0, nhIso + phIso - rho * AEff)) / electron.pt();
+//
+//	if (useRhoActiveAreaCorrections)
+//		return relIsorho;
+//
+//	if (useDeltaBetaCorrections)
+//		return relIsodb;
+//
+//
+//	return relIso;
+//}
 
 double getSmearedJetPtScale(const pat::Jet& jet, int jet_smearing_systematic) {
 	// Get the jet energy resolution scale factors, depending on the jet eta, from 

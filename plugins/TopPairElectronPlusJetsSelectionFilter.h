@@ -18,7 +18,6 @@
 #include <boost/array.hpp>
 #include <string>
 #include <vector>
-#include "DataFormats/PatCandidates/interface/VIDCutFlowResult.h"
 
 namespace TTbarEPlusJetsReferenceSelection {
 	enum Step {
@@ -65,13 +64,9 @@ public:
 
 	static void fillDescriptions(edm::ConfigurationDescriptions & descriptions);
 
-	virtual bool isGoodJet(const pat::Jet& jet) const;
 	virtual bool isGoodElectron(const edm::Ptr<pat::Electron>&) const;
 	virtual double electronIsolation(const pat::Electron& electron) const;
 
-	//definitions of loose objects
-	virtual bool isLooseMuon(const pat::Muon& muon) const;
-	//isolation definitions
 	virtual void getLooseElectrons();
 	virtual void getLooseMuons();
 	virtual void goodIsolatedElectrons();
@@ -100,34 +95,20 @@ private:
 	virtual void setupEventContent(edm::Event& iEvent, const edm::EventSetup& iSetup);
 
 	//config
-	// edm::InputTag jetInput_, electronInput_, muonInput_, hltInputTag_, vertexInputTag_;
-
 	edm::EDGetTokenT<pat::JetCollection> jetInput_;
 	edm::EDGetToken electronInput_;
 
-	// edm::EDGetTokenT<pat::ElectronCollection> electronInput_;
 	edm::EDGetTokenT<pat::MuonCollection> muonInput_;
 	edm::EDGetTokenT<edm::TriggerResults> hltInputTag_;
-	edm::EDGetTokenT<reco::VertexCollection> vertexInputTag_;
-
-	double minLooseMuonPt_, maxLooseMuonEta_;
-	double min1JetPt_, min2JetPt_, min3JetPt_, min4JetPt_;
-	double minBJetPt_;
-	double minJetPtInNtuples_;
 
 	double cleaningDeltaR_;
 
-	const bool applyJEC_;
-	const std::string jetCorrectionService_;
-	const JetCorrector* corrector_;
+//	const bool applyJEC_;
+//	const std::string jetCorrectionService_;
+//	const JetCorrector* corrector_;
 
-	std::string bJetDiscriminator_;
 	double minBJetDiscriminator_;
 	double tightBJetDiscriminator_;
-
-	double tightElectronIso_EB_, tightElectronIso_EE_, controlElectronIso_;
-
-	double looseMuonIso_;
 
 	bool tagAndProbeStudies_, dropTriggerSelection_;
 
@@ -149,9 +130,6 @@ private:
 	pat::ElectronCollection goodIsolatedElectrons_, looseElectrons_;
 	pat::MuonCollection muons_, looseMuons_;
 	pat::Electron signalElectron_;
-	edm::ValueMap<bool> signalElectronIDDecisions_, looseElectronIDDecisions_;
-	edm::ValueMap<vid::CutFlowResult> medium_id_cutflow_data_;
-	reco::VertexCollection vertices_;
 	HLTConfigProvider hltConfig_;
 	edm::TriggerResults triggerResults_;
 

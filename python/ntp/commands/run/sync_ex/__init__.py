@@ -47,7 +47,7 @@ process.source.fileNames = cms.untracked.vstring(
 )
 )
 
-process.nTuplePFJets.btagCalibrationFile = cms.string('{BTAG_CALIB_FILE}')
+process.jetUserData.btagCalibrationFile = cms.string('{BTAG_CALIB_FILE}')
 """
 
 

@@ -51,7 +51,7 @@ globalTags = {
     },
     'MC': {
         7: '76X_mcRun2_asymptotic_RunIIFall15DR76_v1',  # 25ns MC
-        8: '80X_mcRun2_asymptotic_2016_v3',
+        8: '80X_mcRun2_asymptotic_2016_miniAODv2',
     }
 }
 
@@ -238,6 +238,9 @@ process.TFileService = cms.Service(
 # )
 
 process.load('BristolAnalysis.NTupleTools.userdata.ElectronUserData_cfi')
+process.load('BristolAnalysis.NTupleTools.userdata.MuonUserData_cfi')
+process.load('BristolAnalysis.NTupleTools.userdata.JetUserData_cfi')
+
 process.nTupleElectrons.InputTag = 'electronUserData'
 process.topPairEPlusJetsSelection.electronInput = 'electronUserData'
 process.topPairEPlusJetsSelectionTagging.electronInput = 'electronUserData'
@@ -246,6 +249,24 @@ process.topPairEPlusJetsQCDSelectionTagging.electronInput = 'electronUserData'
 process.topPairMuPlusJetsSelectionTagging.electronInput = 'electronUserData'
 process.topPairMuPlusJetsQCDSelectionTagging1.electronInput = 'electronUserData'
 process.topPairMuPlusJetsQCDSelectionTagging2.electronInput = 'electronUserData'
+
+process.nTupleMuons.InputTag = 'muonUserData'
+process.topPairEPlusJetsSelection.muonInput = 'muonUserData'
+process.topPairEPlusJetsSelectionTagging.muonInput = 'muonUserData'
+process.topPairEPlusJetsConversionSelectionTagging.muonInput = 'muonUserData'
+process.topPairEPlusJetsQCDSelectionTagging.muonInput = 'muonUserData'
+process.topPairMuPlusJetsSelectionTagging.muonInput = 'muonUserData'
+process.topPairMuPlusJetsQCDSelectionTagging1.muonInput = 'muonUserData'
+process.topPairMuPlusJetsQCDSelectionTagging2.muonInput = 'muonUserData'
+
+process.nTuplePFJets.InputTag = 'jetUserData'
+process.topPairEPlusJetsSelection.jetInput = 'jetUserData'
+process.topPairEPlusJetsSelectionTagging.jetInput = 'jetUserData'
+process.topPairEPlusJetsConversionSelectionTagging.jetInput = 'jetUserData'
+process.topPairEPlusJetsQCDSelectionTagging.jetInput = 'jetUserData'
+process.topPairMuPlusJetsSelectionTagging.jetInput = 'jetUserData'
+process.topPairMuPlusJetsQCDSelectionTagging1.jetInput = 'jetUserData'
+process.topPairMuPlusJetsQCDSelectionTagging2.jetInput = 'jetUserData'
 
 # EDM NTuples
 # process.load('BristolAnalysis.NTupleTools.content')

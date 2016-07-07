@@ -31,5 +31,19 @@ This number is stored in the ntuple as well as represented in the output paths f
 # Debug messages
 The recommended way to print messages is to use the CMSSW Message Logger (https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMessageLogger)
 and the output level needs to be controlled in the run configuration (`process.MessageLogger`, e.g. https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMessageLoggerDebug). `couts` are discouraged as they cannot be turned on/off without re-compilation.
-   
+
+# Checking if changes affect the selection
+```
+# before any changes are done:
+ntp run sync_ex output_file=sync_exercise_current.root
+ntp create cutflow workspace/results/sync_exercise_current.root
+mv workspace/results/e_cutflow.json workspace/results/e_cutflow_current.json
+mv workspace/results/mu_cutflow.json workspace/results/mu_cutflow_current.json
+# make changes
+ntp run sync_ex output_file=sync_exercise_new.root
+ntp create cutflow workspace/results/sync_exercise_new.root
+# the resulting file should show no changes
+ntp diff cutflow workspace/results/e_cutflow.json workspace/results/e_cutflow_current.json
+ntp diff cutflow workspace/results/mu_cutflow.json workspace/results/mu_cutflow_current.json
+```
  
