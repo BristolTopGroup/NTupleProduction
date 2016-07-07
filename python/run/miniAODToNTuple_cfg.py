@@ -75,7 +75,7 @@ print("Using Global Tag:", globaltag)
 if isTTbarMC:
     # TT Gen Event configuration
     from BristolAnalysis.NTupleTools.ttGenConfig_cff import setupTTGenEvent
-    setupTTGenEvent( process, cms )
+    setupTTGenEvent(process, cms)
 
 # Particle level definitions
 from BristolAnalysis.NTupleTools.pseudoTopConfig_cff import setupPseudoTop
@@ -290,6 +290,103 @@ if is2016:
 process.load('BristolAnalysis.NTupleTools.userdata.ElectronUserData_cfi')
 process.load('BristolAnalysis.NTupleTools.userdata.MuonUserData_cfi')
 process.load('BristolAnalysis.NTupleTools.userdata.JetUserData_cfi')
+
+cleaningDeltaR = 0.4
+from PhysicsTools.PatAlgos.cleaningLayer1.jetCleaner_cfi import cleanPatJets
+from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import selectedPatMuons
+from PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi import selectedPatElectrons
+
+process.goodMuons = selectedPatMuons.clone(
+    src='muonUserData',
+    cut='userInt("isGood")',
+)
+
+process.goodNonIsoR1Muons = process.goodMuons.clone(
+    cut='userInt("isGoodNonIsoR1")',
+)
+
+process.goodNonIsoR2Muons = process.goodMuons.clone(
+    cut='userInt("isGoodNonIsoR2")',
+)
+
+process.goodElectrons = selectedPatElectrons.clone(
+    src='electronUserData',
+    cut='userInt("isGood")',
+)
+
+process.goodConversionElectrons = process.goodElectrons.clone(
+    cut='userInt("isGoodConversion")',
+)
+process.goodNonIsoElectrons = process.goodElectrons.clone(
+    cut='userInt("isGoodNonIso")',
+)
+
+process.goodJets = cleanPatJets.clone(
+    preselection='userInt("passesPt") && userInt("isGood")',
+    checkOverlaps=cms.PSet(
+        electrons=cms.PSet(
+            src=cms.InputTag("goodElectrons"),
+            algorithm=cms.string("byDeltaR"),
+            preselection=cms.string(""),
+            deltaR=cms.double(cleaningDeltaR),
+            # don't check if they share some AOD object ref
+            checkRecoComponents=cms.bool(False),
+            pairCut=cms.string(""),
+            requireNoOverlaps=cms.bool(True),
+        ),
+        muons=cms.PSet(
+            src=cms.InputTag("goodMuons"),
+            algorithm=cms.string("byDeltaR"),
+            preselection=cms.string(""),
+            deltaR=cms.double(cleaningDeltaR),
+            # don't check if they share some AOD object ref
+            checkRecoComponents=cms.bool(False),
+            pairCut=cms.string(""),
+            requireNoOverlaps=cms.bool(True),
+        ),
+    )
+)
+
+process.goodJetsEConversionRegion = process.goodJets.clone()
+process.goodJetsEConversionRegion.checkOverlaps.electrons.src = 'goodConversionElectrons'
+
+process.goodJetsENonIsoRegion = process.goodJets.clone()
+process.goodJetsENonIsoRegion.checkOverlaps.electrons.src = 'goodNonIsoElectrons'
+
+process.goodJetsMuNonIsoR1Region = process.goodJets.clone()
+process.goodJetsMuNonIsoR1Region.checkOverlaps.muons.src = 'goodNonIsoR1Muons'
+
+process.goodJetsMuNonIsoR2Region = process.goodJets.clone()
+process.goodJetsMuNonIsoR2Region.checkOverlaps.muons.src = 'goodNonIsoR2Muons'
+
+# goodBJets = goodJets + Btag
+process.goodBJets = cms.EDFilter(
+    "PATJetSelector",
+    src=cms.InputTag('goodJets'),
+    cut=cms.string('userInt("passesMediumBtagWP")')
+)
+
+process.goodBJetsEConversionRegion = process.goodBJets.clone(
+    src='goodJetsEConversionRegion')
+
+process.goodBJetsENonIsoRegion = process.goodBJets.clone(
+    src='goodJetsENonIsoRegion')
+
+process.goodBJetsMuNonIsoR1Region = process.goodBJets.clone(
+    src='goodJetsMuNonIsoR1Region')
+
+process.goodBJetsMuNonIsoR2Region = process.goodBJets.clone(
+    src='goodJetsMuNonIsoR2Region')
+
+# steps from
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookPATExampleTopQuarks
+from PhysicsTools.PatAlgos.selectionLayer1.jetCountFilter_cfi import countPatJets
+process.step6a = countPatJets.clone(src='goodJets', minNumber=1)
+process.step6b = countPatJets.clone(src='goodJets', minNumber=2)
+process.step6c = countPatJets.clone(src='goodJets', minNumber=3)
+process.step7 = countPatJets.clone(src='goodJets', minNumber=4)
+process.step8a = countPatJets.clone(src='goodBJets', minNumber=1)
+process.step8b = countPatJets.clone(src='goodBJets', minNumber=2)
 
 process.nTupleElectrons.InputTag = 'electronUserData'
 process.topPairEPlusJetsSelection.electronInput = 'electronUserData'
