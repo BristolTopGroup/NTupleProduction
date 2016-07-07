@@ -1,8 +1,8 @@
 {
 	"name": "NTupleProduction",
-	"version": "CMSSW_8_0_14",
-	"cmssw_version": "CMSSW_8_0_14",
-	"scram_arch": "slc6_amd64_gcc530",
+	"version": "CMSSW_8_0_9",
+	"cmssw_version": "CMSSW_8_0_9",
+	"scram_arch": "slc6_amd64_gcc493",
 	"summary": "For the creation of n-tuples",
 	"author": "Bristol Top Quark Group",
 	"source": "https://github.com/BristolTopGroup/NTupleProduction.git",
