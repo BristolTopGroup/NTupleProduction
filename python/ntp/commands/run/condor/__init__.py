@@ -231,7 +231,7 @@ class Command(C):
             tokens = output.split('/')
             base = '/'.join(tokens[4:])
             LOG.debug('Taking base of {0}'.format(base))
-            LOG.debug('and replacing with '.format(HDFS_STORE_BASE))
+            LOG.debug('and replacing with {0}'.format(HDFS_STORE_BASE))
             output = os.path.join(HDFS_STORE_BASE, base)
             output = os.path.join(output, run_config['outputDatasetTag'])
             LOG.debug('Final output directory: {0}'.format(output))
