@@ -34,18 +34,25 @@ def generate_crab_configs():
 
     for campaign, samples in DATASETS.items():
         path = CRAB_CFG_PATH + '/' + campaign
+
         if not os.path.exists(path):
             os.mkdir(path)
 
         for alias, dataset in samples.items():
+
+            isReHLT = False
+            if 'reHLT' in dataset: isReHLT = True
+
             unitsPerJob = 10
             splitting = 'FileBased'
             extras = ''
 
             file_path = path + '/' + alias + '.py'
+            if isReHLT:
+                extras += "config.JobType.pyCfgParams = ['isReHLT=1']\n"
             if 'TTJets' in alias or 'TT_' in alias:
                 unitsPerJob = 5
-                extras = "config.JobType.pyCfgParams = ['isTTbarMC=1']"
+                extras += "config.JobType.pyCfgParams = ['isTTbarMC=1']\n"
             if not 'MINIAODSIM' in dataset:
                 # data
                 unitsPerJob = 500000

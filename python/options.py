@@ -38,6 +38,12 @@ def registerOptions(options):
                      VarParsing.varType.bool,
                      "Is this rereco data")
 
+    options.register('isReHLT',
+                     False,
+                     VarParsing.multiplicity.singleton,
+                     VarParsing.varType.bool,
+                     "Is the MC ReHLT")
+
     options.register('isRunC',
                      False,
                      VarParsing.multiplicity.singleton,

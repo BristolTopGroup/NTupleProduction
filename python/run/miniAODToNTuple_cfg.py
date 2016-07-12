@@ -7,6 +7,7 @@ from BristolAnalysis.NTupleTools.options import CMSSW_MAJOR_VERSION, registerOpt
 options = registerOptions(VarParsing('python'))
 isData = options.isData
 isMC = not isData
+isReHLT = options.isReHLT
 isTTbarMC = options.isTTbarMC
 
 # Define the CMSSW process
@@ -181,7 +182,12 @@ if isMC:
     process.triggerSequence.remove(process.nTupleTriggerIsoMu20)
     process.triggerSequence.remove(process.nTupleTriggerIsoTkMu20)
     process.triggerSequence.remove(process.nTupleTrigger)
-
+    if isReHLT:
+        process.nTupleTriggerEle22erWPLooseGsfMC.HLTInputTag = cms.InputTag('TriggerResults', '', 'SIM')
+        process.nTupleTriggerEle23WPLooseGsfMC.HLTInputTag = cms.InputTag('TriggerResults', '', 'SIM')
+        process.nTupleTriggerIsoMu18MC.HLTInputTag = cms.InputTag('TriggerResults', '', 'SIM')
+        process.nTupleTriggerIsoMu20MC.HLTInputTag = cms.InputTag('TriggerResults', '', 'SIM')
+        process.nTupleTriggerIsoTkMu20MC.HLTInputTag = cms.InputTag('TriggerResults', '', 'SIM')
     # Delete removed modules
     del process.nTupleTriggerEle22erWPLooseGsf, process.nTupleTriggerEle23WPLooseGsf
     del process.nTupleTriggerIsoMu18, process.nTupleTriggerIsoMu20, process.nTupleTriggerIsoTkMu20
