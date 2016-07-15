@@ -52,13 +52,16 @@ def setup_ntupler(process, cms):
         process.nTupleEvent +
 
         # Trigger
-        process.triggerSequence +
+        process.triggerSequence2015 +
+
+        # Trigger
+        process.triggerSequence2016 +
 
         # Trigger Objects
         # process.triggerObjectSequence +
 
         # Vertices
-        process.nTupleVertex + 
+        process.nTupleVertex +
 
         # muons
         process.nTupleMuons +
@@ -90,4 +93,3 @@ def setup_ntupler(process, cms):
 
     process.muonNTuples = cms.Sequence( process.nTuples * process.nTupleTreeMuon )
     process.electronNTuples = cms.Sequence( process.nTuples * process.nTupleTreeElectron )
-

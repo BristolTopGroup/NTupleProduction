@@ -15,7 +15,7 @@ if not 'NTPROOT' in os.environ:
     sys.exit(-1)
 
 # this is the NTupleVersion!
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 NTPROOT = os.environ['NTPROOT']
 WORKSPACE = os.path.join(NTPROOT, 'workspace')
 CRAB_WS = os.path.join(WORKSPACE, 'crab')
@@ -31,8 +31,7 @@ config = Configuration()
 
 config.section_("General")
 config.General.requestName = 'TESTING'
-config.General.workArea = '{crab_work_dir}/v{version}/{date}'.format(
-    crab_work_dir=CRAB_WS, version=__version__, date=TODAY)
+config.General.workArea = 'workdirCrab/v{version}/{date}'.format(version=__version__, date=TODAY)
 config.General.transferOutputs = True
 # config.General.transferLogs = True
 

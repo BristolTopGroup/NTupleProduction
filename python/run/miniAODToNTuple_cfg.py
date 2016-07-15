@@ -1,13 +1,14 @@
 from __future__ import print_function
 import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.VarParsing import VarParsing
-from BristolAnalysis.NTupleTools.options import CMSSW_MAJOR_VERSION, registerOptions
+from BristolAnalysis.NTupleTools.options import CMSSW_MAJOR_VERSION, registerOptions, is2015, is2016
 
 # register options
 options = registerOptions(VarParsing('python'))
 isData = options.isData
 isMC = not isData
 isTTbarMC = options.isTTbarMC
+isReHLT = options.isReHLT
 
 # Define the CMSSW process
 process = cms.Process("Ntuples")
@@ -47,11 +48,11 @@ process.source = cms.Source("PoolSource",
 globalTags = {
     'data': {
         7: '76X_dataRun2_16Dec2015_v0',  # ReReco+Prompt JECv6
-        8: '80X_dataRun2_Prompt_v8',
+        8: '80X_dataRun2_Prompt_ICHEP16JEC_v0',
     },
     'MC': {
         7: '76X_mcRun2_asymptotic_RunIIFall15DR76_v1',  # 25ns MC
-        8: '80X_mcRun2_asymptotic_2016_miniAODv2',
+        8: '80X_mcRun2_asymptotic_2016_miniAODv2_v1',
     }
 }
 
@@ -62,10 +63,14 @@ if (isData):
     globaltag = globalTags['data'][CMSSW_MAJOR_VERSION]
 else:
     globaltag = globalTags['MC'][CMSSW_MAJOR_VERSION]
-print("Using Global Tag:", globaltag)
 process.GlobalTag.globaltag = cms.string(globaltag)
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 # process.load('JetMETCorrections.Configuration.CorrectedJetProducersDefault_cff')
+if CMSSW_MAJOR_VERSION=='7':
+    print("Running on 2015 Data")
+else:
+    print("Running on 2016 Data")
+print("Using Global Tag:", globaltag)
 
 if isTTbarMC:
     # TT Gen Event configuration
@@ -173,53 +178,88 @@ process.nTupleTree.outputCommands.append(
 process.nTupleTree.outputCommands.append(
     'keep bool_topPairEPlusJetsConversionSelectionTagging_*FullSelection*_*')
 
-if isMC:
-    # Remove 76X Data 25ns Triggers
-    process.triggerSequence.remove(process.nTupleTriggerEle22erWPLooseGsf)
-    process.triggerSequence.remove(process.nTupleTriggerEle23WPLooseGsf)
-    process.triggerSequence.remove(process.nTupleTriggerIsoMu18)
-    process.triggerSequence.remove(process.nTupleTriggerIsoMu20)
-    process.triggerSequence.remove(process.nTupleTriggerIsoTkMu20)
-    process.triggerSequence.remove(process.nTupleTrigger)
+# Remove trigger choices to separate input config???
+if is2015:
+    process.nTuples.remove(process.triggerSequence2016)
+    if isMC:
+        # Remove 76X Data 25ns Triggers
+        process.triggerSequence2015.remove(process.nTupleTriggerEle23WPLooseGsf)
+        process.triggerSequence2015.remove(process.nTupleTriggerIsoMu20)
+        process.triggerSequence2015.remove(process.nTupleTriggerIsoTkMu20)
+        process.triggerSequence2015.remove(process.nTupleTrigger)
+        del process.nTupleTriggerEle23WPLooseGsf
+        del process.nTupleTriggerIsoMu20, process.nTupleTriggerIsoTkMu20
+        del process.nTupleTrigger
 
-    # Delete removed modules
-    del process.nTupleTriggerEle22erWPLooseGsf, process.nTupleTriggerEle23WPLooseGsf
-    del process.nTupleTriggerIsoMu18, process.nTupleTriggerIsoMu20, process.nTupleTriggerIsoTkMu20
-    del process.nTupleTrigger
+    if isData:
+        # Remove 76X MC 25ns Triggers
+        process.triggerSequence2015.remove(process.nTupleTriggerEle23WPLooseGsfMC)
+        process.triggerSequence2015.remove(process.nTupleTriggerIsoMu20MC)
+        process.triggerSequence2015.remove(process.nTupleTriggerIsoTkMu20MC)
+        process.triggerSequence2015.remove(process.nTupleTrigger)
+        del process.nTupleTriggerEle23WPLooseGsfMC
+        del process.nTupleTriggerIsoMu20MC, process.nTupleTriggerIsoTkMu20MC
+        del process.nTupleTrigger
 
-if isData:
-    # Remove 76X MC 25ns Triggers
-    process.triggerSequence.remove(process.nTupleTriggerEle22erWPLooseGsfMC)
-    process.triggerSequence.remove(process.nTupleTriggerEle23WPLooseGsfMC)
-    process.triggerSequence.remove(process.nTupleTriggerIsoMu18MC)
-    process.triggerSequence.remove(process.nTupleTriggerIsoMu20MC)
-    process.triggerSequence.remove(process.nTupleTriggerIsoTkMu20MC)
-    process.triggerSequence.remove(process.nTupleTrigger)
+        # Remove PseudoTop and MC Gen Variables
+        process.makingNTuples.remove(process.makePseudoTop)
+        process.nTuples.remove(process.pseudoTopSequence)
+        process.nTuples.remove(process.nTupleGenMET)
+        process.nTuples.remove(process.nTupleGenJets)
+        process.nTuples.remove(process.nTupleGenEventInfo)
+        process.nTuples.remove(process.nTupleGenParticles)
+        # Do not keep Gen branches
+        process.nTupleTree.outputCommands.append('drop *_nTuplePFJets_*Gen*_*')
+        # Delete removed modules and sequences (So they do not run on unscheduled)
+        del process.makePseudoTop, process.pseudoTopSequence, process.pseudoTop
+        del process.nTuplePseudoTopJets, process.nTuplePseudoTopLeptons, process.nTuplePseudoTopNeutrinos, process.nTuplePseudoTops
+        del process.nTupleGenMET, process.nTupleGenJets,  process.nTupleGenEventInfo, process.nTupleGenParticles
 
-    # Remove PseudoTop and MC Gen Variables
-    process.makingNTuples.remove(process.makePseudoTop)
-    process.nTuples.remove(process.pseudoTopSequence)
-    process.nTuples.remove(process.nTupleGenMET)
-    process.nTuples.remove(process.nTupleGenJets)
-    process.nTuples.remove(process.nTupleGenEventInfo)
-    process.nTuples.remove(process.nTupleGenParticles)
-    # Do not keep Gen branches
-    process.nTupleTree.outputCommands.append('drop *_nTuplePFJets_*Gen*_*')
-    # Delete removed modules and sequences (So they do not run on unscheduled)
-    del process.makePseudoTop, process.pseudoTopSequence, process.pseudoTop
-    del process.nTuplePseudoTopJets, process.nTuplePseudoTopLeptons, process.nTuplePseudoTopNeutrinos, process.nTuplePseudoTops
-    del process.nTupleGenMET, process.nTupleGenJets,  process.nTupleGenEventInfo, process.nTupleGenParticles
-    del process.nTupleTriggerEle22erWPLooseGsfMC, process.nTupleTriggerEle23WPLooseGsfMC
-    del process.nTupleTriggerIsoMu18MC, process.nTupleTriggerIsoMu20MC, process.nTupleTriggerIsoTkMu20MC
-    del process.nTupleTrigger
+if is2016:
+    process.nTuples.remove(process.triggerSequence2015)
+    if isMC:
+        if isReHLT:
+            process.nTupleTriggerEle27WPTightGsfMC.HLTInputTag = cms.InputTag('TriggerResults', '', 'HLT2')
+            process.nTupleTriggerIsoMu22MC.HLTInputTag = cms.InputTag('TriggerResults', '', 'HLT2')
+            process.nTupleTriggerIsoTkMu22MC.HLTInputTag = cms.InputTag('TriggerResults', '', 'HLT2')
+        # Remove 76X Data 25ns Triggers
+        process.triggerSequence2016.remove(process.nTupleTriggerEle27WPTightGsf)
+        process.triggerSequence2016.remove(process.nTupleTriggerIsoMu22)
+        process.triggerSequence2016.remove(process.nTupleTriggerIsoTkMu22)
+        process.triggerSequence2016.remove(process.nTupleTrigger)
+        del process.nTupleTriggerEle27WPTightGsf
+        del process.nTupleTriggerIsoMu22, process.nTupleTriggerIsoTkMu22
+        del process.nTupleTrigger
 
-if not options.isTTbarMC:
+    if isData:
+        # Remove 76X MC 25ns Triggers
+        process.triggerSequence2016.remove(process.nTupleTriggerEle27WPTightGsfMC)
+        process.triggerSequence2016.remove(process.nTupleTriggerIsoMu22MC)
+        process.triggerSequence2016.remove(process.nTupleTriggerIsoTkMu22MC)
+        process.triggerSequence2016.remove(process.nTupleTrigger)
+        del process.nTupleTriggerEle27WPTightGsfMC
+        del process.nTupleTriggerIsoMu22MC, process.nTupleTriggerIsoTkMu22MC
+        del process.nTupleTrigger
+        # Remove PseudoTop and MC Gen Variables
+        process.makingNTuples.remove(process.makePseudoTop)
+        process.nTuples.remove(process.pseudoTopSequence)
+        process.nTuples.remove(process.nTupleGenMET)
+        process.nTuples.remove(process.nTupleGenJets)
+        process.nTuples.remove(process.nTupleGenEventInfo)
+        process.nTuples.remove(process.nTupleGenParticles)
+        # Do not keep Gen branches
+        process.nTupleTree.outputCommands.append('drop *_nTuplePFJets_*Gen*_*')
+        # Delete removed modules and sequences (So they do not run on unscheduled)
+        del process.makePseudoTop, process.pseudoTopSequence, process.pseudoTop
+        del process.nTuplePseudoTopJets, process.nTuplePseudoTopLeptons, process.nTuplePseudoTopNeutrinos, process.nTuplePseudoTops
+        del process.nTupleGenMET, process.nTupleGenJets,  process.nTupleGenEventInfo, process.nTupleGenParticles
+
+if not isTTbarMC:
     print('Not a ttbar MC - removing TTbar specific modules')
     process.selectionCriteriaAnalyzer.genSelectionCriteriaInput = cms.VInputTag()
-    
+
 # 76X datasets are all ReReco so far
-process.nTupleEvent.metFiltersInputTag = cms.InputTag(
-    'TriggerResults', '', 'PAT')
+process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults', '', 'PAT')
 
 if not options.printEventContent:
     process.makingNTuples.remove(process.printEventContent)
@@ -236,6 +276,16 @@ process.TFileService = cms.Service(
 #     src=cms.InputTag('slimmedElectrons'),
 #     cut=cms.string("pt > 10 && abs(eta) < 2.5")
 # )
+if is2016:
+    if isReHLT:
+        process.topPairEPlusJetsSelection.HLTInput = cms.InputTag('TriggerResults', '', 'HLT2')
+        process.topPairEPlusJetsSelectionTagging.HLTInput = cms.InputTag('TriggerResults', '', 'HLT2')
+        process.topPairEPlusJetsConversionSelectionTagging.HLTInput = cms.InputTag('TriggerResults', '', 'HLT2')
+        process.topPairEPlusJetsQCDSelectionTagging.HLTInput = cms.InputTag('TriggerResults', '', 'HLT2')
+        process.topPairMuPlusJetsSelection.HLTInput.HLTInput = cms.InputTag('TriggerResults', '', 'HLT2')
+        process.topPairMuPlusJetsSelectionTagging.HLTInput = cms.InputTag('TriggerResults', '', 'HLT2')
+        process.topPairMuPlusJetsQCDSelectionTagging1.HLTInput = cms.InputTag('TriggerResults', '', 'HLT2')
+        process.topPairMuPlusJetsQCDSelectionTagging2.HLTInput = cms.InputTag('TriggerResults', '', 'HLT2')
 
 process.load('BristolAnalysis.NTupleTools.userdata.ElectronUserData_cfi')
 process.load('BristolAnalysis.NTupleTools.userdata.MuonUserData_cfi')
@@ -267,7 +317,6 @@ process.topPairEPlusJetsQCDSelectionTagging.jetInput = 'jetUserData'
 process.topPairMuPlusJetsSelectionTagging.jetInput = 'jetUserData'
 process.topPairMuPlusJetsQCDSelectionTagging1.jetInput = 'jetUserData'
 process.topPairMuPlusJetsQCDSelectionTagging2.jetInput = 'jetUserData'
-
 # EDM NTuples
 # process.load('BristolAnalysis.NTupleTools.content')
 #

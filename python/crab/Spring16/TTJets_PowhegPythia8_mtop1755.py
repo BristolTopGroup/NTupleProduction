@@ -8,9 +8,8 @@ config = deepcopy(crab.base.config)
 config.General.requestName = NAME
 config.Data.outputDatasetTag = NAME
 config.Data.outLFNDirBase += '/' + CAMPAIGN
-config.Data.inputDataset = '/QCD_Pt-50to80_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM'
+config.Data.inputDataset = '/TT_TuneCUETP8M1_mtop1755_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM'
 config.Data.splitting = 'FileBased'
-config.Data.unitsPerJob = 10
-config.JobType.pyCfgParams = ['isReHLT=1']
-
+config.Data.unitsPerJob = 5
+config.JobType.pyCfgParams = ['isTTbarMC=1']
 

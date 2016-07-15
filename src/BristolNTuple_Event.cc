@@ -8,9 +8,10 @@
 using namespace std;
 
 BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig) :
-		recoVertexInputTag_(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("recoVertexInputTag"))), //		
+		recoVertexInputTag_(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("recoVertexInputTag"))), //
 		metFiltersToken_(consumes<edm::TriggerResults>(iConfig.getParameter < edm::InputTag > ("metFiltersToken"))), //
 		metFiltersOfInterest_(iConfig.getParameter < std::vector<std::string> > ("metFiltersOfInterest")), //
+		is2016Regime_(iConfig.getParameter < bool > ("is2016Regime")), //
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //
 		suffix(iConfig.getParameter < std::string > ("Suffix")) {
 	produces<unsigned int>(prefix + "Run" + suffix);
@@ -19,6 +20,7 @@ BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig) :
 	produces<unsigned int>(prefix + "LumiSection" + suffix);
 	produces<double>(prefix + "Time" + suffix);
 	produces<bool>(prefix + "isData" + suffix);
+	produces<bool>(prefix + "is2016Data" + suffix);
 	produces<std::vector<bool> >(prefix + "metFilters" + suffix);
 	produces<bool> (prefix + "passesAllMetFiltersOfInterest" + suffix);
 	produces<unsigned int>(prefix + "NRecoVertices" + suffix);
@@ -39,6 +41,7 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	std::auto_ptr<unsigned int> bunch(new unsigned int(iEvent.bunchCrossing()));
 	std::auto_ptr<double> time(new double(sec + usec / conv));
 	std::auto_ptr<bool> isdata(new bool(iEvent.isRealData()));
+	std::auto_ptr<bool> is2016data(new bool(is2016Regime_));
 	std::auto_ptr<unsigned int> nv(new unsigned int(primaryVertices->size()));
 
 	// MET Filters
@@ -68,6 +71,7 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	iEvent.put(bunch, prefix + "Bunch" + suffix);
 	iEvent.put(time, prefix + "Time" + suffix);
 	iEvent.put(isdata, prefix + "isData" + suffix);
+	iEvent.put(is2016data, prefix + "is2016Data" + suffix);
 	iEvent.put(nv, prefix + "NRecoVertices" + suffix);
 	iEvent.put( metFilters, prefix + "metFilters" + suffix);
 	iEvent.put( passesMETFilters, prefix + "passesAllMetFiltersOfInterest" + suffix);

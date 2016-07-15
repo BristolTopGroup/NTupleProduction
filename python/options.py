@@ -6,6 +6,9 @@ import os
 CMSSW_VERSION = os.environ['CMSSW_VERSION']
 varray = CMSSW_VERSION.split('_')
 CMSSW_MAJOR_VERSION, CMSSW_MINOR_VERSION = int(varray[1]), int(varray[2])
+is2016 = is2015 = False
+if CMSSW_MAJOR_VERSION==8: is2016=True
+if CMSSW_MAJOR_VERSION==7: is2015=True
 
 def registerOptions(options):
     options.register('tagAndProbe',
@@ -37,6 +40,12 @@ def registerOptions(options):
                      VarParsing.multiplicity.singleton,
                      VarParsing.varType.bool,
                      "Is this rereco data")
+
+    options.register('isReHLT',
+                     False,
+                     VarParsing.multiplicity.singleton,
+                     VarParsing.varType.bool,
+                     "Is the MC ReHLT")
 
     options.register('isRunC',
                      False,
