@@ -27,9 +27,9 @@ def generate_crab_configs():
         'CAF/certification/Collisions15/13TeV/' +
         'Cert_246908-260627_13TeV_PromptReco_Collisions15_25ns_JSON.txt',
         'FALL15': '/hdfs/TopQuarkGroup/run2/json/ReReco_MinusBeamSpotIssue.txt',
-        'Spring16' : 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/' + 
-        'CAF/certification/Collisions16/13TeV/' + 
-        'Cert_271036-275125_13TeV_PromptReco_Collisions16_JSON.txt',
+        'Spring16' : 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/' +
+        'CAF/certification/Collisions16/13TeV/' +
+        'Cert_271036-275783_13TeV_PromptReco_Collisions16_JSON.txt',
     }
 
     for campaign, samples in DATASETS.items():
@@ -48,11 +48,15 @@ def generate_crab_configs():
             extras = ''
 
             file_path = path + '/' + alias + '.py'
-            if isReHLT:
-                extras += "config.JobType.pyCfgParams = ['isReHLT=1']\n"
             if 'TTJets' in alias or 'TT_' in alias:
                 unitsPerJob = 5
-                extras += "config.JobType.pyCfgParams = ['isTTbarMC=1']\n"
+                extras += "config.JobType.pyCfgParams = ['isTTbarMC=1']"
+            if isReHLT:
+                if extras:
+                    extras = extras.replace(']','')
+                    extras += ",'isReHLT=1']\n"
+                else:
+                    extras += "config.JobType.pyCfgParams = ['isReHLT=1']\n"
             if not 'MINIAODSIM' in dataset:
                 # data
                 unitsPerJob = 500000
