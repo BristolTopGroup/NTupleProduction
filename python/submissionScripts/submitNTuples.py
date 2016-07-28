@@ -1,10 +1,11 @@
 from datetime import date
+from crab.base import __version__
 import io
 from shutil import move
 from os import remove
 import os
 
-version = '1'
+version = __version__
 crabWorkArea = 'workdirCrab/v'+version+'/'+str(date.today())
 print 'Using workdir ',crabWorkArea
 miniAodDir = 'python/crab/Spring16/'

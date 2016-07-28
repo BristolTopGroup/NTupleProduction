@@ -124,7 +124,6 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 		TTbarMuPlusJetsReferenceSelection::Step stepName = TTbarMuPlusJetsReferenceSelection::Step(step);
 		if (debug_)
 			cout << "Doing selection step: " << TTbarMuPlusJetsReferenceSelection::StringSteps[step] << endl;
-
 		bool passesStep(passesSelectionStep(iEvent, step));
 
 		// Remove at least 4 jet selection for QCD control region (only need at least 3)
@@ -277,18 +276,11 @@ void TopPairMuonPlusJetsSelectionFilter::getLooseMuons() {
 
 void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
 	goodIsolatedMuons_.clear();
+	globalOrTkMuons();
 
 	// Get muons that pass the full selection
-	for (unsigned index = 0; index < muons_.size(); ++index) {
-		const pat::Muon& muon = muons_.at(index);
-
-		// Only these muons are stored in the ntuple
-		// Due to info on tracks not being available for SA muons
-		// This is part of tight muon ID
-		// But still have to do this (and faff with indexToStore) to get index of 
-		// muon out of those that get stored in the ntuple (all but SA muons)
-		if (!(muon.isGlobalMuon() || muon.isTrackerMuon()))
-			continue;
+	for (unsigned index = 0; index < globalOrTkMuons_.size(); ++index) {
+		const pat::Muon& muon = globalOrTkMuons_.at(index);
 
 		bool isGood = false;
 
@@ -307,6 +299,21 @@ void TopPairMuonPlusJetsSelectionFilter::goodIsolatedMuons() {
 			if (goodIsolatedMuons_.size() == 1)
 				signalMuonIndex_ = index;
 		}
+	}
+}
+
+void TopPairMuonPlusJetsSelectionFilter::globalOrTkMuons(){
+	globalOrTkMuons_.clear();
+	for (unsigned index = 0; index < muons_.size(); ++index) {
+		const pat::Muon& muon = muons_.at(index);
+		// Only these muons are stored in the ntuple
+		// Due to info on tracks not being available for SA muons
+		// This is part of tight muon ID
+		// But still have to do this (and faff with indexToStore) to get index of 
+		// muon out of those that get stored in the ntuple (all but SA muons)
+		// if (!(muon.isGlobalMuon() || muon.isTrackerMuon())) continue;
+		if (!(muon.isGlobalMuon() || muon.isTrackerMuon())) continue;
+		globalOrTkMuons_.push_back(muon);		
 	}
 }
 
