@@ -58,6 +58,7 @@ private:
 	virtual void produce(edm::Event&, const edm::EventSetup&) override;
 	virtual void endStream() override;
 
+	// from https://twiki.cern.ch/twiki/bin/view/CMS/TopMUO
 	bool isLoose(const pat::Muon& muon) const;
 	bool isGood(const pat::Muon& muon) const;
 	void fillVertexVariables(const edm::Event&, pat::Muon& el) const;
@@ -199,7 +200,7 @@ bool MuonUserData::isLoose(const pat::Muon& muon) const {
 }
 
 bool MuonUserData::isGood(const pat::Muon& muon) const {
-	bool passesRecoId = muon.userInt("isGlobalOrTrackerMuon");
+	bool passesRecoId = muon.isGlobalMuon();
 	bool passesPt = muon.pt() > minSignalMuonPt_;
 	bool passesEta = fabs(muon.eta()) < maxSignalMuonEta_;
 	bool passesId = false;
