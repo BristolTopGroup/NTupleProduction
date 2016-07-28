@@ -35,7 +35,7 @@ class Command(C):
         with open(output_file, 'w+') as f:
             f.write(json.dumps(diff, indent=4))
         LOG.info('Created diff JSON file: {0}'.format(output_file))
-
+        self.__print_summary(diff)
         return True
 
     def __get_content(self, json_files):
@@ -83,3 +83,15 @@ class Command(C):
                 else:
                     diff[step]['passing'][run] = lumis
         return diff
+
+    def __print_summary(self, diff):
+        LOG.info('==================================')
+        LOG.info('------Summary of differences------')
+        LOG.info('==================================')
+        LOG.info('Selection Step : difference (# events)')
+        result = {}
+        for cut, passing in diff.items():
+            result[cut] = 0
+            for _, lumis in passing.items():
+                result[cut] = sum([len(events) for _, events in lumis.items()])
+        print(json.dumps(result, indent=4))
