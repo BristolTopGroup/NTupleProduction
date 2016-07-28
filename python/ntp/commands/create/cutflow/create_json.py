@@ -91,13 +91,16 @@ def read_cutflows(input_file):
     return e_cutflow, mu_cutflow
 
 
-def write_json(e_cutflow, mu_cutflow):
+def write_json(e_cutflow, mu_cutflow, prefix):
     import json
     import os
     from ntp.commands.setup import RESULTDIR
 
-    e_output = os.path.join(RESULTDIR, 'e_cutflow.json')
-    mu_output = os.path.join(RESULTDIR, 'mu_cutflow.json')
+    if not prefix == '' and not prefix.endswith('_'):
+        prefix += '_'
+
+    e_output = os.path.join(RESULTDIR, prefix + 'e_cutflow.json')
+    mu_output = os.path.join(RESULTDIR, prefix + 'mu_cutflow.json')
 
     LOG.info('Creating electron cutflow file: {0}'.format(e_output))
     with open(e_output, 'w+') as f:
@@ -110,12 +113,16 @@ def write_json(e_cutflow, mu_cutflow):
 if __name__ == '__main__':
     LOG.debug('Creating JSON files with full event details')
     input_file = None
-    if len(sys.argv) > 1:
+    prefix = ''
+    n_args = len(sys.argv)
+    if n_args > 1:
         input_file = sys.argv[1]
+        if n_args == 3:
+            prefix = str(sys.argv[2])
     else:
         LOG.error('No input file specified.')
         sys.exit(-1)
 
     e_cutflow, mu_cutflow = read_cutflows(input_file)
 
-    write_json(e_cutflow, mu_cutflow)
+    write_json(e_cutflow, mu_cutflow, prefix)

@@ -5,7 +5,7 @@
         JSON format. The JSON files can be later used for filtering.
         
     Usage:
-        cutflow ntuple.root [format=table,JSON]
+        cutflow ntuple.root [format=table,JSON] [prefix=""]
         
     Parameters:
         format: The format of the output. Format=table will print a table on
@@ -13,6 +13,7 @@
                 workspace/results with detailed information about which event
                 passed which cut.
                 Default: format=table
+        prefix: prefix to use for resulting output files (e.g. if format=JSON)
 """
 import logging
 import os
@@ -28,6 +29,7 @@ class Command(C):
 
     DEFAULTS = {
         'format': 'table',
+        'prefix': '',
     }
 
     def __init__(self, path=__file__, doc=__doc__):
@@ -44,7 +46,7 @@ class Command(C):
             'cd {CMSSW_SRC}',
             'source /cvmfs/cms.cern.ch/cmsset_default.sh',
             'eval `/cvmfs/cms.cern.ch/common/scram runtime -sh`',
-            'python {CURRENT_FOLDER}/{script}.py {input_file}',
+            'python {CURRENT_FOLDER}/{script}.py {input_file} {args}',
         ]
         script = 'create_table'
         if output_format.lower() == 'table':
@@ -61,6 +63,7 @@ class Command(C):
             CURRENT_FOLDER=CURRENT_FOLDER,
             input_file=input_file,
             script=script,
+            args = self.__variables['prefix'],
         )
 
         from ntp.interpreter import call
