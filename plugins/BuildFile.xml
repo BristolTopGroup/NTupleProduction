@@ -3,14 +3,15 @@
 </library>
 
 <library name = "BristolAnalysisNTupleProductionPlugins_userdata" file="userdata/*.cc">
-	<use name="FWCore/Framework"/>
-	<use name="FWCore/PluginManager"/>
-	<use name="FWCore/ParameterSet"/>
-	<use name="RecoEgamma/EgammaTools"/>
-	<use name="DataFormats/PatCandidates"/>
+	<use name="CondFormats/BTauObjects"/>
 	<use name="CondFormats/JetMETObjects"/>
+	<use name="CondTools/BTau"/>
+	<use name="DataFormats/PatCandidates"/>
+	<use name="FWCore/Framework"/>
+	<use name="FWCore/ParameterSet"/>
+	<use name="FWCore/PluginManager"/>
 	<use name="HLTrigger/HLTcore"/>
 	<use name="JetMETCorrections/Objects"/>
 	<use name="PhysicsTools/Utilities"/>
-	<use name="CondFormats/BTauObjects"/>
+	<use name="RecoEgamma/EgammaTools"/>
 </library>

@@ -40,7 +40,7 @@
 #include "JetMETCorrections/Modules/interface/JetResolution.h"
 
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
-#include "CondFormats/BTauObjects/interface/BTagCalibrationReader.h"
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
 
 namespace ntp {
 namespace userdata {
@@ -55,10 +55,6 @@ public:
 	~JetUserData();
 
 	static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
-
-	enum BTagCalibrationReaders {
-		LOOSE_BC, LOOSE_UDSG, MEDIUM_BC, MEDIUM_UDSG, TIGHT_BC, TIGHT_UDSG, NBTagCalibrationReaders
-	};
 
 	enum BTagWPs {
 		LOOSE, MEDIUM, TIGHT, NBTagWPs,
@@ -77,8 +73,6 @@ private:
 	void fillJEC(pat::Jet& jet, const edm::Event& iEvent, const edm::EventSetup& iSetup,
 			const JetCorrector* jetCorrector) const;
 	void fillJER(pat::Jet& jet) const;
-	std::vector<double> returnBTagSFs(const pat::Jet& jet, const BTagCalibrationReader& reader,
-			const BTagCalibrationReader& readerUp, const BTagCalibrationReader& readerDown) const;
 
 	// ----------member data ---------------------------
 	// inputs
@@ -90,11 +84,6 @@ private:
 	std::string bJetDiscriminator_, btagCalibrationFile_;
 	BTagCalibration btagCalibration_;
 	std::vector<BTagCalibrationReader> btagReaders_;
-	std::vector<BTagCalibrationReader> btagReadersDown_;
-	std::vector<BTagCalibrationReader> btagReadersUp_;
-	std::vector<BTagCalibrationReader> btagUdsgReaders_;
-	std::vector<BTagCalibrationReader> btagUdsgReadersDown_;
-	std::vector<BTagCalibrationReader> btagUdsgReadersUp_;
 
 	// cuts
 	double minLooseJetPt_, maxLooseJetEta_;
@@ -130,11 +119,6 @@ JetUserData::JetUserData(const edm::ParameterSet& iConfig) :
 				btagCalibrationFile_(iConfig.getParameter < std::string > ("btagCalibrationFile")), //
 				btagCalibration_("csvv2", btagCalibrationFile_.c_str()), //
 				btagReaders_(), //
-				btagReadersDown_(), //
-				btagReadersUp_(), //
-				btagUdsgReaders_(), //
-				btagUdsgReadersDown_(), //
-				btagUdsgReadersUp_(), //
 				minSignalJetPt_(iConfig.getParameter<double>("minSignalJetPt")), //
 				maxSignalJetEta_(iConfig.getParameter<double>("maxSignalJetEta")), //
 				minBtagDiscLooseWP_(iConfig.getParameter<double>("minBtagDiscLooseWP")),
@@ -144,27 +128,16 @@ JetUserData::JetUserData(const edm::ParameterSet& iConfig) :
 	produces<std::vector<pat::Jet> >();
 	//now do what ever other initialization is needed
 	btagReaders_.reserve(size_t(BTagWPs::NBTagWPs));
-	btagReadersDown_.reserve(size_t(BTagWPs::NBTagWPs));
-	btagReadersUp_.reserve(size_t(BTagWPs::NBTagWPs));
-	btagUdsgReaders_.reserve(size_t(BTagWPs::NBTagWPs));
-	btagUdsgReadersDown_.reserve(size_t(BTagWPs::NBTagWPs));
-	btagUdsgReadersUp_.reserve(size_t(BTagWPs::NBTagWPs));
 
+	// check for updates:
+	// https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X
 	for (size_t index = 0; index < BTagWPs::NBTagWPs; ++index) {
-		// calibration instance, operating point, measurement type, systematics type
-		btagReaders_.push_back(
-				BTagCalibrationReader(&btagCalibration_, (BTagEntry::OperatingPoint) index, "mujets", "central"));
-		btagUdsgReaders_.push_back(
-				BTagCalibrationReader(&btagCalibration_, (BTagEntry::OperatingPoint) index, "incl", "central"));
-		// + 1 standard deviation
-		btagReadersUp_.push_back(
-				BTagCalibrationReader(&btagCalibration_, (BTagEntry::OperatingPoint) index, "mujets", "up"));
-		btagUdsgReadersUp_.push_back(
-				BTagCalibrationReader(&btagCalibration_, (BTagEntry::OperatingPoint) index, "incl", "up"));
-		btagReadersDown_.push_back(
-				BTagCalibrationReader(&btagCalibration_, (BTagEntry::OperatingPoint) index, "mujets", "down"));
-		btagUdsgReadersDown_.push_back(
-				BTagCalibrationReader(&btagCalibration_, (BTagEntry::OperatingPoint) index, "incl", "down"));
+		// operating point, central sys type, systematics types
+		BTagCalibrationReader reader((BTagEntry::OperatingPoint) index, "central", { "up", "down" });
+		reader.load(btagCalibration_, BTagEntry::FLAV_B, "mujets");
+		reader.load(btagCalibration_, BTagEntry::FLAV_C, "mujets");
+		reader.load(btagCalibration_, BTagEntry::FLAV_UDSG, "incl");
+		btagReaders_.push_back(reader);
 	}
 
 	consumes<double>(edm::InputTag("fixedGridRhoFastjetAll"));
@@ -430,59 +403,26 @@ void JetUserData::fillBtagWeights(pat::Jet& jet) const {
 	unsigned int bQuark = 5;
 	unsigned int cQuark = 4;
 	unsigned int jet_flavour = jet.hadronFlavour();
-	bool isBOrCQuark = jet_flavour == bQuark || jet_flavour == cQuark;
+//	bool isBOrCQuark = jet_flavour == bQuark || jet_flavour == cQuark;
 
 	for (size_t index = 0; index < BTagWPs::NBTagWPs; ++index) {
 		std::string prefix = prefixes.at(index);
-		BTagCalibrationReader reader, readerUp, readerDown;
-		if (isBOrCQuark) {
-			reader = btagReaders_.at(index);
-			readerUp = btagReadersUp_.at(index);
-			readerDown = btagReadersDown_.at(index);
-		} else {
-			reader = btagUdsgReaders_.at(index);
-			readerUp = btagUdsgReadersUp_.at(index);
-			readerDown = btagUdsgReadersDown_.at(index);
+		BTagEntry::JetFlavor bEntry = BTagEntry::FLAV_UDSG;
+		if(jet_flavour == bQuark) {
+			bEntry = BTagEntry::FLAV_B;
 		}
-		std::vector<double> weights = returnBTagSFs(jet, reader, readerUp, readerDown);
-		jet.addUserFloat(prefix + "BTagWeight", weights.at(0));
-		jet.addUserFloat(prefix + "BTagWeightUp", weights.at(1));
-		jet.addUserFloat(prefix + "BTagWeightDown", weights.at(2));
+		if(jet_flavour == cQuark) {
+			bEntry = BTagEntry::FLAV_C;
+		}
+		BTagCalibrationReader reader = btagReaders_.at(index);
+		double weight = reader.eval_auto_bounds("central", bEntry, jet.eta(), jet.pt());
+		double weightUp = reader.eval_auto_bounds("up", bEntry, jet.eta(), jet.pt());
+		double weightDown = reader.eval_auto_bounds("down", bEntry, jet.eta(), jet.pt());
+
+		jet.addUserFloat(prefix + "BTagWeight", weight);
+		jet.addUserFloat(prefix + "BTagWeightUp", weightUp);
+		jet.addUserFloat(prefix + "BTagWeightDown", weightDown);
 	}
-}
-
-std::vector<double> JetUserData::returnBTagSFs(const pat::Jet& jet, const BTagCalibrationReader& reader,
-		const BTagCalibrationReader& readerUp, const BTagCalibrationReader& readerDown) const {
-	unsigned int bQuark = 5;
-	unsigned int cQuark = 4;
-	unsigned int jet_flavour = jet.hadronFlavour();
-
-	BTagEntry::JetFlavor bTagEntry = BTagEntry::FLAV_UDSG; //udsg or unknown
-	if (jet_flavour == bQuark)
-		bTagEntry = BTagEntry::FLAV_B;
-	if (jet_flavour == cQuark)
-		bTagEntry = BTagEntry::FLAV_C;
-
-	double etaToUse = jet.eta();
-	double ptToUse = jet.pt();
-	bool doubleUnc = false;
-
-	if (ptToUse <= 30) {
-		ptToUse = 30;
-	} else if (ptToUse >= 670) {
-		ptToUse = 669;
-		doubleUnc = true;
-	}
-
-	double weight = reader.eval(bTagEntry, etaToUse, ptToUse);
-	double weightUp = readerUp.eval(bTagEntry, etaToUse, ptToUse);
-	double weightDown = readerDown.eval(bTagEntry, etaToUse, ptToUse);
-	if (doubleUnc) {
-		weightUp = 2 * (weightUp - weight) + weight;
-		weightDown = 2 * (weightDown - weight) + weight;
-	}
-
-	return {weight, weightUp, weightDown};
 }
 
 void JetUserData::fillJEC(pat::Jet& jet, const edm::Event& iEvent, const edm::EventSetup& iSetup,
