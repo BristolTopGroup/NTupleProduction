@@ -64,7 +64,6 @@ public:
 	virtual void getLooseElectrons();
 	virtual void getLooseMuons();
 	virtual void goodIsolatedMuons();
-	virtual void globalOrTkMuons();
 	virtual void cleanedJets();
 	virtual void cleanedBJets();
 
@@ -121,7 +120,7 @@ private:
 	pat::JetCollection jets_, cleanedJets_, cleanedBJets_;
 	edm::Handle <edm::View<pat::Electron> > electrons_;
 	pat::ElectronCollection looseElectrons_;
-	pat::MuonCollection muons_, globalOrTkMuons_, goodIsolatedMuons_, looseMuons_;
+	pat::MuonCollection muons_, goodIsolatedMuons_, looseMuons_;
 	pat::Muon signalMuon_;
 	HLTConfigProvider hltConfig_;
 	edm::TriggerResults triggerResults_;
