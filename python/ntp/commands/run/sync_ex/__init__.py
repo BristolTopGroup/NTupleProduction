@@ -16,6 +16,8 @@
                       to the file names (without extension) in crab/*/*.py.
                       Accepts wild-cards and comma-separated lists.
                       Default is 'TTJets_PowhegPythia8'.
+            files:    Instead of running on a specific dataset, run over the
+                      given (comma-separated) list of files
             output_file: Name of the output file. Default: sync_exercise.root
 """
 import logging
@@ -69,11 +71,14 @@ class Command(C):
         self.__prepare(args, variables)
         campaign = self.__variables['campaign']
         chosen_dataset = self.__variables['dataset']
-        input_files = find_input_files(
-            campaign, chosen_dataset, self.__variables, logger=LOG
-        )
+        input_files = self.__variables['files']
+        if not input_files:
+            input_files = find_input_files(
+                campaign, chosen_dataset, self.__variables, logger=LOG
+            )
+            input_files = str(input_files[0])
         # take only first file
-        self.__variables['files'] = str(input_files[0])
+        self.__variables['files'] = input_files
         self.__variables['isTTbarMC'] = 1
 
         from ..local import Command as LocalC

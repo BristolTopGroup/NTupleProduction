@@ -134,6 +134,7 @@ class Command(C):
             )
             f.write(content)
 
+    @time_function('__run_cmssw', LOG)
     def __run_cmssw(self):
         commands = [
             'cd {CMSSW_SRC}',
