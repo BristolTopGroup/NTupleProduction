@@ -1,6 +1,7 @@
 #include "BristolAnalysis/NTupleTools/interface/RootTupleMakerV2_Tree.h"
 
 #include "FWCore/Framework/interface/ConstProductRegistry.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/Framework/interface/ProductSelector.h"
 #include "FWCore/Framework/interface/ProductSelectorRules.h"
 #include "DataFormats/Provenance/interface/SelectedProducts.h"
@@ -39,11 +40,17 @@ RootTupleMakerV2_Tree::TypedBranchConnector<T>::TypedBranchConnector(edm::Branch
 				productInstanceName_(desc->productInstanceName()) {
 	object_ptr_ = &object_;
 	std::string s = productInstanceName_ + t;
+	std::string name = productInstanceName_;
+	if (name == "") {
+		edm::LogWarning("RootTupleMakerV2_Tree::TypedBranchConnector") << "Trying to register new branch (moduleLabel='"
+				<< moduleLabel_ << "') without productInstanceName. Setting productInstanceName=moduleLabel.";
+		name = moduleLabel_;
+	}
 	if (t != "") {
-		tree->Branch(productInstanceName_.c_str(), object_ptr_, s.c_str());
+		tree->Branch(name.c_str(), object_ptr_, s.c_str());
 	} //raw type
 	else {
-		tree->Branch(productInstanceName_.c_str(), &object_ptr_);
+		tree->Branch(name.c_str(), &object_ptr_);
 	} //vector<type>
 }
 
@@ -221,5 +228,4 @@ void RootTupleMakerV2_Tree::registerBranches() {
 		}
 	}
 }
-
 
