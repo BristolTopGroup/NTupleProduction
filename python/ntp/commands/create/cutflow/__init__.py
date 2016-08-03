@@ -63,7 +63,7 @@ class Command(C):
             CURRENT_FOLDER=CURRENT_FOLDER,
             input_file=input_file,
             script=script,
-            args = self.__variables['prefix'],
+            args=self.__variables['prefix'],
         )
 
         from ntp.interpreter import call
@@ -73,17 +73,15 @@ class Command(C):
         if not code == 0:
             LOG.error('An error occured: ' + stdout + stderr)
             return False
-        
+
         self.__text = ''
-        if output_format == 'table':
-            import json
-            output = self.__clean_stdout(stdout)
-            text = json.loads(output)
-            self.__text = '\n'.join(text)
-        else:
-            text = stdout
+        import json
+        output = self.__clean_stdout(stdout)
+        text = json.loads(output)
+        self.__text = '\n'.join(text)
+
         return True
-    
+
     def __clean_stdout(self, stdout):
         import re
         regex = '(\[")(.*?)("\])'
@@ -93,6 +91,6 @@ class Command(C):
             # 1st group == ["
             # 2nd group json
             # 3rd group == "]
-            result =  m.group(1) + m.group(2) +  m.group(3)
+            result = m.group(1) + m.group(2) + m.group(3)
             return result
         return result

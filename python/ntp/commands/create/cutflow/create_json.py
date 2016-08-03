@@ -1,6 +1,7 @@
 import logging
 import sys
 import ntp
+from ntp.commands.create.cutflow.create_table import format_cutflow
 LOG = logging.getLogger('ntp.commands.create.cutflow')
 
 TREE_PATH = 'nTupleTree/tree'
@@ -19,6 +20,7 @@ E_STEPS = [
     'AtLeastFourGoodJets',
     'AtLeastOneBtag',
     'AtLeastTwoBtags',
+    'FullSelection',
 ]
 MU_STEPS = [
     'AllEvents',
@@ -32,6 +34,7 @@ MU_STEPS = [
     'AtLeastFourGoodJets',
     'AtLeastOneBtag',
     'AtLeastTwoBtags',
+    'FullSelection',
 ]
 
 
@@ -52,6 +55,9 @@ def fill_cutflow(cutflow, event, step, branch):
     lumi_section = getattr(event, 'Event.LumiSection')
     event_number = getattr(event, 'Event.Number')
     passing = getattr(event, branch)
+    if not "summary" in cutflow:
+        cutflow["summary"] = 0
+
     if not passing:
         return
 
@@ -65,6 +71,7 @@ def fill_cutflow(cutflow, event, step, branch):
         cutflow["passing"][run_number][lumi_section] = []
 
     cutflow["passing"][run_number][lumi_section].append(event_number)
+    cutflow["summary"] += 1
 
 
 def read_cutflows(input_file):
@@ -110,6 +117,14 @@ def write_json(e_cutflow, mu_cutflow, prefix):
     with open(mu_output, 'w+') as f:
         f.write(json.dumps(mu_cutflow, indent=4))
 
+
+def get_summary(cutflow, cuts):
+    result = []
+    for cut in cuts:
+        result.append((cut, cutflow[cut]['summary']))
+
+    return format_cutflow(result)
+
 if __name__ == '__main__':
     LOG.debug('Creating JSON files with full event details')
     input_file = None
@@ -126,3 +141,11 @@ if __name__ == '__main__':
     e_cutflow, mu_cutflow = read_cutflows(input_file)
 
     write_json(e_cutflow, mu_cutflow, prefix)
+
+    text = ["Cutflow for electron channel:"]
+    text.extend(get_summary(e_cutflow, E_STEPS))
+    text.append('')
+    text.append("Cutflow for muon channel:")
+    text.extend(get_summary(mu_cutflow, MU_STEPS))
+    import json
+    print(json.dumps(text))
