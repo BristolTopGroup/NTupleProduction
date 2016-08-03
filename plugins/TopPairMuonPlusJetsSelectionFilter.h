@@ -10,9 +10,7 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
-#include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
-#include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include <boost/array.hpp>
@@ -61,12 +59,6 @@ public:
 
 	static void fillDescriptions(edm::ConfigurationDescriptions & descriptions);
 
-	virtual void getLooseElectrons();
-	virtual void getLooseMuons();
-	virtual void goodIsolatedMuons();
-	virtual void cleanedJets();
-	virtual void cleanedBJets();
-
 	virtual bool passesSelectionStep(edm::Event& iEvent, unsigned int selectionStep) const;
 
 	virtual bool passesEventCleaning(edm::Event& iEvent) const;
@@ -82,26 +74,20 @@ public:
    	virtual bool hasExactlyOneGoodBJet() const;
 	virtual bool hasAtLeastOneGoodBJet() const;
 	virtual bool hasAtLeastTwoGoodBJets() const;
-	virtual bool hasAtLeastTwoGoodTightBJets() const;
+//	virtual bool hasAtLeastTwoGoodTightBJets() const;
 
 private:
 	virtual void setupEventContent(edm::Event& iEvent, const edm::EventSetup& iSetup);
 
 	//config
-	edm::EDGetTokenT<pat::JetCollection> jetInput_;
-	edm::EDGetToken electronInput_;
+	edm::EDGetTokenT<pat::JetCollection> cleanedJetsToken_;
+	edm::EDGetTokenT<pat::JetCollection> cleanedBJetsToken_;
+	edm::EDGetToken vetoElectronsToken_;
 
-	edm::EDGetTokenT<pat::MuonCollection> muonInput_;
+	edm::EDGetTokenT<pat::MuonCollection> vetoMuonsToken_;
+	edm::EDGetTokenT<pat::MuonCollection> goodMuonsToken_;
+	edm::EDGetTokenT<pat::MuonCollection> muonsToken_;
 	edm::EDGetTokenT<edm::TriggerResults> hltInputTag_;
-
-	double cleaningDeltaR_;
-
-//	const bool applyJEC_;
-//	const std::string jetCorrectionService_;
-//	const JetCorrector* corrector_;
-	
-	double minBJetDiscriminator_;
-	double tightBJetDiscriminator_;
 
 	bool tagAndProbeStudies_, dropTriggerSelection_;
 
@@ -116,11 +102,9 @@ private:
 	boost::array<bool, TTbarMuPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS> passes_;
 	unsigned int runNumber_, signalMuonIndex_;
 	bool isRealData_, hasSignalMuon_;
-	std::vector< unsigned int> cleanedJetIndex_, cleanedBJetIndex_,  cleanedTightBJetIndex_;
-	pat::JetCollection jets_, cleanedJets_, cleanedBJets_;
-	edm::Handle <edm::View<pat::Electron> > electrons_;
-	pat::ElectronCollection looseElectrons_;
-	pat::MuonCollection muons_, goodIsolatedMuons_, looseMuons_;
+	pat::JetCollection cleanedJets_, cleanedBJets_;
+	pat::ElectronCollection vetoElectrons_;
+	pat::MuonCollection muons_, goodIsolatedMuons_, vetoMuons_;
 	pat::Muon signalMuon_;
 	HLTConfigProvider hltConfig_;
 	edm::TriggerResults triggerResults_;

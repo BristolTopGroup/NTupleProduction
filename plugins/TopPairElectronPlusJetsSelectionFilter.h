@@ -64,14 +64,14 @@ public:
 
 	static void fillDescriptions(edm::ConfigurationDescriptions & descriptions);
 
-	virtual bool isGoodElectron(const edm::Ptr<pat::Electron>&) const;
-	virtual double electronIsolation(const pat::Electron& electron) const;
+//	virtual bool isGoodElectron(const edm::Ptr<pat::Electron>&) const;
+//	virtual double electronIsolation(const pat::Electron& electron) const;
 
-	virtual void getLooseElectrons();
-	virtual void getLooseMuons();
-	virtual void goodIsolatedElectrons();
-	virtual void cleanedJets();
-	virtual void cleanedBJets();
+//	virtual void getLooseElectrons();
+//	virtual void getLooseMuons();
+//	virtual void goodIsolatedElectrons();
+//	virtual void cleanedJets();
+//	virtual void cleanedBJets();
 
 	virtual bool passesSelectionStep(edm::Event& iEvent, unsigned int selectionStep) const;
 
@@ -89,32 +89,23 @@ public:
     virtual bool hasExactlyOneGoodBJet() const;
 	virtual bool hasAtLeastOneGoodBJet() const;
 	virtual bool hasAtLeastTwoGoodBJets() const;
-	virtual bool hasAtLeastTwoGoodTightBJets() const;
+//	virtual bool hasAtLeastTwoGoodTightBJets() const;
 
 private:
 	virtual void setupEventContent(edm::Event& iEvent, const edm::EventSetup& iSetup);
 
 	//config
-	edm::EDGetTokenT<pat::JetCollection> jetInput_;
-	edm::EDGetToken electronInput_;
+	edm::EDGetTokenT<pat::JetCollection> cleanedJetsToken_, cleanedBJetsToken_;
+	edm::EDGetToken vetoElectronsToken_, goodElectronsToken_, electronsToken_;
 
-	edm::EDGetTokenT<pat::MuonCollection> muonInput_;
+	edm::EDGetTokenT<pat::MuonCollection> vetoMuonsToken_;
 	edm::EDGetTokenT<edm::TriggerResults> hltInputTag_;
-
-	double cleaningDeltaR_;
-
-//	const bool applyJEC_;
-//	const std::string jetCorrectionService_;
-//	const JetCorrector* corrector_;
-
-	double minBJetDiscriminator_;
-	double tightBJetDiscriminator_;
 
 	bool tagAndProbeStudies_, dropTriggerSelection_;
 
 	std::string prefix_, MCSampleTag_;
 
-	bool debug_, taggingMode_, jetSelectionInTaggingMode_, bSelectionInTaggingMode_;
+	bool taggingMode_, jetSelectionInTaggingMode_, bSelectionInTaggingMode_;
 
 	// Control region selections
 	bool nonIsolatedElectronSelection_;
@@ -125,10 +116,9 @@ private:
 	unsigned int runNumber_, signalElectronIndex_;
 	bool isRealData_, hasSignalElectron_;
 	std::vector< unsigned int> cleanedJetIndex_, cleanedBJetIndex_,  cleanedTightBJetIndex_;
-	pat::JetCollection jets_, cleanedJets_, cleanedBJets_;
-    edm::Handle<edm::View<pat::Electron> > electrons_;
-	pat::ElectronCollection goodIsolatedElectrons_, looseElectrons_;
-	pat::MuonCollection muons_, looseMuons_;
+	pat::JetCollection cleanedJets_, cleanedBJets_;
+	pat::ElectronCollection electrons_, goodIsolatedElectrons_, vetoElectrons_;
+	pat::MuonCollection vetoMuons_;
 	pat::Electron signalElectron_;
 	HLTConfigProvider hltConfig_;
 	edm::TriggerResults triggerResults_;

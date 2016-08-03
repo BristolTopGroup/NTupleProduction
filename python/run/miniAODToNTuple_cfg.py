@@ -66,7 +66,7 @@ else:
 process.GlobalTag.globaltag = cms.string(globaltag)
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 # process.load('JetMETCorrections.Configuration.CorrectedJetProducersDefault_cff')
-if CMSSW_MAJOR_VERSION=='7':
+if CMSSW_MAJOR_VERSION == '7':
     print("Running on 2015 Data")
 else:
     print("Running on 2016 Data")
@@ -98,10 +98,8 @@ from BristolAnalysis.NTupleTools.Jets_Setup_cff import setup_jets
 setup_jets(process, cms, options)
 
 # Load the selection filters and the selection analyzers
-process.load('BristolAnalysis.NTupleTools.muonSelection_cff')
-process.load('BristolAnalysis.NTupleTools.qcdMuonSelection_cff')
-process.load('BristolAnalysis.NTupleTools.qcdElectronSelection_cff')
-process.load('BristolAnalysis.NTupleTools.electronSelection_cff')
+process.load('BristolAnalysis.NTupleTools.muonSelections_cff')
+process.load('BristolAnalysis.NTupleTools.electronSelections_cff')
 process.load('BristolAnalysis.NTupleTools.SelectionCriteriaAnalyzer_cfi')
 
 if options.tagAndProbe:
@@ -121,6 +119,10 @@ setup_ntupler(process, cms)
 
 process.nTupleGenEventInfo.isTTbarMC = cms.bool(isTTbarMC)
 
+# mapping between MiniAOD collections and our object selections
+process.load('BristolAnalysis.NTupleTools.indices_cff')
+
+
 if isTTbarMC:
     process.makingNTuples = cms.Path(
         # process.metFilters *
@@ -133,6 +135,7 @@ if isTTbarMC:
         process.ttGenEvent *
         process.selectionCriteriaAnalyzer *
         process.makePseudoTop *
+        process.indexSequence *
         process.printEventContent *
         process.nTuples *
         process.nTupleTree
@@ -147,43 +150,37 @@ else:
         process.qcdMuonSelectionAnalyzerSequence *
         process.qcdElectronSelectionAnalyzerSequence *
         process.selectionCriteriaAnalyzer *
+        process.indexSequence *
         process.printEventContent *
         process.nTuples *
         process.nTupleTree
     )
 
-process.nTupleTree.outputCommands.append(
-    'keep uint*_topPairMuPlusJetsSelectionTagging_*_*')
-process.nTupleTree.outputCommands.append(
-    'keep uint*_topPairMuPlusJetsQCDSelectionTagging1_*_*')
-process.nTupleTree.outputCommands.append(
-    'keep uint*_topPairMuPlusJetsQCDSelectionTagging2_*_*')
-process.nTupleTree.outputCommands.append(
-    'keep uint*_topPairEPlusJetsSelectionTagging_*_*')
-process.nTupleTree.outputCommands.append(
-    'keep uint*_topPairEPlusJetsQCDSelectionTagging_*_*')
-process.nTupleTree.outputCommands.append(
-    'keep uint*_topPairEPlusJetsConversionSelectionTagging_*_*')
-
-process.nTupleTree.outputCommands.append(
-    'keep bool_topPairMuPlusJetsSelectionTagging_*_*')
-process.nTupleTree.outputCommands.append(
-    'keep bool_topPairMuPlusJetsQCDSelectionTagging1_*FullSelection*_*')
-process.nTupleTree.outputCommands.append(
-    'keep bool_topPairMuPlusJetsQCDSelectionTagging2_*FullSelection*_*')
-process.nTupleTree.outputCommands.append(
-    'keep bool_topPairEPlusJetsSelectionTagging_*_*')
-process.nTupleTree.outputCommands.append(
-    'keep bool_topPairEPlusJetsQCDSelectionTagging_*FullSelection*_*')
-process.nTupleTree.outputCommands.append(
-    'keep bool_topPairEPlusJetsConversionSelectionTagging_*FullSelection*_*')
+process.nTupleTree.outputCommands.extend(
+    [
+        'keep uint*_topPairMuPlusJetsSelectionTagging_*_*',
+        'keep uint*_topPairMuPlusJetsQCDSelectionTagging1_*_*',
+        'keep uint*_topPairMuPlusJetsQCDSelectionTagging2_*_*',
+        'keep uint*_topPairEPlusJetsSelectionTagging_*_*',
+        'keep uint*_topPairEPlusJetsQCDSelectionTagging_*_*',
+        'keep uint*_topPairEPlusJetsConversionSelectionTagging_*_*',
+        'keep bool_topPairMuPlusJetsSelectionTagging_*_*',
+        'keep bool_topPairMuPlusJetsQCDSelectionTagging1_*FullSelection*_*',
+        'keep bool_topPairMuPlusJetsQCDSelectionTagging2_*FullSelection*_*',
+        'keep bool_topPairEPlusJetsSelectionTagging_*_*',
+        'keep bool_topPairEPlusJetsQCDSelectionTagging_*FullSelection*_*',
+        'keep bool_topPairEPlusJetsConversionSelectionTagging_*FullSelection*_*',
+        'keep uint*_*Indices*_*_*',
+    ]
+)
 
 # Remove trigger choices to separate input config???
 if is2015:
     process.nTuples.remove(process.triggerSequence2016)
     if isMC:
         # Remove 76X Data 25ns Triggers
-        process.triggerSequence2015.remove(process.nTupleTriggerEle23WPLooseGsf)
+        process.triggerSequence2015.remove(
+            process.nTupleTriggerEle23WPLooseGsf)
         process.triggerSequence2015.remove(process.nTupleTriggerIsoMu20)
         process.triggerSequence2015.remove(process.nTupleTriggerIsoTkMu20)
         process.triggerSequence2015.remove(process.nTupleTrigger)
@@ -193,7 +190,8 @@ if is2015:
 
     if isData:
         # Remove 76X MC 25ns Triggers
-        process.triggerSequence2015.remove(process.nTupleTriggerEle23WPLooseGsfMC)
+        process.triggerSequence2015.remove(
+            process.nTupleTriggerEle23WPLooseGsfMC)
         process.triggerSequence2015.remove(process.nTupleTriggerIsoMu20MC)
         process.triggerSequence2015.remove(process.nTupleTriggerIsoTkMu20MC)
         process.triggerSequence2015.remove(process.nTupleTrigger)
@@ -210,7 +208,8 @@ if is2015:
         process.nTuples.remove(process.nTupleGenParticles)
         # Do not keep Gen branches
         process.nTupleTree.outputCommands.append('drop *_nTuplePFJets_*Gen*_*')
-        # Delete removed modules and sequences (So they do not run on unscheduled)
+        # Delete removed modules and sequences (So they do not run on
+        # unscheduled)
         del process.makePseudoTop, process.pseudoTopSequence, process.pseudoTop
         del process.nTuplePseudoTopJets, process.nTuplePseudoTopLeptons, process.nTuplePseudoTopNeutrinos, process.nTuplePseudoTops
         del process.nTupleGenMET, process.nTupleGenJets,  process.nTupleGenEventInfo, process.nTupleGenParticles
@@ -219,11 +218,15 @@ if is2016:
     process.nTuples.remove(process.triggerSequence2015)
     if isMC:
         if isReHLT:
-            process.nTupleTriggerEle27WPTightGsfMC.HLTInputTag = cms.InputTag('TriggerResults', '', 'HLT2')
-            process.nTupleTriggerIsoMu22MC.HLTInputTag = cms.InputTag('TriggerResults', '', 'HLT2')
-            process.nTupleTriggerIsoTkMu22MC.HLTInputTag = cms.InputTag('TriggerResults', '', 'HLT2')
+            process.nTupleTriggerEle27WPTightGsfMC.HLTInputTag = cms.InputTag(
+                'TriggerResults', '', 'HLT2')
+            process.nTupleTriggerIsoMu22MC.HLTInputTag = cms.InputTag(
+                'TriggerResults', '', 'HLT2')
+            process.nTupleTriggerIsoTkMu22MC.HLTInputTag = cms.InputTag(
+                'TriggerResults', '', 'HLT2')
         # Remove 76X Data 25ns Triggers
-        process.triggerSequence2016.remove(process.nTupleTriggerEle27WPTightGsf)
+        process.triggerSequence2016.remove(
+            process.nTupleTriggerEle27WPTightGsf)
         process.triggerSequence2016.remove(process.nTupleTriggerIsoMu22)
         process.triggerSequence2016.remove(process.nTupleTriggerIsoTkMu22)
         process.triggerSequence2016.remove(process.nTupleTrigger)
@@ -233,7 +236,8 @@ if is2016:
 
     if isData:
         # Remove 76X MC 25ns Triggers
-        process.triggerSequence2016.remove(process.nTupleTriggerEle27WPTightGsfMC)
+        process.triggerSequence2016.remove(
+            process.nTupleTriggerEle27WPTightGsfMC)
         process.triggerSequence2016.remove(process.nTupleTriggerIsoMu22MC)
         process.triggerSequence2016.remove(process.nTupleTriggerIsoTkMu22MC)
         process.triggerSequence2016.remove(process.nTupleTrigger)
@@ -249,7 +253,8 @@ if is2016:
         process.nTuples.remove(process.nTupleGenParticles)
         # Do not keep Gen branches
         process.nTupleTree.outputCommands.append('drop *_nTuplePFJets_*Gen*_*')
-        # Delete removed modules and sequences (So they do not run on unscheduled)
+        # Delete removed modules and sequences (So they do not run on
+        # unscheduled)
         del process.makePseudoTop, process.pseudoTopSequence, process.pseudoTop
         del process.nTuplePseudoTopJets, process.nTuplePseudoTopLeptons, process.nTuplePseudoTopNeutrinos, process.nTuplePseudoTops
         del process.nTupleGenMET, process.nTupleGenJets,  process.nTupleGenEventInfo, process.nTupleGenParticles
@@ -259,7 +264,8 @@ if not isTTbarMC:
     process.selectionCriteriaAnalyzer.genSelectionCriteriaInput = cms.VInputTag()
 
 # 76X datasets are all ReReco so far
-process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults', '', 'PAT')
+process.nTupleEvent.metFiltersInputTag = cms.InputTag(
+    'TriggerResults', '', 'PAT')
 
 if not options.printEventContent:
     process.makingNTuples.remove(process.printEventContent)
@@ -278,19 +284,36 @@ process.TFileService = cms.Service(
 # )
 if is2016:
     if isReHLT:
-        process.topPairEPlusJetsSelection.HLTInput = cms.InputTag('TriggerResults', '', 'HLT2')
-        process.topPairEPlusJetsSelectionTagging.HLTInput = cms.InputTag('TriggerResults', '', 'HLT2')
-        process.topPairEPlusJetsConversionSelectionTagging.HLTInput = cms.InputTag('TriggerResults', '', 'HLT2')
-        process.topPairEPlusJetsQCDSelectionTagging.HLTInput = cms.InputTag('TriggerResults', '', 'HLT2')
-        process.topPairMuPlusJetsSelection.HLTInput.HLTInput = cms.InputTag('TriggerResults', '', 'HLT2')
-        process.topPairMuPlusJetsSelectionTagging.HLTInput = cms.InputTag('TriggerResults', '', 'HLT2')
-        process.topPairMuPlusJetsQCDSelectionTagging1.HLTInput = cms.InputTag('TriggerResults', '', 'HLT2')
-        process.topPairMuPlusJetsQCDSelectionTagging2.HLTInput = cms.InputTag('TriggerResults', '', 'HLT2')
+        process.topPairEPlusJetsSelection.HLTInput = cms.InputTag(
+            'TriggerResults', '', 'HLT2')
+        process.topPairEPlusJetsSelectionTagging.HLTInput = cms.InputTag(
+            'TriggerResults', '', 'HLT2')
+        process.topPairEPlusJetsConversionSelectionTagging.HLTInput = cms.InputTag(
+            'TriggerResults', '', 'HLT2')
+        process.topPairEPlusJetsQCDSelectionTagging.HLTInput = cms.InputTag(
+            'TriggerResults', '', 'HLT2')
+        process.topPairMuPlusJetsSelection.HLTInput.HLTInput = cms.InputTag(
+            'TriggerResults', '', 'HLT2')
+        process.topPairMuPlusJetsSelectionTagging.HLTInput = cms.InputTag(
+            'TriggerResults', '', 'HLT2')
+        process.topPairMuPlusJetsQCDSelectionTagging1.HLTInput = cms.InputTag(
+            'TriggerResults', '', 'HLT2')
+        process.topPairMuPlusJetsQCDSelectionTagging2.HLTInput = cms.InputTag(
+            'TriggerResults', '', 'HLT2')
 
 process.load('BristolAnalysis.NTupleTools.userdata.ElectronUserData_cfi')
 process.load('BristolAnalysis.NTupleTools.userdata.MuonUserData_cfi')
 process.load('BristolAnalysis.NTupleTools.userdata.JetUserData_cfi')
 
+###############################################################################
+# Here we define the objects we want to work with. As an example we have
+# 3 types of muons:
+# - our signal muons with tight isolation
+# - our non-isolated muons for control region 1
+# - our non-isolated muons for control region 2
+# for each muon we have 1 jet collection and therefore 1 b-jet collection
+# which leads to a total of 6 jet collections and 3 muon collections.
+###############################################################################
 cleaningDeltaR = 0.4
 from PhysicsTools.PatAlgos.cleaningLayer1.jetCleaner_cfi import cleanPatJets
 from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import selectedPatMuons
@@ -299,6 +322,11 @@ from PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi import selectedP
 process.goodMuons = selectedPatMuons.clone(
     src='muonUserData',
     cut='userInt("isGood")',
+)
+
+process.vetoMuons = selectedPatMuons.clone(
+    src='muonUserData',
+    cut='userInt("isLoose")',
 )
 
 process.goodNonIsoR1Muons = process.goodMuons.clone(
@@ -311,7 +339,12 @@ process.goodNonIsoR2Muons = process.goodMuons.clone(
 
 process.goodElectrons = selectedPatElectrons.clone(
     src='electronUserData',
-    cut='userInt("isGood")',
+    cut=cms.string('userInt("isGood")'),
+    lazyParser=cms.untracked.bool(True),
+)
+
+process.vetoElectrons = process.goodElectrons.clone(
+    cut=cms.string('userInt("isLoose")'),
 )
 
 process.goodConversionElectrons = process.goodElectrons.clone(
@@ -322,6 +355,7 @@ process.goodNonIsoElectrons = process.goodElectrons.clone(
 )
 
 process.goodJets = cleanPatJets.clone(
+    src=cms.InputTag("jetUserData"),
     preselection='userInt("passesPt") && userInt("isGood")',
     checkOverlaps=cms.PSet(
         electrons=cms.PSet(
@@ -366,6 +400,12 @@ process.goodBJets = cms.EDFilter(
     cut=cms.string('userInt("passesMediumBtagWP")')
 )
 
+process.goodTightBJets = cms.EDFilter(
+    "PATJetSelector",
+    src=cms.InputTag('goodJets'),
+    cut=cms.string('userInt("passesTightBtagWP")')
+)
+
 process.goodBJetsEConversionRegion = process.goodBJets.clone(
     src='goodJetsEConversionRegion')
 
@@ -377,6 +417,27 @@ process.goodBJetsMuNonIsoR1Region = process.goodBJets.clone(
 
 process.goodBJetsMuNonIsoR2Region = process.goodBJets.clone(
     src='goodJetsMuNonIsoR2Region')
+# tight b-tag WP
+process.goodTightBJetsEConversionRegion = process.goodTightBJets.clone(
+    src='goodJetsEConversionRegion')
+
+process.goodTightBJetsENonIsoRegion = process.goodTightBJets.clone(
+    src='goodJetsENonIsoRegion')
+
+process.goodTightBJetsMuNonIsoR1Region = process.goodTightBJets.clone(
+    src='goodJetsMuNonIsoR1Region')
+
+process.goodTightBJetsMuNonIsoR2Region = process.goodTightBJets.clone(
+    src='goodJetsMuNonIsoR2Region')
+
+###############################################################################
+# End of analysis object definition
+###############################################################################
+
+
+###############################################################################
+# Begin selection
+###############################################################################
 
 # steps from
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookPATExampleTopQuarks
@@ -387,33 +448,16 @@ process.step6c = countPatJets.clone(src='goodJets', minNumber=3)
 process.step7 = countPatJets.clone(src='goodJets', minNumber=4)
 process.step8a = countPatJets.clone(src='goodBJets', minNumber=1)
 process.step8b = countPatJets.clone(src='goodBJets', minNumber=2)
+###############################################################################
+# end selection
+###############################################################################
 
+
+# ntuple output
 process.nTupleElectrons.InputTag = 'electronUserData'
-process.topPairEPlusJetsSelection.electronInput = 'electronUserData'
-process.topPairEPlusJetsSelectionTagging.electronInput = 'electronUserData'
-process.topPairEPlusJetsConversionSelectionTagging.electronInput = 'electronUserData'
-process.topPairEPlusJetsQCDSelectionTagging.electronInput = 'electronUserData'
-process.topPairMuPlusJetsSelectionTagging.electronInput = 'electronUserData'
-process.topPairMuPlusJetsQCDSelectionTagging1.electronInput = 'electronUserData'
-process.topPairMuPlusJetsQCDSelectionTagging2.electronInput = 'electronUserData'
-
 process.nTupleMuons.InputTag = 'muonUserData'
-process.topPairEPlusJetsSelection.muonInput = 'muonUserData'
-process.topPairEPlusJetsSelectionTagging.muonInput = 'muonUserData'
-process.topPairEPlusJetsConversionSelectionTagging.muonInput = 'muonUserData'
-process.topPairEPlusJetsQCDSelectionTagging.muonInput = 'muonUserData'
-process.topPairMuPlusJetsSelectionTagging.muonInput = 'muonUserData'
-process.topPairMuPlusJetsQCDSelectionTagging1.muonInput = 'muonUserData'
-process.topPairMuPlusJetsQCDSelectionTagging2.muonInput = 'muonUserData'
-
 process.nTuplePFJets.InputTag = 'jetUserData'
-process.topPairEPlusJetsSelection.jetInput = 'jetUserData'
-process.topPairEPlusJetsSelectionTagging.jetInput = 'jetUserData'
-process.topPairEPlusJetsConversionSelectionTagging.jetInput = 'jetUserData'
-process.topPairEPlusJetsQCDSelectionTagging.jetInput = 'jetUserData'
-process.topPairMuPlusJetsSelectionTagging.jetInput = 'jetUserData'
-process.topPairMuPlusJetsQCDSelectionTagging1.jetInput = 'jetUserData'
-process.topPairMuPlusJetsQCDSelectionTagging2.jetInput = 'jetUserData'
+
 # EDM NTuples
 # process.load('BristolAnalysis.NTupleTools.content')
 #
