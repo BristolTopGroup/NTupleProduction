@@ -29,7 +29,7 @@ def generate_crab_configs():
         'FALL15': '/hdfs/TopQuarkGroup/run2/json/ReReco_MinusBeamSpotIssue.txt',
         'Spring16' : 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/' +
         'CAF/certification/Collisions16/13TeV/' +
-        'Cert_271036-275783_13TeV_PromptReco_Collisions16_JSON.txt',
+        'Cert_271036-277148_13TeV_PromptReco_Collisions16_JSON.txt',
     }
 
     for campaign, samples in DATASETS.items():
