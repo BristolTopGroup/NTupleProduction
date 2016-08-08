@@ -186,7 +186,7 @@ DATASETS = {
         "WJets_PU20bx25": "/WJetsToLNu_13TeV-madgraph-pythia8-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM"
     },
     "Spring16": {
-        "DYJetsToLL_M50": "/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
+        "DYJetsToLL_M50": "/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext1-v1/MINIAODSIM",
         "QCD_MuEnriched_15to20": "/QCD_Pt-15to20_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM",
         "QCD_MuEnriched_20to30": "/QCD_Pt-20to30_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM",
         "QCD_MuEnriched_30to50": "/QCD_Pt-30to50_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM",
@@ -210,12 +210,16 @@ DATASETS = {
         "QCD_EMEnriched_120to170": "/QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8/RunIISpring16MiniAODv2-FlatPU8to37HcalNZSRAW_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM",
         "QCD_EMEnriched_170to300": "/QCD_Pt-170to300_EMEnriched_TuneCUETP8M1_13TeV_pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
         "QCD_EMEnriched_300toInf": "/QCD_Pt-300toInf_EMEnriched_TuneCUETP8M1_13TeV_pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
-        "SingleElectron_Run2016B_PromptReco_v1": "/SingleElectron/Run2016B-PromptReco-v1/MINIAOD",
         "SingleElectron_Run2016B_PromptReco_v2": "/SingleElectron/Run2016B-PromptReco-v2/MINIAOD",
         "SingleElectron_Run2016C_PromptReco_v2": "/SingleElectron/Run2016C-PromptReco-v2/MINIAOD",
-        "SingleMuon_Run2016B_PromptReco_v1": "/SingleMuon/Run2016B-PromptReco-v1/MINIAOD",
+	"SingleElectron_Run2016D_PromptReco_v2": "/SingleElectron/Run2016D-PromptReco-v2/MINIAOD",
+	"SingleElectron_Run2016E_PromptReco_v2": "/SingleElectron/Run2016E-PromptReco-v2/MINIAOD",
+	"SingleElectron_Run2016F_PromptReco_v1": "/SingleElectron/Run2016F-PromptReco-v1/MINIAOD",
         "SingleMuon_Run2016B_PromptReco_v2": "/SingleMuon/Run2016B-PromptReco-v2/MINIAOD",
-        "SingleMuon_Run2016C_PromptReco_v2": "/SingleMuon/Run2016B-PromptReco-v2/MINIAOD",
+        "SingleMuon_Run2016C_PromptReco_v2": "/SingleMuon/Run2016C-PromptReco-v2/MINIAOD",
+        "SingleMuon_Run2016D_PromptReco_v2": "/SingleMuon/Run2016D-PromptReco-v2/MINIAOD",
+        "SingleMuon_Run2016E_PromptReco_v2": "/SingleMuon/Run2016E-PromptReco-v2/MINIAOD",
+        "SingleMuon_Run2016F_PromptReco_v1": "/SingleMuon/Run2016F-PromptReco-v1/MINIAOD",
         "TTJets_PowhegPythia8": "/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext3-v1/MINIAODSIM",
         "TTJets_PowhegPythia8_scaledown": "/TT_TuneCUETP8M1_13TeV-powheg-scaledown-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
         "TTJets_PowhegPythia8_scaleup": "/TT_TuneCUETP8M1_13TeV-powheg-scaleup-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
@@ -229,13 +233,13 @@ DATASETS = {
         "STbar_tW": "/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v2/MINIAODSIM",
         "ST_s": "/ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
         "STbar_t": "/ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
-        "WJetsToLNu": "/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
+        "WJetsToLNu": "/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext1-v1/MINIAODSIM",
     },
     "Test": {
-        "SingleElectron_16Dec2015_RunC": "/SingleElectron/Run2015C_25ns-16Dec2015-v1/MINIAOD",
-        "SingleMuon_16Dec2015_RunC": "/SingleMuon/Run2015C_25ns-16Dec2015-v1/MINIAOD",
-        "TTJets_PowhegPythia8": "/TT_TuneCUETP8M1mpiOFF_13TeV-powheg-pythia8/RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/MINIAODSIM",
-        "WJetsToLNu": "/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM"
+        "SingleElectron": "/SingleElectron/Run2016B-PromptReco-v2/MINIAOD",
+        "SingleMuon": "/SingleMuon/Run2016B-PromptReco-v2/MINIAOD",
+        "TTJets_PowhegPythia8": "/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext3-v1/MINIAODSIM",
+        "WJetsToLNu": "/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext1-v1/MINIAODSIM"
     }
 }
 
