@@ -2,24 +2,18 @@ import FWCore.ParameterSet.Config as cms
 
 topPairEPlusJetsSelection = cms.EDFilter('TopPairElectronPlusJetsSelectionFilter',
     # Specify input collections
-    jetInput=cms.InputTag("patJetsReapplyJEC"),
-    electronInput=cms.InputTag("slimmedElectrons"),
-    muonInput=cms.InputTag("slimmedMuons"),
+    cleanedJets=cms.InputTag("goodJets"),
+    cleanedBJets=cms.InputTag("goodBJets"),
+    goodElectrons=cms.InputTag("goodElectrons"),
+    vetoElectrons=cms.InputTag("vetoElectrons"),
+    electrons=cms.InputTag("electronUserData"),
+    vetoMuons=cms.InputTag("vetoMuons"),
     HLTInput=cms.InputTag('TriggerResults', '', 'HLT'),
 
-    # Jet cleaning delta R
-    cleaningDeltaR=cms.double(0.4),
-
-    # B Jet Selection
-    # Working points taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X
-    minBJetDiscriminator=cms.double(0.800),
-    tightBJetDiscriminator=cms.double(0.935),
-    
     prefix=cms.untracked.string('TopPairElectronPlusJetsSelection.'),
     MCSampleTag = cms.string('Summer12'),#Fall11 or Summer12 or Summer11Leg
 
     #flags
-    debug=cms.untracked.bool(False),
     taggingMode=cms.bool(False),
 
     tagAndProbeStudies = cms.bool(False),

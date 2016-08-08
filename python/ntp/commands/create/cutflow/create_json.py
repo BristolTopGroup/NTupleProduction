@@ -1,6 +1,7 @@
 import logging
 import sys
 import ntp
+from ntp.commands.create.cutflow.create_table import format_cutflow
 LOG = logging.getLogger('ntp.commands.create.cutflow')
 
 TREE_PATH = 'nTupleTree/tree'
@@ -19,6 +20,7 @@ E_STEPS = [
     'AtLeastFourGoodJets',
     'AtLeastOneBtag',
     'AtLeastTwoBtags',
+    'FullSelection',
 ]
 MU_STEPS = [
     'AllEvents',
@@ -32,6 +34,7 @@ MU_STEPS = [
     'AtLeastFourGoodJets',
     'AtLeastOneBtag',
     'AtLeastTwoBtags',
+    'FullSelection',
 ]
 
 
@@ -52,6 +55,9 @@ def fill_cutflow(cutflow, event, step, branch):
     lumi_section = getattr(event, 'Event.LumiSection')
     event_number = getattr(event, 'Event.Number')
     passing = getattr(event, branch)
+    if not "summary" in cutflow:
+        cutflow["summary"] = 0
+
     if not passing:
         return
 
@@ -65,6 +71,7 @@ def fill_cutflow(cutflow, event, step, branch):
         cutflow["passing"][run_number][lumi_section] = []
 
     cutflow["passing"][run_number][lumi_section].append(event_number)
+    cutflow["summary"] += 1
 
 
 def read_cutflows(input_file):
@@ -91,13 +98,16 @@ def read_cutflows(input_file):
     return e_cutflow, mu_cutflow
 
 
-def write_json(e_cutflow, mu_cutflow):
+def write_json(e_cutflow, mu_cutflow, prefix):
     import json
     import os
     from ntp.commands.setup import RESULTDIR
 
-    e_output = os.path.join(RESULTDIR, 'e_cutflow.json')
-    mu_output = os.path.join(RESULTDIR, 'mu_cutflow.json')
+    if not prefix == '' and not prefix.endswith('_'):
+        prefix += '_'
+
+    e_output = os.path.join(RESULTDIR, prefix + 'e_cutflow.json')
+    mu_output = os.path.join(RESULTDIR, prefix + 'mu_cutflow.json')
 
     LOG.info('Creating electron cutflow file: {0}'.format(e_output))
     with open(e_output, 'w+') as f:
@@ -107,15 +117,35 @@ def write_json(e_cutflow, mu_cutflow):
     with open(mu_output, 'w+') as f:
         f.write(json.dumps(mu_cutflow, indent=4))
 
+
+def get_summary(cutflow, cuts):
+    result = []
+    for cut in cuts:
+        result.append((cut, cutflow[cut]['summary']))
+
+    return format_cutflow(result)
+
 if __name__ == '__main__':
     LOG.debug('Creating JSON files with full event details')
     input_file = None
-    if len(sys.argv) > 1:
+    prefix = ''
+    n_args = len(sys.argv)
+    if n_args > 1:
         input_file = sys.argv[1]
+        if n_args == 3:
+            prefix = str(sys.argv[2])
     else:
         LOG.error('No input file specified.')
         sys.exit(-1)
 
     e_cutflow, mu_cutflow = read_cutflows(input_file)
 
-    write_json(e_cutflow, mu_cutflow)
+    write_json(e_cutflow, mu_cutflow, prefix)
+
+    text = ["Cutflow for electron channel:"]
+    text.extend(get_summary(e_cutflow, E_STEPS))
+    text.append('')
+    text.append("Cutflow for muon channel:")
+    text.extend(get_summary(mu_cutflow, MU_STEPS))
+    import json
+    print(json.dumps(text))

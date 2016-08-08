@@ -103,6 +103,7 @@ class Command(C):
     def __init__(self, path=__file__, doc=__doc__):
         super(Command, self).__init__(path, doc)
         self.__input_files = []
+        self.__outdirs = []
 
     def run(self, args, variables):
         self.__prepare(args, variables)
@@ -127,6 +128,12 @@ class Command(C):
         for dataset in datasets:
             self.__run_dataset(campaign, dataset)
         # to check status:
+        msg = 'To check the status you can run\n'
+        if len(self.__outdirs) == 1:
+            msg += 'DAGstatus {0}/diamond.status -s'.format(self.__outdirs[0])
+        else:
+            msg += 'DAGstatus workspace/condor/*/diamond.status -s'
+        LOG.info(msg)
         # ntp condor status
 
         return True
@@ -159,6 +166,7 @@ class Command(C):
         out_dir += '_{0}'.format(latest)
 
         self.__job_dir = out_dir
+        self.__outdirs.append(out_dir)
         self.__job_log_dir = os.path.join(self.__job_dir, 'log')
         self.__setup_script = os.path.join(self.__job_dir, 'setup.sh')
         self.__run_script = os.path.join(self.__job_dir, 'run.sh')
@@ -203,7 +211,8 @@ class Command(C):
         }
 
         using_local_files = self.__variables['files'] != ''
-        input_files = find_input_files(campaign, dataset, self.__variables, LOG)
+        input_files = find_input_files(
+            campaign, dataset, self.__variables, LOG)
 
         if not using_local_files:
             run_config = get_config(campaign, dataset)

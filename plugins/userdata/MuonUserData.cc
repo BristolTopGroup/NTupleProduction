@@ -58,6 +58,7 @@ private:
 	virtual void produce(edm::Event&, const edm::EventSetup&) override;
 	virtual void endStream() override;
 
+	// from https://twiki.cern.ch/twiki/bin/view/CMS/TopMUO
 	bool isLoose(const pat::Muon& muon) const;
 	bool isGood(const pat::Muon& muon) const;
 	void fillVertexVariables(const edm::Event&, pat::Muon& el) const;
@@ -153,7 +154,9 @@ void MuonUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
 		for (size_t index = 0; index < nMuons; ++index) {
 			pat::Muon& mu = muonCollection->at(index);
-			bool hasTrack = mu.isGlobalMuon() || mu.isTrackerMuon();
+			bool isGlobalOrTrackerMuon = mu.isGlobalMuon() || mu.isTrackerMuon();
+			// reconstruction algorithm ID
+			mu.addUserInt("isGlobalOrTrackerMuon", isGlobalOrTrackerMuon);
 
 			//isolation
 			mu.addUserFloat("PFRelIso03", getRelativeIsolation(mu, 0.3, false));
@@ -165,7 +168,7 @@ void MuonUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 			fillVertexVariables(iEvent, mu);
 			// beamspot correction
 			double trkd0 = -9999.;
-			if (hasTrack) {
+			if (isGlobalOrTrackerMuon) {
 				trkd0 = mu.track()->d0();
 				if (useBeamSpotCorrection_ && bsHandle.isValid()) {
 					trkd0 = -(mu.track()->dxy(bsHandle->position()));
@@ -188,14 +191,16 @@ void MuonUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 }
 
 bool MuonUserData::isLoose(const pat::Muon& muon) const {
+	bool passesRecoId = muon.userInt("isGlobalOrTrackerMuon");
 	bool passesPt = muon.pt() > minLooseMuonPt_;
 	bool passesEta = fabs(muon.eta()) < maxLooseMuonEta_;
 	bool passesId = muon.isLooseMuon();
 	bool passesIso = muon.userFloat("PFRelIso04DeltaBeta") < looseMuonIso_;
-	return passesPt && passesEta && passesId && passesIso;
+	return passesRecoId && passesPt && passesEta && passesId && passesIso;
 }
 
 bool MuonUserData::isGood(const pat::Muon& muon) const {
+	bool passesRecoId = muon.isGlobalMuon();
 	bool passesPt = muon.pt() > minSignalMuonPt_;
 	bool passesEta = fabs(muon.eta()) < maxSignalMuonEta_;
 	bool passesId = false;
@@ -204,7 +209,7 @@ bool MuonUserData::isGood(const pat::Muon& muon) const {
 		passesId = muon.isTightMuon(primaryVertex_);
 	}
 
-	return passesPt && passesEta && passesId;
+	return passesRecoId && passesPt && passesEta && passesId;
 }
 
 void MuonUserData::fillVertexVariables(const edm::Event& iEvent, pat::Muon& mu) const {

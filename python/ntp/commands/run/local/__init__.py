@@ -97,6 +97,10 @@ class Command(C):
 
         self.__write_pset(input_files)
 
+        # making sure the correct HLT menu is read
+        if 'reHLT' in input_files[0]:
+            self.__variables['isReHLT'] = 1
+
         if not self.__variables['noop']:
             code = self.__run_cmssw()
             self.__text = "Ran {PSET}\n"
@@ -130,6 +134,7 @@ class Command(C):
             )
             f.write(content)
 
+    @time_function('__run_cmssw', LOG)
     def __run_cmssw(self):
         commands = [
             'cd {CMSSW_SRC}',

@@ -35,7 +35,7 @@ class Command(C):
         with open(output_file, 'w+') as f:
             f.write(json.dumps(diff, indent=4))
         LOG.info('Created diff JSON file: {0}'.format(output_file))
-
+        self.__print_summary(diff)
         return True
 
     def __get_content(self, json_files):
@@ -62,6 +62,7 @@ class Command(C):
                 continue
             diff[step] = {}
             diff[step]['passing'] = {}
+            diff[step]['summary'] = 0
 
             data1 = d['passing']
             data2 = d2[step]['passing']
@@ -82,4 +83,38 @@ class Command(C):
                             diff[step]['passing'][run][lumi] = events
                 else:
                     diff[step]['passing'][run] = lumis
+
+        summary = self.__create_summary(data, diff)
+        for cut in diff.keys():
+            diff[cut]['summary'] = summary[cut]
         return diff
+
+    def __create_summary(self, data, diff):
+        d1, d2 = data
+        cuts = d1.keys()
+        summary = {}
+
+        for cut in cuts:
+            n1 = sum(
+                [len(events) for lumis in d1[cut]['passing'].values() for events in lumis.values()])
+            n2 = sum(
+                [len(events) for lumis in d2[cut]['passing'].values() for events in lumis.values()])
+            n_diff = sum(
+                [len(events) for lumis in diff[cut]['passing'].values() for events in lumis.values()])
+            if n1 - n2 < 0:
+                summary[cut] = -1 * n_diff
+            else:
+                summary[cut] = n_diff
+
+        return summary
+
+    def __print_summary(self, diff):
+        LOG.info('==================================')
+        LOG.info('------Summary of differences------')
+        LOG.info('==================================')
+        LOG.info('Selection Step : difference (# events)')
+        result = {}
+        for cut in diff.keys():
+            result[cut] = diff[cut]['summary']
+
+        print(json.dumps(result, indent=4))
