@@ -1,6 +1,6 @@
 import os
 import sys
-from .das_client import get_data
+from .das_client import get_data, x509
 from .datasets import create_sample_list
 import json
 import logging
@@ -28,7 +28,12 @@ def ask_das(query):
     idx = 0
     limit = 0
     debug = False
-    data = get_data(host, query, idx, limit, debug)
+    capath = x509()
+    cert = x509()
+    key = x509()
+    data = get_data(
+        host, query, idx, limit, debug, capath=capath, cert=cert, ckey=key
+    )
     if isinstance(data, basestring):
         dasjson = json.loads(data)
     else:
