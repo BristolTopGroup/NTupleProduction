@@ -65,6 +65,7 @@ NEWPP=$(echo "$PYTHONUSERBASE"/lib/python*/site-packages)
 NEWPP=$(echo ${NEWPP// /:})
 PYTHONPATH=$NEWPP:$PYTHONPATH; export PYTHONPATH
 PATH=$PYTHONUSERBASE/bin:$PATH; export PATH
+PATH=/software/miniconda/bin:$PATH; export PATH
 
 # for CMSSW
 source /cvmfs/cms.cern.ch/cmsset_default.sh
