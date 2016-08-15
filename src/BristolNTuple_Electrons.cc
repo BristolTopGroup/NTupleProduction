@@ -38,8 +38,6 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 	produces < std::vector<double> > (prefix + "DeltaPhiTrkSC" + suffix);
 	produces < std::vector<double> > (prefix + "DeltaEtaTrkSC" + suffix);
 	produces < std::vector<int> > (prefix + "NumberOfBrems" + suffix);
-	produces < std::vector<double> > (prefix + "mvaTrigV0" + suffix);
-	produces < std::vector<double> > (prefix + "mvaNonTrigV0" + suffix);
 
 	//electron isolation variables
 	produces < std::vector<double> > (prefix + "TrkIso03" + suffix);
@@ -138,8 +136,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > deltaPhiTrkSC(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > deltaEtaTrkSC(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > numberOfBrems(new std::vector<int>());
-	std::auto_ptr < std::vector<double> > mvaTrigV0(new std::vector<double>());
-	std::auto_ptr < std::vector<double> > mvaNonTrigV0(new std::vector<double>());
 
 	//electron isolation variables
 	std::auto_ptr < std::vector<double> > trkIso04(new std::vector<double>());
@@ -357,8 +353,6 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	iEvent.put(deltaPhiTrkSC, prefix + "DeltaPhiTrkSC" + suffix);
 	iEvent.put(deltaEtaTrkSC, prefix + "DeltaEtaTrkSC" + suffix);
 	iEvent.put(numberOfBrems, prefix + "NumberOfBrems" + suffix);
-	iEvent.put(mvaTrigV0, prefix + "mvaTrigV0" + suffix);
-	iEvent.put(mvaNonTrigV0, prefix + "mvaNonTrigV0" + suffix);
 
 	//electron isolation variables
 	iEvent.put(trkIso04, prefix + "TrkIso04" + suffix);
