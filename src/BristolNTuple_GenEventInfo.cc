@@ -38,7 +38,7 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 	produces <std::vector<double> > ( prefix_ + "systematicWeights" + suffix_ );
 	produces <std::vector<int> > ( prefix_ + "systematicWeightIDs" + suffix_ );
 
-	produces < std::vector<double> > (prefix_ + "PDFWeights" + suffix_);
+//	produces < std::vector<double> > (prefix_ + "PDFWeights" + suffix_);
 	produces < std::vector<int> > (prefix_ + "PileUpInteractions" + suffix_);
 	produces < std::vector<int> > (prefix_ + "NumberOfTrueInteractions" + suffix_);
 	produces < std::vector<int> > (prefix_ + "PileUpOriginBX" + suffix_);
