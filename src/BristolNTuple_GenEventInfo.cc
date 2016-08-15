@@ -138,7 +138,7 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	std::auto_ptr<std::vector<double> > systematicWeights(new std::vector<double>());
 	std::auto_ptr<std::vector<int> > systematicWeightIDs(new std::vector<int>());
 
-	std::auto_ptr < std::vector<double> > pdfWeights(new std::vector<double>());
+//	std::auto_ptr < std::vector<double> > pdfWeights(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > Number_interactions(new std::vector<int>());
 
 	std::auto_ptr < std::vector<int> > NumberOfTrueInteractions(new std::vector<int>());
@@ -481,7 +481,7 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	iEvent.put(centralLHEWeight, prefix_ + "centralLHEWeight" + suffix_);
 	iEvent.put(systematicWeights, prefix_ + "systematicWeights" + suffix_);
 	iEvent.put(systematicWeightIDs, prefix_ + "systematicWeightIDs" + suffix_);
-	iEvent.put(pdfWeights, prefix_ + "PDFWeights" + suffix_);
+//	iEvent.put(pdfWeights, prefix_ + "PDFWeights" + suffix_);
 	iEvent.put(Number_interactions, prefix_ + "PileUpInteractions" + suffix_);
 	iEvent.put(NumberOfTrueInteractions, prefix_ + "NumberOfTrueInteractions" + suffix_);
 	iEvent.put(OriginBX, prefix_ + "PileUpOriginBX" + suffix_);

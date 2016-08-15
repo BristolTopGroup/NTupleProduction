@@ -331,6 +331,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				py->push_back(it->py());
 				pz->push_back(it->pz());
 				energy->push_back(it->energy());
+				jec_vec->push_back(it->userFloat("JEC"));
 			}
 
 			//kinematic variables before corrections
