@@ -31,12 +31,13 @@ class Command(C):
         time_left = 0
 
         if is_valid:
-            _, stdout, _ = call(
+            _, stdout, stderr = call(
                 'voms-proxy-info --timeleft',
                 logger=LOG,
                 shell=True)
+            raw_output = stdout if not stdout == '' else stderr
             try:
-                time_left = int(stdout)
+                time_left = int(raw_output)
             except:
                 time_left = 0
                 msg = 'Proxy exists ({0}) but '.format(proxy)
