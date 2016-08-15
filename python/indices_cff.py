@@ -31,7 +31,7 @@ electronIndices = {
         }
     },
     'cleanedJetIndex': {
-        'original': 'electronUserData',
+        'original': 'jetUserData',
         'new': {
             'signal': 'goodJets',
             'controlRegion1': 'goodJetsEConversionRegion',
@@ -47,7 +47,7 @@ electronIndices = {
         }
     },
     'cleanedTightBJetIndex': {
-        'original': 'electronUserData',
+        'original': 'jetUserData',
         'new': {
             'signal': 'goodTightBJets',
             'controlRegion1': 'goodTightBJetsEConversionRegion',
@@ -81,7 +81,7 @@ muonIndices = {
         }
     },
     'cleanedJetIndex': {
-        'original': 'electronUserData',
+        'original': 'jetUserData',
         'new': {
             'signal': 'goodJets',
             'controlRegion1': 'goodJetsMuNonIsoR1Region',
@@ -97,7 +97,7 @@ muonIndices = {
         }
     },
     'cleanedTightBJetIndex': {
-        'original': 'electronUserData',
+        'original': 'jetUserData',
         'new': {
             'signal': 'goodTightBJets',
             'controlRegion1': 'goodTightBJetsMuNonIsoR1Region',
@@ -106,7 +106,7 @@ muonIndices = {
     }
 }
 muonRegions = {
-    'signal': 'TopPairMuonPlusJetsSelectionFilter',
+    'signal': 'TopPairMuonPlusJetsSelection',
     'controlRegion1': 'TopPairMuonPlusJetsQCDSelection1p5to3',
     'controlRegion2': 'TopPairMuonPlusJetsQCDSelection3toInf',
 }
