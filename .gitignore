@@ -13,3 +13,4 @@ workspace*
 .vagrant
 *.cmsgit-cache*
 docs/_build
+external
