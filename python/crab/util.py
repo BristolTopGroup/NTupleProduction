@@ -7,9 +7,8 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
-NTPROOT = os.environ['NTPROOT']
-CACHE = NTPROOT + '/workspace/cache'
-CRAB_CFG_PATH = NTPROOT + '/python/crab'
+from ntp import NTPROOT
+CRAB_CFG_PATH = os.path.join(NTPROOT, 'python', 'crab')
 
 
 def get_dataset(campaign, dataset_alias):

@@ -13,6 +13,7 @@ import logging
 import os
 from .. import Command as C
 from ntp.commands.setup import CMSSW_SRC
+from hepshell.interpreter import time_function
 
 LOG = logging.getLogger(__name__)
 
@@ -33,6 +34,7 @@ class Command(C):
     def __init__(self, path=__file__, doc=__doc__):
         super(Command, self).__init__(path, doc)
 
+    @time_function('merge', LOG)
     def run(self, args, variables):
         self.__prepare(args, variables)
         files = [os.path.abspath(f) for f in args]
@@ -81,7 +83,7 @@ class Command(C):
         )
 
         LOG.info("Merging files")
-        from ntp.interpreter import call
+        from hepshell.interpreter import call
         code, _, _ = call(
             [all_in_one], LOG, stdout_log_level=logging.INFO, shell=True)
 

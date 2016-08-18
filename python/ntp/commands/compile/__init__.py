@@ -11,7 +11,7 @@
 """
 import logging
 from .. import Command as C
-from ntp.interpreter import time_function
+from hepshell.interpreter import time_function
 
 LOG = logging.getLogger(__name__)
 
@@ -30,7 +30,6 @@ class Command(C):
         if not self.__can_run():
             return False
         from ..setup import CMSSW_SRC
-        import resource
         self.__prepare(args, variables)
         n_jobs = int(self.__variables['ncpu'])
         commands = [
@@ -43,7 +42,7 @@ class Command(C):
         all_in_one = ' && '.join(commands)
         all_in_one = all_in_one.format(CMSSW_SRC=CMSSW_SRC, n_jobs=n_jobs)
 
-        from ntp.interpreter import call
+        from hepshell.interpreter import call
         call(all_in_one, logger=LOG, shell=True)
 
         return True

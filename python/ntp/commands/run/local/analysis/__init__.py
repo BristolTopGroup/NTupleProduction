@@ -29,7 +29,7 @@ import glob
 import shutil
 
 from .. import Command as C
-from ntp.interpreter import time_function
+from hepshell.interpreter import time_function
 from ntp import NTPROOT
 from ntp.commands.setup import CMSSW_SRC, TMPDIR, RESULTDIR, LOGDIR
 from crab.util import find_input_files
@@ -327,7 +327,7 @@ class Command(C):
         )
 
         LOG.info("Executing BAT")
-        from ntp.interpreter import call
+        from hepshell.interpreter import call
         code, _, _ = call(
             [all_in_one], LOG, stdout_log_level=logging.INFO, shell=True)
         self.__move_output_files()

@@ -30,7 +30,7 @@ import subprocess
 import logging
 
 from .. import Command as C
-from ntp.interpreter import time_function
+from hepshell.interpreter import time_function
 from ntp import NTPROOT
 
 LOG = logging.getLogger(__name__)
@@ -144,5 +144,5 @@ class Command(C):
             tarball=tarball,
         )
 
-        from ntp.interpreter import call
+        from hepshell.interpreter import call
         call(all_in_one, logger=LOG, shell=True)

@@ -9,14 +9,14 @@ LOG = logging.getLogger(__name__)
 USER = get_user()
 
 # env variables
-if not 'NTPROOT' in os.environ:
+if not 'HEP_PROJECT_ROOT' in os.environ:
     import sys
-    print('Cannot find NTPROOT env variable. Did you "source bin/env.sh"?')
+    print('Cannot find HEP_PROJECT_ROOT env variable. Did you "source bin/env.sh"?')
     sys.exit(-1)
 
 # this is the NTupleVersion!
 __version__ = '0.0.8'
-NTPROOT = os.environ['NTPROOT']
+NTPROOT = os.environ['HEP_PROJECT_ROOT']
 WORKSPACE = os.path.join(NTPROOT, 'workspace')
 CRAB_WS = os.path.join(WORKSPACE, 'crab')
 TODAY = datetime.date.today().isoformat()

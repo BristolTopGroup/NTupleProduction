@@ -74,12 +74,12 @@ if [ -f /cvmfs/cms.cern.ch/crab3/crab.sh ]; then
 fi
 
 # for grid tools
-vomsInfo=`which voms-proxy-info` &> /dev/null
+vomsInfo=`which voms-proxy-info &> /dev/null`
 if [ "$vomsInfo" = "" ]; then
   if [ -f /cvmfs/grid.cern.ch/etc/profile.d/setup-cvmfs-ui.sh ]; then
 	source /cvmfs/grid.cern.ch/etc/profile.d/setup-cvmfs-ui.sh
   else
-    echo "Cannot find voms-proxy-info nor etup-cvmfs-ui.sh"
+    echo "Cannot find voms-proxy-info nor setup-cvmfs-ui.sh"
   fi
 fi
 

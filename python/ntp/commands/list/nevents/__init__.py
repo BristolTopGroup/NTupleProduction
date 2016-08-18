@@ -9,7 +9,7 @@ import logging
 import os
 from .. import Command as C
 from ntp.commands.setup import CMSSW_SRC
-from ntp.interpreter import time_function
+from hepshell.interpreter import time_function
 
 LOG = logging.getLogger(__name__)
 CURRENT_FOLDER = os.path.dirname(os.path.abspath(__file__))
@@ -49,7 +49,7 @@ class Command(C):
             input_file=input_file
         )
 
-        from ntp.interpreter import call
+        from hepshell.interpreter import call
         code, stdout, stderr = call(
             [all_in_one], LOG, stdout_log_level=logging.DEBUG, shell=True)
 

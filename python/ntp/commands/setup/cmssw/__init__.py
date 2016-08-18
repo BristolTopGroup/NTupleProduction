@@ -14,7 +14,7 @@
 """
 import logging
 from .. import Command as C
-from ntp.interpreter import time_function
+from hepshell.interpreter import time_function
 
 LOG = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ class Command(C):
             cmssw_version=self.__version
         )
 
-        from ntp.interpreter import call
+        from hepshell.interpreter import call
         call(all_in_one, logger=LOG, shell=True)
 
         return True

@@ -23,7 +23,7 @@
 import logging
 import os
 from .. import Command as C
-from ntp.interpreter import time_function
+from hepshell.interpreter import time_function
 from ntp import NTPROOT
 from ntp.commands.setup import RESULTDIR
 from crab.util import find_input_files
