@@ -7,10 +7,6 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
-from ntp import NTPROOT
-CRAB_CFG_PATH = os.path.join(NTPROOT, 'python', 'crab')
-
-
 def get_dataset(campaign, dataset_alias):
     samples = create_sample_list()
     if not campaign in samples:
@@ -54,17 +50,66 @@ def drop_das_fields(row):
 def get_files(campaign, dataset_alias):
     LOG.info("Searching for files of {0}/{1}".format(campaign, dataset_alias))
     files = []
+
     dataset = get_dataset(campaign, dataset_alias)
-    query = "file dataset={0}".format(dataset)
-    data = ask_das(query)
-    for row in data:
-        drop_das_fields(row)
-        if 'file' in row:
-            f = row['file'][0]['name']
-            files.append(f)
-    # TODO: cache the response
+
+    def __get_files_from_das():
+        query = "file dataset={0}".format(dataset)
+        data = ask_das(query)
+        for row in data:
+            drop_das_fields(row)
+            if 'file' in row:
+                f = row['file'][0]['name']
+                files.append(f)
+        data_cache = {
+            'dataset': dataset,
+            'files': files,
+        }
+        write_cache(campaign, dataset_alias, data_cache)
+
+    if cache_exists(campaign, dataset_alias):
+        data = read_cache(campaign, dataset_alias)
+        cached_dataset = data['dataset']
+        if dataset == cached_dataset:
+            files = data['files']
+        else:
+            __get_files_from_das()
+    else:
+        __get_files_from_das()
     LOG.info("Found {0} files".format(len(files)))
     return files
+
+
+def get_cache_file(campaign, dataset_alias):
+    from ntp import NTPROOT
+    CACHE = os.path.join(NTPROOT, 'workspace', 'cache', 'crab')
+    filename = '{0}.json'.format(dataset_alias)
+    path = os.path.join(CACHE, campaign, filename)
+    return path
+
+
+def cache_exists(campaign, dataset_alias):
+    return os.path.exists(get_cache_file(campaign, dataset_alias))
+
+
+def read_cache(campaign, dataset_alias):
+    cache_file = get_cache_file(campaign, dataset_alias)
+
+    data = {}
+    with open(cache_file) as f:
+        data = json.load(f)
+    return data
+
+
+def write_cache(campaign, dataset_alias, data):
+    cache_file = get_cache_file(campaign, dataset_alias)
+    cache_dir = os.path.dirname(cache_file)
+
+    if not os.path.exists(cache_dir):
+        os.makedirs(cache_dir)
+
+    with open(cache_file, 'w+') as f:
+        f.write(json.dumps(data, indent=4))
 
 
 def find_input_files(campaign, dataset, variables, logger):
