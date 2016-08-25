@@ -77,6 +77,22 @@ ntp merge $@
 
 """
 
+ANALYSIS_SETUP_SCRIPT = SETUP_SCRIPT
+
+ANALYSIS_SCRIPT = """
+ntp run local analysis $@ nevents=0
+
+"""
+
+ANALYSIS_MODES = [
+    'central',
+    'JES_down',
+    'JES_up',
+    'JetSmearing_down',
+    'JetSmearing_up',
+]
+
+
 LOG_STEM = 'ntp_job.$(cluster).$(process)'
 
 # file splitting for datasets containing 'key'
@@ -87,6 +103,10 @@ SPLITTING_BY_FILE = {
     'TT_': 5,
     'DEFAULT': 10,
 }
+
+
+# Analysis jobs: 1 file = 17s processing time
+N_FILES_PER_ANALYSIS_JOB = 50  # ~= 14 min
 
 
 class Command(C):
@@ -173,6 +193,9 @@ class Command(C):
         self.__merge_setup_script = os.path.join(
             self.__job_dir, 'merge_setup.sh')
         self.__merge_script = os.path.join(self.__job_dir, 'merge.sh')
+        self.__analysis_setup_script = os.path.join(
+            self.__job_dir, 'analysis_setup.sh')
+        self.__analysis_script = os.path.join(self.__job_dir, 'analysis.sh')
         self.__run_config = os.path.join(self.__job_dir, 'config.json')
 
     def __find_highest_numbering(self, folders):
@@ -259,6 +282,12 @@ class Command(C):
         with open(self.__merge_setup_script, 'w+') as f:
             f.write(MERGE_SETUP_SCRIPT)
 
+        with open(self.__analysis_setup_script, 'w+') as f:
+            f.write(ANALYSIS_SETUP_SCRIPT)
+
+        with open(self.__analysis_script, 'w+') as f:
+            f.write(ANALYSIS_SCRIPT)
+
         import json
         with open(self.__run_config, 'w+') as f:
             f.write(json.dumps(self.__config, indent=4))
@@ -271,17 +300,25 @@ class Command(C):
             dot='diamond.dot'
         )
 
-        layer_1_jobs = self.__create_layer1()
-        for job in layer_1_jobs:
+        # layer 1 - ntuples
+        ntuple_jobs = self.__create_ntuple_layer()
+        for job in ntuple_jobs:
             dag_man.add_job(job, retry=RETRY_COUNT)
 
-        layer_2_jobs = self.__create_layer2(layer_1_jobs)
-        for job in layer_2_jobs:
-            dag_man.add_job(job, requires=layer_1_jobs, retry=2)
+        # layer 2 - analysis
+        for mode in ANALYSIS_MODES:
+            analysis_jobs = self.__create_analysis_layer(ntuple_jobs, mode)
+            for job in analysis_jobs:
+                dag_man.add_job(job, requires=ntuple_jobs, retry=RETRY_COUNT)
+            # layer 2b
+            # for each analysis mode create 1 merged file
+            merge_jobs = self.__create_merge_layer(analysis_jobs, mode)
+            for job in merge_jobs:
+                dag_man.add_job(job, requires=analysis_jobs, retry=2)
 
         self.__dag = dag_man
 
-    def __create_layer1(self):
+    def __create_ntuple_layer(self):
         jobs = []
 
         run_config = self.__config
@@ -310,6 +347,8 @@ class Command(C):
             memory='1500MB'
         )
         parameters = 'files={files} output_file={output_file} {params}'
+        if run_config['lumiMask']:
+            parameters += ' json_url={0}'.format(run_config['lumiMask'])
         n_files_per_group = SPLITTING_BY_FILE['DEFAULT']
         for name, value in SPLITTING_BY_FILE.items():
             if name in run_config['inputDataset']:
@@ -318,7 +357,9 @@ class Command(C):
         grouped_files = self.__group_files(
             input_files, n_files_per_group)
         for i, f in enumerate(grouped_files):
-            output_file = 'ntuple_{0}.root'.format(i)
+            output_file = '{dataset}_ntuple_{job_number}.root'.format(
+                dataset=run_config['outputDatasetTag'],
+                job_number=i)
             args = parameters.format(
                 files=','.join(f),
                 output_file=output_file,
@@ -329,22 +370,24 @@ class Command(C):
             rel_out_file = os.path.join(rel_out_dir, output_file)
             rel_log_file = os.path.join(rel_log_dir, 'ntp.log')
             job = htc.Job(
-                name='job_{0}'.format(i),
+                name='ntuple_job_{0}'.format(i),
                 args=args,
                 output_files=[rel_out_file, rel_log_file])
             job_set.add_job(job)
             jobs.append(job)
         return jobs
 
-    def __create_layer2(self, layer1_jobs):
+    def __create_analysis_layer(self, ntuple_jobs, mode):
+        jobs = []
         run_config = self.__config
-
+        hdfs_store = run_config['outLFNDirBase'].replace('ntuple', 'atOutput')
+        hdfs_store += '/tmp'
         job_set = htc.JobSet(
-            exe=self.__merge_script,
+            exe=self.__analysis_script,
             copy_exe=True,
-            setup_script=self.__merge_setup_script,
+            setup_script=self.__analysis_setup_script,
             filename=os.path.join(
-                self.__job_dir, 'ntuple_merge.condor'),
+                self.__job_dir, 'ntuple_analysis.condor'),
             out_dir=self.__job_log_dir,
             out_file=LOG_STEM + '.out',
             err_dir=self.__job_log_dir,
@@ -354,7 +397,64 @@ class Command(C):
             share_exe_setup=True,
             common_input_files=self.__input_files,
             transfer_hdfs_input=False,
-            hdfs_store=run_config['outLFNDirBase'],
+            hdfs_store=hdfs_store,
+            certificate=self.REQUIRE_GRID_CERT,
+            cpus=1,
+            memory='1500MB'
+        )
+
+        parameters = 'files={files} output_file={output_file} mode={mode}'
+
+        input_files = [
+            f.hdfs for job in ntuple_jobs for f in job.output_file_mirrors if f.hdfs.endswith('.root')]
+        n_files_per_group = N_FILES_PER_ANALYSIS_JOB
+        grouped_files = self.__group_files(input_files, n_files_per_group)
+
+        for i, f in enumerate(grouped_files):
+            output_file = '{dataset}_atOutput_{mode}_{job_number}.root'.format(
+                dataset=run_config['outputDatasetTag'],
+                mode=mode,
+                job_number=i
+            )
+
+            args = parameters.format(
+                files=','.join(f),
+                output_file=output_file,
+                mode=mode,
+            )
+            rel_out_dir = os.path.relpath(RESULTDIR, NTPROOT)
+            rel_log_dir = os.path.relpath(LOGDIR, NTPROOT)
+            rel_out_file = os.path.join(rel_out_dir, output_file)
+            rel_log_file = os.path.join(rel_log_dir, 'ntp.log')
+            job = htc.Job(
+                name='analysis_{0}_job_{1}'.format(mode, i),
+                args=args,
+                output_files=[rel_out_file, rel_log_file])
+            job_set.add_job(job)
+            jobs.append(job)
+
+        return jobs
+
+    def __create_merge_layer(self, analysis_jobs, mode):
+        run_config = self.__config
+
+        hdfs_store = run_config['outLFNDirBase'].replace('ntuple', 'atOutput')
+        job_set = htc.JobSet(
+            exe=self.__merge_script,
+            copy_exe=True,
+            setup_script=self.__merge_setup_script,
+            filename=os.path.join(
+                self.__job_dir, 'analysis_merge.condor'),
+            out_dir=self.__job_log_dir,
+            out_file=LOG_STEM + '.out',
+            err_dir=self.__job_log_dir,
+            err_file=LOG_STEM + '.err',
+            log_dir=self.__job_log_dir,
+            log_file=LOG_STEM + '.log',
+            share_exe_setup=True,
+            common_input_files=self.__input_files,
+            transfer_hdfs_input=False,
+            hdfs_store=hdfs_store,
             certificate=self.REQUIRE_GRID_CERT,
             cpus=1,
             memory='1500MB'
@@ -364,7 +464,7 @@ class Command(C):
         output_file = '{0}.root'.format(run_config['outputDatasetTag'])
 
         all_output_files = [
-            f for job in layer1_jobs for f in job.output_file_mirrors]
+            f for job in analysis_jobs for f in job.output_file_mirrors]
         root_output_files = [
             f.hdfs for f in all_output_files if f.hdfs.endswith('.root')]
 
@@ -375,7 +475,7 @@ class Command(C):
         rel_log_dir = os.path.relpath(LOGDIR, NTPROOT)
         rel_log_file = os.path.join(rel_log_dir, 'ntp.log')
         job = htc.Job(
-            name='merge',
+            name='{0}_merge_job'.format(mode),
             args=args,
             output_files=[output_file, rel_log_file])
         job_set.add_job(job)

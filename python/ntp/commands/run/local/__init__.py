@@ -23,6 +23,8 @@
                       Default is 1000.
             noop:     'NO OPeration', will not run CMSSW. Default: false
             output_file: Name of the output file. Default: ntuple.root
+            json_url: URL to JSON file, e.g. https://cms-service-dqm.web.cern.ch/../..._JSON.txt
+                      Default: ''
 """
 from __future__ import print_function
 import os
@@ -36,7 +38,7 @@ from crab.util import find_input_files
 
 LOG = logging.getLogger(__name__)
 PSET = os.path.join(TMPDIR, 'pset.py')
-OUTPUT_FILE = os.path.join(RESULTDIR, 'ntuple.root')
+OUTPUT_FILE = os.path.join(RESULTDIR, '{ds}_ntuple.root')
 BTAG_CALIB_FILE = os.path.join(NTPROOT, 'data/BTagSF/CSVv2.csv')
 
 BASE = """
@@ -58,6 +60,11 @@ process.source.fileNames = cms.untracked.vstring(
 )
 
 process.jetUserData.btagCalibrationFile = cms.string('{BTAG_CALIB_FILE}')
+
+if '{JSON_URL}':
+    import FWCore.PythonUtilities.LumiList as LumiList
+    process.source.lumisToProcess = LumiList.LumiList(url = '{JSON_URL}').getVLuminosityBlockRange()
+
 """
 
 
@@ -69,8 +76,9 @@ class Command(C):
         'nevents': 1000,
         'files': '',
         'noop': False,
-        'output_file': OUTPUT_FILE,
+        'output_file': OUTPUT_FILE.format(ds='TTJets_PowhegPythia8'),
         'pset_template': BASE,
+        'json_url': '',
     }
 
     def __init__(self, path=__file__, doc=__doc__):
@@ -78,11 +86,14 @@ class Command(C):
 
     @time_function('run local', LOG)
     def run(self, args, variables):
+        output_file = None
         if 'output_file' in variables:
             output_file = os.path.join(RESULTDIR, variables['output_file'])
             if not output_file.endswith('.root'):
                 output_file += '.root'
-            variables['output_file'] = output_file
+        else:
+            output_file = OUTPUT_FILE.format(ds=variables['dataset'])
+        variables['output_file'] = output_file
 
         self.__prepare(args, variables)
         campaign = self.__variables['campaign']
@@ -130,7 +141,8 @@ class Command(C):
                 nevents=nevents,
                 input_files=input_files,
                 OUTPUT_FILE=self.__output_file,
-                BTAG_CALIB_FILE=BTAG_CALIB_FILE
+                BTAG_CALIB_FILE=BTAG_CALIB_FILE,
+                JSON_URL=self.__variables['json_url'],
             )
             f.write(content)
 

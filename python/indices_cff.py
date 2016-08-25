@@ -23,7 +23,7 @@ electronIndices = {
         }
     },
     'vetoMuonIndices': {
-        'original': 'muonUserData',
+        'original': 'globalOrTrackerMuons',
         'new': {
             'signal': 'vetoMuons',
             'controlRegion1': 'vetoMuons',
@@ -57,7 +57,7 @@ electronIndices = {
 }
 muonIndices = {
     'signalMuonIndices': {
-        'original': 'muonUserData',
+        'original': 'globalOrTrackerMuons',
         'new': {
             'signal': 'goodMuons',
             'controlRegion1': 'goodNonIsoR1Muons',
@@ -73,7 +73,7 @@ muonIndices = {
         }
     },
     'vetoMuonIndices': {
-        'original': 'muonUserData',
+        'original': 'globalOrTrackerMuons',
         'new': {
             'signal': 'vetoMuons',
             'controlRegion1': 'vetoMuons',
@@ -107,8 +107,8 @@ muonIndices = {
 }
 muonRegions = {
     'signal': 'TopPairMuonPlusJetsSelection',
-    'controlRegion1': 'TopPairMuonPlusJetsQCDSelection1p5to3',
-    'controlRegion2': 'TopPairMuonPlusJetsQCDSelection3toInf',
+    'controlRegion1': 'TopPairMuonPlusJetsQCDSelection3toInf',
+    'controlRegion2': 'TopPairMuonPlusJetsQCDSelection1p5to3',
 }
 electronRegions = {
     'signal': 'TopPairElectronPlusJetsSelection',

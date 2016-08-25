@@ -7,8 +7,8 @@
 """
 import logging
 import os
-import pwd
 from .. import Command as C
+from crab import das_client
 
 LOG = logging.getLogger(__name__)
 
@@ -22,11 +22,15 @@ class Command(C):
 
     def __init__(self, path=__file__, doc=__doc__):
         super(Command, self).__init__(path, doc)
+        self.__results = {
+            'timeleft_in_seconds': 0,
+            'timeleft_in_minutes': 0,
+        }
 
     def run(self, args, variables):
         self.__prepare(args, variables)
         from ntp.interpreter import call
-        proxy = '/tmp/x509up_u{0}'.format(pwd.getpwuid(os.getuid()).pw_uid)
+        proxy = das_client.x509()
         is_valid = os.path.isfile(proxy)
         time_left = 0
 

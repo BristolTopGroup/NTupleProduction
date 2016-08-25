@@ -319,6 +319,12 @@ from PhysicsTools.PatAlgos.cleaningLayer1.jetCleaner_cfi import cleanPatJets
 from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import selectedPatMuons
 from PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi import selectedPatElectrons
 
+
+process.globalOrTrackerMuons= selectedPatMuons.clone(
+    src='muonUserData',
+    cut='userInt("isGlobalOrTrackerMuon")',
+)
+
 process.goodMuons = selectedPatMuons.clone(
     src='muonUserData',
     cut='userInt("isGood")',

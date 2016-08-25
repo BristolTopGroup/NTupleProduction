@@ -37,6 +37,18 @@
 			"source": "ganga",
 			"destination": "",
 			"provider": "pip"
+		},
+		{
+			"name": "AnalysisSoftware",
+			"source": "https://github.com/BristolTopGroup/AnalysisSoftware.git",
+			"destination": "BristolAnalysis/Tools",
+			"provider": "git"
+		},
+		{
+			"name": "TopHitFit",
+			"source": "https://github.com/BristolTopGroup/TopHitFit.git",
+			"destination": "TopQuarkAnalysis/TopHitFit",
+			"provider": "git"
 		}
 	]
 }
