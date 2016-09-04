@@ -27,6 +27,16 @@ class Command(C):
     def __init__(self, path=__file__, doc=__doc__):
         super(Command, self).__init__(path, doc)
 
+        # condor specific
+        self.__have_fresh_tar_files = False
+        self.__input_files = []
+        self.__job_log_dir = ''
+        self.__job_dir = ''
+        self.__outdirs = []
+        self.__setup_script = 'setup.sh'
+        self.__run_script = 'run.sh'
+        self.__config_file = 'config.json'
+
     def run(self, args, variables):
         from .local import Command
         c = Command()

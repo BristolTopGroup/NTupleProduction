@@ -80,7 +80,7 @@ ntp merge $@
 ANALYSIS_SETUP_SCRIPT = SETUP_SCRIPT
 
 ANALYSIS_SCRIPT = """
-ntp run local analysis $@ nevents=0
+ntp run analysis $@ nevents=0
 
 """
 
