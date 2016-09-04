@@ -206,6 +206,8 @@ class Command(C):
 
     def __create_tar_file(self, args, variables):
         from ntp.commands.create.tarball import Command as TarCommand
+        if self.__variables['noop'] and TarCommand.tarballs_exist():
+            return
         c = TarCommand()
         c.run(args, variables)
         self.__text += c.__text
