@@ -42,7 +42,7 @@ class Command(C):
         campaign = self.__variables['campaign']
         dataset = self.__variables['dataset']
 
-        from ntp.interpreter import call
+        from hepshell.interpreter import call
         crab_config = CONFIG_PATH.format(
             NTPROOT=NTPROOT,
             campaign=campaign,

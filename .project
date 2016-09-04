@@ -3,6 +3,8 @@
 	<name>NTupleProduction</name>
 	<comment></comment>
 	<projects>
+		<project>CMSSW</project>
+		<project>hepshell</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

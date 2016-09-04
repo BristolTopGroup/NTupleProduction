@@ -3,30 +3,34 @@
 from __future__ import print_function
 import os
 import readline
-import string
-import shlex
 import sys
-import types
 import warnings
 
 warnings.filterwarnings("ignore")
 
 current_path = os.path.split(__file__)[0]
-# add ntp python path to PYTHONPATH
-path_to_ntp = os.path.join(current_path, '..', 'python')
-sys.path.append(path_to_ntp)
+# configure which commands to use. All modules in HEP_PROJECT_COMMANDS
+# that contain a `Command` class will be considered a valid command
+os.environ['HEP_PROJECT_COMMANDS'] = os.path.join(current_path, '..', 'python', 'ntp', 'commands')
+# the parent python module for all commands, e.g. myPackage.commands
+os.environ['HEP_PROJECT_BASE_MODULE'] = 'ntp.commands'
+# use basic commands provided by HEPSHELL
+os.environ['USE_HEPSHELL_COMMANDS'] = '1'
+# optional
+path_to_projects_python = os.path.join(current_path, '..', 'python')
+sys.path.append(path_to_projects_python)
 
-import ntp as custom_python_shell
+import hepshell
 
 if len(sys.argv) == 1:
     if not sys.stdout.isatty():
-        rc = custom_python_shell.run_command(['help'])
+        rc = hepshell.run_command(['help'])
         sys.exit(rc)
     else:
         os.environ['TERM'] = 'vt100'
         name_of_this_script = os.path.basename(sys.argv[0])
-        custom_python_shell.run_cli('{0} > '.format(name_of_this_script))
+        hepshell.run_cli('{0} > '.format(name_of_this_script))
 else:
     args = sys.argv[1:]
-    rc = custom_python_shell.run_command(args)
+    rc = hepshell.run_command(args)
     sys.exit(rc)

@@ -212,9 +212,9 @@ DATASETS = {
         "QCD_EMEnriched_300toInf": "/QCD_Pt-300toInf_EMEnriched_TuneCUETP8M1_13TeV_pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
         "SingleElectron_Run2016B_PromptReco_v2": "/SingleElectron/Run2016B-PromptReco-v2/MINIAOD",
         "SingleElectron_Run2016C_PromptReco_v2": "/SingleElectron/Run2016C-PromptReco-v2/MINIAOD",
-	"SingleElectron_Run2016D_PromptReco_v2": "/SingleElectron/Run2016D-PromptReco-v2/MINIAOD",
-	"SingleElectron_Run2016E_PromptReco_v2": "/SingleElectron/Run2016E-PromptReco-v2/MINIAOD",
-	"SingleElectron_Run2016F_PromptReco_v1": "/SingleElectron/Run2016F-PromptReco-v1/MINIAOD",
+        "SingleElectron_Run2016D_PromptReco_v2": "/SingleElectron/Run2016D-PromptReco-v2/MINIAOD",
+        "SingleElectron_Run2016E_PromptReco_v2": "/SingleElectron/Run2016E-PromptReco-v2/MINIAOD",
+        "SingleElectron_Run2016F_PromptReco_v1": "/SingleElectron/Run2016F-PromptReco-v1/MINIAOD",
         "SingleMuon_Run2016B_PromptReco_v2": "/SingleMuon/Run2016B-PromptReco-v2/MINIAOD",
         "SingleMuon_Run2016C_PromptReco_v2": "/SingleMuon/Run2016C-PromptReco-v2/MINIAOD",
         "SingleMuon_Run2016D_PromptReco_v2": "/SingleMuon/Run2016D-PromptReco-v2/MINIAOD",
@@ -258,8 +258,8 @@ def get_dataset_name(cfg):
 def create_sample_list():
     import os
     import glob
-    NTPROOT = os.environ['NTPROOT']
-    CRAB_CFG_DIR = NTPROOT + '/python/crab'
+    from ntp import NTPROOT
+    CRAB_CFG_DIR = os.path.join(NTPROOT, 'python', 'crab')
     cfgs = glob.glob(CRAB_CFG_DIR + '/*/*.py')
 
     samples = {}

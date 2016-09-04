@@ -8,7 +8,7 @@
 """
 import logging
 from .. import Command as C
-from ntp.interpreter import time_function
+from hepshell.interpreter import time_function
 
 LOG = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ class Command(C):
             'eval `/cvmfs/cms.cern.ch/common/scram runtime -sh`',
         ]
         from .. import DEPENDENCIES, CMSSW_SRC
-        from ntp.interpreter import call
+        from hepshell.interpreter import call
 
         rcs = []
         for dep in DEPENDENCIES:

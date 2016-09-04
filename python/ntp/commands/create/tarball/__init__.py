@@ -13,7 +13,7 @@ import sys
 import shutil
 
 from .. import Command as C
-from ntp.interpreter import time_function
+from hepshell.interpreter import time_function
 from ntp.commands.setup import CMSSW_SRC, TMPDIR, DESTINATION
 from ntp import NTPROOT
 
