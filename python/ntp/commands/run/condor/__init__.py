@@ -1,11 +1,6 @@
 """
-    run condor: Runs the n-tuple production on the a condor batch system.
-                All run commands require a valid grid certificate as they
-                either read data from the grid via XRootD or run on grid
-                resources.
-                The command will use python/run/miniAODToNTuple_cfg.py.
-                All unknown parameters will be bassed to 'ntp run local'
-                inside the condor job.
+    run condor: Runs 'ntp run condor ntuple', 'ntp run condor analysis' and
+                'ntp run condor merge' as a Directed Acyclic Graph workflow.
         Usage:
             run condor [campaign=<X>]  [dataset=<X>] [file=<path>]
 
@@ -30,7 +25,6 @@
 """
 from __future__ import print_function
 import os
-import getpass
 import logging
 import glob
 
@@ -38,6 +32,9 @@ from .. import Command as C
 from crab.util import get_files
 from ntp import NTPROOT
 from ntp.commands.setup import WORKSPACE, LOGDIR, CACHEDIR, RESULTDIR
+from ntp.utils import find_latest_iteration
+from ntp.utils.hdfs import HDFS_STORE_BASE
+
 
 LOG = logging.getLogger(__name__)
 
@@ -46,68 +43,8 @@ try:
 except:
     LOG.error('Could not import htcondenser')
 
-
 CONDOR_ROOT = os.path.join(WORKSPACE, 'condor')
-HDFS_STORE_BASE = "/hdfs/TopQuarkGroup/{user}".format(
-    user=getpass.getuser())
-
-RETRY_COUNT = 10
-
-SETUP_SCRIPT = """
-tar -xf ntp.tar.gz
-source bin/env.sh
-ntp setup from_tarball=cmssw_src.tar.gz
-
-"""
-
-RUN_SCRIPT = """
-ntp run local $@ nevents=-1
-
-"""
-
-MERGE_SETUP_SCRIPT = """
-tar -xf ntp.tar.gz
-source bin/env.sh
-ntp setup from_tarball=cmssw_src.tar.gz compile=0
-
-"""
-
-MERGE_SCRIPT = """
-ntp merge $@
-
-"""
-
-ANALYSIS_SETUP_SCRIPT = SETUP_SCRIPT
-
-ANALYSIS_SCRIPT = """
-ntp run local analysis $@ nevents=0
-
-"""
-
-ANALYSIS_MODES = [
-    'central',
-    'JES_down',
-    'JES_up',
-    'JetSmearing_down',
-    'JetSmearing_up',
-]
-
-
 LOG_STEM = 'ntp_job.$(cluster).$(process)'
-
-# file splitting for datasets containing 'key'
-SPLITTING_BY_FILE = {
-    'SingleElectron': 3,
-    'SingleMuon': 3,
-    'TTJet': 5,
-    'TT_': 5,
-    'DEFAULT': 10,
-}
-
-
-# Analysis jobs: 1 file = 17s processing time
-N_FILES_PER_ANALYSIS_JOB = 50  # ~= 14 min
-
 
 class Command(C):
 
@@ -122,11 +59,28 @@ class Command(C):
 
     def __init__(self, path=__file__, doc=__doc__):
         super(Command, self).__init__(path, doc)
+        # used by sub-commands
         self.__input_files = []
         self.__outdirs = []
+        self.__output_files = []
+        self.__root_output_files = []
+        self.__job_log_dir = ''
+        self.__job_dir = ''
+        self.__config = {}
 
     def run(self, args, variables):
+        # sub commands
+        from .ntuple import Command as NTupleCommand
+        from ..analysis.DICE import Command as AnalysisCommand
+        from .merge import Command as MergeCommand
+        self.__ntuple = NTupleCommand()
+        self.__analysis = AnalysisCommand()
+        self.__merge = MergeCommand()
+
         self.__prepare(args, variables)
+        self.__ntuple.__prepare(args, variables)
+        self.__analysis.__prepare(args, variables)
+        self.__merge.__prepare(args, variables)
 
         campaign = self.__variables['campaign']
         chosen_dataset = self.__variables['dataset']
@@ -150,22 +104,22 @@ class Command(C):
         # to check status:
         msg = 'To check the status you can run\n'
         if len(self.__outdirs) == 1:
-            msg += 'DAGstatus {0}/diamond.status -s'.format(self.__outdirs[0])
+            msg += 'DAGstatus {0}/*.status -s'.format(self.__outdirs[0])
         else:
-            msg += 'DAGstatus workspace/condor/*/diamond.status -s'
+            msg += 'DAGstatus workspace/condor/*/*.status -s'
         LOG.info(msg)
         # ntp condor status
 
         return True
 
     def __run_dataset(self, campaign, dataset):
-        self.__set_job_dirs(campaign, dataset)
+        self.set_job_dirs(campaign, dataset)
 
         self.__create_folders()
 
         # which dataset, file, etc
-        self.__get_run_config(campaign, dataset)
-        self.__write_files()
+        self.__set_run_config(campaign, dataset)
+
         # create DAG for condor
         self.__create_dag()
 
@@ -175,35 +129,16 @@ class Command(C):
 #             for job in self.__dag:
 #                 print(job.name, 'running:', job.manager.exe, ' '.join(job.args))
 
-    def __set_job_dirs(self, campaign, dataset):
-        out_dir = os.path.join(CONDOR_ROOT, campaign, dataset)
-
-        existing_dirs = glob.glob(out_dir + '_*')
-        latest = 1
-        if existing_dirs:
-            latest = self.__find_highest_numbering(existing_dirs)
-            latest += 1
-        out_dir += '_{0}'.format(latest)
+    def set_job_dirs(self, campaign, dataset):
+        out_dir = os.path.join(CONDOR_ROOT, campaign, dataset, 'workflow')
+        out_dir = self.__get_latest_outdir(out_dir)
 
         self.__job_dir = out_dir
-        self.__outdirs.append(out_dir)
         self.__job_log_dir = os.path.join(self.__job_dir, 'log')
-        self.__setup_script = os.path.join(self.__job_dir, 'setup.sh')
-        self.__run_script = os.path.join(self.__job_dir, 'run.sh')
-        self.__merge_setup_script = os.path.join(
-            self.__job_dir, 'merge_setup.sh')
-        self.__merge_script = os.path.join(self.__job_dir, 'merge.sh')
-        self.__analysis_setup_script = os.path.join(
-            self.__job_dir, 'analysis_setup.sh')
-        self.__analysis_script = os.path.join(self.__job_dir, 'analysis.sh')
-        self.__run_config = os.path.join(self.__job_dir, 'config.json')
 
-    def __find_highest_numbering(self, folders):
-        numbers = []
-        for f in folders:
-            number = int(f.split('_')[-1])
-            numbers.append(number)
-        return max(numbers)
+        self.__ntuple.set_job_dir(out_dir)
+        self.__analysis.set_job_dir(out_dir)
+        self.__merge.set_job_dir(out_dir)
 
     def __create_folders(self):
         dirs = [CONDOR_ROOT, self.__job_dir, self.__job_log_dir]
@@ -213,15 +148,30 @@ class Command(C):
 
     def __create_tar_file(self, args, variables):
         from ntp.commands.create.tarball import Command as TarCommand
+        if self.__variables['noop'] and TarCommand.tarballs_exist():
+            return
         c = TarCommand()
         c.run(args, variables)
         self.__text += c.__text
         self.__input_files.extend(c.get_tar_files())
 
-    def __get_run_config(self, campaign, dataset):
+    def __set_run_config(self, campaign, dataset):
+        from copy import deepcopy
+        self.__config = self.__get_crab_config(campaign, dataset)
+        self.__ntuple.__config = deepcopy(self.__config)
+        self.__analysis.__config = deepcopy(self.__config)
+        
+        output_dir = self.__config['outLFNDirBase']
+        self.__analysis.__config['outputDir'] = output_dir.replace(
+            'ntuple', 'atOutput'
+        )
+        self.__merge.__config = deepcopy(self.__config)
+
+    def __get_crab_config(self, campaign, dataset):
         from crab.util import find_input_files
         from crab import get_config
-        run_config = {
+        from crab.base import __version__ as ntuple_version
+        config = {
             'requestName': 'Test',
             'outputDatasetTag': 'Test',
             'inputDataset': 'Test',
@@ -229,8 +179,9 @@ class Command(C):
             'unitsPerJob': 1,
             'outLFNDirBase': os.path.join(HDFS_STORE_BASE, 'ntuple'),
             'lumiMask': '',
-            'pyCfgParams': None,
+            'pyCfgParams': [],
             'files': [],
+            'ntuple_version': ntuple_version,
         }
 
         using_local_files = self.__variables['files'] != ''
@@ -238,23 +189,23 @@ class Command(C):
             campaign, dataset, self.__variables, LOG)
 
         if not using_local_files:
-            run_config = get_config(campaign, dataset)
-            run_config['outLFNDirBase'] = self.__replace_output_dir(run_config)
+            config = get_config(campaign, dataset)
+            config['outLFNDirBase'] = self.__replace_output_dir(config)
 
-        run_config['files'] = input_files
+        config['files'] = input_files
         parameters = self.__extract_params()
-        if run_config['pyCfgParams']:
+        if config['pyCfgParams']:
             params = '{parameters} {cfg_params}'.format(
                 parameters=parameters,
-                cfg_params=' '.join(run_config['pyCfgParams']),
+                cfg_params=' '.join(config['pyCfgParams']),
             )
-            run_config['pyCfgParams'] = params
+            config['pyCfgParams'] = params
         else:
-            run_config['pyCfgParams'] = parameters
+            config['pyCfgParams'] = parameters
 
         LOG.info('Retrieved CRAB config')
 
-        self.__config = run_config
+        return config
 
     def __replace_output_dir(self, run_config):
         output = run_config['outLFNDirBase']
@@ -270,30 +221,15 @@ class Command(C):
         return output
 
     def __write_files(self):
-        with open(self.__setup_script, 'w+') as f:
-            f.write(SETUP_SCRIPT)
-
-        with open(self.__run_script, 'w+') as f:
-            f.write(RUN_SCRIPT)
-
-        with open(self.__merge_script, 'w+') as f:
-            f.write(MERGE_SCRIPT)
-
-        with open(self.__merge_setup_script, 'w+') as f:
-            f.write(MERGE_SETUP_SCRIPT)
-
-        with open(self.__analysis_setup_script, 'w+') as f:
-            f.write(ANALYSIS_SETUP_SCRIPT)
-
-        with open(self.__analysis_script, 'w+') as f:
-            f.write(ANALYSIS_SCRIPT)
-
-        import json
-        with open(self.__run_config, 'w+') as f:
-            f.write(json.dumps(self.__config, indent=4))
+        self.__ntuple.write_job_files()
+        self.__analysis.write_job_files()
+        self.__merge.write_job_files()
 
     def __create_dag(self):
         """ Creates a Directional Acyclic Grag (DAG) for condor """
+        from .ntuple import RETRY_COUNT as NTUPLE_RETRY_COUNT
+        from .analysis import RETRY_COUNT as ANALYSIS_RETRY_COUNT
+        from .merge import RETRY_COUNT as MERGE_RETRY_COUNT
         dag_man = htc.DAGMan(
             filename=os.path.join(self.__job_dir, 'diamond.dag'),
             status_file=os.path.join(self.__job_dir, 'diamond.status'),
@@ -301,189 +237,45 @@ class Command(C):
         )
 
         # layer 1 - ntuples
-        ntuple_jobs = self.__create_ntuple_layer()
+        ntuple_jobs = self.__ntuple.create_job_layer(self.__config['files'])
         for job in ntuple_jobs:
-            dag_man.add_job(job, retry=RETRY_COUNT)
+            dag_man.add_job(job, retry=NTUPLE_RETRY_COUNT)
+
+        ntuple_output_files = self.__ntuple.get_root_output_files()
 
         # layer 2 - analysis
+        from .analysis import ANALYSIS_MODES
+        self.__analysis.__config['files'] = ntuple_output_files
         for mode in ANALYSIS_MODES:
-            analysis_jobs = self.__create_analysis_layer(ntuple_jobs, mode)
+            analysis_jobs = self.__analysis.create_job_layer(
+                ntuple_output_files, mode)
             for job in analysis_jobs:
-                dag_man.add_job(job, requires=ntuple_jobs, retry=RETRY_COUNT)
+                dag_man.add_job(
+                    job, requires=ntuple_jobs, retry=ANALYSIS_RETRY_COUNT)
+
+            analysis_output_files = self.__analysis.get_root_output_files()
             # layer 2b
             # for each analysis mode create 1 merged file
-            merge_jobs = self.__create_merge_layer(analysis_jobs, mode)
+            merge_jobs = self.__merge.create_job_layer(
+                input_files=analysis_output_files,
+                mode=mode
+            )
             for job in merge_jobs:
-                dag_man.add_job(job, requires=analysis_jobs, retry=2)
+                dag_man.add_job(
+                    job, requires=analysis_jobs, retry=MERGE_RETRY_COUNT)
 
         self.__dag = dag_man
+        
+        self.__write_files()
 
-    def __create_ntuple_layer(self):
-        jobs = []
+    def get_root_output_files(self):
+        return self.__root_output_files
 
-        run_config = self.__config
-        input_files = run_config['files']
-        if self.__variables['test']:
-            input_files = [input_files[0]]
-
-        job_set = htc.JobSet(
-            exe=self.__run_script,
-            copy_exe=True,
-            setup_script=self.__setup_script,
-            filename=os.path.join(
-                self.__job_dir, 'ntuple_production.condor'),
-            out_dir=self.__job_log_dir,
-            out_file=LOG_STEM + '.out',
-            err_dir=self.__job_log_dir,
-            err_file=LOG_STEM + '.err',
-            log_dir=self.__job_log_dir,
-            log_file=LOG_STEM + '.log',
-            share_exe_setup=True,
-            common_input_files=self.__input_files,
-            transfer_hdfs_input=False,
-            hdfs_store=run_config['outLFNDirBase'] + '/tmp',
-            certificate=self.REQUIRE_GRID_CERT,
-            cpus=1,
-            memory='1500MB'
-        )
-        parameters = 'files={files} output_file={output_file} {params}'
-        if run_config['lumiMask']:
-            parameters += ' json_url={0}'.format(run_config['lumiMask'])
-        n_files_per_group = SPLITTING_BY_FILE['DEFAULT']
-        for name, value in SPLITTING_BY_FILE.items():
-            if name in run_config['inputDataset']:
-                n_files_per_group = value
-
-        grouped_files = self.__group_files(
-            input_files, n_files_per_group)
-        for i, f in enumerate(grouped_files):
-            output_file = '{dataset}_ntuple_{job_number}.root'.format(
-                dataset=run_config['outputDatasetTag'],
-                job_number=i)
-            args = parameters.format(
-                files=','.join(f),
-                output_file=output_file,
-                params=run_config['pyCfgParams']
-            )
-            rel_out_dir = os.path.relpath(RESULTDIR, NTPROOT)
-            rel_log_dir = os.path.relpath(LOGDIR, NTPROOT)
-            rel_out_file = os.path.join(rel_out_dir, output_file)
-            rel_log_file = os.path.join(rel_log_dir, 'ntp.log')
-            job = htc.Job(
-                name='ntuple_job_{0}'.format(i),
-                args=args,
-                output_files=[rel_out_file, rel_log_file])
-            job_set.add_job(job)
-            jobs.append(job)
-        return jobs
-
-    def __create_analysis_layer(self, ntuple_jobs, mode):
-        jobs = []
-        run_config = self.__config
-        hdfs_store = run_config['outLFNDirBase'].replace('ntuple', 'atOutput')
-        hdfs_store += '/tmp'
-        job_set = htc.JobSet(
-            exe=self.__analysis_script,
-            copy_exe=True,
-            setup_script=self.__analysis_setup_script,
-            filename=os.path.join(
-                self.__job_dir, 'ntuple_analysis.condor'),
-            out_dir=self.__job_log_dir,
-            out_file=LOG_STEM + '.out',
-            err_dir=self.__job_log_dir,
-            err_file=LOG_STEM + '.err',
-            log_dir=self.__job_log_dir,
-            log_file=LOG_STEM + '.log',
-            share_exe_setup=True,
-            common_input_files=self.__input_files,
-            transfer_hdfs_input=False,
-            hdfs_store=hdfs_store,
-            certificate=self.REQUIRE_GRID_CERT,
-            cpus=1,
-            memory='1500MB'
-        )
-
-        parameters = 'files={files} output_file={output_file} mode={mode}'
-
-        input_files = [
-            f.hdfs for job in ntuple_jobs for f in job.output_file_mirrors if f.hdfs.endswith('.root')]
-        n_files_per_group = N_FILES_PER_ANALYSIS_JOB
-        grouped_files = self.__group_files(input_files, n_files_per_group)
-
-        for i, f in enumerate(grouped_files):
-            output_file = '{dataset}_atOutput_{mode}_{job_number}.root'.format(
-                dataset=run_config['outputDatasetTag'],
-                mode=mode,
-                job_number=i
-            )
-
-            args = parameters.format(
-                files=','.join(f),
-                output_file=output_file,
-                mode=mode,
-            )
-            rel_out_dir = os.path.relpath(RESULTDIR, NTPROOT)
-            rel_log_dir = os.path.relpath(LOGDIR, NTPROOT)
-            rel_out_file = os.path.join(rel_out_dir, output_file)
-            rel_log_file = os.path.join(rel_log_dir, 'ntp.log')
-            job = htc.Job(
-                name='analysis_{0}_job_{1}'.format(mode, i),
-                args=args,
-                output_files=[rel_out_file, rel_log_file])
-            job_set.add_job(job)
-            jobs.append(job)
-
-        return jobs
-
-    def __create_merge_layer(self, analysis_jobs, mode):
-        run_config = self.__config
-
-        hdfs_store = run_config['outLFNDirBase'].replace('ntuple', 'atOutput')
-        job_set = htc.JobSet(
-            exe=self.__merge_script,
-            copy_exe=True,
-            setup_script=self.__merge_setup_script,
-            filename=os.path.join(
-                self.__job_dir, 'analysis_merge.condor'),
-            out_dir=self.__job_log_dir,
-            out_file=LOG_STEM + '.out',
-            err_dir=self.__job_log_dir,
-            err_file=LOG_STEM + '.err',
-            log_dir=self.__job_log_dir,
-            log_file=LOG_STEM + '.log',
-            share_exe_setup=True,
-            common_input_files=self.__input_files,
-            transfer_hdfs_input=False,
-            hdfs_store=hdfs_store,
-            certificate=self.REQUIRE_GRID_CERT,
-            cpus=1,
-            memory='1500MB'
-        )
-
-        parameters = '{files} output_file={output_file}'
-        output_file = '{0}.root'.format(run_config['outputDatasetTag'])
-
-        all_output_files = [
-            f for job in analysis_jobs for f in job.output_file_mirrors]
-        root_output_files = [
-            f.hdfs for f in all_output_files if f.hdfs.endswith('.root')]
-
-        args = parameters.format(
-            files=' '.join(root_output_files),
-            output_file=output_file,
-        )
-        rel_log_dir = os.path.relpath(LOGDIR, NTPROOT)
-        rel_log_file = os.path.join(rel_log_dir, 'ntp.log')
-        job = htc.Job(
-            name='{0}_merge_job'.format(mode),
-            args=args,
-            output_files=[output_file, rel_log_file])
-        job_set.add_job(job)
-
-        return [job]
-
-    def __group_files(self, input_files, n_files_per_group):
-        N = n_files_per_group
-        grouped_files = [input_files[n:n + N]
-                         for n in range(0, len(input_files), N)]
-        return grouped_files
+    def __get_latest_outdir(self, out_dir):
+        existing_dirs = glob.glob(out_dir + '_*')
+        latest = 1
+        if existing_dirs:
+            latest = find_latest_iteration(existing_dirs)
+            latest += 1
+        out_dir += '_{0}'.format(latest)
+        return out_dir

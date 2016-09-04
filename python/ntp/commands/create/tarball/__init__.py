@@ -113,3 +113,11 @@ class Command(C):
 
     def get_tar_files(self):
         return self.__tar_files
+
+    @staticmethod
+    def tarballs_exist():
+        cmssw_tars = [CMSSW_TAR + '.tar', CMSSW_TAR + '.tar.gz']
+        cmssw_exists = any([os.path.exists(p) for p in cmssw_tars])
+        ntp_tars = [NTP_TAR + '.tar', NTP_TAR + '.tar.gz']
+        ntp_exists = any([os.path.exists(p) for p in ntp_tars])
+        return cmssw_exists and ntp_exists

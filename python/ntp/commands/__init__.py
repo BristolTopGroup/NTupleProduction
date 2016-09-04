@@ -21,6 +21,7 @@ class Command(object):
         self.__doc = doc
         self.__text = ''
         self.__variables = copy.deepcopy(self.DEFAULTS)
+        self.__args = []
         self.__results = {}
 
     def __can_run(self):

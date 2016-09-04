@@ -30,7 +30,6 @@ class Command(C):
         if not self.__can_run():
             return False
         from ..setup import CMSSW_SRC
-        import resource
         self.__prepare(args, variables)
         n_jobs = int(self.__variables['ncpu'])
         commands = [
