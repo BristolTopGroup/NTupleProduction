@@ -204,15 +204,6 @@ class Command(C):
             if not os.path.exists(d):
                 os.makedirs(d)
 
-    def __create_tar_file(self, args, variables):
-        from ntp.commands.create.tarball import Command as TarCommand
-        if self.__variables['noop'] and TarCommand.tarballs_exist():
-            return
-        c = TarCommand()
-        c.run(args, variables)
-        self.__text += c.__text
-        self.__input_files.extend(c.get_tar_files())
-
     def __get_run_config(self, campaign, dataset):
         from crab.util import find_input_files
         from crab import get_config
