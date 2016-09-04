@@ -38,6 +38,8 @@ from .. import Command as C
 from crab.util import get_files
 from ntp import NTPROOT
 from ntp.commands.setup import WORKSPACE, LOGDIR, CACHEDIR, RESULTDIR
+from ntp.utils import find_latest_iteration, make_even_chunks
+from ntp.utils.hdfs import HDFS_STORE_BASE
 
 LOG = logging.getLogger(__name__)
 
@@ -48,8 +50,6 @@ except:
 
 
 CONDOR_ROOT = os.path.join(WORKSPACE, 'condor')
-HDFS_STORE_BASE = "/hdfs/TopQuarkGroup/{user}".format(
-    user=getpass.getuser())
 
 RETRY_COUNT = 10
 
@@ -181,7 +181,7 @@ class Command(C):
         existing_dirs = glob.glob(out_dir + '_*')
         latest = 1
         if existing_dirs:
-            latest = self.__find_highest_numbering(existing_dirs)
+            latest = find_latest_iteration(existing_dirs)
             latest += 1
         out_dir += '_{0}'.format(latest)
 
@@ -197,13 +197,6 @@ class Command(C):
             self.__job_dir, 'analysis_setup.sh')
         self.__analysis_script = os.path.join(self.__job_dir, 'analysis.sh')
         self.__run_config = os.path.join(self.__job_dir, 'config.json')
-
-    def __find_highest_numbering(self, folders):
-        numbers = []
-        for f in folders:
-            number = int(f.split('_')[-1])
-            numbers.append(number)
-        return max(numbers)
 
     def __create_folders(self):
         dirs = [CONDOR_ROOT, self.__job_dir, self.__job_log_dir]
@@ -354,8 +347,7 @@ class Command(C):
             if name in run_config['inputDataset']:
                 n_files_per_group = value
 
-        grouped_files = self.__group_files(
-            input_files, n_files_per_group)
+        grouped_files = make_even_chunks(input_files, n_files_per_group)
         for i, f in enumerate(grouped_files):
             output_file = '{dataset}_ntuple_{job_number}.root'.format(
                 dataset=run_config['outputDatasetTag'],
@@ -481,9 +473,3 @@ class Command(C):
         job_set.add_job(job)
 
         return [job]
-
-    def __group_files(self, input_files, n_files_per_group):
-        N = n_files_per_group
-        grouped_files = [input_files[n:n + N]
-                         for n in range(0, len(input_files), N)]
-        return grouped_files
