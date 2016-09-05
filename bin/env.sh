@@ -75,9 +75,11 @@ fi
 
 # for grid tools
 vomsInfo=`which voms-proxy-info &> /dev/null`
-if [ "$vomsInfo" = "" ]; then
+if [ "$vomsInfo" == "" ]; then
   if [ -f /cvmfs/grid.cern.ch/etc/profile.d/setup-cvmfs-ui.sh ]; then
 	source /cvmfs/grid.cern.ch/etc/profile.d/setup-cvmfs-ui.sh
+	# the UI uses an old java version, we do not want that
+	unset JAVA_HOME
   else
     echo "Cannot find voms-proxy-info nor setup-cvmfs-ui.sh"
   fi
@@ -99,6 +101,8 @@ if [ ! -d "${HEP_PROJECT_ROOT}/external/miniconda" ] ; then
 	# python modules
 	pip install -U python-cjson
 	pip install -U git+https://github.com/kreczko/hepshell.git
+	# clean the cache (downloaded tarballs)
+	conda clean -t -y
 else
 	PATH=${HEP_PROJECT_ROOT}/external/miniconda/bin:$PATH; export PATH
 fi
