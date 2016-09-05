@@ -90,7 +90,10 @@ class Command(C):
         ignore.append(os.path.join(NTPROOT, 'data/test'))
 
         for directory, dst in directories_to_copy:
-            self.__make_snapshot(directory, dst, *ignore)
+            # this check is only relevant when creating a tarball
+            # of a tarball install
+            if not os.path.exists(dst):
+                self.__make_snapshot(directory, dst, *ignore)
 
     def __prepare_ntp(self):
         ignore = ['data', '.git*', 'workspace*', '*.root', '.*']
