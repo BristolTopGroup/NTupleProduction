@@ -41,3 +41,22 @@ def find_latest_iteration(directories):
         number = int(d.split('_')[-1])
         numbers.append(number)
     return max(numbers)
+
+
+def read(*names, **kwargs):
+    import io, os
+    with io.open(
+        os.path.join(os.path.dirname(__file__), *names),
+        encoding=kwargs.get("encoding", "utf8")
+    ) as fp:
+        return fp.read()
+
+
+def find_version(*file_path):
+    import re
+    version_file = read(*file_path)
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
+                              version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
