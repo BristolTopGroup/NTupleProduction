@@ -17,8 +17,9 @@ from hepshell.interpreter import time_function
 from ntp.commands.setup import CMSSW_SRC, TMPDIR, DESTINATION
 from ntp import NTPROOT
 
-CMSSW_TAR = os.path.join(TMPDIR, 'cmssw_src')
+CMSSW_TAR = os.path.join(TMPDIR, 'cmssw')
 NTP_TAR = os.path.join(TMPDIR, 'ntp')
+CMSSW_BASE = os.path.join(CMSSW_SRC, '../')
 
 LOG = logging.getLogger(__name__)
 
@@ -42,12 +43,10 @@ class Command(C):
             CMSSW_TAR, CMSSW_TAR + '.tar', CMSSW_TAR + '.tar.gz',
             NTP_TAR, NTP_TAR + '.tar', NTP_TAR + '.tar.gz',
         )
-        test_data = os.path.join(CMSSW_SRC, DESTINATION, 'data/test')
-        self.__make_snapshot(
-            CMSSW_SRC, CMSSW_TAR, '.git*', test_data)
-        self.__make_snapshot(
-            NTPROOT, NTP_TAR, '.git*', NTPROOT + '/data/test',
-            NTPROOT + '/workspace*',  NTPROOT + '/*.root', '.*')
+
+        self.__prepare_cmssw_libraries()
+        self.__prepare_cmssw_src()
+        self.__prepare_ntp()
 
         self.__create_tar(CMSSW_TAR)
         self.__create_tar(NTP_TAR)
@@ -56,6 +55,49 @@ class Command(C):
             self.__cleanup(CMSSW_TAR, NTP_TAR)
 
         return True
+
+    def __prepare_cmssw_libraries(self):
+        directories = ['bin','lib', 'biglib', 'module']
+        for d in directories:
+            path = os.path.join(CMSSW_BASE, d)
+            LOG.debug('Checking directory {0}'.format(path))
+            if os.path.exists(path):
+                LOG.debug('Adding directory {0} to archive'.format(path))
+                dst = os.path.join(CMSSW_TAR, d)
+                self.__make_snapshot(path, dst)
+
+    def __prepare_cmssw_src(self):
+        # Note that directories are only looked-for and added under the src/ folder.
+        # /data/ subdirs contain data files needed by the code
+        # /interface/ subdirs contain C++ header files needed e.g. by ROOT6
+        directories = ['data', 'interface', 'python']
+
+        directories_to_copy = []
+        dst_base = os.path.join(CMSSW_TAR, 'src')
+        for root, _, _ in os.walk(CMSSW_SRC):
+            if os.path.basename(root) in directories:
+                dst = root.replace(CMSSW_SRC, dst_base)
+                directories_to_copy.append((root, dst))
+        # now NTP bits
+        for directory in directories:
+            ntp_path = os.path.join(NTPROOT, directory)
+            dst = ntp_path.replace(
+                NTPROOT, os.path.join(CMSSW_TAR, 'src', DESTINATION))
+            if os.path.exists(ntp_path):
+                directories_to_copy.append((ntp_path, dst))
+
+        ignore = []
+        ignore.append(os.path.join(NTPROOT, 'data/test'))
+
+        for directory, dst in directories_to_copy:
+            self.__make_snapshot(directory, dst, *ignore)
+
+    def __prepare_ntp(self):
+        ignore = ['data', '.git*', 'workspace*', '*.root', '.*']
+        ignore.extend(['src', 'plugins', 'docs', 'interface'])
+        ignore = [os.path.join(NTPROOT, i) for i in ignore]
+        ignore.append('git-*')
+        self.__make_snapshot(NTPROOT, NTP_TAR, *ignore)
 
     def __ignore(self, *patterns):
         import fnmatch
@@ -79,7 +121,7 @@ class Command(C):
         return _ignore_patterns
 
     def __make_snapshot(self, src, dst, *ignore):
-        LOG.debug('Making snapshot of {0}'.format(src))
+        LOG.debug('Making snapshot of {0} -> {1}'.format(src, dst))
         ignore_func = self.__ignore(*ignore)
         shutil.copytree(src, dst, ignore=ignore_func)
 

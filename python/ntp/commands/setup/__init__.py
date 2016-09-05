@@ -42,7 +42,6 @@ TMPDIR = os.path.join(WORKSPACE, 'tmp')
 
 
 def get_metadata():
-    metadata = {}
     metadata_file = os.path.join(NTPROOT, 'metadata.json')
     with open(metadata_file) as metadata_file:
         metadata = json.load(metadata_file)
@@ -50,7 +49,8 @@ def get_metadata():
 
 METADATA = get_metadata()
 CMSSW_VERSION = METADATA['cmssw_version']
-CMSSW_SRC = os.path.join(WORKSPACE, '{0}/src'.format(CMSSW_VERSION))
+CMSSW_BASE = os.path.join(WORKSPACE, CMSSW_VERSION)
+CMSSW_SRC = os.path.join(CMSSW_BASE, 'src')
 DEPENDENCIES = METADATA['dependencies']
 LINKS = METADATA['links']
 SCRAM_ARCH = METADATA['scram_arch']
@@ -133,13 +133,15 @@ class Command(C):
 
     def __extract_tarball(self, tarball):
         commands = [
-            'cd {CMSSW_SRC}',
+            'cd {CMSSW_BASE}',
             'tar xzf {tarball}',
+            'cd {CMSSW_SRC}',
             'echo "{tarball}" > .tarball_setup'
         ]
 
         all_in_one = ' && '.join(commands)
         all_in_one = all_in_one.format(
+            CMSSW_BASE=CMSSW_BASE,
             CMSSW_SRC=CMSSW_SRC,
             tarball=tarball,
         )
