@@ -56,7 +56,7 @@ RETRY_COUNT = 10
 SETUP_SCRIPT = """
 tar -xf ntp.tar.gz
 source bin/env.sh
-ntp setup from_tarball=cmssw_src.tar.gz
+ntp setup from_tarball=cmssw.tar.gz
 
 """
 
@@ -68,7 +68,7 @@ ntp run local $@ nevents=-1
 MERGE_SETUP_SCRIPT = """
 tar -xf ntp.tar.gz
 source bin/env.sh
-ntp setup from_tarball=cmssw_src.tar.gz compile=0
+ntp setup from_tarball=cmssw.tar.gz compile=0
 
 """
 
