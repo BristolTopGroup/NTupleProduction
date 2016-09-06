@@ -150,13 +150,13 @@ def find_input_files(campaign, dataset, variables, logger):
 
 
 def get_user():
-    from CRABClient.UserUtilities import getUsernameFromSiteDB, UsernameException
+    from CRABClient.UserUtilities import getUsernameFromSiteDB
 
     LOG = logging.getLogger(__name__)
     user = 'nobody'
     try:
         user = getUsernameFromSiteDB()
-    except UsernameException, e:
+    except Exception as e:
         import traceback
         LOG.error(
             'Could not get user name from https://cmsweb.cern.ch/sitedb/data/prod/whoami')
