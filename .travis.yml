@@ -1,0 +1,16 @@
+# travis-ci.org build & test configuration
+language: python
+
+matrix:
+    include:
+        - python: 2.7
+        - python: 3.5
+    allow_failures:
+        - python: 3.5
+
+install:
+  - source bin/env.sh
+
+script:
+  - python python/ntp/utils/test/test_utils.py
+cache: apt
