@@ -40,6 +40,8 @@ LOGDIR = os.path.join(WORKSPACE, 'log')
 RESULTDIR = os.path.join(WORKSPACE, 'results')
 TMPDIR = os.path.join(WORKSPACE, 'tmp')
 
+DPS_RESULTDIR = os.path.join(RESULTDIR, 'dps')
+
 
 def get_metadata():
     metadata_file = os.path.join(NTPROOT, 'metadata.json')

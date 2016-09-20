@@ -14,7 +14,7 @@ import sys
 import shutil
 from .. import Command as C
 
-from .. import WORKSPACE, CACHEDIR, LOGDIR, RESULTDIR, TMPDIR
+from .. import WORKSPACE, CACHEDIR, LOGDIR, RESULTDIR, TMPDIR, DPS_RESULTDIR
 
 LOG = logging.getLogger(__name__)
 
@@ -40,6 +40,7 @@ class Command(C):
         os.makedirs(CACHEDIR)
         os.makedirs(LOGDIR)
         os.makedirs(RESULTDIR)
+        os.makedirs(DPS_RESULTDIR)
         os.makedirs(TMPDIR)
         LOG.info('Created workspace {0}'.format(WORKSPACE))
 
