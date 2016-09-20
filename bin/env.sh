@@ -99,10 +99,13 @@ if [ ! -d "${HEP_PROJECT_ROOT}/external/miniconda" ] ; then
 	conda update pip -y
 	conda install git wget pycurl -y
 	# python modules
+	conda create -n ntp python=2.7
+	source activate ntp
 	pip install -U python-cjson
 	pip install -U git+https://github.com/kreczko/hepshell.git
 	# clean the cache (downloaded tarballs)
 	conda clean -t -y
 else
 	PATH=${HEP_PROJECT_ROOT}/external/miniconda/bin:$PATH; export PATH
+	source activate ntp
 fi
