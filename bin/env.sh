@@ -91,7 +91,7 @@ if [ ! -d "${HEP_PROJECT_ROOT}/external" ] ; then
 fi
 
 if [ ! -d "${HEP_PROJECT_ROOT}/external/miniconda" ] ; then
-	wget -nv http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+	wget -nv https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh
 	bash miniconda.sh -b -p ${HEP_PROJECT_ROOT}/external/miniconda
 	PATH=${HEP_PROJECT_ROOT}/external/miniconda/bin:$PATH; export PATH
 	rm -f miniconda.sh
