@@ -7,13 +7,13 @@ electronUserData = cms.EDProducer(
     beamSpotCollection=cms.InputTag('offlineBeamSpot'),
     conversionInput=cms.InputTag('reducedEgamma', 'reducedConversions'),
     electronVetoIdMap=cms.InputTag(
-        "egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-veto"),
+        "egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-veto"),
     electronLooseIdMap=cms.InputTag(
-        "egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-loose"),
+        "egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-loose"),
     electronMediumIdMap=cms.InputTag(
-        "egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-medium"),
+        "egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-medium"),
     electronTightIdMap=cms.InputTag(
-        "egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-tight"),
+        " egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-tight"),
     electronHEEPIdMap=cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV60"),
     # Top Object Definitions
     minLooseElectronPt=cms.double(15.),
