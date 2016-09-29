@@ -12,5 +12,5 @@ config.Data.inputDataset = '/SingleElectron/Run2016C-PromptReco-v2/MINIAOD'
 config.Data.splitting = 'EventAwareLumiBased'
 config.Data.unitsPerJob = 500000
 config.JobType.pyCfgParams = ['isData=1']
-config.Data.lumiMask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/Cert_271036-277148_13TeV_PromptReco_Collisions16_JSON.txt'
+config.Data.lumiMask = 'TOP_Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON_UnprescaledPaths.txt'
 
