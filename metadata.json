@@ -51,7 +51,7 @@
 			"provider": "git"
 		},{
 			"name": "DailyPythonScripts",
-			"source": "git+https://github.com/kreczko/DailyPythonScripts.git@python-package",
+			"source": "git+https://github.com/BristolTopGroup/DailyPythonScripts.git",
 			"destination": "",
 			"provider": "pip"
 		}
