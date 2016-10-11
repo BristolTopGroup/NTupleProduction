@@ -49,6 +49,11 @@
 			"source": "https://github.com/BristolTopGroup/TopHitFit.git",
 			"destination": "TopQuarkAnalysis/TopHitFit",
 			"provider": "git"
+		},{
+			"name": "DailyPythonScripts",
+			"source": "git+https://github.com/BristolTopGroup/DailyPythonScripts.git",
+			"destination": "",
+			"provider": "pip"
 		}
 	]
 }

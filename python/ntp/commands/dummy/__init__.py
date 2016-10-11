@@ -10,17 +10,19 @@
         something: a weird parameter
 """
 import logging
-from .. import Command as C
-
+from ntp.commands import Command as C
+from hepshell.interpreter import time_function
 LOG = logging.getLogger(__name__)
+
 
 class Command(C):
 
     def __init__(self, path=__file__, doc=__doc__):
         super(Command, self).__init__(path, doc)
 
+    @time_function('dummy', LOG)
     def run(self, args, variables):
         self.__prepare(args, variables)
-        self.__text = "NOT IMPLEMENTED"
+        self.__text = "Running dummy command"
 
         return True

@@ -91,18 +91,24 @@ if [ ! -d "${HEP_PROJECT_ROOT}/external" ] ; then
 fi
 
 if [ ! -d "${HEP_PROJECT_ROOT}/external/miniconda" ] ; then
-	wget -nv http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+	wget -nv https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh
 	bash miniconda.sh -b -p ${HEP_PROJECT_ROOT}/external/miniconda
 	PATH=${HEP_PROJECT_ROOT}/external/miniconda/bin:$PATH; export PATH
 	rm -f miniconda.sh
 	conda update conda -y
 	conda update pip -y
-	conda install git wget pycurl -y
+	conda install git wget pycurl psutil -y
+	conda config --add channels http://conda.anaconda.org/NLeSC
+    conda config --set show_channel_urls yes
 	# python modules
+	conda create -n ntp python=2.7 root=6 root-numpy numpy matplotlib nose sphinx pytables rootpy
+	source activate ntp
 	pip install -U python-cjson
+	pip install -U uncertainties
 	pip install -U git+https://github.com/kreczko/hepshell.git
 	# clean the cache (downloaded tarballs)
 	conda clean -t -y
 else
 	PATH=${HEP_PROJECT_ROOT}/external/miniconda/bin:$PATH; export PATH
+	source activate ntp
 fi
