@@ -40,9 +40,33 @@ from crab.util import find_input_files
 LOG = logging.getLogger(__name__)
 PSET = os.path.join(TMPDIR, 'pset.py')
 OUTPUT_FILE = os.path.join(RESULTDIR, '{ds}_ntuple.root')
-BTAG_CALIB_FILE = os.path.join(NTPROOT, 'data/BTagSF/CSVv2.csv')
-
 from ntp.commands.run.ntuple.template import PYCONF
+BTAG_CALIB_FILE = os.path.join(CMSSW_SRC, 'BristolAnalysis', 'NTupleTools', 'data','BTagSF','CSVv2.csv')
+BASE = """
+import FWCore.ParameterSet.Config as cms
+from run.miniAODToNTuple_cfg import process
+
+process.maxEvents.input = cms.untracked.int32({nevents})
+
+process.TFileService.fileName='{OUTPUT_FILE}'
+
+# In order to work around the limitation of 255 parameters to a python function
+# we pass 1 tuple of all the files to the vstring function
+# see
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePoolInputSources#Example_3_More_than_255_input_fi
+process.source.fileNames = cms.untracked.vstring(
+*(
+{input_files},
+)
+)
+
+process.jetUserData.btagCalibrationFile = cms.string('{BTAG_CALIB_FILE}')
+
+if '{JSON_URL}':
+    import FWCore.PythonUtilities.LumiList as LumiList
+    process.source.lumisToProcess = LumiList.LumiList(url = '{JSON_URL}').getVLuminosityBlockRange()
+
+"""
 
 
 class Command(C):
@@ -115,6 +139,13 @@ class Command(C):
     def __write_pset(self, input_files):
         nevents = int(self.__variables['nevents'])
         input_files = self.__format_input_files(input_files)
+
+        if self.__variables['json_url'] != '':
+            if not 'https://cms-service-dqm.web.cern.ch' in self.__variables['json_url']:
+                local_json = 'file:{0}/{1}/{2}'.format( CMSSW_SRC, 'BristolAnalysis/NTupleTools', self.__variables['json_url']) 
+                LOG.debug('Local json :{0}'.format(local_json) )
+                self.__variables['json_url']= local_json
+
 
         with open(PSET, 'w+') as f:
             content = self.__variables['pset_template'].format(
