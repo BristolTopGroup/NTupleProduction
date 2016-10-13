@@ -117,3 +117,9 @@ else
 	PATH=${TOPQ_CONDA_PATH}/bin:$PATH; export PATH
 	source activate ntp
 fi
+
+if [ ! -d "DEV" ] ; then
+  mkdir DEV
+fi
+
+echo "NTP is now available in $PWD"

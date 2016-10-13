@@ -37,7 +37,11 @@
 			"name": "AnalysisSoftware",
 			"source": "https://github.com/BristolTopGroup/AnalysisSoftware.git",
 			"destination": "BristolAnalysis/Tools",
-			"provider": "git"
+			"provider": "git",
+			"setup-cmds": [
+				"ln -s {CMSSW_SRC}/BristolAnalysis/Tools {CMSSW_SRC}/../../../DEV/AS",
+				"echo \"AS is now available in DEV/AS (links to {CMSSW_SRC}/BristolAnalysis/Tools)\""
+			]
 		},
 		{
 			"name": "TopHitFit",
@@ -48,7 +52,11 @@
 			"name": "DailyPythonScripts",
 			"source": "git+https://github.com/BristolTopGroup/DailyPythonScripts.git",
 			"destination": "",
-			"provider": "pip"
+			"provider": "pip",
+			"setup-cmds": [
+				"cd ../../.. && ln -s ../external/miniconda/envs/ntp/lib/python2.7/site-packages/dps DEV/dps",
+				"echo \"DPS is now availble in DEV/dps (links to external/miniconda/envs/ntp/lib/python2.7/site-packages/dps)\""
+			]
 		}
 	]
 }
