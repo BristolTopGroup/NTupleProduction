@@ -43,20 +43,20 @@ TMPDIR = os.path.join(WORKSPACE, 'tmp')
 DPS_RESULTDIR = os.path.join(RESULTDIR, 'dps')
 
 
-def get_metadata():
-    metadata_file = os.path.join(NTPROOT, 'metadata.json')
-    with open(metadata_file) as metadata_file:
-        metadata = json.load(metadata_file)
-    return metadata
+def get_setup():
+    setup_file = os.path.join(NTPROOT, 'setup.json')
+    with open(setup_file) as setup_file:
+        setup = json.load(setup_file)
+    return setup
 
-METADATA = get_metadata()
-CMSSW_VERSION = METADATA['cmssw_version']
+SETUP = get_setup()
+CMSSW_VERSION = SETUP['cmssw_version']
 CMSSW_BASE = os.path.join(WORKSPACE, CMSSW_VERSION)
 CMSSW_SRC = os.path.join(CMSSW_BASE, 'src')
-DEPENDENCIES = METADATA['dependencies']
-LINKS = METADATA['links']
-SCRAM_ARCH = METADATA['scram_arch']
-DESTINATION = METADATA['destination']
+DEPENDENCIES = SETUP['dependencies']
+LINKS = SETUP['links']
+SCRAM_ARCH = SETUP['scram_arch']
+DESTINATION = SETUP['destination']
 
 
 class Command(C):

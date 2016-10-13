@@ -1,13 +1,13 @@
 """
     setup cmssw:
         Sets up the CMS software in the workspace. Workspace must exist.
-        
+
     Usage:
         setup cmssw version=<cmssw_version>
-        
+
     Parameters:
         version: The version of CMSSW to set up (e.g. CMSSW_8_0_0)
-                 Default: What is defined in metadata.json
+                 Default: What is defined in setup.json
 
         init-git: Prepares the CMSSW area for merging of git branches.
                   Default:true
