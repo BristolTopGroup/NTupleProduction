@@ -98,6 +98,7 @@ class Command(C):
     def __prepare_ntp(self):
         ignore = ['data', '.git*', 'workspace*', '*.root', '.*']
         ignore.extend(['src', 'plugins', 'docs', 'interface'])
+        ignore.extend(['external'])
         ignore = [os.path.join(NTPROOT, i) for i in ignore]
         ignore.append('git-*')
         self.__make_snapshot(NTPROOT, NTP_TAR, *ignore)

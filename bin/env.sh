@@ -85,30 +85,34 @@ if [ "$vomsInfo" == "" ]; then
   fi
 fi
 
-# miniconda setup for modern python and additional python packages
-if [ ! -d "${HEP_PROJECT_ROOT}/external" ] ; then
-	mkdir ${HEP_PROJECT_ROOT}/external
-fi
-
-if [ ! -d "${HEP_PROJECT_ROOT}/external/miniconda" ] ; then
+TOPQ_CONDA_PATH=/software/TopQuarkGroup/miniconda; export TOPQ_CONDA_PATH
+if [ ! -d "${TOPQ_CONDA_PATH}" ] ; then
+  # just create all parent folders except miniconda
+  echo "Could not find conda install in ${TOPQ_CONDA_PATH}. Installing conda ..."
+  mkdir -p ${TOPQ_CONDA_PATH}; rmdir ${TOPQ_CONDA_PATH}
 	wget -nv https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh
-	bash miniconda.sh -b -p ${HEP_PROJECT_ROOT}/external/miniconda
-	PATH=${HEP_PROJECT_ROOT}/external/miniconda/bin:$PATH; export PATH
+	bash miniconda.sh -b -p ${TOPQ_CONDA_PATH}
+	PATH=${TOPQ_CONDA_PATH}/bin:$PATH; export PATH
 	rm -f miniconda.sh
+  echo "Finished conda installation, creating new conda environment"
 	conda update conda -y
 	conda update pip -y
 	conda install git wget pycurl psutil -y
 	conda config --add channels http://conda.anaconda.org/NLeSC
     conda config --set show_channel_urls yes
 	# python modules
-	conda create -n ntp python=2.7 root=6 root-numpy numpy matplotlib nose sphinx pytables rootpy
+	conda create -n ntp python=2.7 root=6 root-numpy numpy matplotlib nose sphinx pytables rootpy pandas -y
+  echo "Created conda environment, installing basic dependencies"
 	source activate ntp
 	pip install -U python-cjson
 	pip install -U uncertainties
 	pip install -U git+https://github.com/kreczko/hepshell.git
 	# clean the cache (downloaded tarballs)
 	conda clean -t -y
+  # give the group write access
+  chmod g+r -R ${TOPQ_CONDA_PATH}
 else
-	PATH=${HEP_PROJECT_ROOT}/external/miniconda/bin:$PATH; export PATH
+  echo "Found conda install in ${TOPQ_CONDA_PATH}, activating..."
+	PATH=${TOPQ_CONDA_PATH}/bin:$PATH; export PATH
 	source activate ntp
 fi
