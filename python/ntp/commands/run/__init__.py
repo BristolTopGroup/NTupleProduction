@@ -105,3 +105,25 @@ class Command(C):
         for d in dirs:
             if not os.path.exists(d):
                 os.makedirs(d)
+
+    def __set_automatic_parameters(self):
+        from ntp.utils.data import is_real_data, is_ttbar_mc
+        test_file = self.__variables['input_files'][0]
+        self.__variables['isReHLT'] = int('reHLT' in test_file)
+        self.__variables['isData'] = int(is_real_data(test_file))
+        self.__variables['isTTbarMC'] = int(is_ttbar_mc(test_file))
+
+    @staticmethod
+    def input_files_from_path(path):
+        """
+            Converts given path(s) to input files.
+        """
+        if ',' in path:
+            input_files = path.split(',')
+        elif '*' in path:
+            import glob
+            input_files = glob.glob(path)
+        else:  # neither wildcard nor comma separated list
+            input_files = [path]
+        input_files = [os.path.abspath(f) for f in input_files]
+        return [f for f in input_files if os.path.exists(f)]

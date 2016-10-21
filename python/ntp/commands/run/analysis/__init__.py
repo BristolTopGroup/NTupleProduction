@@ -36,7 +36,7 @@ import logging
 import glob
 import shutil
 
-from .. import Command as C
+from ntp.commands.run import Command as ParentCommand
 from hepshell.interpreter import time_function
 from ntp import NTPROOT
 from ntp.commands.setup import CMSSW_SRC, TMPDIR, RESULTDIR, LOGDIR
@@ -57,19 +57,6 @@ ANALYSIS_MODES = [
 ]
 
 
-def input_files_from_path(path):
-    """
-        Converts given path(s) to input files.
-    """
-    if ',' in path:
-        input_files = path.split(',')
-    elif '*' in path:
-        input_files = glob.glob(path)
-    else:  # neither wildcard nor comma separated list
-        input_files = [path]
-    input_files = [os.path.abspath(f) for f in input_files]
-    return [f for f in input_files if os.path.exists(f)]
-
 
 def get_datasets():
     from imp import load_source
@@ -86,10 +73,10 @@ def input_files_from_dataset(dataset):
         import sys
         sys.exit(msg)
     path = [os.path.join(p, '*.root') for p in datasets[dataset]]
-    return input_files_from_path(path)
+    return ParentCommand.input_files_from_path(path)
 
 
-class Command(C):
+class Command(ParentCommand):
     #     """
     #         This command is used for input file discovery & steering of anlysis
     #         jobs. Once all arguments and parameters are passed this commands calls
@@ -162,17 +149,10 @@ class Command(C):
         path = self.__variables['files']
         dataset = self.__variables['dataset']
         if path != '':
-            input_files = input_files_from_path(path)
+            input_files = ParentCommand.input_files_from_path(path)
         else:
             input_files = input_files_from_dataset(dataset)
         self.__variables['input_files'] = input_files
-
-    def __set_automatic_parameters(self):
-        from ntp.utils.data import is_real_data, is_ttbar_mc
-        test_file = self.__variables['input_files'][0]
-        self.__variables['isReHLT'] = int('reHLT' in test_file)
-        self.__variables['isData'] = int(is_real_data(test_file))
-        self.__variables['isTTbarMC'] = int(is_ttbar_mc(test_file))
 
     def __run_payload(self):
         # TODO: add checking/dynamic subcommand discovery
