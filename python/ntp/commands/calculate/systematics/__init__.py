@@ -36,14 +36,6 @@ from hepshell.interpreter import time_function
 from ntp.commands.run import Command as C
 from ntp.commands.setup import DPS_RESULTDIR
 
-from dps.config.xsection import XSectionConfig
-from dps.utils.systematic import append_PDF_uncertainties, print_dictionary,\
-    get_symmetrised_systematic_uncertainty, generate_covariance_matrices,\
-    get_measurement_with_total_systematic_uncertainty,\
-    write_normalised_xsection_measurement, get_normalised_cross_sections
-from dps.utils.file_utilities import make_folder_if_not_exists
-from dps.config.variable_binning import bin_edges_vis
-
 LOG = logging.getLogger(__name__)
 
 JSON_PATH = os.path.join(
@@ -70,6 +62,15 @@ class Command(C):
 
     @time_function('calculate systematics', LOG)
     def run(self, args, variables):
+        from dps.config.xsection import XSectionConfig
+        from dps.utils.systematic import append_PDF_uncertainties
+        from dps.utils.systematic import print_dictionary,\
+            get_symmetrised_systematic_uncertainty, generate_covariance_matrices,\
+            get_measurement_with_total_systematic_uncertainty,\
+            write_normalised_xsection_measurement, get_normalised_cross_sections
+        from dps.utils.file_utilities import make_folder_if_not_exists
+        from dps.config.variable_binning import bin_edges_vis
+
         self.__prepare(args, variables)
         self.__text = "Running calculate systematics"
         centre_of_mass_energy = self.__variables['centre_of_mass_energy']

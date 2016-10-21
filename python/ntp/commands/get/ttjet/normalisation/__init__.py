@@ -38,9 +38,6 @@ from ntp.commands.run import Command as C
 from ntp.commands.setup import DPS_RESULTDIR
 from ntp.commands.create.dps.configs import DPS_CONFIGDIR
 
-from dps.analysis.xsection.lib import closure_tests as CTs
-from dps.config.xsection import XSectionConfig
-
 LOG = logging.getLogger(__name__)
 INPUT_PATH = os.path.join(
     DPS_CONFIGDIR, 'measurements', 'background_subtraction')
@@ -61,6 +58,8 @@ class Command(C):
     }
 
     def __init__(self, path=__file__, doc=__doc__):
+        from dps.analysis.xsection.lib import closure_tests as CTs
+        from dps.config.xsection import XSectionConfig
         variables = '|'.join(XSectionConfig.variables)
         closure_tests = '|'.join(CTs.keys())
         doc = doc.format(variables=variables, closure_tests=closure_tests)
@@ -74,6 +73,7 @@ class Command(C):
 
     def __run(self):
         import importlib
+        from dps.config.xsection import XSectionConfig
         get_ttjet_normalisation = importlib.import_module(
             'dps.analysis.xsection.01_get_ttjet_normalisation', 'dps.analysis.xsection')
 
