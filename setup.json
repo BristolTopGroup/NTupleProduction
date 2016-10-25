@@ -28,6 +28,11 @@
 			"destination": "",
 			"provider": "git-cms-merge-topic"
 		},{
+			"name": "htcondenser",
+			"source": "git+https://github.com/kreczko/htcondenser.git@setup",
+			"destination": "",
+			"provider": "pip"
+		},{
 			"name": "ganga",
 			"source": "ganga",
 			"destination": "",
@@ -48,15 +53,6 @@
 			"source": "https://github.com/BristolTopGroup/TopHitFit.git",
 			"destination": "TopQuarkAnalysis/TopHitFit",
 			"provider": "git"
-		},{
-			"name": "DailyPythonScripts",
-			"source": "git+https://github.com/BristolTopGroup/DailyPythonScripts.git",
-			"destination": "",
-			"provider": "pip",
-			"setup-cmds": [
-				"cd ../../.. && ln -s ../external/miniconda/envs/ntp/lib/python2.7/site-packages/dps DEV/dps",
-				"echo \"DPS is now availble in DEV/dps (links to external/miniconda/envs/ntp/lib/python2.7/site-packages/dps)\""
-			]
 		}
 	]
 }

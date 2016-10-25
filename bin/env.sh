@@ -108,6 +108,7 @@ if [ ! -d "${TOPQ_CONDA_PATH}" ] ; then
 	source activate ntp
   conda install git wget pycurl -y
 	pip install -U -r requirements.txt
+  pip install -U --install-option="--prefix=${HEP_PROJECT_ROOT}/external" git+https://github.com/BristolTopGroup/DailyPythonScripts.git
 	# clean the cache (downloaded tarballs)
 	conda clean -t -y
   # give the group write access
@@ -123,3 +124,11 @@ if [ ! -d "DEV" ] ; then
 fi
 
 echo "NTP is now available in $PWD"
+
+# adjusting paths for dps
+PATH=${HEP_PROJECT_ROOT}/external/bin:$PATH; export PATH
+PYTHONPATH=${HEP_PROJECT_ROOT}/external/lib/python2.7/site-packages:$PYTHONPATH; export PYTHONPATH
+if [ ! -e "DEV/DPS" ]; then
+  ln -s ../external/lib/python2.7/site-packages/dps DEV/DPS
+fi
+echo "DPS is now available in DEV/DPS"
