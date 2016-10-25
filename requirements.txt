@@ -1,4 +1,4 @@
 python-cjson
 uncertainties
--e git+https://github.com/kreczko/hepshell.git#egg=hepshell
--e git+https://github.com/raggleton/htcondenser.git#egg=htcondenser
+git+https://github.com/kreczko/hepshell.git
+git+https://github.com/raggleton/htcondenser.git
