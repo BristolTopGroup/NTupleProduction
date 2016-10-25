@@ -98,13 +98,15 @@ if [ ! -d "${TOPQ_CONDA_PATH}" ] ; then
   echo "Finished conda installation, creating new conda environment"
 	conda update conda -y
 	conda update pip -y
-	conda install git wget pycurl psutil -y
+	conda install psutil -y
 	conda config --add channels http://conda.anaconda.org/NLeSC
     conda config --set show_channel_urls yes
 	# python modules
-	conda create -n ntp python=2.7 root=6 root-numpy numpy matplotlib nose sphinx pytables rootpy pandas -y
+	conda create -n ntp python=2.7 root=6 root-numpy numpy matplotlib nose \
+  sphinx pytables rootpy pandas -y
   echo "Created conda environment, installing basic dependencies"
 	source activate ntp
+  conda install git wget pycurl -y
 	pip install -U python-cjson
 	pip install -U uncertainties
 	pip install -U git+https://github.com/kreczko/hepshell.git
