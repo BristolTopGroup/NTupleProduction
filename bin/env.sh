@@ -1,4 +1,5 @@
 #!/bin/bash
+unset PYTHONPATH
 drop_from_path()
 {
    # Assert that we got enough arguments
