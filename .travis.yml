@@ -13,4 +13,5 @@ install:
 
 script:
   - python python/ntp/utils/test/test_utils.py
+  - ./test/test.sh
 cache: apt

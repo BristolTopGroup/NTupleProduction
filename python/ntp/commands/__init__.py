@@ -5,7 +5,8 @@ import copy
 
 LOG = logging.getLogger(__name__)
 
-from hepshell.commands import Command as BaseCommand
+
+from hepshell.command import Command as BaseCommand
 
 class Command(BaseCommand):
     """Base class for all commands"""
