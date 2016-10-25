@@ -107,9 +107,7 @@ if [ ! -d "${TOPQ_CONDA_PATH}" ] ; then
   echo "Created conda environment, installing basic dependencies"
 	source activate ntp
   conda install git wget pycurl -y
-	pip install -U python-cjson
-	pip install -U uncertainties
-	pip install -U git+https://github.com/kreczko/hepshell.git
+	pip install -U -r requirements.txt
 	# clean the cache (downloaded tarballs)
 	conda clean -t -y
   # give the group write access
