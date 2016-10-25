@@ -3,66 +3,24 @@ NTupleProduction
 
 ## Brief Description
 Software for nTuples production from MiniAOD files for ttbar+X differential cross section analysis.
-The master branch corresponds to the Run 2 analysis path. 
+The master branch corresponds to the Run 2 analysis path.
 For the Run 1 analysis path, please refer to branch 'run1' as well as the relevant releases.
 
 ## General Recipe
-
 To setup the code:
-
-```
-#set GITHUBUSERNAME if not previously set
-export GITHUBUSERNAME=yourGITHUBUsername
-git config --global user.github $GITHUBUSERNAME
-#on soolin:
-export CMSSW_GIT_REFERENCE=/cvmfs/cms.cern.ch/cmssw.git
-
-# Set up the CMSSW release
-export SCRAM_ARCH=slc6_amd64_gcc493
-
-cmsrel CMSSW_8_0_8_patch1
-cd CMSSW_8_0_8_patch1/src/
-cmsenv
-git cms-init
-
-# Do merge-topics and addpkgs first if needed
-# Pseudo top producer
-git-cms-merge-topic jhgoh:PseudoTop76
-
-
-# Clone our main ntuple producing software and checkout run2 branch
-git clone git@github.com:BristolTopGroup/NTupleProduction.git  
-cd BristolAnalysis/NTupleTools
-# optional for development
-git remote rename origin upstream
-git remote add origin git@github.com:<Your Git name with forked repo>/NTupleProduction.git
-git fetch --all
-# for ntuple production once a tag is available
-# git checkout <tag branch>
-cd ../../
-
-# Clone our version of the TopSkimming software and checkout run2 branch
-git clone git@github.com:BristolTopGroup/TopSkimming.git TopQuarkAnalysis/TopSkimming
-cd TopQuarkAnalysis/TopSkimming
-git remote rename origin upstream
-cd ../../
-
-# Compile
-scramv1 b -j 8
-cd BristolAnalysis/NTupleTools
-source bin/env.sh
-
-#test release
-### Not yet available
-```
-
-## Experimental setup
-This setup is a very new feature and is currently only meant for testing
 ```
 git clone git@github.com:BristolTopGroup/NTupleProduction.git
 cd NTupleProduction
 source bin/env.sh
-ntp setup run2:latest
+ntp setup
+```
+which should create the folders`external` and `workspace`.
+For available commands and how to use them type `ntp help`.
+
+### Testing
+To check if all is OK you can run
+```
+./test/test.sh
 ```
 
 ## Notes
@@ -71,7 +29,7 @@ More information can be found at [Bristol Ntuple Recipes twiki page](https://twi
 ## Bugs
 Please report any problems on our [issues page](https://github.com/BristolTopGroup/NTupleProduction/issues).
 
-# Vagrant
+# Vagrant (work in progress)
 Vagrant is used to "Create and configure lightweight, reproducible, and portable development environments" and can be downloaded from https://www.vagrantup.com/
 
 ## How to use the existing CMSSW box
@@ -91,7 +49,7 @@ vagrant up
 # log onto the machine
 vagrant ssh
 # and follow instructions under "Setting up CMSSW"
-``` 
+```
 
 ## How to make a vagrant box for NTupleProduction (or any CMSSW project)
 A list of general boxes can be found on http://www.vagrantbox.es .
@@ -126,7 +84,7 @@ cd
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 . $VO_CMS_SW_DIR/cmsset_default.sh
 # follow the instructions except for the NTupleTools git clone
-# do not forget to 
+# do not forget to
 # scp -r soolin:/storage/.cmsgit-cache <your NTupleTools folder>
 # and
 export CMSSW_GIT_REFERENCE=/vagrant/.cmsgit-cache
@@ -144,14 +102,14 @@ Edit the Vagrant file to adjust your path to your CMSSW area, i.e.
 ```config.vm.synced_folder ".", "/home/vagrant/CMSSW_7_0_9_patch2/src/NTupleProduction"```
 and restart the Vagrant box (```vagrant halt && vagrant up```).
 Now ssh into the box again and go into the CMSSW src folder
-```shell 
+```shell
 cd /home/vagrant/CMSSW_7_4_10_patch1/src
 scram b -j2
 ```
 Hooray! You are compiling a CMSSW package on your machine!
 Once you are done with the machine you can exit (```exit```) and either destroy the machine or halt it
 ```
-# to destroy 
+# to destroy
 vagrant destroy
 # to halt
 vagrant halt
