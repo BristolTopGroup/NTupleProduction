@@ -203,7 +203,7 @@ void TopPairElectronPlusJetsSelectionFilter::setupEventContent(edm::Event& iEven
 	goodIsolatedElectrons_ = *goodElectrons;
 
 	// Electrons (for veto)
-	LogDebug("NTP_EPlusJets") << "Getting loose electrons";
+	LogDebug("NTP_EPlusJets") << "Getting veto electrons";
 	edm::Handle < std::vector<pat::Electron> > vetoElectrons;
 	iEvent.getByToken(vetoElectronsToken_, vetoElectrons);
 	vetoElectrons_ = *vetoElectrons;

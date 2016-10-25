@@ -350,7 +350,7 @@ process.goodElectrons = selectedPatElectrons.clone(
 )
 
 process.vetoElectrons = process.goodElectrons.clone(
-    cut=cms.string('userInt("isLoose")'),
+    cut=cms.string('userInt("isVeto")'),
 )
 
 process.goodConversionElectrons = process.goodElectrons.clone(

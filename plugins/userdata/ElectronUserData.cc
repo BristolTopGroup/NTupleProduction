@@ -62,8 +62,9 @@ private:
 	bool isMatchedWithTrigger(const pat::Electron, trigger::TriggerObjectCollection, int&);
 
 	bool passesInvertedIDCuts(const vid::CutFlowResult fullCutFlowData, std::vector<uint> invertedSelection) const;
-	bool isLoose(const edm::Ptr<pat::Electron>& electron) const;
-	bool isGood(const edm::Ptr<pat::Electron>& electron) const;
+	bool isVeto(const edm::Ptr<pat::Electron>& electron, std::vector<reco::Vertex> primaryVertices) const;
+	bool isGood(const edm::Ptr<pat::Electron>& electron, std::vector<reco::Vertex> primaryVertices) const;
+	bool passesImpactParameterSelection(const edm::Ptr<pat::Electron>& electron, std::vector<reco::Vertex> primaryVertices) const;
 	void fillVertexVariables(const edm::Event&, pat::Electron& el) const;
 
 	// inputs
@@ -72,15 +73,15 @@ private:
 	const edm::EDGetTokenT<reco::BeamSpot> beamSpotInputTag_;
 	const edm::EDGetTokenT<std::vector<reco::Conversion> > conversionsInputTag_;
 
-	const edm::EDGetTokenT<edm::ValueMap<bool> > looseElectronIDMapToken_;
-	const edm::EDGetTokenT<edm::ValueMap<bool> > mediumElectronIDMapToken_;
-	const edm::EDGetTokenT<edm::ValueMap<vid::CutFlowResult> > eleMediumIdFullInfoMapToken_;
+	const edm::EDGetTokenT<edm::ValueMap<bool> > vetoElectronIDMapToken_;
+	const edm::EDGetTokenT<edm::ValueMap<bool> > tightElectronIDMapToken_;
+	const edm::EDGetTokenT<edm::ValueMap<vid::CutFlowResult> > eleTightIdFullInfoMapToken_;
 
-	edm::ValueMap<bool> mediumElectronIDDecisions_, looseElectronIDDecisions_;
-	edm::ValueMap<vid::CutFlowResult> mediumIdCutFlowData_;
+	edm::ValueMap<bool> tightElectronIDDecisions_, vetoElectronIDDecisions_;
+	edm::ValueMap<vid::CutFlowResult> tightIdCutFlowData_;
 
 	// cuts
-	double minLooseElectronPt_, maxLooseElectronEta_;
+	double minVetoElectronPt_, maxVetoElectronEta_;
 	double minSignalElectronPt_, maxSignalElectronEta_;
 
 	// ----------member data ---------------------------
@@ -109,17 +110,17 @@ ElectronUserData::ElectronUserData(const edm::ParameterSet& iConfig) :
 				conversionsInputTag_(
 						consumes < std::vector
 								< reco::Conversion >> (iConfig.getParameter < edm::InputTag > ("conversionInput"))), //
-				looseElectronIDMapToken_(
+				vetoElectronIDMapToken_(
 						consumes < edm::ValueMap<bool>
-								> (iConfig.getParameter < edm::InputTag > ("electronLooseIdMap"))), //
-				mediumElectronIDMapToken_(
+								> (iConfig.getParameter < edm::InputTag > ("electronVetoIdMap"))), //
+				tightElectronIDMapToken_(
 						consumes < edm::ValueMap<bool>
-								> (iConfig.getParameter < edm::InputTag > ("electronMediumIdMap"))), //
-				eleMediumIdFullInfoMapToken_(
+								> (iConfig.getParameter < edm::InputTag > ("electronTightIdMap"))), //
+				eleTightIdFullInfoMapToken_(
 						consumes < edm::ValueMap<vid::CutFlowResult>
-								> (iConfig.getParameter < edm::InputTag > ("electronMediumIdMap"))), //
-				minLooseElectronPt_(iConfig.getParameter<double>("minLooseElectronPt")), //
-				maxLooseElectronEta_(iConfig.getParameter<double>("maxLooseElectronEta")), //
+								> (iConfig.getParameter < edm::InputTag > ("electronTightIdMap"))), //
+				minVetoElectronPt_(iConfig.getParameter<double>("minVetoElectronPt")), //
+				maxVetoElectronEta_(iConfig.getParameter<double>("maxVetoElectronEta")), //
 				minSignalElectronPt_(iConfig.getParameter<double>("minSignalElectronPt")), //
 				maxSignalElectronEta_(iConfig.getParameter<double>("maxSignalElectronEta")) {
 	//register your products
@@ -152,17 +153,17 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 	edm::Handle < std::vector<reco::Vertex> > primaryVertices;
 	iEvent.getByToken(vtxInputTag_, primaryVertices);
 
-	edm::Handle < edm::ValueMap<bool> > loose_id_decisions;
-	iEvent.getByToken(looseElectronIDMapToken_, loose_id_decisions);
-	looseElectronIDDecisions_ = *loose_id_decisions;
+	edm::Handle < edm::ValueMap<bool> > veto_id_decisions;
+	iEvent.getByToken(vetoElectronIDMapToken_, veto_id_decisions);
+	vetoElectronIDDecisions_ = *veto_id_decisions;
 
-	edm::Handle < edm::ValueMap<bool> > medium_id_decisions;
-	iEvent.getByToken(mediumElectronIDMapToken_, medium_id_decisions);
-	mediumElectronIDDecisions_ = *medium_id_decisions;
+	edm::Handle < edm::ValueMap<bool> > tight_id_decisions;
+	iEvent.getByToken(tightElectronIDMapToken_, tight_id_decisions);
+	tightElectronIDDecisions_ = *tight_id_decisions;
 
-	edm::Handle < edm::ValueMap<vid::CutFlowResult> > medium_id_cutflow_data;
-	iEvent.getByToken(eleMediumIdFullInfoMapToken_, medium_id_cutflow_data);
-	mediumIdCutFlowData_ = *medium_id_cutflow_data;
+	edm::Handle < edm::ValueMap<vid::CutFlowResult> > tight_id_cutflow_data;
+	iEvent.getByToken(eleTightIdFullInfoMapToken_, tight_id_cutflow_data);
+	tightIdCutFlowData_ = *tight_id_cutflow_data;
 
 	if (electrons.isValid()) {
 		std::auto_ptr < std::vector<pat::Electron> > electronCollection(new std::vector<pat::Electron>(*electrons));
@@ -174,15 +175,15 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 			const edm::Ptr<pat::Electron> elPtr(electrons, index);
 			std::vector < uint > idCutsToInvert { 99 };
 
-			vid::CutFlowResult fullCutFlowDataMedium = mediumIdCutFlowData_[elPtr];
-			el.addUserInt("passesLooseId", looseElectronIDDecisions_[elPtr]);
-			el.addUserInt("passesMediumId", mediumElectronIDDecisions_[elPtr]);
-			idCutsToInvert = {9};
+			vid::CutFlowResult fullCutFlowDataTight = tightIdCutFlowData_[elPtr];
+			el.addUserInt("passesVetoId", vetoElectronIDDecisions_[elPtr]);
+			el.addUserInt("passesTightId", tightElectronIDDecisions_[elPtr]);
+			idCutsToInvert = {7};
 			// (*HEEP_id_cutflow_data)[ elPtr ].getCutFlowResultMasking(maskCuts).cutFlowPassed();
-			el.addUserInt("passesMediumNonIsoId", passesInvertedIDCuts(fullCutFlowDataMedium, idCutsToInvert));
-			idCutsToInvert = {10, 11};
-			el.addUserInt("passesMediumConversionId", passesInvertedIDCuts(fullCutFlowDataMedium, idCutsToInvert));
-			el.addUserFloat("PFRelIsoWithEA", fullCutFlowDataMedium.getValueCutUpon(9));
+			el.addUserInt("passesTightNonIsoId", passesInvertedIDCuts(fullCutFlowDataTight, idCutsToInvert));
+			idCutsToInvert = {8, 9};
+			el.addUserInt("passesTightConversionId", passesInvertedIDCuts(fullCutFlowDataTight, idCutsToInvert));
+			el.addUserFloat("PFRelIsoWithEA", fullCutFlowDataTight.getValueCutUpon(7));
 
 			bool matchesConv = false;
 			if (hConversions.isValid() && bsHandle.isValid()) {
@@ -199,10 +200,10 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 			fillVertexVariables(iEvent, el);
 
 			// Top Object Definitions
-			el.addUserInt("isLoose", isLoose(elPtr));
-			el.addUserInt("isGood", isGood(elPtr) && el.userInt("passesMediumId"));
-			el.addUserInt("isGoodNonIso", isGood(elPtr) && el.userInt("passesMediumNonIsoId"));
-			el.addUserInt("isGoodConversion", isGood(elPtr) && el.userInt("passesMediumConversionId"));
+			el.addUserInt("isVeto", isVeto(elPtr, *primaryVertices));
+			el.addUserInt("isGood", isGood(elPtr, *primaryVertices) && el.userInt("passesTightId"));
+			el.addUserInt("isGoodNonIso", isGood(elPtr, *primaryVertices) && el.userInt("passesTightNonIsoId"));
+			el.addUserInt("isGoodConversion", isGood(elPtr, *primaryVertices) && el.userInt("passesTightConversionId"));
 
 		}
 		iEvent.put(electronCollection);
@@ -242,12 +243,10 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
  *  //   3   : GsfEleDPhiInCut
  *  //   4   : GsfEleFull5x5SigmaIEtaIEtaCut
  *  //   5   : GsfEleHadronicOverEMCut
- *  //   6   : GsfEleDxyCut
- *  //   7   : GsfEleDzCut
- *  //   8   : GsfEleEInverseMinusPInverseCut
- *  //   9   : GsfEleEffAreaPFIsoCut
- *  //   10  : GsfEleConversionVetoCut
- *  //   11  : GsfEleMissingHitsCut
+ *  //   6   : GsfEleEInverseMinusPInverseCut
+ *  //   7   : GsfEleEffAreaPFIsoCut
+ *  //   8  : GsfEleConversionVetoCut
+ *  //   9  : GsfEleMissingHitsCut
  */
 
 bool ElectronUserData::passesInvertedIDCuts(const vid::CutFlowResult fullCutFlowData,
@@ -268,20 +267,50 @@ bool ElectronUserData::passesInvertedIDCuts(const vid::CutFlowResult fullCutFlow
 	return passesFullSelection;
 }
 
-bool ElectronUserData::isLoose(const edm::Ptr<pat::Electron>& electron) const {
-	bool passesPt = electron->pt() > minLooseElectronPt_;
-	bool passesEta = fabs(electron->eta()) < maxLooseElectronEta_;
-	bool passesId = looseElectronIDDecisions_[electron];
-	return passesPt && passesEta && passesId;
+bool ElectronUserData::isVeto(const edm::Ptr<pat::Electron>& electron, std::vector<reco::Vertex> primaryVertices) const {
+	bool passesPt = electron->pt() > minVetoElectronPt_;
+	bool passesEta = fabs(electron->eta()) < maxVetoElectronEta_;
+	bool passesId = vetoElectronIDDecisions_[electron];
+	bool passesImpactParameter = passesImpactParameterSelection( electron, primaryVertices );
+	return passesPt && passesEta && passesId && passesImpactParameter;
 }
 
-bool ElectronUserData::isGood(const edm::Ptr<pat::Electron>& electron) const {
+bool ElectronUserData::isGood(const edm::Ptr<pat::Electron>& electron, std::vector<reco::Vertex> primaryVertices) const {
 	bool passesPtAndEta = electron->pt() > minSignalElectronPt_ && fabs(electron->eta()) < maxSignalElectronEta_;
 	bool notInCrack = fabs(electron->superCluster()->eta()) < 1.4442 || fabs(electron->superCluster()->eta()) > 1.5660;
 	bool inECAL = fabs(electron->superCluster()->eta()) < 2.5;
+	bool passesImpactParameter = passesImpactParameterSelection( electron, primaryVertices );
 
-	return passesPtAndEta && notInCrack && inECAL;
+	return passesPtAndEta && notInCrack && inECAL && passesImpactParameter;
 }
+
+bool ElectronUserData::passesImpactParameterSelection(const edm::Ptr<pat::Electron>& electron, std::vector<reco::Vertex> primaryVertices) const {
+
+	// https://github.com/cms-sw/cmssw/blob/86088d61d757bad0e55addda14859c5ea6108d84/RecoEgamma/ElectronIdentification/plugins/cuts/GsfEleDxyCut.cc
+	// https://github.com/cms-sw/cmssw/blob/86088d61d757bad0e55addda14859c5ea6108d84/RecoEgamma/ElectronIdentification/plugins/cuts/GsfEleDzCut.cc
+	const float dxyCutValue = 
+	    ( std::abs(electron->superCluster()->position().eta()) < 1.479 ? 
+	      0.05 : 0.1 );
+
+	const float dzCutValue = 
+	    ( std::abs(electron->superCluster()->position().eta()) < 1.479 ? 
+	      0.1 : 0.2 );
+
+	const double dxy = ( primaryVertices.size() ? 
+			       electron->gsfTrack()->dxy(primaryVertices[0].position()) : 
+			       electron->gsfTrack()->dxy() );
+
+
+	const double dz = ( primaryVertices.size() ? 
+		      electron->gsfTrack()->dz(primaryVertices[0].position()) : 
+		      electron->gsfTrack()->dz() );
+
+	bool passesD0Selection = std::abs(dxy) < dxyCutValue;
+	bool passesDZSelection = std::abs(dz) < dzCutValue;
+
+	return passesD0Selection && passesDZSelection;
+}
+
 
 void ElectronUserData::fillVertexVariables(const edm::Event& iEvent, pat::Electron& el) const {
 	edm::Handle < std::vector<reco::Vertex> > primaryVertices;

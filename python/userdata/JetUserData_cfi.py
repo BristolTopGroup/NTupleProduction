@@ -18,5 +18,5 @@ jetUserData = cms.EDProducer(
     minBtagDiscLooseWP=cms.double(0.460),
     minBtagDiscMediumWP=cms.double(0.800),
     minBtagDiscTightWP=cms.double(0.935),
-    btagCalibrationFile=cms.string('CSVv2.csv'),
+    btagCalibrationFile=cms.string('CSVv2_ichep.csv'),
 )

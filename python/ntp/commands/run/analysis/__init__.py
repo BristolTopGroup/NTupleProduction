@@ -45,7 +45,7 @@ from .template import PYCONF
 
 BAT_BASE = os.path.join(CMSSW_SRC, 'BristolAnalysis', 'Tools')
 BAT_PYTHON = os.path.join(BAT_BASE, 'python')
-ANALYSIS_INFO_FILE = os.path.join(BAT_PYTHON, 'analysis_info.py')
+ANALYSIS_INFO_FILE = os.path.join(BAT_PYTHON, 'analysis_info_2016.py')
 LOG = logging.getLogger(__name__)
 
 ANALYSIS_MODES = [
@@ -56,6 +56,24 @@ ANALYSIS_MODES = [
     'JetSmearing_up',
 ]
 
+
+def input_files_from_path(path):
+    """
+        Converts given path(s) to input files.
+    """
+    if not isinstance(path, list):
+        path = [path]
+    input_files = []
+    for p in path:
+        if ',' in p:
+            input_files.extend( p.split(',') )
+        elif '*' in p:
+            input_files.extend( glob.glob(p) )
+        else:  # neither wildcard nor comma separated list
+            input_files.append( p )
+
+    input_files = [os.path.abspath(f) for f in input_files]
+    return [f for f in input_files if os.path.exists(f)]
 
 
 def get_datasets():
@@ -72,8 +90,8 @@ def input_files_from_dataset(dataset):
         LOG.error(msg)
         import sys
         sys.exit(msg)
-    path = [os.path.join(p, '*.root') for p in datasets[dataset]]
-    return ParentCommand.input_files_from_path(path)
+    path = [os.path.join(p, '*/*.root') for p in datasets[dataset]]
+    return input_files_from_path(path)
 
 
 class Command(ParentCommand):

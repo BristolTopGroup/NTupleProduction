@@ -9,7 +9,7 @@ from PhysicsTools.PatAlgos.tools.coreTools import *
 
 #use jet energy correction from database (loaded from BristolAnalysis/NTupleTools/python_custom_JEC_cff.py)
 #==False -> use JEC from Global Tag 
-USE_JEC_FROM_DB = False
+USE_JEC_FROM_DB = True
 #if 'False' taus are included in the jet collections
 removeTausFromJetCollection = False
 #if remove eles from gen jets
@@ -226,10 +226,10 @@ if USE_JEC_FROM_DB:
     from BristolAnalysis.NTupleTools.custom_JEC_cff import *
     database = ''
     if options.useData:
-        database = 'BristolAnalysis/NTupleTools/data/JEC/Summer12_V3_DATA.db'
+        database = 'BristolAnalysis/NTupleTools/data/JEC/Spring16_25nsV6_DATA.db'
         configureCustomJEC_DATA(process, cms, database)
     else:
-        database = 'BristolAnalysis/NTupleTools/data/JEC/Summer12_V3_MC.db'
+        database = 'BristolAnalysis/NTupleTools/data/JEC/Spring16_25nsV6_MC.db'
         configureCustomJEC_MC(process, cms, database)
     
 if not options.useData :

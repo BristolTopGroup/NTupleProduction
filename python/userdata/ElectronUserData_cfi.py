@@ -13,7 +13,7 @@ electronUserData = cms.EDProducer(
     electronMediumIdMap=cms.InputTag(
         "egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-medium"),
     electronTightIdMap=cms.InputTag(
-        " egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-tight"),
+        "egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-tight"),
     electronHEEPIdMap=cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV60"),
     # Top Object Definitions
     minLooseElectronPt=cms.double(15.),

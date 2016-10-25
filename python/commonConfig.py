@@ -13,9 +13,9 @@ config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'BristolAnalysis/NTupleTools/Configuration/makeTuplesFromMiniAOD_cfg.py'
 # config.JobType.pyCfgParams = ['isTTbarMC=1']
 config.JobType.allowUndistributedCMSSW = True
-config.JobType.inputFiles = [	'BristolAnalysis/NTupleTools/data/BTagSF/CSVv2.csv',
-								'BristolAnalysis/NTupleTools/data/JEC/Fall15_25nsV2_DATA.db',
-								'BristolAnalysis/NTupleTools/data/JEC/Fall15_25nsV2_MC.db']
+config.JobType.inputFiles = [	'BristolAnalysis/NTupleTools/data/BTagSF/CSVv2_ichep.csv',
+								'BristolAnalysis/NTupleTools/data/JEC/Spring16_25nsV6_DATA.db',
+								'BristolAnalysis/NTupleTools/data/JEC/Spring16_25nsV6_MC.db']
 
 config.section_("Data")
 # config.Data.inputDataset = '/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
