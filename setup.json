@@ -27,16 +27,6 @@
 			"source": "jhgoh:PseudoTop76",
 			"destination": "",
 			"provider": "git-cms-merge-topic"
-		},{
-			"name": "htcondenser",
-			"source": "git+https://github.com/kreczko/htcondenser.git@setup",
-			"destination": "",
-			"provider": "pip"
-		},{
-			"name": "ganga",
-			"source": "ganga",
-			"destination": "",
-			"provider": "pip"
 		},
 		{
 			"name": "AnalysisSoftware",
