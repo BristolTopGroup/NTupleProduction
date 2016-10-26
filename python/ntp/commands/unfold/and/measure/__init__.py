@@ -45,18 +45,6 @@ from hepshell.interpreter import time_function
 from ntp.commands.run import Command as C
 from ntp.commands.setup import DPS_RESULTDIR
 
-# from dps.config.xsection import XSectionConfig
-# import dps.config.RooUnfold as unfoldCfg
-# from dps.utils.file_utilities import read_data_from_JSON, write_data_to_JSON
-# from dps.utils.Calculation import calculate_xsection, calculate_normalised_xsection, \
-#     combine_complex_results
-
-unfold_and_measure = importlib.import_module(
-    'dps.analysis.xsection.02_unfold_and_measure', 'dps.analysis.xsection')
-get_unfolded_normalisation = unfold_and_measure.get_unfolded_normalisation
-calculate_xsections = unfold_and_measure.calculate_xsections
-calculate_normalised_xsections = unfold_and_measure.calculate_normalised_xsections
-
 LOG = logging.getLogger(__name__)
 
 JSON_PATH = os.path.join(
