@@ -60,7 +60,7 @@ class Command(ParentCommand):
         dataset = self.__variables['dataset']
 
         # create tarball
-#         self.__create_tar_file(args, variables)
+        self.__create_tar_file(args, variables)
 
         self.__run(campaign, dataset)
         # to check status:
@@ -147,6 +147,8 @@ class Command(ParentCommand):
             run_config['pyCfgParams'] = parameters
 
         LOG.info('Retrieved CRAB config')
+
+        run_config['additional_input_files'] = self.__input_files
 
         self.__config = run_config
 

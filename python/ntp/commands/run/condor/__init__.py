@@ -240,6 +240,8 @@ class Command(C):
 
         LOG.info('Retrieved CRAB config')
 
+        run_config['additional_input_files'] = self.__input_files
+
         self.__config = run_config
 
     def __replace_output_dir(self, run_config):
