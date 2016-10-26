@@ -66,6 +66,7 @@ class Command(C):
         from ntp.commands.create.tarball import Command as TarCommand
         no_operation = 'noop' in self.__variables and self.__variables['noop']
         if no_operation and TarCommand.tarballs_exist():
+            self.__input_files.extend(TarCommand.get_existing_files())
             return
         if self.__have_fresh_tar_files:
             return
