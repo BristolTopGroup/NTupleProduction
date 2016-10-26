@@ -61,7 +61,7 @@ ntp setup from_tarball=cmssw.tar.gz
 """
 
 RUN_SCRIPT = """
-ntp run local $@ nevents=-1
+ntp run ntuple $@ nevents=-1
 
 """
 
