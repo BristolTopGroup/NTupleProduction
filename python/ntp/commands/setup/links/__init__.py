@@ -1,8 +1,8 @@
 """
     setup links:
-        Links the relevant folders (as defined in metadata.json) to the
+        Links the relevant folders (as defined in setup.json) to the
         CMSSW setup. Requires workspace & CMSSW to be set up
-        
+
     Usage:
         setup links
 """

@@ -91,29 +91,44 @@ if [ ! -d "${TOPQ_CONDA_PATH}" ] ; then
   # just create all parent folders except miniconda
   echo "Could not find conda install in ${TOPQ_CONDA_PATH}. Installing conda ..."
   mkdir -p ${TOPQ_CONDA_PATH}; rmdir ${TOPQ_CONDA_PATH}
-	wget -nv https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh
-	bash miniconda.sh -b -p ${TOPQ_CONDA_PATH}
-	PATH=${TOPQ_CONDA_PATH}/bin:$PATH; export PATH
-	rm -f miniconda.sh
+  wget -nv https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh
+  bash miniconda.sh -b -p ${TOPQ_CONDA_PATH}
+  PATH=${TOPQ_CONDA_PATH}/bin:$PATH; export PATH
+  rm -f miniconda.sh
   echo "Finished conda installation, creating new conda environment"
-	conda update conda -y
-	conda update pip -y
-	conda install psutil -y
-	conda config --add channels http://conda.anaconda.org/NLeSC
-    conda config --set show_channel_urls yes
-	# python modules
-	conda create -n ntp python=2.7 root=6 root-numpy numpy matplotlib nose \
+  conda update conda -y
+  conda update pip -y
+  conda install psutil -y
+  conda config --add channels http://conda.anaconda.org/NLeSC
+  conda config --set show_channel_urls yes
+  # python modules
+  conda create -n ntp python=2.7 root=6 root-numpy numpy matplotlib nose \
   sphinx pytables rootpy pandas -y
   echo "Created conda environment, installing basic dependencies"
-	source activate ntp
+  source activate ntp
   conda install git wget pycurl -y
-	pip install -U -r requirements.txt
-	# clean the cache (downloaded tarballs)
-	conda clean -t -y
+  pip install -U -r requirements.txt
+  pip install -U --install-option="--prefix=${HEP_PROJECT_ROOT}/external" git+https://github.com/BristolTopGroup/DailyPythonScripts.git
+  # clean the cache (downloaded tarballs)
+  conda clean -t -y
   # give the group write access
   chmod g+r -R ${TOPQ_CONDA_PATH}
 else
   echo "Found conda install in ${TOPQ_CONDA_PATH}, activating..."
-	PATH=${TOPQ_CONDA_PATH}/bin:$PATH; export PATH
-	source activate ntp
+  PATH=${TOPQ_CONDA_PATH}/bin:$PATH; export PATH
+  source activate ntp
 fi
+
+if [ ! -d "DEV" ] ; then
+  mkdir DEV
+fi
+
+echo "NTP is now available in $PWD"
+
+# adjusting paths for dps
+PATH=${HEP_PROJECT_ROOT}/external/bin:$PATH; export PATH
+PYTHONPATH=${HEP_PROJECT_ROOT}/external/lib/python2.7/site-packages:$PYTHONPATH; export PYTHONPATH
+if [ ! -e "DEV/DPS" ]; then
+  ln -s ../external/lib/python2.7/site-packages/dps DEV/DPS
+fi
+echo "DPS is now available in DEV/DPS"

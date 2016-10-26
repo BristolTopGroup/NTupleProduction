@@ -1,8 +1,8 @@
 """
     setup dependencies:
-        Sets up NTP's dependencies as defined in metadata.json
+        Sets up NTP's dependencies as defined in setup.json
         Workspace & CMSSW must be set up
-        
+
     Usage:
         setup dependencies
 """
