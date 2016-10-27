@@ -134,8 +134,8 @@ class Command(ParentCommand):
         campaign = self.__variables['campaign']
         if path != '':
             input_files = ParentCommand.input_files_from_path(path)
-            # dress them for CMSSW
-            input_files = ['file://{0}'.format(f) for f in input_files]
+            # dress them for CMSSW (unless they have a global path)
+            input_files = ['file://{0}'.format(f) if not f.startswith('/store') else f for f in input_files]
         else:
             input_files = find_input_files(
                 campaign, dataset, self.__variables, LOG
