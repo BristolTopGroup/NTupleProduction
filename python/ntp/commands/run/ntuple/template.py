@@ -1,6 +1,6 @@
 PYCONF = """
 import FWCore.ParameterSet.Config as cms
-from run.miniAODToNTuple_cfg import process
+from BristolAnalysis.NTupleTools.run.miniAODToNTuple_cfg import process
 
 process.maxEvents.input = cms.untracked.int32({nevents})
 

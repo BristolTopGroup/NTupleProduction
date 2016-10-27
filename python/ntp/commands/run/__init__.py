@@ -66,6 +66,7 @@ class Command(C):
         from ntp.commands.create.tarball import Command as TarCommand
         no_operation = 'noop' in self.__variables and self.__variables['noop']
         if no_operation and TarCommand.tarballs_exist():
+            self.__input_files.extend(TarCommand.get_existing_files())
             return
         if self.__have_fresh_tar_files:
             return
@@ -126,4 +127,4 @@ class Command(C):
         else:  # neither wildcard nor comma separated list
             input_files = [path]
         input_files = [os.path.abspath(f) for f in input_files]
-        return [f for f in input_files if os.path.exists(f)]
+        return [f for f in input_files if os.path.exists(f) or f.startswith('/store')]

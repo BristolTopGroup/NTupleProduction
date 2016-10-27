@@ -167,3 +167,11 @@ class Command(C):
         ntp_tars = [NTP_TAR + '.tar', NTP_TAR + '.tar.gz']
         ntp_exists = any([os.path.exists(p) for p in ntp_tars])
         return cmssw_exists and ntp_exists
+
+    @staticmethod
+    def get_existing_files():
+        cmssw_tars = [CMSSW_TAR + '.tar', CMSSW_TAR + '.tar.gz']
+        ntp_tars = [NTP_TAR + '.tar', NTP_TAR + '.tar.gz']
+        existing_files = [p for p in cmssw_tars if os.path.exists(p)]
+        existing_files.extend([p for p in ntp_tars if os.path.exists(p)])
+        return existing_files

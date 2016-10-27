@@ -17,6 +17,38 @@ drop_from_path()
                           -e "s;${drop};;g"`
 }
 
+TOPQ_CONDA_PATH=/software/TopQuarkGroup/miniconda; export TOPQ_CONDA_PATH
+if [ ! -d "${TOPQ_CONDA_PATH}" ] ; then
+  # just create all parent folders except miniconda
+  echo "Could not find conda install in ${TOPQ_CONDA_PATH}. Installing conda ..."
+  mkdir -p ${TOPQ_CONDA_PATH}; rmdir ${TOPQ_CONDA_PATH}
+  wget -nv https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh
+  bash miniconda.sh -b -p ${TOPQ_CONDA_PATH}
+  PATH=${TOPQ_CONDA_PATH}/bin:$PATH; export PATH
+  rm -f miniconda.sh
+  echo "Finished conda installation, creating new conda environment"
+  conda update conda -y
+  conda update pip -y
+  conda install psutil -y
+  conda config --add channels http://conda.anaconda.org/NLeSC
+  conda config --set show_channel_urls yes
+  # python modules
+  conda create -n ntp python=2.7 root=6 root-numpy numpy matplotlib nose \
+  sphinx pytables rootpy pandas -y
+  echo "Created conda environment, installing basic dependencies"
+  source activate ntp
+  conda install git wget pycurl -y
+  pip install -U -r requirements.txt
+  # clean the cache (downloaded tarballs)
+  conda clean -t -y
+  # give the group write access
+  chmod g+r -R ${TOPQ_CONDA_PATH}
+else
+  echo "Found conda install in ${TOPQ_CONDA_PATH}, activating..."
+  PATH=${TOPQ_CONDA_PATH}/bin:$PATH; export PATH
+  source activate ntp
+fi
+
 if [ -n "${HEP_PROJECT_ROOT}" ] ; then
    old_projectbase=${HEP_PROJECT_ROOT}
 fi
@@ -86,44 +118,16 @@ if [ "$vomsInfo" == "" ]; then
   fi
 fi
 
-TOPQ_CONDA_PATH=/software/TopQuarkGroup/miniconda; export TOPQ_CONDA_PATH
-if [ ! -d "${TOPQ_CONDA_PATH}" ] ; then
-  # just create all parent folders except miniconda
-  echo "Could not find conda install in ${TOPQ_CONDA_PATH}. Installing conda ..."
-  mkdir -p ${TOPQ_CONDA_PATH}; rmdir ${TOPQ_CONDA_PATH}
-  wget -nv https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh
-  bash miniconda.sh -b -p ${TOPQ_CONDA_PATH}
-  PATH=${TOPQ_CONDA_PATH}/bin:$PATH; export PATH
-  rm -f miniconda.sh
-  echo "Finished conda installation, creating new conda environment"
-  conda update conda -y
-  conda update pip -y
-  conda install psutil -y
-  conda config --add channels http://conda.anaconda.org/NLeSC
-  conda config --set show_channel_urls yes
-  # python modules
-  conda create -n ntp python=2.7 root=6 root-numpy numpy matplotlib nose \
-  sphinx pytables rootpy pandas -y
-  echo "Created conda environment, installing basic dependencies"
-  source activate ntp
-  conda install git wget pycurl -y
-  pip install -U -r requirements.txt
-  pip install -U --install-option="--prefix=${HEP_PROJECT_ROOT}/external" git+https://github.com/BristolTopGroup/DailyPythonScripts.git
-  # clean the cache (downloaded tarballs)
-  conda clean -t -y
-  # give the group write access
-  chmod g+r -R ${TOPQ_CONDA_PATH}
-else
-  echo "Found conda install in ${TOPQ_CONDA_PATH}, activating..."
-  PATH=${TOPQ_CONDA_PATH}/bin:$PATH; export PATH
-  source activate ntp
-fi
-
 if [ ! -d "DEV" ] ; then
   mkdir DEV
 fi
 
 echo "NTP is now available in $PWD"
+
+if [ ! -d ${HEP_PROJECT_ROOT}/external ] ; then
+  mkdir ${HEP_PROJECT_ROOT}/external
+  pip install -U --install-option="--prefix=${HEP_PROJECT_ROOT}/external" git+https://github.com/BristolTopGroup/DailyPythonScripts.git
+fi
 
 # adjusting paths for dps
 PATH=${HEP_PROJECT_ROOT}/external/bin:$PATH; export PATH
