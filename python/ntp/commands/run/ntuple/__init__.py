@@ -51,7 +51,7 @@ from .template import PYCONF
 LOG = logging.getLogger(__name__)
 PSET = os.path.join(TMPDIR, 'pset.py')
 OUTPUT_FILE = os.path.join(RESULTDIR, '{ds}_ntuple.root')
-BTAG_CALIB_FILE = os.path.join(NTPROOT, 'data/BTagSF/CSVv2.csv')
+BTAG_CALIB_FILE = os.path.join(NTPROOT, 'data/BTagSF/CSVv2_ichep.csv')
 
 
 def get_datasets(campaign):
