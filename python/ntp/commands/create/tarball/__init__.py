@@ -70,9 +70,7 @@ class Command(C):
         # Note that directories are only looked-for and added under the src/ folder.
         # /data/ subdirs contain data files needed by the code
         # /interface/ subdirs contain C++ header files needed e.g. by ROOT6
-        directories = [os.path.join(CMSSW_SRC, 'BristolAnalysis', 'NTupleTools','data'), 
-            os.path.join(CMSSW_SRC, 'BristolAnalysis', 'NTupleTools','interface'),
-            os.path.join(CMSSW_SRC, 'BristolAnalysis', 'NTupleTools','python')]
+        directories = ['data', 'interface', 'python']
 
         directories_to_copy = []
         dst_base = os.path.join(CMSSW_TAR, 'src')
