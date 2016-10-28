@@ -96,7 +96,7 @@ class Command(C):
                 self.__make_snapshot(directory, dst, *ignore)
 
     def __prepare_ntp(self):
-        ignore = ['data', '.git*', 'workspace*', '*.root', '.*']
+        ignore = ['.git*', 'workspace*', '*.root', '.*']
         ignore.extend(['src', 'plugins', 'docs', 'interface'])
         ignore.extend(['DEV'])
         ignore = [os.path.join(NTPROOT, i) for i in ignore]
