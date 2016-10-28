@@ -70,7 +70,9 @@ class Command(C):
         # Note that directories are only looked-for and added under the src/ folder.
         # /data/ subdirs contain data files needed by the code
         # /interface/ subdirs contain C++ header files needed e.g. by ROOT6
-        directories = ['data', 'interface', 'python']
+        directories = [os.path.join(CMSSW_SRC, 'BristolAnalysis', 'NTupleTools','data'), 
+            os.path.join(CMSSW_SRC, 'BristolAnalysis', 'NTupleTools','interface'),
+            os.path.join(CMSSW_SRC, 'BristolAnalysis', 'NTupleTools','python')]
 
         directories_to_copy = []
         dst_base = os.path.join(CMSSW_TAR, 'src')
@@ -96,7 +98,7 @@ class Command(C):
                 self.__make_snapshot(directory, dst, *ignore)
 
     def __prepare_ntp(self):
-        ignore = ['.git*', 'workspace*', '*.root', '.*']
+        ignore = ['data', '.git*', 'workspace*', '*.root', '.*']
         ignore.extend(['src', 'plugins', 'docs', 'interface'])
         ignore.extend(['DEV'])
         ignore = [os.path.join(NTPROOT, i) for i in ignore]
