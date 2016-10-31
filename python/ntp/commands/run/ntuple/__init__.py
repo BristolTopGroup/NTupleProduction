@@ -126,7 +126,7 @@ class Command(ParentCommand):
             output_file = self.__variables['output_file']
         else: 
             output_file = '_'.join([dataset, campaign, suffix])
-            output_file = os.path.join(RESULTDIR, os.path.basename(output_file))
+        output_file = os.path.join(RESULTDIR, os.path.basename(output_file))
 
         if not output_file.endswith('.root'):
             output_file += '.root'
