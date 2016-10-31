@@ -1,4 +1,5 @@
 """
+DEPRECATED
     run condor: Runs the n-tuple production on the a condor batch system.
                 All run commands require a valid grid certificate as they
                 either read data from the grid via XRootD or run on grid
@@ -126,6 +127,9 @@ class Command(C):
         self.__outdirs = []
 
     def run(self, args, variables):
+        self.__text = """This command is deprecated and will be replaced with
+        a newer version soon."""
+        return False
         self.__prepare(args, variables)
 
         campaign = self.__variables['campaign']

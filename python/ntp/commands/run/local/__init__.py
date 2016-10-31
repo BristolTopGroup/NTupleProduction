@@ -1,4 +1,5 @@
 """
+DEPRECATED
     run local:  Runs the n-tuple production on the current machine.
                 All run commands require a valid grid certificate as they
                 either read data from the grid via XRootD or run on grid
@@ -62,6 +63,9 @@ class Command(C):
 
     @time_function('run local', LOG)
     def run(self, args, variables):
+        self.__text = """This command is deprecated and will be replaced with
+        a newer version soon."""
+        return False
         output_file = None
         if 'output_file' in variables:
             output_file = os.path.join(RESULTDIR, variables['output_file'])
