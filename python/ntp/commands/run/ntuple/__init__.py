@@ -121,10 +121,16 @@ class Command(ParentCommand):
             return False
 
     def __add_output_file(self, dataset, campaign, suffix):
-        output_file = '_'.join([dataset, campaign, suffix])
-        output_file = os.path.join(RESULTDIR, output_file)
+
+        if self.__variables['output_file'] is not None:
+            output_file = self.__variables['output_file']
+        else: 
+            output_file = '_'.join([dataset, campaign, suffix])
+            output_file = os.path.join(RESULTDIR, os.path.basename(output_file))
+
         if not output_file.endswith('.root'):
             output_file += '.root'
+
         self.__variables['output_file'] = output_file
 
     def __add_input_files(self):
