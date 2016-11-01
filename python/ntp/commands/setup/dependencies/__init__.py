@@ -28,7 +28,7 @@ class Command(C):
             'source /cvmfs/cms.cern.ch/cmsset_default.sh',
             'eval `/cvmfs/cms.cern.ch/common/scram runtime -sh`',
         ]
-        from .. import DEPENDENCIES, CMSSW_SRC
+        from .. import DEPENDENCIES, CMSSW_SRC, CMSSW_VERSION
         from hepshell.interpreter import call
 
         rcs = []
@@ -54,7 +54,10 @@ class Command(C):
 
             all_in_one = ' && '.join(commands)
             all_in_one = all_in_one + ' && ' + command + ' \n'
-            all_in_one = all_in_one.format(CMSSW_SRC=CMSSW_SRC)
+            all_in_one = all_in_one.format(
+                CMSSW_VERSION=CMSSW_VERSION,
+                CMSSW_SRC=CMSSW_SRC,
+                )
             rc = call(all_in_one, logger=LOG, shell=True)
             rcs.append(rc)
 
