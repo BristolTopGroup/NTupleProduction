@@ -29,8 +29,10 @@
 			"destination": "BristolAnalysis/Tools",
 			"provider": "git",
 			"setup-cmds": [
-				"ln -s {CMSSW_SRC}/BristolAnalysis/Tools {CMSSW_SRC}/../../../DEV/AS",
-				"echo \"AS is now available in DEV/AS (links to {CMSSW_SRC}/BristolAnalysis/Tools)\""
+				"cd {CMSSW_SRC}/../../../DEV/",
+				"ln -s ../workspace/{CMSSW_VERSION}/src/BristolAnalysis/Tools AS",
+				"cd -",
+				"echo \"AS is now available in DEV/AS (links to {CMSSW_VERSION}/src/BristolAnalysis/Tools)\""
 			]
 		},
 		{
