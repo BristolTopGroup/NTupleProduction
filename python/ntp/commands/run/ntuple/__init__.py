@@ -82,7 +82,7 @@ class Command(ParentCommand):
         'where': 'local',
         'input_files': [],
         'test': False,
-        'output_file': '',
+        'output_file': None,
     }
 
     def __init__(self, path=__file__, doc=__doc__):
@@ -121,7 +121,6 @@ class Command(ParentCommand):
             return False
 
     def __add_output_file(self, dataset, campaign, suffix):
-
         if self.__variables['output_file'] is not None:
             output_file = self.__variables['output_file']
         else: 
