@@ -40,7 +40,7 @@ process.printEventContent = cms.EDAnalyzer("EventContentAnalyzer")
 # Source
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
-                                'root://xrootd.unl.edu//store/data/Run2015C_25ns/SingleMuon/MINIAOD/16Dec2015-v1/00000/002C22D4-E1AF-E511-AE8E-001E673971CA.root',
+                                'root://xrootd.unl.edu//store/data/Run2015C_25ns/SingleMuon/MINIAOD/16Dec2015-v1/00000/002C24D4-E1AF-E511-AE8E-001E673971CA.root',
                             )
                             )
 
@@ -218,31 +218,31 @@ if is2016:
     process.nTuples.remove(process.triggerSequence2015)
     if isMC:
         if isReHLT:
-            process.nTupleTriggerEle27WPTightGsfMC.HLTInputTag = cms.InputTag(
+            process.nTupleTriggerEle32erWPTightGsfMC.HLTInputTag = cms.InputTag(
                 'TriggerResults', '', 'HLT2')
-            process.nTupleTriggerIsoMu22MC.HLTInputTag = cms.InputTag(
+            process.nTupleTriggerIsoMu24MC.HLTInputTag = cms.InputTag(
                 'TriggerResults', '', 'HLT2')
-            process.nTupleTriggerIsoTkMu22MC.HLTInputTag = cms.InputTag(
+            process.nTupleTriggerIsoTkMu24MC.HLTInputTag = cms.InputTag(
                 'TriggerResults', '', 'HLT2')
         # Remove 76X Data 25ns Triggers
         process.triggerSequence2016.remove(
-            process.nTupleTriggerEle27WPTightGsf)
-        process.triggerSequence2016.remove(process.nTupleTriggerIsoMu22)
-        process.triggerSequence2016.remove(process.nTupleTriggerIsoTkMu22)
+            process.nTupleTriggerEle32erWPTightGsf)
+        process.triggerSequence2016.remove(process.nTupleTriggerIsoMu24)
+        process.triggerSequence2016.remove(process.nTupleTriggerIsoTkMu24)
         process.triggerSequence2016.remove(process.nTupleTrigger)
-        del process.nTupleTriggerEle27WPTightGsf
-        del process.nTupleTriggerIsoMu22, process.nTupleTriggerIsoTkMu22
+        del process.nTupleTriggerEle32erWPTightGsf
+        del process.nTupleTriggerIsoMu24, process.nTupleTriggerIsoTkMu24
         del process.nTupleTrigger
 
     if isData:
         # Remove 76X MC 25ns Triggers
         process.triggerSequence2016.remove(
-            process.nTupleTriggerEle27WPTightGsfMC)
-        process.triggerSequence2016.remove(process.nTupleTriggerIsoMu22MC)
-        process.triggerSequence2016.remove(process.nTupleTriggerIsoTkMu22MC)
+            process.nTupleTriggerEle32erWPTightGsfMC)
+        process.triggerSequence2016.remove(process.nTupleTriggerIsoMu24MC)
+        process.triggerSequence2016.remove(process.nTupleTriggerIsoTkMu24MC)
         process.triggerSequence2016.remove(process.nTupleTrigger)
-        del process.nTupleTriggerEle27WPTightGsfMC
-        del process.nTupleTriggerIsoMu22MC, process.nTupleTriggerIsoTkMu22MC
+        del process.nTupleTriggerEle32erWPTightGsfMC
+        del process.nTupleTriggerIsoMu24MC, process.nTupleTriggerIsoTkMu24MC
         del process.nTupleTrigger
         # Remove PseudoTop and MC Gen Variables
         process.makingNTuples.remove(process.makePseudoTop)
