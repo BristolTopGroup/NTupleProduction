@@ -6,7 +6,7 @@ jetUserData = cms.EDProducer(
     jetCollection=cms.InputTag("patJetsReapplyJEC"),
     beamSpotCollection=cms.InputTag('offlineBeamSpot'),
     # Top Object Definitions
-    minSignalJetPt=cms.double(20.),
+    minSignalJetPt=cms.double(30.),
     maxSignalJetEta=cms.double(2.4),
 
     jecUncertainty=cms.string('AK4PFchs'),
