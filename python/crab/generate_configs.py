@@ -20,7 +20,7 @@ def generate_crab_configs():
     from crab.datasets import DATASETS
     import os
 
-    NTPROOT = os.environ['NTPROOT']
+    NTPROOT = os.environ['HEP_PROJECT_ROOT']
     CRAB_CFG_PATH = NTPROOT + '/python/crab'
     LUMI_MASKS = {
         '25ns': 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/' +
@@ -30,6 +30,9 @@ def generate_crab_configs():
         'Spring16' : 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/' +
         'CAF/certification/Collisions16/13TeV/' +
         'Cert_271036-277148_13TeV_PromptReco_Collisions16_JSON.txt',
+        'Moriond17': 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/' +
+        'CAF/certification/Collisions16/13TeV/' +
+        'Cert_271036-280385_13TeV_PromptReco_Collisions16_JSON.txt',
     }
 
     for campaign, samples in DATASETS.items():
