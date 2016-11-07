@@ -29,13 +29,13 @@ nTupleTriggerIsoTkMu20MC = nTupleTrigger.clone( Prefix='HLTIsoTkMu20MC.', PathOf
 # ------ 2016 ReReco ------ #
 # Data
 # Electron
-nTupleTriggerEle32erWPTightGsf = nTupleTrigger.clone( Prefix='HLTEle32erWPTightGsf.', PathOfInterest='HLT_Ele32_eta2p1_WPTight_Gsf_v')
+nTupleTriggerEle27WPTightGsf = nTupleTrigger.clone( Prefix='HLTEle27WPTightGsf.', PathOfInterest='HLT_Ele27_WPTight_Gsf_v')
 # Muon
 nTupleTriggerIsoMu24 = nTupleTrigger.clone( Prefix='HLTIsoMu24.', PathOfInterest='HLT_IsoMu24_v')
 nTupleTriggerIsoTkMu24 = nTupleTrigger.clone( Prefix='HLTIsoTkMu24.', PathOfInterest='HLT_IsoTkMu24_v')
 # MC
 # Electron
-nTupleTriggerEle32erWPTightGsfMC = nTupleTrigger.clone( Prefix='HLTEle32erWPTightGsfMC.', PathOfInterest='HLT_Ele32_eta2p1_WPTight_Gsf_v')
+nTupleTriggerEle27WPTightGsfMC = nTupleTrigger.clone( Prefix='HLTEle27WPTightGsfMC.', PathOfInterest='HLT_Ele27_WPTight_Gsf_v')
 # Muon
 nTupleTriggerIsoMu24MC = nTupleTrigger.clone( Prefix='HLTIsoMu24MC.', PathOfInterest='HLT_IsoMu24_v')
 nTupleTriggerIsoTkMu24MC = nTupleTrigger.clone( Prefix='HLTIsoTkMu24MC.', PathOfInterest='HLT_IsoTkMu24_v')
@@ -51,11 +51,11 @@ triggerSequence2015 = cms.Sequence(
 )
 
 triggerSequence2016 = cms.Sequence(
-    nTupleTriggerEle32erWPTightGsf *
+    nTupleTriggerEle27WPTightGsf *
     nTupleTriggerIsoMu24 *
     nTupleTriggerIsoTkMu24 *
 
-    nTupleTriggerEle32erWPTightGsfMC *
+    nTupleTriggerEle27WPTightGsfMC *
     nTupleTriggerIsoMu24MC *
     nTupleTriggerIsoTkMu24MC
 )
