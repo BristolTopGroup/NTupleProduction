@@ -12,5 +12,5 @@ config.Data.inputDataset = '/SingleElectron/Run2016D-23Sep2016-v1/MINIAOD'
 config.Data.splitting = 'EventAwareLumiBased'
 config.Data.unitsPerJob = 500000
 config.JobType.pyCfgParams = ['isData=1']
-config.Data.lumiMask = 'EFG_SingleEle27_withL1IsoEG26unprescaled.txt'
+config.Data.lumiMask = 'data/JSON/LSfor_HLT_Ele27_WPTight_Gsf_withLowestSeed_L1_SingleIsoEG26.json'
 
