@@ -17,9 +17,9 @@ electronUserData = cms.EDProducer(
     electronHEEPIdMap=cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV60"),
     # Top Object Definitions
     minLooseElectronPt=cms.double(15.),
-    maxLooseElectronEta=cms.double(2.4),
-    minSignalElectronPt=cms.double(29.),
-    maxSignalElectronEta=cms.double(2.4),
+    maxLooseElectronEta=cms.double(2.1),
+    minSignalElectronPt=cms.double(34.),
+    maxSignalElectronEta=cms.double(2.1),
     #     mediumElectronIDMap_bitmap=cms.InputTag(
     #         'egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-mediumBitmap'),
 
