@@ -43,6 +43,11 @@
 			"source": "ikrav:egm_id_80X_v1",
 			"destination": "",
 			"provider": "git-cms-merge-topic"
+		},{
+			"name": "recoMET",
+			"source": "cms-met:METRecipe_8020",
+			"destination": "",
+			"provider": "git-cms-merge-topic"
 		}
 	]
 }
