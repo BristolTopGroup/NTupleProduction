@@ -2,6 +2,7 @@ from __future__ import print_function
 import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.VarParsing import VarParsing
 from BristolAnalysis.NTupleTools.options import CMSSW_MAJOR_VERSION, registerOptions, is2015, is2016
+import sys
 
 # register options
 options = registerOptions(VarParsing('python'))
@@ -13,10 +14,13 @@ isReHLT = options.isReHLT
 # Define the CMSSW process
 process = cms.Process("Ntuples")
 
+
 # Load the standard set of configuration modules
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
+
+
 
 # Message Logger settings
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -48,7 +52,7 @@ process.source = cms.Source("PoolSource",
 globalTags = {
     'data': {
         7: '76X_dataRun2_16Dec2015_v0',  # ReReco+Prompt JECv6
-        8: '80X_dataRun2_Prompt_ICHEP16JEC_v0',
+        8: '80X_dataRun2_2016SeptRepro_v4',
     },
     'MC': {
         7: '76X_mcRun2_asymptotic_RunIIFall15DR76_v1',  # 25ns MC
@@ -59,13 +63,16 @@ globalTags = {
 process.load(
     "Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 globaltag = ''
+
 if (isData):
     globaltag = globalTags['data'][CMSSW_MAJOR_VERSION]
 else:
     globaltag = globalTags['MC'][CMSSW_MAJOR_VERSION]
 process.GlobalTag.globaltag = cms.string(globaltag)
+
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 # process.load('JetMETCorrections.Configuration.CorrectedJetProducersDefault_cff')
+
 if CMSSW_MAJOR_VERSION == '7':
     print("Running on 2015 Data")
 else:
