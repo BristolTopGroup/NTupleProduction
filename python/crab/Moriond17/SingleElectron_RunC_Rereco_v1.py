@@ -12,5 +12,5 @@ config.Data.inputDataset = '/SingleElectron/Run2016C-23Sep2016-v1/MINIAOD'
 config.Data.splitting = 'EventAwareLumiBased'
 config.Data.unitsPerJob = 500000
 config.JobType.pyCfgParams = ['isData=1']
-config.Data.lumiMask = 'data/JSON/LSfor_HLT_Ele27_WPTight_Gsf_withLowestSeed_L1_SingleIsoEG26.json'
+config.Data.lumiMask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/Cert_271036-280385_13TeV_PromptReco_Collisions16_JSON.txt'
 
