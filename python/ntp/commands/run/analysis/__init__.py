@@ -40,6 +40,7 @@ from ntp.commands.run import Command as ParentCommand
 from hepshell.interpreter import time_function
 from ntp import NTPROOT
 from ntp.commands.setup import CMSSW_SRC, TMPDIR, RESULTDIR, LOGDIR
+
 from crab.util import find_input_files
 from .template import PYCONF
 
@@ -55,44 +56,6 @@ ANALYSIS_MODES = [
     'JetSmearing_down',
     'JetSmearing_up',
 ]
-
-
-def input_files_from_path(path):
-    """
-        Converts given path(s) to input files.
-    """
-    if not isinstance(path, list):
-        path = [path]
-    input_files = []
-    for p in path:
-        if ',' in p:
-            input_files.extend( p.split(',') )
-        elif '*' in p:
-            input_files.extend( glob.glob(p) )
-        else:  # neither wildcard nor comma separated list
-            input_files.append( p )
-
-    input_files = [os.path.abspath(f) for f in input_files]
-    return [f for f in input_files if os.path.exists(f)]
-
-
-def get_datasets():
-    from imp import load_source
-    analysis_info = load_source('analysis_info', ANALYSIS_INFO_FILE)
-
-    return analysis_info.datasets_13TeV
-
-
-def input_files_from_dataset(dataset):
-    datasets = get_datasets()
-    if not dataset in datasets:
-        msg = 'Cannot find dataset {0}'.format(dataset)
-        LOG.error(msg)
-        import sys
-        sys.exit(msg)
-    path = [os.path.join(p, '*/*.root') for p in datasets[dataset]]
-    return input_files_from_path(path)
-
 
 class Command(ParentCommand):
     #     """
@@ -169,7 +132,7 @@ class Command(ParentCommand):
         if path != '':
             input_files = ParentCommand.input_files_from_path(path)
         else:
-            input_files = input_files_from_dataset(dataset)
+            input_files = self.__input_files_from_dataset(dataset)
         self.__variables['input_files'] = input_files
 
     def __run_payload(self):
@@ -189,3 +152,19 @@ class Command(ParentCommand):
         if bad:
             LOG.debug('Mode {0} is only supported for simulation'.format(mode))
         return not bad
+
+    def __get_datasets(self):
+        from imp import load_source
+        analysis_info = load_source('analysis_info', ANALYSIS_INFO_FILE)
+        return analysis_info.datasets_13TeV
+
+    def __input_files_from_dataset(self, dataset):
+        datasets = self.__get_datasets()
+        if not dataset in datasets:
+            msg = 'Cannot find dataset {0}'.format(dataset)
+            LOG.error(msg)
+            import sys
+            sys.exit(msg)
+        path = [os.path.join(p, '*/*.root') for p in datasets[dataset]]
+        return ParentCommand.input_files_from_path(path)
+
