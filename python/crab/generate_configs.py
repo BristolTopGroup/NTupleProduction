@@ -31,8 +31,8 @@ def generate_crab_configs():
         'CAF/certification/Collisions16/13TeV/' +
         'Cert_271036-277148_13TeV_PromptReco_Collisions16_JSON.txt',
         'Moriond17': 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/' +
-        'CAF/certification/Collisions16/13TeV/' +
-        'Cert_271036-280385_13TeV_PromptReco_Collisions16_JSON.txt',
+        'CAF/certification/Collisions16/13TeV/ReReco/' +
+        'Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt',
     }
 
     for campaign, samples in DATASETS.items():
