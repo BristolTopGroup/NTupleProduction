@@ -228,3 +228,4 @@ class Command(C):
             jobs.append(job)
 
         return jobs
+        
