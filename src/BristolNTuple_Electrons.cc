@@ -80,9 +80,9 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 	produces < std::vector<double> > (prefix + "HcalIsoD2Heep04" + suffix);
 	produces < std::vector<double> > (prefix + "TrkIsoHeep04" + suffix);
 
-	produces < std::vector<bool> > (prefix + "isMediumElectron" + suffix);
-	produces < std::vector<bool> > (prefix + "isMediumNonIsoElectron" + suffix);
-	produces < std::vector<bool> > (prefix + "isMediumConversionElectron" + suffix);
+	produces < std::vector<bool> > (prefix + "isTightElectron" + suffix);
+	produces < std::vector<bool> > (prefix + "isTightNonIsoElectron" + suffix);
+	produces < std::vector<bool> > (prefix + "isTightConversionElectron" + suffix);
 
 	//electron conversion identification variables
 	produces < std::vector<double> > (prefix + "Dist" + suffix);
@@ -169,9 +169,9 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > PFRelIsoWithEA(new std::vector<double>());
 
 	// Electron ID variables
-	std::auto_ptr < std::vector<bool> > isMediumElectron(new std::vector<bool>());
-	std::auto_ptr < std::vector<bool> > isMediumConversionElectron(new std::vector<bool>());
-	std::auto_ptr < std::vector<bool> > isMediumNonIsoElectron(new std::vector<bool>());
+	std::auto_ptr < std::vector<bool> > isTightElectron(new std::vector<bool>());
+	std::auto_ptr < std::vector<bool> > isTightConversionElectron(new std::vector<bool>());
+	std::auto_ptr < std::vector<bool> > isTightNonIsoElectron(new std::vector<bool>());
 
 	//high energy electron isolation variables
 	std::auto_ptr < std::vector<double> > ecalIsoHeep03(new std::vector<double>());
@@ -226,9 +226,9 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			if (px->size() >= maxSize) break;
 
 			// Check ID
-			isMediumElectron->push_back( it->userInt("passesMediumId") );
-			isMediumNonIsoElectron->push_back( it->userInt("passesMediumNonIsoId")  );
-			isMediumConversionElectron->push_back( it->userInt("passesMediumConversionId") );
+			isTightElectron->push_back( it->userInt("passesTightId") );
+			isTightNonIsoElectron->push_back( it->userInt("passesTightNonIsoId")  );
+			isTightConversionElectron->push_back( it->userInt("passesTightConversionId") );
 			hasMatchedConvPhot->push_back(it->userInt("hasMatchedConvPhot"));
 			PFRelIsoWithEA->push_back( it->userFloat("PFRelIsoWithEA") );
 			// Vertex association variables
@@ -395,9 +395,9 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	iEvent.put(hcalIsoD2Heep04, prefix + "HcalIsoD2Heep04" + suffix);
 	iEvent.put(trkIsoHeep04, prefix + "TrkIsoHeep04" + suffix);
 
-	iEvent.put(isMediumElectron, prefix + "isMediumElectron" + suffix);
-	iEvent.put(isMediumNonIsoElectron, prefix + "isMediumNonIsoElectron" + suffix);
-	iEvent.put(isMediumConversionElectron, prefix + "isMediumConversionElectron" + suffix);
+	iEvent.put(isTightElectron, prefix + "isTightElectron" + suffix);
+	iEvent.put(isTightNonIsoElectron, prefix + "isTightNonIsoElectron" + suffix);
+	iEvent.put(isTightConversionElectron, prefix + "isTightConversionElectron" + suffix);
 
 	//electron conversion identification variables
 	iEvent.put(missingHits, prefix + "MissingHits" + suffix);

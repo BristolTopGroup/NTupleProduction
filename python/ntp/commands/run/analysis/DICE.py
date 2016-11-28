@@ -49,7 +49,7 @@ LOG_FILE = LOG_STEM + '.log'
 SPLITTING_BY_FILE = {
     'SingleElectron': 3,
     'SingleMuon': 3,
-    'TTJet': 5,
+    'TTJet': 4,
     'TT_': 5,
     'DEFAULT': 50,  # ~= 14 min
 }
@@ -140,6 +140,22 @@ class Command(C):
             analysis_jobs = self.create_job_layer(input_files, mode)
             for job in analysis_jobs:
                 dag_man.add_job(job, retry=RETRY_COUNT)
+            # # layer 2b
+            # # for each analysis mode create 1 merged file
+            # merge_jobs = self.__create_merge_layer(analysis_jobs, mode)
+            # for job in merge_jobs:
+            #     dag_man.add_job(job, requires=analysis_jobs, retry=2)
+
+        # # layer 2 - analysis
+        # for mode in ANALYSIS_MODES:
+        #     analysis_jobs = self.__create_analysis_layer(ntuple_jobs, mode)
+        #     for job in analysis_jobs:
+        #         dag_man.add_job(job, requires=ntuple_jobs, retry=RETRY_COUNT)
+        #     # layer 2b
+        #     # for each analysis mode create 1 merged file
+        #     merge_jobs = self.__create_merge_layer(analysis_jobs, mode)
+        #     for job in merge_jobs:
+        #         dag_man.add_job(job, requires=analysis_jobs, retry=2)
 
         self.__dag = dag_man
 
@@ -172,8 +188,11 @@ class Command(C):
             hdfs_store=hdfs_store,
             certificate=self.REQUIRE_GRID_CERT,
             cpus=1,
-            memory='1500MB'
+            memory='1500MB',
         )
+
+        job_set.job_template='/storage/ec6821/NTupleProd/new/NTupleProduction/job.condor'
+
 
         parameters = 'files={files} output_file_suffix={suffix} mode={mode}'
         parameters += ' dataset={dataset}'
@@ -209,3 +228,4 @@ class Command(C):
             jobs.append(job)
 
         return jobs
+        

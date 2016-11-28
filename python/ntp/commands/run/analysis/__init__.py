@@ -40,12 +40,13 @@ from ntp.commands.run import Command as ParentCommand
 from hepshell.interpreter import time_function
 from ntp import NTPROOT
 from ntp.commands.setup import CMSSW_SRC, TMPDIR, RESULTDIR, LOGDIR
+
 from crab.util import find_input_files
 from .template import PYCONF
 
 BAT_BASE = os.path.join(CMSSW_SRC, 'BristolAnalysis', 'Tools')
 BAT_PYTHON = os.path.join(BAT_BASE, 'python')
-ANALYSIS_INFO_FILE = os.path.join(BAT_PYTHON, 'analysis_info.py')
+ANALYSIS_INFO_FILE = os.path.join(BAT_PYTHON, 'analysis_info_2016.py')
 LOG = logging.getLogger(__name__)
 
 ANALYSIS_MODES = [
@@ -55,26 +56,6 @@ ANALYSIS_MODES = [
     'JetSmearing_down',
     'JetSmearing_up',
 ]
-
-
-
-def get_datasets():
-    from imp import load_source
-    analysis_info = load_source('analysis_info', ANALYSIS_INFO_FILE)
-
-    return analysis_info.datasets_13TeV
-
-
-def input_files_from_dataset(dataset):
-    datasets = get_datasets()
-    if not dataset in datasets:
-        msg = 'Cannot find dataset {0}'.format(dataset)
-        LOG.error(msg)
-        import sys
-        sys.exit(msg)
-    path = [os.path.join(p, '*.root') for p in datasets[dataset]]
-    return ParentCommand.input_files_from_path(path)
-
 
 class Command(ParentCommand):
     #     """
@@ -151,7 +132,7 @@ class Command(ParentCommand):
         if path != '':
             input_files = ParentCommand.input_files_from_path(path)
         else:
-            input_files = input_files_from_dataset(dataset)
+            input_files = self.__input_files_from_dataset(dataset)
         self.__variables['input_files'] = input_files
 
     def __run_payload(self):
@@ -171,3 +152,19 @@ class Command(ParentCommand):
         if bad:
             LOG.debug('Mode {0} is only supported for simulation'.format(mode))
         return not bad
+
+    def __get_datasets(self):
+        from imp import load_source
+        analysis_info = load_source('analysis_info', ANALYSIS_INFO_FILE)
+        return analysis_info.datasets_13TeV
+
+    def __input_files_from_dataset(self, dataset):
+        datasets = self.__get_datasets()
+        if not dataset in datasets:
+            msg = 'Cannot find dataset {0}'.format(dataset)
+            LOG.error(msg)
+            import sys
+            sys.exit(msg)
+        path = [os.path.join(p, '*/*.root') for p in datasets[dataset]]
+        return ParentCommand.input_files_from_path(path)
+

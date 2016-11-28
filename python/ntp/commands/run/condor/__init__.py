@@ -297,16 +297,16 @@ class Command(C):
         for job in ntuple_jobs:
             dag_man.add_job(job, retry=RETRY_COUNT)
 
-        # layer 2 - analysis
-        for mode in ANALYSIS_MODES:
-            analysis_jobs = self.__create_analysis_layer(ntuple_jobs, mode)
-            for job in analysis_jobs:
-                dag_man.add_job(job, requires=ntuple_jobs, retry=RETRY_COUNT)
-            # layer 2b
-            # for each analysis mode create 1 merged file
-            merge_jobs = self.__create_merge_layer(analysis_jobs, mode)
-            for job in merge_jobs:
-                dag_man.add_job(job, requires=analysis_jobs, retry=2)
+        # # layer 2 - analysis
+        # for mode in ANALYSIS_MODES:
+        #     analysis_jobs = self.__create_analysis_layer(ntuple_jobs, mode)
+        #     for job in analysis_jobs:
+        #         dag_man.add_job(job, requires=ntuple_jobs, retry=RETRY_COUNT)
+        #     # layer 2b
+        #     # for each analysis mode create 1 merged file
+        #     merge_jobs = self.__create_merge_layer(analysis_jobs, mode)
+        #     for job in merge_jobs:
+        #         dag_man.add_job(job, requires=analysis_jobs, retry=2)
 
         self.__dag = dag_man
 

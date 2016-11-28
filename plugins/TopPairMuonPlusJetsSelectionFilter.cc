@@ -172,7 +172,7 @@ void TopPairMuonPlusJetsSelectionFilter::setupEventContent(edm::Event& iEvent, c
 	triggerResults_ = *triggerResults;
 
 	// Electrons (for veto)
-	LogDebug("NTP_MuPlusJets") << "Getting loose electrons";
+	LogDebug("NTP_MuPlusJets") << "Getting veto electrons";
 	edm::Handle < std::vector<pat::Electron> > electrons;
 	iEvent.getByToken(vetoElectronsToken_, electrons);
 	vetoElectrons_ = *electrons;

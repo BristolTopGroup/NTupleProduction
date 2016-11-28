@@ -15,16 +15,16 @@ if not 'HEP_PROJECT_ROOT' in os.environ:
     sys.exit(-1)
 
 # this is the NTupleVersion!
-__version__ = '0.0.8'
+__version__ = '0.1.1'
 NTPROOT = os.environ['HEP_PROJECT_ROOT']
 WORKSPACE = os.path.join(NTPROOT, 'workspace')
 CRAB_WS = os.path.join(WORKSPACE, 'crab')
 TODAY = datetime.date.today().isoformat()
 PSET = NTPROOT + '/python/run/miniAODToNTuple_cfg.py'
 INPUT_FILES = [
-    'data/BTagSF/CSVv2.csv',
-    'data/JEC/Fall15_25nsV2_DATA.db',
-    'data/JEC/Fall15_25nsV2_MC.db',
+    'data/BTagSF/CSVv2_ichep.csv',
+    'data/JEC/Spring16_25nsV6_DATA.db',
+    'data/JEC/Spring16_25nsV6_MC.db',
 ]
 
 config = Configuration()

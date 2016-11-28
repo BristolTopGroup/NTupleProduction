@@ -2,6 +2,7 @@ from __future__ import print_function
 import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.VarParsing import VarParsing
 from BristolAnalysis.NTupleTools.options import CMSSW_MAJOR_VERSION, registerOptions, is2015, is2016
+import sys
 
 # register options
 options = registerOptions(VarParsing('python'))
@@ -13,10 +14,13 @@ isReHLT = options.isReHLT
 # Define the CMSSW process
 process = cms.Process("Ntuples")
 
+
 # Load the standard set of configuration modules
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
+
+
 
 # Message Logger settings
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -40,7 +44,7 @@ process.printEventContent = cms.EDAnalyzer("EventContentAnalyzer")
 # Source
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
-                                'root://xrootd.unl.edu//store/data/Run2015C_25ns/SingleMuon/MINIAOD/16Dec2015-v1/00000/002C22D4-E1AF-E511-AE8E-001E673971CA.root',
+                                'root://xrootd.unl.edu//store/data/Run2015C_25ns/SingleMuon/MINIAOD/16Dec2015-v1/00000/002C24D4-E1AF-E511-AE8E-001E673971CA.root',
                             )
                             )
 
@@ -48,7 +52,7 @@ process.source = cms.Source("PoolSource",
 globalTags = {
     'data': {
         7: '76X_dataRun2_16Dec2015_v0',  # ReReco+Prompt JECv6
-        8: '80X_dataRun2_Prompt_ICHEP16JEC_v0',
+        8: '80X_dataRun2_2016SeptRepro_v4',
     },
     'MC': {
         7: '76X_mcRun2_asymptotic_RunIIFall15DR76_v1',  # 25ns MC
@@ -59,13 +63,16 @@ globalTags = {
 process.load(
     "Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 globaltag = ''
+
 if (isData):
     globaltag = globalTags['data'][CMSSW_MAJOR_VERSION]
 else:
     globaltag = globalTags['MC'][CMSSW_MAJOR_VERSION]
 process.GlobalTag.globaltag = cms.string(globaltag)
+
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 # process.load('JetMETCorrections.Configuration.CorrectedJetProducersDefault_cff')
+
 if CMSSW_MAJOR_VERSION == '7':
     print("Running on 2015 Data")
 else:
@@ -218,31 +225,31 @@ if is2016:
     process.nTuples.remove(process.triggerSequence2015)
     if isMC:
         if isReHLT:
-            process.nTupleTriggerEle27WPTightGsfMC.HLTInputTag = cms.InputTag(
+            process.nTupleTriggerEle32erWPTightGsfMC.HLTInputTag = cms.InputTag(
                 'TriggerResults', '', 'HLT2')
-            process.nTupleTriggerIsoMu22MC.HLTInputTag = cms.InputTag(
+            process.nTupleTriggerIsoMu24MC.HLTInputTag = cms.InputTag(
                 'TriggerResults', '', 'HLT2')
-            process.nTupleTriggerIsoTkMu22MC.HLTInputTag = cms.InputTag(
+            process.nTupleTriggerIsoTkMu24MC.HLTInputTag = cms.InputTag(
                 'TriggerResults', '', 'HLT2')
         # Remove 76X Data 25ns Triggers
         process.triggerSequence2016.remove(
-            process.nTupleTriggerEle27WPTightGsf)
-        process.triggerSequence2016.remove(process.nTupleTriggerIsoMu22)
-        process.triggerSequence2016.remove(process.nTupleTriggerIsoTkMu22)
+            process.nTupleTriggerEle32erWPTightGsf)
+        process.triggerSequence2016.remove(process.nTupleTriggerIsoMu24)
+        process.triggerSequence2016.remove(process.nTupleTriggerIsoTkMu24)
         process.triggerSequence2016.remove(process.nTupleTrigger)
-        del process.nTupleTriggerEle27WPTightGsf
-        del process.nTupleTriggerIsoMu22, process.nTupleTriggerIsoTkMu22
+        del process.nTupleTriggerEle32erWPTightGsf
+        del process.nTupleTriggerIsoMu24, process.nTupleTriggerIsoTkMu24
         del process.nTupleTrigger
 
     if isData:
         # Remove 76X MC 25ns Triggers
         process.triggerSequence2016.remove(
-            process.nTupleTriggerEle27WPTightGsfMC)
-        process.triggerSequence2016.remove(process.nTupleTriggerIsoMu22MC)
-        process.triggerSequence2016.remove(process.nTupleTriggerIsoTkMu22MC)
+            process.nTupleTriggerEle32erWPTightGsfMC)
+        process.triggerSequence2016.remove(process.nTupleTriggerIsoMu24MC)
+        process.triggerSequence2016.remove(process.nTupleTriggerIsoTkMu24MC)
         process.triggerSequence2016.remove(process.nTupleTrigger)
-        del process.nTupleTriggerEle27WPTightGsfMC
-        del process.nTupleTriggerIsoMu22MC, process.nTupleTriggerIsoTkMu22MC
+        del process.nTupleTriggerEle32erWPTightGsfMC
+        del process.nTupleTriggerIsoMu24MC, process.nTupleTriggerIsoTkMu24MC
         del process.nTupleTrigger
         # Remove PseudoTop and MC Gen Variables
         process.makingNTuples.remove(process.makePseudoTop)
@@ -350,7 +357,7 @@ process.goodElectrons = selectedPatElectrons.clone(
 )
 
 process.vetoElectrons = process.goodElectrons.clone(
-    cut=cms.string('userInt("isLoose")'),
+    cut=cms.string('userInt("isVeto")'),
 )
 
 process.goodConversionElectrons = process.goodElectrons.clone(

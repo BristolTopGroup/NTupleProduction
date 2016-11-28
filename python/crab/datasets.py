@@ -237,19 +237,38 @@ DATASETS = {
         "TTJets_PowhegPythia8_Moriond17": "/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM"
     },
     "Moriond17": {
-        "SingleElectron_RunB_Rereco_v3": "/SingleElectron/Run2016B-23Sep2016-v3/MINIAOD",
-        "SingleElectron_RunC_Rereco_v1": "/SingleElectron/Run2016C-23Sep2016-v1/MINIAOD",
-        "SingleElectron_RunD_Rereco_v1": "/SingleElectron/Run2016D-23Sep2016-v1/MINIAOD",
-        "SingleElectron_RunE_Rereco_v1": "/SingleElectron/Run2016E-23Sep2016-v1/MINIAOD",
-        "SingleElectron_RunF_Rereco_v1": "/SingleElectron/Run2016F-23Sep2016-v1/MINIAOD",
-        "SingleElectron_RunG_Rereco_v1": "/SingleElectron/Run2016G-23Sep2016-v1/MINIAOD",
-        "SingleMuon_RunB_Rereco_v3": "/SingleMuon/Run2016B-23Sep2016-v3/MINIAOD",
-        "SingleMuon_RunC_Rereco_v1": "/SingleMuon/Run2016C-23Sep2016-v1/MINIAOD",
-        "SingleMuon_RunD_Rereco_v1": "/SingleMuon/Run2016D-23Sep2016-v1/MINIAOD",
-        "SingleMuon_RunE_Rereco_v1": "/SingleMuon/Run2016E-23Sep2016-v1/MINIAOD",
-        "SingleMuon_RunF_Rereco_v1": "/SingleMuon/Run2016F-23Sep2016-v1/MINIAOD",
-        "SingleMuon_RunG_Rereco_v1": "/SingleMuon/Run2016G-23Sep2016-v1/MINIAOD",
-        "TTJets_PowhegPythia8": "/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM"
+        "SingleElectron_RunB_Rereco_v3" : "/SingleElectron/Run2016B-23Sep2016-v3/MINIAOD",
+        "SingleElectron_RunC_Rereco_v1" : "/SingleElectron/Run2016C-23Sep2016-v1/MINIAOD",
+        "SingleElectron_RunD_Rereco_v1" : "/SingleElectron/Run2016D-23Sep2016-v1/MINIAOD",
+        "SingleElectron_RunE_Rereco_v1" : "/SingleElectron/Run2016E-23Sep2016-v1/MINIAOD",
+        "SingleElectron_RunF_Rereco_v1" : "/SingleElectron/Run2016F-23Sep2016-v1/MINIAOD",
+        "SingleElectron_RunG_Rereco_v1" : "/SingleElectron/Run2016G-23Sep2016-v1/MINIAOD",
+        "SingleMuon_RunB_Rereco_v3"     : "/SingleMuon/Run2016B-23Sep2016-v3/MINIAOD",
+        "SingleMuon_RunC_Rereco_v1"     : "/SingleMuon/Run2016C-23Sep2016-v1/MINIAOD",
+        "SingleMuon_RunD_Rereco_v1"     : "/SingleMuon/Run2016D-23Sep2016-v1/MINIAOD",
+        "SingleMuon_RunE_Rereco_v1"     : "/SingleMuon/Run2016E-23Sep2016-v1/MINIAOD",
+        "SingleMuon_RunF_Rereco_v1"     : "/SingleMuon/Run2016F-23Sep2016-v1/MINIAOD",
+        "SingleMuon_RunG_Rereco_v1"     : "/SingleMuon/Run2016G-23Sep2016-v1/MINIAOD",
+
+        "TTJets_PowhegPythia8"          : "/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM"
+        "TTJets_PowhegPythia8_mtop1695" : "/TT_TuneCUETP8M1_mtop1695_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM",
+        "TTJets_PowhegPythia8_mtop1755" : "/TT_TuneCUETP8M1_mtop1755_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM",
+        "TTJets_PowhegPythia8_scaleup" : "/TT_TuneCUETP8M1up_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM",
+        "TTJets_PowhegPythia8_scaledown" : "/TT_TuneCUETP8M1down_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM",
+
+        # "ST_tW": "",
+        # "STbar_tW": "",
+        # "ST_s": "",
+        # "STbar_t": "",
+
+        "DY1JetsToLL": "/DY1JetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM",
+        "DY2JetsToLL": "/DY2JetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM",
+        "DY3JetsToLL": "/DY3JetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM",
+        "DYBBJetsToLL": "/DYBBJetsToLL_M-10to70_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM",
+
+        # "WJetsToLNu": "",
+
+
     },
     "Test": {
         "SingleElectron": "/SingleElectron/Run2016B-PromptReco-v2/MINIAOD",

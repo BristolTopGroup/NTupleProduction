@@ -6,7 +6,7 @@ muonUserData = cms.EDProducer(
     muonCollection=cms.InputTag("slimmedMuons"),
     beamSpotCollection=cms.InputTag('offlineBeamSpot'),
     # Top Object Definitions
-    minSignalMuonPt=cms.double(18.),
+    minSignalMuonPt=cms.double(26.),
     maxSignalMuonEta=cms.double(2.4),
     minLooseMuonPt=cms.double(10.),
     maxLooseMuonEta=cms.double(2.5),

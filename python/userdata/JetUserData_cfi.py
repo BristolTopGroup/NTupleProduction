@@ -6,7 +6,7 @@ jetUserData = cms.EDProducer(
     jetCollection=cms.InputTag("patJetsReapplyJEC"),
     beamSpotCollection=cms.InputTag('offlineBeamSpot'),
     # Top Object Definitions
-    minSignalJetPt=cms.double(20.),
+    minSignalJetPt=cms.double(30.),
     maxSignalJetEta=cms.double(2.4),
 
     jecUncertainty=cms.string('AK4PFchs'),
@@ -18,5 +18,5 @@ jetUserData = cms.EDProducer(
     minBtagDiscLooseWP=cms.double(0.460),
     minBtagDiscMediumWP=cms.double(0.800),
     minBtagDiscTightWP=cms.double(0.935),
-    btagCalibrationFile=cms.string('CSVv2.csv'),
+    btagCalibrationFile=cms.string('CSVv2_ichep.csv'),
 )

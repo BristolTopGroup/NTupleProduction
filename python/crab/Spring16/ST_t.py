@@ -8,9 +8,8 @@ config = deepcopy(crab.base.config)
 config.General.requestName = NAME
 config.Data.outputDatasetTag = NAME
 config.Data.outLFNDirBase += '/' + CAMPAIGN
-config.Data.inputDataset = '/SingleElectron/Run2016D-PromptReco-v2/MINIAOD'
-config.Data.splitting = 'EventAwareLumiBased'
-config.Data.unitsPerJob = 500000
-config.JobType.pyCfgParams = ['isData=1']
-config.Data.lumiMask = 'data/JSON/TOP_Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON_UnprescaledPaths.txt'
+config.Data.inputDataset = '/ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
+config.Data.splitting = 'FileBased'
+config.Data.unitsPerJob = 10
+
 

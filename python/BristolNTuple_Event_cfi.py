@@ -7,7 +7,7 @@ nTupleEvent = cms.EDProducer( "BristolNTuple_Event",
 	    metFiltersOfInterest = cms.vstring(
 			'Flag_HBHENoiseFilter',
 			'Flag_HBHENoiseIsoFilter',
-			'Flag_CSCTightHalo2015Filter',
+			'Flag_globalTightHalo2016Filter',
 			'Flag_EcalDeadCellTriggerPrimitiveFilter',
 			'Flag_goodVertices',
 			'Flag_eeBadScFilter',

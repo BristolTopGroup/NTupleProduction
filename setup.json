@@ -22,8 +22,7 @@
 			"source": "https://github.com/BristolTopGroup/TopSkimming.git",
 			"destination": "TopQuarkAnalysis/TopSkimming",
 			"provider": "git"
-		},
-		{
+		},{
 			"name": "AnalysisSoftware",
 			"source": "https://github.com/BristolTopGroup/AnalysisSoftware.git",
 			"destination": "BristolAnalysis/Tools",
@@ -34,12 +33,21 @@
 				"cd -",
 				"echo \"AS is now available in DEV/AS (links to {CMSSW_VERSION}/src/BristolAnalysis/Tools)\""
 			]
-		},
-		{
+		},{
 			"name": "TopHitFit",
 			"source": "https://github.com/BristolTopGroup/TopHitFit.git",
 			"destination": "TopQuarkAnalysis/TopHitFit",
 			"provider": "git"
+		},{
+			"name": "egammaID",
+			"source": "ikrav:egm_id_80X_v1",
+			"destination": "",
+			"provider": "git-cms-merge-topic"
+		},{
+			"name": "recoMET",
+			"source": "cms-met:METRecipe_8020",
+			"destination": "",
+			"provider": "git-cms-merge-topic"
 		}
 	]
 }

@@ -8,7 +8,7 @@ config = deepcopy(crab.base.config)
 config.General.requestName = NAME
 config.Data.outputDatasetTag = NAME
 config.Data.outLFNDirBase += '/' + CAMPAIGN
-config.Data.inputDataset = '/QCD_Pt-50to80_EMEnriched_TuneCUETP8M1_13TeV_pythia8/RunIISpring16MiniAODv2-FlatPU8to37HcalNZSRAW_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM'
+config.Data.inputDataset = '/QCD_Pt-50to80_EMEnriched_TuneCUETP8M1_13TeV_pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 10
 
