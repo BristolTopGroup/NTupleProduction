@@ -24,15 +24,15 @@ def generate_crab_configs():
     CRAB_CFG_PATH = NTPROOT + '/python/crab'
     LUMI_MASKS = {
         '25ns': 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/' +
-        'CAF/certification/Collisions15/13TeV/' +
-        'Cert_246908-260627_13TeV_PromptReco_Collisions15_25ns_JSON.txt',
+            'CAF/certification/Collisions15/13TeV/' +
+            'Cert_246908-260627_13TeV_PromptReco_Collisions15_25ns_JSON.txt',
         'FALL15': '/hdfs/TopQuarkGroup/run2/json/ReReco_MinusBeamSpotIssue.txt',
         'Spring16' : 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/' +
-        'CAF/certification/Collisions16/13TeV/' +
-        'Cert_271036-277148_13TeV_PromptReco_Collisions16_JSON.txt',
+            'CAF/certification/Collisions16/13TeV/' +
+            'Cert_271036-277148_13TeV_PromptReco_Collisions16_JSON.txt',
         'Moriond17': 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/' +
-        'CAF/certification/Collisions16/13TeV/ReReco/' +
-        'Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt',
+            'CAF/certification/Collisions16/13TeV/ReReco/Final/' + 
+            'Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt',
     }
 
     for campaign, samples in DATASETS.items():
