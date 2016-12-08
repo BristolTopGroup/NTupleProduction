@@ -51,7 +51,7 @@ class Command(C):
     def __extract_params(self):
         args = []
         for var, value in self.__variables.items():
-            if var in self.DEFAULTS:
+            if var in self.DEFAULTS and 'useJECFromFile' not in var:
                 continue
             args.append('{0}={1}'.format(var, value))
         return ' '.join(args)
@@ -119,12 +119,19 @@ class Command(C):
         """
             Converts given path(s) to input files.
         """
-        if ',' in path:
-            input_files = path.split(',')
-        elif '*' in path:
-            import glob
-            input_files = glob.glob(path)
-        else:  # neither wildcard nor comma separated list
-            input_files = [path]
+        import glob
+        if type(path) is list:
+            for p in path:
+                if '*' in p:
+                    input_files = glob.glob(p)
+                else:  # neither wildcard nor comma separated list
+                    input_files = path
+        else:
+            if ',' in path:
+                input_files = path.split(',')
+            elif '*' in path:
+                input_files = glob.glob(path)
+            else:  # neither wildcard nor comma separated list
+                input_files = [path]
         input_files = [os.path.abspath(f) for f in input_files]
         return [f for f in input_files if os.path.exists(f) or f.startswith('/store')]
