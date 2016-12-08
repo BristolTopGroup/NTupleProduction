@@ -57,7 +57,6 @@ TopPairMuonPlusJetsSelectionFilter::TopPairMuonPlusJetsSelectionFilter(const edm
 	}
 	produces<bool>(prefix_ + "FullSelection");
 	produces<bool>(prefix_ + "FullSelectionNoB");
-//	produces<bool>(prefix_ + "FullSelection2Tight");
 	produces<unsigned int>(prefix_ + "NumberOfBtags");
 	produces<unsigned int>(prefix_ + "NumberOfJets");
 }
@@ -131,9 +130,6 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 			break;
 	}
 
-//	if (passesSelection) {
-//		passesSelectionWithTightBtagging = hasAtLeastTwoGoodTightBJets();
-//	}
 
 	// Store info in event
 	for (unsigned int step = 0; step < TTbarMuPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS; ++step) {
@@ -142,7 +138,6 @@ bool TopPairMuonPlusJetsSelectionFilter::filter(edm::Event& iEvent, const edm::E
 	}
 	iEvent.put(std::auto_ptr<bool>(new bool(passesSelection)), prefix_ + "FullSelection");
 	iEvent.put(std::auto_ptr<bool>(new bool(passesSelectionExceptBtagging)), prefix_ + "FullSelectionNoB");
-//	iEvent.put(std::auto_ptr<bool>(new bool(passesSelectionWithTightBtagging)), prefix_ + "FullSelection2Tight");
 
 	// Store number of cleaned jets in event
 	unsigned int numberOfJets(cleanedJets_.size());
@@ -342,10 +337,6 @@ bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastOneGoodBJet() const {
 bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastTwoGoodBJets() const {
 	return cleanedBJets_.size() >= 2;
 }
-
-//bool TopPairMuonPlusJetsSelectionFilter::hasAtLeastTwoGoodTightBJets() const {
-//	return cleanedTightBJets_.size() > 1;
-//}
 
 // ------------ method called once each job just before starting event loop  ------------
 void TopPairMuonPlusJetsSelectionFilter::beginJob() {
