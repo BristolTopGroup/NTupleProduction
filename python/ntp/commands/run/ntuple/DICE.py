@@ -33,7 +33,7 @@ ntp setup from_tarball=cmssw.tar.gz
 """
 
 RUN_SCRIPT = """
-DEBUG=1 ntp run ntuple $@ nevents=-1
+ntp run ntuple $@ nevents=-1
 
 """
 
@@ -199,6 +199,10 @@ class Command(ParentCommand):
         if self.__variables['test']:
             input_files = [input_files[0]]
 
+        input_files.append(self.__run_script)
+        input_files.append(self.__setup_script)
+        print(input_files)
+
         job_set = htc.JobSet(
             exe=self.__run_script,
             copy_exe=True,
@@ -213,7 +217,7 @@ class Command(ParentCommand):
             log_file=LOG_STEM + '.log',
             share_exe_setup=True,
             common_input_files=self.__input_files,
-            transfer_hdfs_input=False,
+            transfer_hdfs_input=True,
             hdfs_store=run_config['outLFNDirBase'] + '/tmp',
             certificate=self.REQUIRE_GRID_CERT,
             cpus=1,
