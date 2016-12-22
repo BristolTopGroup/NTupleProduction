@@ -35,12 +35,9 @@ default_settings = {{
     'MuonScaleFactorSystematic': 0,
     'JESsystematic': 0,
     'JetSmearingSystematic': 0,
-    'PUFile_Muon':'PileUp_2015_truth_central_Muon.root',
-    'PUFile_up_Muon':'PileUp_2015_truth_up_Muon.root',
-    'PUFile_down_Muon':'PileUp_2015_truth_down_Muon.root',
-    'PUFile_Electron':'PileUp_2015_truth_central_Electron.root',
-    'PUFile_up_Electron':'PileUp_2015_truth_up_Electron.root',
-    'PUFile_down_Electron':'PileUp_2015_truth_down_Electron.root',
+    'PUFile':'PileUp_2015_truth_central.root',
+    'PUFile_up':'PileUp_2015_truth_up.root',
+    'PUFile_down':'PileUp_2015_truth_down.root',
     'MuonIdIsoScaleFactorsFile': 'nofile.root',
     'TTbarLikelihoodFile': 'LikelihoodInputAnalyserOutput.root',
     'BTagEfficiencyFile': 'BTagEfficiency.root',
@@ -63,8 +60,8 @@ analysis_settings = {{
     'JetSmearing_down': {{'JetSmearingSystematic': -1}},
     'LightJet_down': {{'LightTagSystematic': -1}},
     'LightJet_up': {{'LightTagSystematic': 1}},
-    'PU_down':{{ 'PUFile_Muon':'PileUp_2015_truth_down_Muon.root', 'PUFile_Electron':'PileUp_2015_truth_down_Electron.root', 'custom_file_suffix':'PU_down' }},
-    'PU_up':{{'PUFile_Muon':'PileUp_2015_truth_up_Muon.root', 'PUFile_Electron':'PileUp_2015_truth_up_Electron.root', 'custom_file_suffix':'PU_up' }},
+    'PU_down':{{ 'PUFile':'PileUp_2015_truth_down.root', 'custom_file_suffix':'PU_down' }},
+    'PU_up':{{'PUFile':'PileUp_2015_truth_up.root', 'custom_file_suffix':'PU_up' }},
     'Test': {{'custom_file_suffix': 'TESTING'}}
 }}
 
@@ -101,12 +98,9 @@ if sample in ['TTJets-mcatnlo', 'TTJets-powheg']:
 ntupleToProcess = -1
 
 #File for pile-up re-weighting
-PUFile_Muon = opj(BAT_DATA, settings['PUFile_Muon'] )
-PUFile_up_Muon = opj(BAT_DATA, settings['PUFile_up_Muon'] )
-PUFile_down_Muon = opj(BAT_DATA, settings['PUFile_down_Muon'] )
-PUFile_Electron = opj(BAT_DATA, settings['PUFile_Electron'] )
-PUFile_up_Electron = opj(BAT_DATA, settings['PUFile_up_Electron'] )
-PUFile_down_Electron = opj(BAT_DATA, settings['PUFile_down_Electron'] )
+PUFile = opj(BAT_DATA, settings['PUFile'] )
+PUFile_up = opj(BAT_DATA, settings['PUFile_up'] )
+PUFile_down = opj(BAT_DATA, settings['PUFile_down'] )
 getMuonScaleFactorsFromFile = True
 getElectronScaleFactorsFromFile = True
 ElectronIdScaleFactorsFile = opj(BAT_DATA, 'egammaEffi.txt_SF2D.root')
@@ -169,7 +163,7 @@ applyMetType0Corr = False
 TQAFPath = ""
 
 # integrated luminosity the MC simulation will be scaled to
-lumi = 36260
+lumi = 36459
 # this value will be part of the output file name:
 # DataType_CenterOfMassEnergyTeV_lumipb-1_....
 centerOfMassEnergy = 13
