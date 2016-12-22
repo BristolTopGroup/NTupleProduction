@@ -23,7 +23,7 @@ except:
     LOG.error('Could not import htcondenser')
 
 CONDOR_ROOT = os.path.join(WORKSPACE, 'condor')
-RETRY_COUNT = 10
+RETRY_COUNT = 1
 PREFIX = 'analysis'
 
 SETUP_SCRIPT = """
@@ -47,11 +47,12 @@ LOG_FILE = LOG_STEM + '.log'
 # file splitting for datasets containing 'key'
 # Analysis jobs: 1 file = 17s processing time
 SPLITTING_BY_FILE = {
-    'SingleElectron': 3,
-    'SingleMuon': 3,
-    'TTJet': 4,
-    'TT_': 5,
-    'DEFAULT': 50,  # ~= 14 min
+    'SingleElectron': 20,
+    'SingleMuon': 20,
+    'TTJet': 10,
+    'TT_': 10,
+    'WJets' : 10,
+    'DEFAULT': 25,  # ~= 14 min
 }
 
 N_FILES_PER_ANALYSIS_JOB = SPLITTING_BY_FILE['DEFAULT']
@@ -184,24 +185,26 @@ class Command(C):
             log_file=LOG_FILE,
             share_exe_setup=True,
             common_input_files=self.__input_files,
-            transfer_hdfs_input=False,
+            transfer_hdfs_input=True,
             hdfs_store=hdfs_store,
             certificate=self.REQUIRE_GRID_CERT,
             cpus=1,
             memory='1500MB',
         )
 
-        job_set.job_template='/storage/ec6821/NTupleProd/new/NTupleProduction/job.condor'
-
-
         parameters = 'files={files} output_file_suffix={suffix} mode={mode}'
         parameters += ' dataset={dataset}'
 
+        dataset = config['parameters']['dataset']
+
         n_files_per_group = N_FILES_PER_ANALYSIS_JOB
+        for name, value in SPLITTING_BY_FILE.items():
+            if name in dataset:
+                n_files_per_group = value
+
         grouped_files = make_even_chunks(
             input_files, size_of_chunk=n_files_per_group)
 
-        dataset = config['parameters']['dataset']
         for i, f in enumerate(grouped_files):
             suffix = 'atOutput_{job_number}.root'.format(
                 dataset=dataset,
