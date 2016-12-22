@@ -3,48 +3,64 @@ import os
 
 
 jobTemplates = [
-	# ["TTJets_PowhegPythia8_tree.root", [
-	# 	"TTJets_PowhegPythia8_central_atOutput_*.root"
-	# ] ],
-	# ["TTJets_PowhegPythia8_scaleup_tree.root", [
-	# 	"TTJets_PowhegPythia8_scaleup_central_atOutput_*.root"
-	# ], "C" ],
-	# ["TTJets_PowhegPythia8_scaledown_tree.root", [
-	# 	"TTJets_PowhegPythia8_scaledown_central_atOutput_*.root"
-	# ], "C" ],
-	# ["TTJets_PowhegPythia8_mtop1695_tree.root", [
-	# 	"TTJets_PowhegPythia8_mtop1695_central_atOutput_*.root"
-	# ], "C" ],
-	# ["TTJets_PowhegPythia8_mtop1755_tree.root", [
-	# 	"TTJets_PowhegPythia8_mtop1755_central_atOutput_*.root"
-	# ], "C" ],
+	["TTJets_PowhegPythia8_tree.root", [
+		"TTJets_PowhegPythia8_central_atOutput_*.root"
+	] ],
+	["TTJets_PowhegPythia8_isrup_tree.root", [
+		"TTJets_PowhegPythia8_isrup_central_atOutput_*.root"
+	], "C" ],
+	["TTJets_PowhegPythia8_isrdown_tree.root", [
+		"TTJets_PowhegPythia8_isrdown_central_atOutput_*.root"
+	], "C" ],
+	["TTJets_PowhegPythia8_fsrup_tree.root", [
+		"TTJets_PowhegPythia8_fsrup_central_atOutput_*.root"
+	], "C" ],
+	["TTJets_PowhegPythia8_fsrdown_tree.root", [
+		"TTJets_PowhegPythia8_fsrdown_central_atOutput_*.root"
+	], "C" ],
+	["TTJets_PowhegPythia8_up_tree.root", [
+		"TTJets_PowhegPythia8_up_central_atOutput_*.root"
+	], "C" ],
+	["TTJets_PowhegPythia8_down_tree.root", [
+		"TTJets_PowhegPythia8_down_central_atOutput_*.root"
+	], "C" ],
+
+	["TTJets_PowhegPythia8_mtop1695_tree.root", [
+		"TTJets_PowhegPythia8_mtop1695_central_atOutput_*.root"
+	], "C" ],
+	["TTJets_PowhegPythia8_mtop1755_tree.root", [
+		"TTJets_PowhegPythia8_mtop1755_central_atOutput_*.root"
+	], "C" ],
+
+	["TTJets_PowhegHerwigpp_tree.root", [
+		"TTJets_PowhegHerwigpp_central_atOutput_*.root"
+	], "C"],
+
 	# ["TTJets_amc_tree.root", [
 	# 	"TTJets_amcatnloFXFX_central_atOutput_*.root"
 	# ], "C"],
 	# ["TTJets_madgraph_tree.root", [
 	# 	"TTJets_madgraphMLM_central_atOutput_*.root"
 	# ], "C"],
-	# ["TTJets_powhegHerwigpp_tree.root", [
-	# 	"TTJets_PowhegHerwigpp_central_atOutput_*.root"
-	# ], "C"],
+
 	# # ["TTJets_PowhegPythia8_Moriond17_tree.root", [
 	# # 	"TTJets_PowhegPythia8_Moriond17_central_atOutput_*.root"
 	# # ] ],
 
-	# ["SingleTop_tree.root", [
-	# 	"ST_tW_central_atOutput_*.root"
-	# ] ],
-	# ["VJets_tree.root", [
-	# 	"DYJetsToLL_M50_central_atOutput_*", 
-	# 	"WJetsToLNu_central_atOutput_*"
-	# ] ],
-	# ["QCD_Electron_tree.root", [
-	# 	"QCD_bcToE_*_central_atOutput_*", 
-	# 	"QCD_EMEnriched_*_central_atOutput_*"
-	# ] ],
-	# ["QCD_Muon_tree.root", [
-	# 	"QCD_MuEnriched_*_central_atOutput_*.root"
-	# ] ],
+	["SingleTop_tree.root", [
+		"ST*_central_atOutput_*.root"
+	] ],
+	["VJets_tree.root", [
+		"DYJetsToLL_M50_central_atOutput_*", 
+		"WJetsToLNu_central_atOutput_*"
+	] ],
+	["QCD_Electron_tree.root", [
+		# "QCD_bcToE_*_central_atOutput_*", 
+		"QCD_EMEnriched_*_central_atOutput_*"
+	] ],
+	["QCD_Muon_tree.root", [
+		"QCD_MuEnriched_*_central_atOutput_*.root"
+	] ],
 
 	["data_muon_tree.root", [
 		"SingleMuon_RunB_central_atOutput_*.root",
@@ -53,7 +69,8 @@ jobTemplates = [
 		"SingleMuon_RunE_central_atOutput_*.root",
 		"SingleMuon_RunF_central_atOutput_*.root",
 		"SingleMuon_RunG_central_atOutput_*.root",
-		"SingleMuon_RunH_central_atOutput_*.root"
+		"SingleMuon_RunH_Prompt_v2_central_atOutput_*.root",
+		"SingleMuon_RunH_Prompt_v3_central_atOutput_*.root",
 	], "C"],
 	["data_electron_tree.root", [
 		"SingleElectron_RunB_central_atOutput_*.root",
@@ -62,7 +79,8 @@ jobTemplates = [
 		"SingleElectron_RunE_central_atOutput_*.root",
 		"SingleElectron_RunF_central_atOutput_*.root",
 		"SingleElectron_RunG_central_atOutput_*.root",
-		"SingleElectron_RunH_central_atOutput_*.root"
+		"SingleElectron_RunH_Prompt_v2_central_atOutput_*.root",
+		"SingleElectron_RunH_Prompt_v3_central_atOutput_*.root"
 	], "C"],
 ]
 

@@ -17,6 +17,7 @@ import glob
 import shutil
 import logging
 import os
+import time
 import subprocess
 from .. import Command as C
 from hepshell.interpreter import time_function
@@ -49,8 +50,8 @@ class Command(C):
         'output_dir': '',
         'input_jobs': '',
         'input_dir': '/hdfs/TopQuarkGroup/{user}/{version}/atOutput/',
-        'user': 'db0268',
-        'version': '0.1.2',
+        'user': 'ec6821',
+        'version': '1.0.0',
     }
 
     def __init__(self, path=__file__, doc=__doc__):
@@ -104,10 +105,8 @@ class Command(C):
 
             nJobs = len(INPUTFILES)
             INPUTFILES = ' '.join(INPUTFILES)
-            print INPUTFILES
 
-            SIZE = int(nJobs / 10)
-            if SIZE == 0: SIZE =1
+            SIZE = 20
             SIZE = str(SIZE)
 
             command = ' '.join([
@@ -117,5 +116,6 @@ class Command(C):
                 '--input', INPUTFILES]
             )
             print "Merging to : ", OUTPUTFILE
-            print "Number of Intermediate hadds : ", SIZE
+            print "Number of Intermediate hadds : ", nJobs / int(SIZE)
             os.system(command)
+            time.sleep(2)
