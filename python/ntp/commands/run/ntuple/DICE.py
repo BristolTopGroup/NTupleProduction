@@ -41,8 +41,9 @@ ntp run ntuple $@ nevents=-1
 SPLITTING_BY_FILE = {
     'SingleElectron': 3,
     'SingleMuon': 3,
-    'TTJet': 5,
-    'TT_': 5,
+    'TTJet': 3,
+    'TT_': 3,
+    'ST' : 3,
     'DEFAULT': 10,
 }
 
