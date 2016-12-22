@@ -17,5 +17,5 @@ script:
   - python python/ntp/utils/test/test_utils.py
   - ./test/test.sh
   - sudo docker build -t kreczko/ntp .
-  - sudo docker run -t --privileged=true kreczko/ntp
+  - sudo docker run -t -v /software:/software --privileged=true kreczko/ntp
 cache: apt

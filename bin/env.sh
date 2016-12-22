@@ -40,7 +40,7 @@ if [ ! -d "${TOPQ_CONDA_PATH}" ] ; then
   conda install git wget pycurl -yq
   pip install -U -r requirements.txt
   # clean the cache (downloaded tarballs)
-  conda clean -t -yq
+  conda clean -t -y
   # give the group write access
   chmod g+r -R ${TOPQ_CONDA_PATH}
 else

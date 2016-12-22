@@ -20,7 +20,6 @@ COPY ./setup.json /project/.
 COPY ./BuildFile.xml /project/BuildFile.xml
 
 ENV DEBUG 1
-RUN source bin/env.sh
 
 # need to execute env.sh and ntp setup in CMD
 # as CVMFS needs 'privileged' rights,
