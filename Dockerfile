@@ -2,7 +2,7 @@ FROM hepsw/cvmfs-cms
 
 MAINTAINER lkreczko@gmail.com
 
-RUN yum install -y wget glibc gcc
+RUN yum install -y -q wget glibc gcc
 RUN useradd tquark
 RUN mkdir /software && chown -R tquark /software
 RUN mkdir /project && chown -R tquark /project
