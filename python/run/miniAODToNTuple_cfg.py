@@ -100,7 +100,7 @@ setupMETFilters(process, cms)
 from BristolAnalysis.NTupleTools.MET_Setup_cff import setup_MET
 setup_MET(process, cms, options)
 
-# Custom JEC
+# Custom JEC if useJECFromFile is true
 from BristolAnalysis.NTupleTools.Jets_Setup_cff import setup_jets
 setup_jets(process, cms, options)
 
@@ -311,6 +311,8 @@ if is2016:
 process.load('BristolAnalysis.NTupleTools.userdata.ElectronUserData_cfi')
 process.load('BristolAnalysis.NTupleTools.userdata.MuonUserData_cfi')
 process.load('BristolAnalysis.NTupleTools.userdata.JetUserData_cfi')
+if options.useJECFromFile:
+    process.jetUserData.jetCollection=cms.InputTag("patJetsReapplyJEC")
 
 ###############################################################################
 # Here we define the objects we want to work with. As an example we have
