@@ -97,7 +97,7 @@ class Command(ParentCommand):
         dataset = self.__variables['dataset']
         mode = self.__variables['mode']
         modes = ANALYSIS_MODES if mode == 'all' else [mode]
-        datasets = get_datasets().keys() if dataset == 'all' else [dataset]
+        datasets = self.__get_datasets().keys() if dataset == 'all' else [dataset]
 
         results = []
         for dataset in datasets:
