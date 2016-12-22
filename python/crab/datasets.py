@@ -250,7 +250,7 @@ DATASETS = {
         "SingleMuon_RunF_Rereco_v1"     : "/SingleMuon/Run2016F-23Sep2016-v1/MINIAOD",
         "SingleMuon_RunG_Rereco_v1"     : "/SingleMuon/Run2016G-23Sep2016-v1/MINIAOD",
 
-        "TTJets_PowhegPythia8"          : "/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM"
+        "TTJets_PowhegPythia8"          : "/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM",
         "TTJets_PowhegPythia8_mtop1695" : "/TT_TuneCUETP8M1_mtop1695_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM",
         "TTJets_PowhegPythia8_mtop1755" : "/TT_TuneCUETP8M1_mtop1755_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM",
         "TTJets_PowhegPythia8_scaleup" : "/TT_TuneCUETP8M1up_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM",
