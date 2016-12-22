@@ -11,6 +11,5 @@ config.Data.outLFNDirBase += '/' + CAMPAIGN
 config.Data.inputDataset = '/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM'
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 5
-config.JobType.pyCfgParams = ['isTTbarMC=1','isReHLT=1']
-
+config.JobType.pyCfgParams = ['isTTbarMC=1']
 
