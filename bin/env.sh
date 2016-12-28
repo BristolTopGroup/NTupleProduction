@@ -27,17 +27,17 @@ if [ ! -d "${TOPQ_CONDA_PATH}" ] ; then
   PATH=${TOPQ_CONDA_PATH}/bin:$PATH; export PATH
   rm -f miniconda.sh
   echo "Finished conda installation, creating new conda environment"
-  conda update conda -y
-  conda update pip -y
-  conda install psutil -y
+  conda update conda -yq
+  conda update pip -yq
+  conda install psutil -yq
   conda config --add channels http://conda.anaconda.org/NLeSC
   conda config --set show_channel_urls yes
   # python modules
   conda create -n ntp python=2.7 root=6 root-numpy numpy matplotlib nose \
-  sphinx pytables rootpy pandas -y
+  sphinx pytables rootpy pandas -yq
   echo "Created conda environment, installing basic dependencies"
   source activate ntp
-  conda install git wget pycurl -y
+  conda install git wget pycurl -yq
   pip install -U -r requirements.txt
   # clean the cache (downloaded tarballs)
   conda clean -t -y

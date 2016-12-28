@@ -1,17 +1,21 @@
 # travis-ci.org build & test configuration
+sudo: required
+
 language: python
 
-matrix:
-    include:
-        - python: 2.7
-        - python: 3.5
-    allow_failures:
-        - python: 3.5
+services:
+  - docker
+
+before_install:
+  - docker pull hepsw/cvmfs-cms
+  - sudo mkdir /software && sudo chown $USER /software
 
 install:
-  - source bin/env.sh
+ - source bin/env.sh
 
 script:
   - python python/ntp/utils/test/test_utils.py
   - ./test/test.sh
+  - sudo docker build -t kreczko/ntp .
+  - sudo docker run -t -v /software:/software --privileged=true kreczko/ntp
 cache: apt
