@@ -89,7 +89,6 @@ public:
     virtual bool hasExactlyOneGoodBJet() const;
 	virtual bool hasAtLeastOneGoodBJet() const;
 	virtual bool hasAtLeastTwoGoodBJets() const;
-//	virtual bool hasAtLeastTwoGoodTightBJets() const;
 
 private:
 	virtual void setupEventContent(edm::Event& iEvent, const edm::EventSetup& iSetup);

@@ -253,6 +253,11 @@ bool ElectronUserData::passesInvertedIDCuts(const vid::CutFlowResult fullCutFlow
 		std::vector<uint> invertedSelection) const {
 
 	bool passesFullSelection = true;
+
+	// // To read the cuts in the electron ID
+	// for (uint icut = 0; icut < fullCutFlowData.cutFlowSize(); icut++) {
+	// 	std::cout << "Cut : " << icut << " Name : " << fullCutFlowData.getNameAtIndex(icut) << std::endl;
+	// }
 	for (uint icut = 0; icut < fullCutFlowData.cutFlowSize(); icut++) {
 		bool passesThisCut = fullCutFlowData.getCutResultByIndex(icut);
 		for (auto invertedCut = invertedSelection.begin(); invertedCut != invertedSelection.end(); invertedCut++) {

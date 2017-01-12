@@ -23,6 +23,9 @@ To check if all is OK you can run
 ./test/test.sh
 ```
 
+### Geenrate the configs
+python python/crab/generate_datasets.py
+
 ## Notes
 More information can be found at [Bristol Ntuple Recipes twiki page](https://twiki.cern.ch/twiki/bin/view/CMS/BristolNTuplerRecipes), although it's outdated.
 

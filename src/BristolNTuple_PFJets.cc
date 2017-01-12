@@ -235,7 +235,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
 			double pt = it->pt();
 			double ptUp = it->userFloat("ptUp");
-			double ptDown = it->userFloat("ptUp");
+			double ptDown = it->userFloat("ptDown");
 			// do not store any jets below a pt threshold
 			if (pt <=minJetPtToStore && ptUp <= minJetPtToStore && ptDown <= minJetPtToStore)
 				continue;

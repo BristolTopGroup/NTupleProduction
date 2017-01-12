@@ -97,11 +97,13 @@ class Command(ParentCommand):
         dataset = self.__variables['dataset']
         mode = self.__variables['mode']
         modes = ANALYSIS_MODES if mode == 'all' else [mode]
-        datasets = get_datasets().keys() if dataset == 'all' else [dataset]
+        datasets = self.__get_datasets().keys() if dataset == 'all' else [dataset]
 
         results = []
         for dataset in datasets:
-            for modes in modes:
+            for mode in modes:
+                # Don't do Jet Smearing or Jet Scale for data
+                if ('SingleMuon' in dataset or 'SingleElectron' in dataset ) and 'central' not in mode: continue
                 results.append(self.__run(dataset, mode))
         return all(results)
 
@@ -165,6 +167,7 @@ class Command(ParentCommand):
             LOG.error(msg)
             import sys
             sys.exit(msg)
+
         path = [os.path.join(p, '*/*.root') for p in datasets[dataset]]
         return ParentCommand.input_files_from_path(path)
 

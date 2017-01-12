@@ -17,6 +17,12 @@ def setup_jets(process, cms, options, postfix="PFlow"):
     # use external JECs (sqlite file)
     usePrivateSQlite = options.useJECFromFile
     runOnData = options.isData
+
+    if not usePrivateSQlite:
+      print 'Using default JEC already applied on jets in miniAOD'
+      process.reapplyJEC = cms.Sequence()
+      return
+
     '''
     application of residual corrections. Have to be set to True once the 13 TeV
     residual corrections are available. False to be kept meanwhile. Can be kept

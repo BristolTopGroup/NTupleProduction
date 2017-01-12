@@ -32,6 +32,8 @@
             json_url: Data-only:
                       URL to JSON file, e.g. https://cms-service-dqm.web.cern.ch/../..._JSON.txt
                       or (local file) file://<path>. Default: ''
+            useJECFromFile:
+                      Overwrite the current GT with more recent JEC
             where:    Where to run the analysis. Can be 'local|DICE'.
                   Default is 'local'.
             test:     Run just one job for testing (DICE only). Default: false.
@@ -83,6 +85,7 @@ class Command(ParentCommand):
         'input_files': [],
         'test': False,
         'output_file': '',
+        'useJECFromFile': False,
     }
 
     def __init__(self, path=__file__, doc=__doc__):

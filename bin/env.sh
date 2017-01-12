@@ -39,6 +39,7 @@ if [ ! -d "${TOPQ_CONDA_PATH}" ] ; then
   source activate ntp
   conda install git wget pycurl -yq
   pip install -U -r requirements.txt
+  pip install -U --process-dependency-links git+https://github.com/BristolComputing/condor-comforter.git
   # clean the cache (downloaded tarballs)
   conda clean -t -y
   # give the group write access

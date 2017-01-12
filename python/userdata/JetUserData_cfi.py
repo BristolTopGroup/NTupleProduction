@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 jetUserData = cms.EDProducer(
     'JetUserData',
     vertexCollection=cms.InputTag('offlineSlimmedPrimaryVertices'),
-    jetCollection=cms.InputTag("patJetsReapplyJEC"),
+    jetCollection=cms.InputTag("slimmedJets"),
     beamSpotCollection=cms.InputTag('offlineBeamSpot'),
     # Top Object Definitions
     minSignalJetPt=cms.double(30.),
@@ -15,8 +15,8 @@ jetUserData = cms.EDProducer(
     # from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X
     bJetDiscriminator=cms.string(
         'pfCombinedInclusiveSecondaryVertexV2BJetTags'),
-    minBtagDiscLooseWP=cms.double(0.460),
-    minBtagDiscMediumWP=cms.double(0.800),
-    minBtagDiscTightWP=cms.double(0.935),
+    minBtagDiscLooseWP=cms.double(0.5426),
+    minBtagDiscMediumWP=cms.double(0.8484),
+    minBtagDiscTightWP=cms.double(0.9535),
     btagCalibrationFile=cms.string('CSVv2_ichep.csv'),
 )
