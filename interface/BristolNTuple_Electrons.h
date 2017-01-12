@@ -7,20 +7,20 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 
-class BristolNTuple_Electrons : public edm::EDProducer {
- public:
+class BristolNTuple_Electrons: public edm::EDProducer {
+public:
   explicit BristolNTuple_Electrons(const edm::ParameterSet&);
 
- private:
-  void produce( edm::Event &, const edm::EventSetup & );
+private:
+  void produce(edm::Event &, const edm::EventSetup &);
 
   const edm::EDGetToken inputTag;
 
-  const std::string     prefix,suffix;
-  const unsigned int    maxSize;
+  const std::string prefix, suffix;
+  const unsigned int maxSize;
+  const double minPtToStore_;
   const bool storePFIsolation_, debugRelease_;
 
 };
 
 #endif
-

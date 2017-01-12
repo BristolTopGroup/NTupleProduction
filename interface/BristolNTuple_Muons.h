@@ -15,6 +15,7 @@ class BristolNTuple_Muons : public edm::EDProducer {
   const edm::EDGetTokenT<std::vector<pat::Muon>> inputTag;
   const std::string     prefix,suffix;
   const unsigned int    maxSize;
+  const double minPtToStore_;
   const std::string     muonID;
   const bool            beamSpotCorr;
   const bool storePFIsolation;

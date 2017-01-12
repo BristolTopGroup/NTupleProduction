@@ -13,6 +13,7 @@ BristolNTuple_Muons::BristolNTuple_Muons(const edm::ParameterSet& iConfig) :
 				prefix(iConfig.getParameter < std::string > ("Prefix")), //
 				suffix(iConfig.getParameter < std::string > ("Suffix")), //
 				maxSize(iConfig.getParameter<unsigned int>("MaxSize")), //
+				minPtToStore_(iConfig.getParameter<double>("minPtToStore")), //
 				muonID(iConfig.getParameter < std::string > ("MuonID")), //
 				beamSpotCorr(iConfig.getParameter<bool>("BeamSpotCorr")), //
 				storePFIsolation(iConfig.getParameter<bool>("storePFIsolation")), //
@@ -197,6 +198,8 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 				break;
 			if (!(it->isGlobalMuon() || it->isTrackerMuon()))
 				continue;
+			if(it->pt() < minPtToStore_)
+			  continue;
 
 			//kinematic variables
 			px->push_back(it->px());

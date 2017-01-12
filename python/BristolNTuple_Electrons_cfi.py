@@ -5,6 +5,7 @@ nTupleElectrons = cms.EDProducer("BristolNTuple_Electrons",
     Prefix = cms.string('Electrons.'),
     Suffix = cms.string(''),
     MaxSize = cms.uint32(99),
+    minPtToStore = cms.double(10.),
     storePFIsolation = cms.bool(True),
     debugRelease = cms.bool(False),
 )

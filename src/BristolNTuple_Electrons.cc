@@ -9,10 +9,11 @@
 #include "FWCore/Framework/interface/ESHandle.h"
 
 BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfig) :
-  		inputTag(consumes<edm::View<pat::Electron>>(iConfig.getParameter<edm::InputTag>("InputTag"))),			
+    inputTag(consumes<edm::View<pat::Electron>>(iConfig.getParameter<edm::InputTag>("InputTag"))),
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //
 		suffix(iConfig.getParameter < std::string > ("Suffix")), //
 		maxSize(iConfig.getParameter<unsigned int>("MaxSize")), //
+    minPtToStore_(iConfig.getParameter<double>("minPtToStore")), //
 		storePFIsolation_(iConfig.getParameter<bool>("storePFIsolation")), //
 		debugRelease_(iConfig.getParameter<bool>("debugRelease"))
 {
@@ -54,7 +55,7 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 		produces < std::vector<double> > (prefix + "PFRelIso03" + suffix);
 
 		produces < std::vector<double> > (prefix + "PFRelIso04" + suffix);
-		
+
 		//new variable for pf delta beta corrected reliso
 		produces < std::vector<double> > (prefix + "sumChargedHadronPt03" + suffix);
 		produces < std::vector<double> > (prefix + "sumChargedHadronPt04" + suffix);
@@ -64,7 +65,7 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 		produces < std::vector<double> > (prefix + "sumPhotonPt04" + suffix);
 		produces < std::vector<double> > (prefix + "sumPUPt03" + suffix);
 		produces < std::vector<double> > (prefix + "sumPUPt04" + suffix);
-		
+
 		produces < std::vector<double> > (prefix + "PFRelIso03DeltaBeta" + suffix);
 		produces < std::vector<double> > (prefix + "PFRelIso04DeltaBeta" + suffix);
 		produces < std::vector<double> > (prefix + "PFRelIsoWithEA" + suffix);
@@ -148,11 +149,11 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > hcalIso03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > relIso03(new std::vector<double>());
 
-	
+
 	//muonn PF isolation variables
 	std::auto_ptr < std::vector<double> > PFRelIso03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PFRelIso04(new std::vector<double>());
-	
+
 	//new iso vars
 	std::auto_ptr < std::vector<double> > sumChargedHadronPt03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > sumChargedHadronPt04(new std::vector<double>());
@@ -162,7 +163,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > sumPhotonPt04(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > sumPUPt03(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > sumPUPt04(new std::vector<double>());
-	
+
 	std::auto_ptr < std::vector<double> > PFRelIso03DeltaBeta(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > PFRelIso04DeltaBeta(new std::vector<double>());
 
@@ -224,6 +225,8 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			const auto it = electrons->ptrAt(index);
 			// exit from loop when you reach the required number of electrons (99)
 			if (px->size() >= maxSize) break;
+			if(it->pt() < minPtToStore_)
+			  continue;
 
 			// Check ID
 			isTightElectron->push_back( it->userInt("passesTightId") );
@@ -282,7 +285,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 				sumChargedHadronPt03->push_back(pfIso.sumChargedHadronPt);
 				sumChargedHadronPt04->push_back(0);
-			
+
 				sumNeutralHadronPt03->push_back(pfIso.sumNeutralHadronEt);
 				sumNeutralHadronPt04->push_back(0);
 
@@ -291,12 +294,12 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 				sumPUPt03->push_back(pfIso.sumPUPt);
 				sumPUPt04->push_back(0);
-				
+
 				// 3rd and 4th arguments for rho isolation
 				PFRelIso03->push_back(( pfIso.sumChargedHadronPt + pfIso.sumNeutralHadronEt + pfIso.sumPhotonEt ) / it->pt());
 				PFRelIso04->push_back(0);
 
-				PFRelIso03DeltaBeta->push_back(( pfIso.sumChargedHadronPt 
+				PFRelIso03DeltaBeta->push_back(( pfIso.sumChargedHadronPt
 				  + std::max(0.0 , pfIso.sumNeutralHadronEt + pfIso.sumPhotonEt - 0.5 * pfIso.sumPUPt ) ) / it->pt());
 				PFRelIso04DeltaBeta->push_back(0);
 			}
@@ -369,7 +372,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	if (storePFIsolation_) {
 		iEvent.put(PFRelIso03, prefix + "PFRelIso03" + suffix);
 		iEvent.put(PFRelIso04, prefix + "PFRelIso04" + suffix);
-		
+
 		iEvent.put(sumChargedHadronPt03, prefix + "sumChargedHadronPt03" + suffix);
 		iEvent.put(sumChargedHadronPt04, prefix + "sumChargedHadronPt04" + suffix);
 		iEvent.put(sumNeutralHadronPt03, prefix + "sumNeutralHadronPt03" + suffix);
@@ -378,7 +381,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 		iEvent.put(sumPhotonPt04, prefix + "sumPhotonPt04" + suffix);
 		iEvent.put(sumPUPt03, prefix + "sumPUPt03" + suffix);
 		iEvent.put(sumPUPt04, prefix + "sumPUPt04" + suffix);
-		
+
 		iEvent.put(PFRelIso03DeltaBeta, prefix + "PFRelIso03DeltaBeta" + suffix);
 		iEvent.put(PFRelIso04DeltaBeta, prefix + "PFRelIso04DeltaBeta" + suffix);
 		iEvent.put(PFRelIsoWithEA, prefix + "PFRelIsoWithEA" + suffix);
