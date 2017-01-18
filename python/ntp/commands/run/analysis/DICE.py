@@ -136,8 +136,15 @@ class Command(C):
         )
 
         input_files = self.__config['parameters']['input_files']
+        dataset = self.__config['parameters']['dataset']
+
         # layer 2 - analysis
         for mode in ANALYSIS_MODES:
+
+            if 'TTJet' in dataset:
+                if 'down' in dataset or 'up' in dataset or 'mtop' in dataset:
+                    if mode != 'central' : continue
+
             analysis_jobs = self.create_job_layer(input_files, mode)
             for job in analysis_jobs:
                 dag_man.add_job(job, retry=RETRY_COUNT)
