@@ -29,6 +29,12 @@ BristolNTuple_Muons::BristolNTuple_Muons(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "Py" + suffix);
 	produces < std::vector<double> > (prefix + "Pz" + suffix);
 	produces < std::vector<double> > (prefix + "Energy" + suffix);
+
+	// extra kinematic variables for easier debugging
+  produces<std::vector<double> >(prefix + "Pt" + suffix);
+  produces<std::vector<double> >(prefix + "Eta" + suffix);
+  produces<std::vector<double> >(prefix + "Phi" + suffix);
+
 	//extra properties
 	produces < std::vector<int> > (prefix + "Charge" + suffix);
 
@@ -104,6 +110,11 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	std::auto_ptr < std::vector<double> > py(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > pz(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > energy(new std::vector<double>());
+
+	// extra kinematic variables for easier debugging
+  std::auto_ptr<std::vector<double> > pt_store(new std::vector<double>());
+  std::auto_ptr<std::vector<double> > eta_store(new std::vector<double>());
+  std::auto_ptr<std::vector<double> > phi_store(new std::vector<double>());
 
 	//extra properties
 	std::auto_ptr < std::vector<int> > charge(new std::vector<int>());
@@ -206,6 +217,12 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 			py->push_back(it->py());
 			pz->push_back(it->pz());
 			energy->push_back(it->energy());
+
+			// extra kinematic variables for easier debugging
+			pt_store->push_back(it->pt());
+			eta_store->push_back(it->eta());
+			phi_store->push_back(it->phi());
+
 			//extra properties
 			charge->push_back(it->charge());
 
@@ -292,6 +309,11 @@ void BristolNTuple_Muons::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	iEvent.put(py, prefix + "Py" + suffix);
 	iEvent.put(pz, prefix + "Pz" + suffix);
 	iEvent.put(energy, prefix + "Energy" + suffix);
+
+	// extra kinematic variables for easier debugging
+  iEvent.put(pt_store, prefix + "Pt" + suffix);
+  iEvent.put(eta_store, prefix + "Eta" + suffix);
+  iEvent.put(phi_store, prefix + "Phi" + suffix);
 
 	//extra properties
 	iEvent.put(charge, prefix + "Charge" + suffix);

@@ -23,6 +23,12 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 	produces < std::vector<double> > (prefix + "Py" + suffix);
 	produces < std::vector<double> > (prefix + "Pz" + suffix);
 	produces < std::vector<double> > (prefix + "Energy" + suffix);
+
+	// extra kinematic variables for easier debugging
+  produces<std::vector<double> >(prefix + "Pt" + suffix);
+  produces<std::vector<double> >(prefix + "Eta" + suffix);
+  produces<std::vector<double> >(prefix + "Phi" + suffix);
+
 	//extra properties
 	produces < std::vector<int> > (prefix + "Charge" + suffix);
 	produces < std::vector<double> > (prefix + "ecalDrivenMomentum.Px" + suffix);
@@ -122,6 +128,10 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > py(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > pz(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > energy(new std::vector<double>());
+  // extra kinematic variables for easier debugging
+  std::auto_ptr<std::vector<double> > pt_store(new std::vector<double>());
+  std::auto_ptr<std::vector<double> > eta_store(new std::vector<double>());
+  std::auto_ptr<std::vector<double> > phi_store(new std::vector<double>());
 	//extra properties
 	std::auto_ptr < std::vector<int> > charge(new std::vector<int>());
 	std::auto_ptr < std::vector<double> > ecalDrivenMomentumPx(new std::vector<double>());
@@ -252,6 +262,12 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			py->push_back(it->py());
 			pz->push_back(it->pz());
 			energy->push_back(it->energy());
+
+			// extra kinematic variables for easier debugging
+      pt_store->push_back(it->pt());
+      eta_store->push_back(it->eta());
+      phi_store->push_back(it->phi());
+
 			//extra properties
 			charge->push_back(it->charge());
 			ecalDrivenMomentumPx->push_back(it->ecalDrivenMomentum().Px());
@@ -341,6 +357,12 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	iEvent.put(py, prefix + "Py" + suffix);
 	iEvent.put(pz, prefix + "Pz" + suffix);
 	iEvent.put(energy, prefix + "Energy" + suffix);
+
+	// extra kinematic variables for easier debugging
+  iEvent.put(pt_store, prefix + "Pt" + suffix);
+  iEvent.put(eta_store, prefix + "Eta" + suffix);
+  iEvent.put(phi_store, prefix + "Phi" + suffix);
+
 	//extra properties
 	iEvent.put(charge, prefix + "Charge" + suffix);
 	iEvent.put(ecalDrivenMomentumPx, prefix + "ecalDrivenMomentum.Px" + suffix);

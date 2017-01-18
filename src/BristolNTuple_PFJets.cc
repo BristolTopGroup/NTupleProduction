@@ -25,6 +25,10 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "PyRAW" + suffix);
 	produces < std::vector<double> > (prefix + "PzRAW" + suffix);
 	produces < std::vector<double> > (prefix + "EnergyRAW" + suffix);
+	// extra kinematic variables for easier debugging
+	produces < std::vector<double> > (prefix + "Pt" + suffix);
+	produces < std::vector<double> > (prefix + "Eta" + suffix);
+	produces < std::vector<double> > (prefix + "Phi" + suffix);
 	//extra properties
 	produces < std::vector<double> > (prefix + "Charge" + suffix);
 	produces < std::vector<double> > (prefix + "Mass" + suffix);
@@ -122,6 +126,10 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<double> > py_raw(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > pz_raw(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > energy_raw(new std::vector<double>());
+	// extra kinematic variables for easier debugging
+  std::auto_ptr<std::vector<double> > pt_store(new std::vector<double>());
+  std::auto_ptr<std::vector<double> > eta_store(new std::vector<double>());
+  std::auto_ptr<std::vector<double> > phi_store(new std::vector<double>());
 	//extra properties
 	std::auto_ptr < std::vector<double> > charge(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > mass(new std::vector<double>());
@@ -339,6 +347,12 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 			py_raw->push_back(it->correctedJet("Uncorrected").py());
 			pz_raw->push_back(it->correctedJet("Uncorrected").pz());
 			energy_raw->push_back(it->correctedJet("Uncorrected").energy());
+
+			// extra kinematic variables for easier debugging
+			pt_store->push_back(it->pt());
+			eta_store->push_back(it->eta());
+			phi_store->push_back(it->phi());
+
 			//extra properties
 			charge->push_back(it->jetCharge());
 			mass->push_back(it->mass());
@@ -420,6 +434,12 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(py_raw, prefix + "PyRAW" + suffix);
 	iEvent.put(pz_raw, prefix + "PzRAW" + suffix);
 	iEvent.put(energy_raw, prefix + "EnergyRAW" + suffix);
+
+	// extra kinematic variables for easier debugging
+  iEvent.put(pt_store, prefix + "Pt" + suffix);
+  iEvent.put(eta_store, prefix + "Eta" + suffix);
+  iEvent.put(phi_store, prefix + "Phi" + suffix);
+
 	//extra properties
 	iEvent.put(charge, prefix + "Charge" + suffix);
 	iEvent.put(mass, prefix + "Mass" + suffix);
