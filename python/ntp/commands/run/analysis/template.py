@@ -38,7 +38,8 @@ default_settings = {{
     'PUFile':'PileUp_2015_truth_central.root',
     'PUFile_up':'PileUp_2015_truth_up.root',
     'PUFile_down':'PileUp_2015_truth_down.root',
-    'MuonIdIsoScaleFactorsFile': 'nofile.root',
+    'MuonIdScaleFactorsFile': 'EfficienciesAndSF_COMBINED.root',
+    'MuonIsoScaleFactorsFile': 'EfficienciesAndSF_Isolation_COMBINED.root',
     'TTbarLikelihoodFile': 'LikelihoodInputAnalyserOutput.root',
     'BTagEfficiencyFile': 'BTagEfficiency.root',
     'BTagSystematic': 0,
@@ -107,8 +108,8 @@ ElectronIdScaleFactorsFile = opj(BAT_DATA, 'egammaEffi.txt_SF2D.root')
 ElectronIsoScaleFactorsFile = opj(BAT_DATA, 'egammaEffi.txt_SF2D.root')
 ElectronTriggerScaleFactorsFile = opj(
     BAT_DATA, 'ElectronTriggerEfficiencies.root')
-MuonIdScaleFactorsFile = opj(BAT_DATA, 'MuonID_Z_RunBCD_prompt80X_7p65.root')
-MuonIsoScaleFactorsFile = opj(BAT_DATA, 'MuonIso_Z_RunBCD_prompt80X_7p65.root')
+MuonIdScaleFactorsFile = opj(BAT_DATA, 'EfficienciesAndSF_COMBINED.root')
+MuonIsoScaleFactorsFile = opj(BAT_DATA, 'EfficienciesAndSF_Isolation_COMBINED.root')
 MuonTriggerScaleFactorsFile = opj(BAT_DATA,'SingleMuonTrigger_Combined.root')
 MuonTrackingHIPScaleFactorsFile = opj(BAT_DATA, 'ratios_hist.root' )
 getHadronTriggerFromFile = True
