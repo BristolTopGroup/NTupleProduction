@@ -28,8 +28,8 @@ class Command(ParentCommand):
     def run(self, args, variables):
         self.__prepare(args, variables)
         input_files = self.__variables['input_files']
-        LOG.debug(
-            "Using files for NTP input:\n{0}".format('\n'.join(input_files)))
+        # LOG.debug(
+            # "Using files for NTP input:\n{0}".format('\n'.join(input_files)))
 
         self.__output_file = self.__variables['output_file']
 

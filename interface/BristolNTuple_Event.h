@@ -18,6 +18,9 @@ private:
   	const edm::EDGetTokenT<std::vector<reco::Vertex>> recoVertexInputTag_;
 	const edm::EDGetTokenT<edm::TriggerResults> metFiltersToken_;
 	std::vector<std::string> metFiltersOfInterest_;
+	const edm::EDGetTokenT<bool> badChCandFilterToken_;
+    const edm::EDGetTokenT<bool> badPFMuonFilterToken_;
+
 	const bool is2016Regime_;
 	const std::string prefix, suffix;
 

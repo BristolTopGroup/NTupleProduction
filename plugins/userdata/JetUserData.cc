@@ -72,7 +72,8 @@ private:
 	void fillBtagWeights(pat::Jet& jet) const;
 	void fillJEC(pat::Jet& jet, const edm::Event& iEvent, const edm::EventSetup& iSetup,
 			const JetCorrector* jetCorrector) const;
-	void fillJER(pat::Jet& jet) const;
+	void fillJER(pat::Jet& jet, const edm::Event& iEvent, JME::JetResolution resolution, 
+			JME::JetResolutionScaleFactor resolution_sf) const;
 
 	// ----------member data ---------------------------
 	// inputs
@@ -81,6 +82,8 @@ private:
 	const edm::EDGetTokenT<reco::BeamSpot> beamSpotInputTag_;
 	std::string jecUncertainty_;
 	const std::string jetCorrectionService_;
+	bool jerFromFile_;
+	std::string resFile_, resFile_sf_;
 	std::string bJetDiscriminator_, btagCalibrationFile_;
 	BTagCalibration btagCalibration_;
 	std::vector<BTagCalibrationReader> btagReaders_;
@@ -90,6 +93,7 @@ private:
 	double minSignalJetPt_, maxSignalJetEta_;
 
 	double minBtagDiscLooseWP_, minBtagDiscMediumWP_, minBtagDiscTightWP_;
+	edm::EDGetTokenT<double> rho_;
 
 };
 
@@ -115,6 +119,9 @@ JetUserData::JetUserData(const edm::ParameterSet& iConfig) :
 						consumes < reco::BeamSpot > (iConfig.getParameter < edm::InputTag > ("beamSpotCollection"))), //
 				jecUncertainty_(iConfig.getParameter < std::string > ("jecUncertainty")), //
 				jetCorrectionService_(iConfig.getParameter < std::string > ("jetCorrectionService")), //
+				jerFromFile_(iConfig.getParameter < bool > ("jerFromFile")), //
+				resFile_(iConfig.getParameter < std::string > ("resolutionFile")), //
+				resFile_sf_(iConfig.getParameter < std::string > ("resolutionSFFile")), //
 				bJetDiscriminator_(iConfig.getParameter < std::string > ("bJetDiscriminator")), //
 				btagCalibrationFile_(iConfig.getParameter < std::string > ("btagCalibrationFile")), //
 				btagCalibration_("csvv2", btagCalibrationFile_.c_str()), //
@@ -123,7 +130,8 @@ JetUserData::JetUserData(const edm::ParameterSet& iConfig) :
 				maxSignalJetEta_(iConfig.getParameter<double>("maxSignalJetEta")), //
 				minBtagDiscLooseWP_(iConfig.getParameter<double>("minBtagDiscLooseWP")),
 				minBtagDiscMediumWP_(iConfig.getParameter<double>("minBtagDiscMediumWP")),
-				minBtagDiscTightWP_(iConfig.getParameter<double>("minBtagDiscTightWP")) {
+				minBtagDiscTightWP_(iConfig.getParameter<double>("minBtagDiscTightWP")),
+				rho_(consumes<double>(iConfig.getParameter < edm::InputTag > ("rho"))){
 	//register your products
 	produces<std::vector<pat::Jet> >();
 	//now do what ever other initialization is needed
@@ -139,8 +147,6 @@ JetUserData::JetUserData(const edm::ParameterSet& iConfig) :
 		reader.load(btagCalibration_, BTagEntry::FLAV_UDSG, "incl");
 		btagReaders_.push_back(reader);
 	}
-
-	consumes<double>(edm::InputTag("fixedGridRhoFastjetAll"));
 }
 
 JetUserData::~JetUserData() {
@@ -167,14 +173,23 @@ void JetUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
 	edm::ESHandle < JetCorrectorParametersCollection > jetCorrectorCollection;
 	iSetup.get<JetCorrectionsRecord>().get(jecUncertainty_, jetCorrectorCollection);
+
 	JetCorrectorParameters const & jetCorrectorParams = (*jetCorrectorCollection)["Uncertainty"];
 	JetCorrectionUncertainty jecUnc(jetCorrectorParams);
 	const JetCorrector* jetCorrector(JetCorrector::getJetCorrector(jetCorrectionService_, iSetup));
 
-//	bool isSimulation = !iEvent.isRealData();
-
-	// https://twiki.cern.ch/twiki/bin/view/CMS/JetEnergyScale
-	// https://twiki.cern.ch/twiki/bin/view/CMS/JECAnalysesRecommendations
+	JME::JetResolution resolution;
+	JME::JetResolutionScaleFactor resolution_sf;
+	if (!iEvent.isRealData()) {
+		if( jerFromFile_ == true ){
+			resolution = JME::JetResolution(resFile_);
+			resolution_sf = JME::JetResolutionScaleFactor(resFile_sf_);
+		}
+		else{
+			resolution = JME::JetResolution::get(iSetup, "AK4PFchs_pt");
+			resolution_sf = JME::JetResolutionScaleFactor::get(iSetup, "AK4PFchs");
+		}
+	}
 
 	if (jets.isValid()) {
 		std::auto_ptr < std::vector<pat::Jet> > jetCollection(new std::vector<pat::Jet>(*jets));
@@ -204,8 +219,7 @@ void JetUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 			// only for simulation
 			if (!iEvent.isRealData()) {
 				fillBtagWeights(jet);
-				// JER
-				fillJER(jet);
+				fillJER(jet, iEvent, resolution, resolution_sf);
 			}
 		}
 		iEvent.put(jetCollection);
@@ -435,8 +449,30 @@ void JetUserData::fillJEC(pat::Jet& jet, const edm::Event& iEvent, const edm::Ev
 	jet.addUserFloat("L1OffJEC", jet.correctedJet("L1FastJet").pt() / jet.correctedJet("Uncorrected").pt());
 }
 
-void JetUserData::fillJER(pat::Jet& jet) const {
+void JetUserData::fillJER(pat::Jet& jet, const edm::Event& iEvent, 
+		JME::JetResolution resolution, JME::JetResolutionScaleFactor resolution_sf) const {
 
+	edm::Handle<double> rho;
+	iEvent.getByToken(rho_, rho);
+
+	JME::JetParameters jer_parameters;
+	jer_parameters.setJetPt(jet.pt());
+	jer_parameters.setJetEta(jet.eta());
+	jer_parameters.setRho(*rho);
+
+	// Retreive resolution and scale factors
+	float r = resolution.getResolution(jer_parameters);
+	float sf = resolution_sf.getScaleFactor(jer_parameters);
+	float sf_up = resolution_sf.getScaleFactor(jer_parameters, Variation::UP);
+	float sf_down = resolution_sf.getScaleFactor(jer_parameters, Variation::DOWN);
+
+	// std::cout << "Scale factors (Nominal / Up / Down) : " << sf << " / " << sf_up << " / " << sf_down << std::endl;
+
+	jet.addUserFloat("JER", r);
+	jet.addUserFloat("JER_SF", sf);
+	jet.addUserFloat("JER_SFUp", sf_up);
+	jet.addUserFloat("JER_SFDown", sf_down);
+	// Store here. Could move JER implementation here too
 }
 
 // ------------ method called once each stream before processing any runs, lumis or events  ------------

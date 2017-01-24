@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 nTupleElectrons = cms.EDProducer("BristolNTuple_Electrons",
-    InputTag = cms.InputTag('slimmedElectrons'),
+    InputTag = cms.InputTag('calibratedPatElectrons'),
     Prefix = cms.string('Electrons.'),
     Suffix = cms.string(''),
     MaxSize = cms.uint32(99),

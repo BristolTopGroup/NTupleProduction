@@ -56,7 +56,7 @@ globalTags = {
     },
     'MC': {
         7: '76X_mcRun2_asymptotic_RunIIFall15DR76_v1',  # 25ns MC
-        8: '80X_mcRun2_asymptotic_2016_miniAODv2_v1',
+        8: '80X_mcRun2_asymptotic_2016_TrancheIV_v7',
     }
 }
 
@@ -88,13 +88,9 @@ if isTTbarMC:
 from BristolAnalysis.NTupleTools.pseudoTopConfig_cff import setupPseudoTop
 setupPseudoTop(process, cms)
 
-# Electron VID
-from BristolAnalysis.NTupleTools.ElectronID_cff import setup_electronID
-setup_electronID(process, cms)
-
-# Rerun HBHE filter and others
-from BristolAnalysis.NTupleTools.metFilters_cfi import setupMETFilters
-setupMETFilters(process, cms)
+# # Rerun HBHE filter and others
+# from BristolAnalysis.NTupleTools.metFilters_cfi import setupMETFilters
+# setupMETFilters(process, cms)
 
 # Rerun MET
 from BristolAnalysis.NTupleTools.MET_Setup_cff import setup_MET
@@ -103,6 +99,14 @@ setup_MET(process, cms, options)
 # Custom JEC if useJECFromFile is true
 from BristolAnalysis.NTupleTools.Jets_Setup_cff import setup_jets
 setup_jets(process, cms, options)
+
+# Electron Regression, Smearing and VID
+from BristolAnalysis.NTupleTools.Electron_Setup_cff import setup_electrons
+setup_electrons(process, cms, options)
+
+# Bad Muon Filters
+from BristolAnalysis.NTupleTools.Muon_Setup_cff import setup_muons
+setup_muons(process, cms, options)
 
 # Load the selection filters and the selection analyzers
 process.load('BristolAnalysis.NTupleTools.muonSelections_cff')
@@ -133,6 +137,8 @@ process.load('BristolAnalysis.NTupleTools.indices_cff')
 if isTTbarMC:
     process.makingNTuples = cms.Path(
         # process.metFilters *
+        process.badMuonTagger *
+        process.smearedElectrons *
         process.egmGsfElectronIDSequence *
         process.reapplyJEC *
         process.electronSelectionAnalyzerSequence *
@@ -150,6 +156,8 @@ if isTTbarMC:
 else:
     process.makingNTuples = cms.Path(
         # process.metFilters *
+        process.badMuonTagger *
+        process.smearedElectrons *
         process.egmGsfElectronIDSequence *
         process.reapplyJEC *
         process.electronSelectionAnalyzerSequence *

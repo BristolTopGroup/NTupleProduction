@@ -95,11 +95,10 @@ BristolNTuple_PFJets::BristolNTuple_PFJets(const edm::ParameterSet& iConfig) :
 	produces < std::vector<double> > (prefix + "tightBTagSFUp" + suffix);
 	produces < std::vector<double> > (prefix + "tightBTagSFDown" + suffix);
 	// JER information
-	// produces < std::vector<double> > (prefix + "jer" + suffix);
-	// produces < std::vector<double> > (prefix + "jerSF" + suffix);
-	// produces < std::vector<double> > (prefix + "jerSFUp" + suffix);
-	// produces < std::vector<double> > (prefix + "jerSFDown" + suffix);
-
+	produces < std::vector<double> > (prefix + "jer" + suffix);
+	produces < std::vector<double> > (prefix + "jerSF" + suffix);
+	produces < std::vector<double> > (prefix + "jerSFUp" + suffix);
+	produces < std::vector<double> > (prefix + "jerSFDown" + suffix);
 	//jet-vertex association
 	if (doVertexAssociation) {
 		produces < std::vector<double> > (prefix + "BestVertexTrackAssociationFactor" + suffix);
@@ -127,9 +126,9 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<double> > pz_raw(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > energy_raw(new std::vector<double>());
 	// extra kinematic variables for easier debugging
-  std::auto_ptr<std::vector<double> > pt_store(new std::vector<double>());
-  std::auto_ptr<std::vector<double> > eta_store(new std::vector<double>());
-  std::auto_ptr<std::vector<double> > phi_store(new std::vector<double>());
+  	std::auto_ptr<std::vector<double> > pt_store(new std::vector<double>());
+  	std::auto_ptr<std::vector<double> > eta_store(new std::vector<double>());
+  	std::auto_ptr<std::vector<double> > phi_store(new std::vector<double>());
 	//extra properties
 	std::auto_ptr < std::vector<double> > charge(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > mass(new std::vector<double>());
@@ -193,12 +192,11 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	std::auto_ptr < std::vector<double> > tight_btagSF(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > tight_btagSF_up(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > tight_btagSF_down(new std::vector<double>());
-
-	// std::auto_ptr < std::vector<double> > jer(new std::vector<double>());
-	// std::auto_ptr < std::vector<double> > jerSF(new std::vector<double>());
-	// std::auto_ptr < std::vector<double> > jerSF_up(new std::vector<double>());
-	// std::auto_ptr < std::vector<double> > jerSF_down(new std::vector<double>());
-
+	//jet energy resolution and scale factors
+	std::auto_ptr < std::vector<double> > jer(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > jerSF(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > jerSF_up(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > jerSF_down(new std::vector<double>());
 	//jet-vertex association
 	std::auto_ptr < std::vector<double> > bestVertexTrackAssociationFactor(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > bestVertexTrackAssociationIndex(new std::vector<int>());
@@ -211,29 +209,6 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
 	edm::Handle < std::vector<pat::Jet> > jets;
 	iEvent.getByToken(inputTag, jets);
-
-	// JME::JetResolution resolution = JME::JetResolution::get(iSetup, "AK4PFchs_pt");
-	// JME::JetResolutionScaleFactor resolution_sf = JME::JetResolutionScaleFactor::get(iSetup, "AK4PFchs");
-// std::string jetSFType_;
-// std::string jetResPtType_;
-
-// srcJets = cms.InputTag("ak4PFJetsCHS"),
-// srcJetSF = cms.string('AK4PFchs'),
-// srcJetResPt = cms.string('AK4PFchs_pt'),
-// srcJetResPhi = cms.string('AK4PFchs_phi'),
-
-// jetSFType_ = iConfig.getParameter<std::string>("srcJetSF");
-// jetResPtType_ = iConfig.getParameter<std::string>("srcJetResPt");
-// jetResPhiType_ = iConfig.getParameter<std::string>("srcJetResPhi");
-// rhoToken_ = consumes<double>(iConfig.getParameter<edm::InputTag>("srcRho"));
-
-// JME::JetResolution resPtObj = JME::JetResolution::get(setup, jetResPtType_);
-// JME::JetResolution resPhiObj = JME::JetResolution::get(setup, jetResPhiType_);
-// JME::JetResolutionScaleFactor resSFObj = JME::JetResolutionScaleFactor::get(setup, jetSFType_);
-
-
-
-
 	if (jets.isValid()) {
 
 		for (std::vector<pat::Jet>::const_iterator it = jets->begin(); it != jets->end(); ++it) {
@@ -308,21 +283,6 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				genParton_phi->push_back(genparton_phi);
 				genParton_pdgId->push_back(genparton_pdgId);
 			}
-
-
-
-			// JME::JetParameters jetParams;
-
-			// // JER SF only depend on jet eta
-			// jetParams.setJetEta(it->eta());
-			// jerSF->push_back(resolution_sf.getScaleFactor(jetParams));
-			// jerSF_up->push_back(resolution_sf.getScaleFactor(jetParams, Variation::UP));
-			// jerSF_down->push_back(resolution_sf.getScaleFactor(jetParams, Variation::DOWN));
-
-			// // JER depends on jet eta and jet pt
-			// jetParams.setJetPt(it->pt());
-			// jer->push_back(resolution.getResolution(jetParams));
-
 
 			// fill in all the vectors
 			//kinematic variables
@@ -407,6 +367,12 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				tight_btagSF->push_back(it->userFloat("tightBTagWeight"));
 				tight_btagSF_up->push_back(it->userFloat("tightBTagWeightUp"));
 				tight_btagSF_down->push_back(it->userFloat("tightBTagWeightDown"));
+
+				// Store JER and JER SF
+				jer->push_back( it->userFloat("JER") );
+				jerSF->push_back( it->userFloat("JER_SF") );
+				jerSF_up->push_back( it->userFloat("JER_SFUp") );
+				jerSF_down->push_back( it->userFloat("JER_SFDown") );
 			}
 
 			//jet-vertex association
@@ -436,9 +402,9 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(energy_raw, prefix + "EnergyRAW" + suffix);
 
 	// extra kinematic variables for easier debugging
-  iEvent.put(pt_store, prefix + "Pt" + suffix);
-  iEvent.put(eta_store, prefix + "Eta" + suffix);
-  iEvent.put(phi_store, prefix + "Phi" + suffix);
+	iEvent.put(pt_store, prefix + "Pt" + suffix);
+	iEvent.put(eta_store, prefix + "Eta" + suffix);
+	iEvent.put(phi_store, prefix + "Phi" + suffix);
 
 	//extra properties
 	iEvent.put(charge, prefix + "Charge" + suffix);
@@ -508,10 +474,12 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	iEvent.put(tight_btagSF, prefix + "tightBTagSF" + suffix);
 	iEvent.put(tight_btagSF_up, prefix + "tightBTagSFUp" + suffix);
 	iEvent.put(tight_btagSF_down, prefix + "tightBTagSFDown" + suffix);
-	// iEvent.put(jer, prefix + "jer" + suffix);
-	// iEvent.put(jerSF, prefix + "jerSF" + suffix);
-	// iEvent.put(jerSF_up, prefix + "jerSFUp" + suffix);
-	// iEvent.put(jerSF_down, prefix + "jerSFDown" + suffix);
+
+	// jer information
+	iEvent.put(jer, prefix + "jer" + suffix);
+	iEvent.put(jerSF, prefix + "jerSF" + suffix);
+	iEvent.put(jerSF_up, prefix + "jerSFUp" + suffix);
+	iEvent.put(jerSF_down, prefix + "jerSFDown" + suffix);
 
 	//jet-vertex association
 	if (doVertexAssociation) {
