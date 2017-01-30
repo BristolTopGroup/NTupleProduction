@@ -5,13 +5,13 @@
 #include "DataFormats/PatCandidates/interface/Isolation.h"
 #include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
 #include "FWCore/Framework/interface/EDConsumerBase.h"
+#include "DataFormats/Math/interface/deltaR.h"
 
 using namespace edm;
 using namespace std;
 using namespace reco;
 using namespace isodeposit;
 using namespace pat;
-
 
 reco::TrackRef pmcTrack(const pat::Muon& mu, int & refit_id) {
 	return tevOptimized(mu.innerTrack(), mu.globalTrack(), mu.tpfmsMuon(), mu.pickyMuon(), refit_id);
@@ -54,7 +54,7 @@ bool passesFilter(const edm::Event& event, const edm::EDGetTokenT<bool> filter) 
 	if (filterResult.isValid()) {
 		// edm::LogInfo("PatUtilities_Filter") << "Successfully obtained " << filter;
 		result = *filterResult;
-	} 
+	}
 	// else
 	// 	edm::LogError("PatUtilities_Filter_Error") << "Error! Can't get the product " << filter;
 
@@ -145,104 +145,118 @@ unsigned int findTrigger(const std::string& triggerWildCard, const HLTConfigProv
 double getSmearedJetPtScale(const pat::Jet& jet, int jet_smearing_systematic) {
 	// Get the jet energy resolution scale factors, depending on the jet eta, from 
 	// https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution#Recommendations_for_7_and_8_TeV
-	
-				
+
 	//Jeson's smeary code:
 	double scaleFactor(0.);
 	if (fabs(jet.eta()) >= 0.0 && fabs(jet.eta()) < 0.5) {
 		switch (jet_smearing_systematic) {
-			case -1:
-				scaleFactor = 0.990;
-				break;
-			case 1:
-				scaleFactor = 1.115;
-				break;
-			default:
-				scaleFactor = 1.052;
+		case -1:
+			scaleFactor = 0.990;
+			break;
+		case 1:
+			scaleFactor = 1.115;
+			break;
+		default:
+			scaleFactor = 1.052;
 		}
 	}
 	if (fabs(jet.eta()) >= 0.5 && fabs(jet.eta()) < 1.1) {
 		switch (jet_smearing_systematic) {
-			case -1:
-				scaleFactor = 1.001;
-				break;
-			case 1:
-				scaleFactor = 1.114;
-				break;
-			default:
-				scaleFactor = 1.057;
+		case -1:
+			scaleFactor = 1.001;
+			break;
+		case 1:
+			scaleFactor = 1.114;
+			break;
+		default:
+			scaleFactor = 1.057;
 		}
 	}
 	if (fabs(jet.eta()) >= 1.1 && fabs(jet.eta()) < 1.7) {
 		switch (jet_smearing_systematic) {
-			case -1:
-				scaleFactor = 1.032;
-				break;
-			case 1:
-				scaleFactor = 1.161;
-				break;
-			default:
-				scaleFactor = 1.096;
+		case -1:
+			scaleFactor = 1.032;
+			break;
+		case 1:
+			scaleFactor = 1.161;
+			break;
+		default:
+			scaleFactor = 1.096;
 		}
 	}
 	if (fabs(jet.eta()) >= 1.7 && fabs(jet.eta()) < 2.3) {
 		switch (jet_smearing_systematic) {
-			case -1:
-				scaleFactor = 1.042;
-				break;
-			case 1:
-				scaleFactor = 1.228;
-				break;
-			default:
-				scaleFactor = 1.134;
+		case -1:
+			scaleFactor = 1.042;
+			break;
+		case 1:
+			scaleFactor = 1.228;
+			break;
+		default:
+			scaleFactor = 1.134;
 		}
 	}
 	if (fabs(jet.eta()) >= 2.3 && fabs(jet.eta()) < 5.0) {
 		switch (jet_smearing_systematic) {
-			case -1:
-				scaleFactor = 1.089;
-				break;
-			case 1:
-				scaleFactor = 1.488;
-				break;
-			default:
-				scaleFactor = 1.288;
+		case -1:
+			scaleFactor = 1.089;
+			break;
+		case 1:
+			scaleFactor = 1.488;
+			break;
+		default:
+			scaleFactor = 1.288;
 		}
 	}
 
 	//use raw scaleFactors from above to calculate the final factors to apply
 	double matchedGeneratedJetpt = jet.pt();
-	if(jet.genJet()){
-		if ( jet.genJet()->energy() != 0 ) { // Check done in Analysis Tools
+	if (jet.genJet()) {
+		if (jet.genJet()->energy() != 0) { // Check done in Analysis Tools
 			matchedGeneratedJetpt = jet.genJet()->pt();
 		}
 	}
 	double jetPt = jet.pt();
-	double factor = 1-scaleFactor;
+	double factor = 1 - scaleFactor;
 	double deltaPt = factor * (jetPt - matchedGeneratedJetpt);
-	double ptScale = std::max(0.0, ((jetPt + deltaPt)/jetPt));
+	double ptScale = std::max(0.0, ((jetPt + deltaPt) / jetPt));
 
 	return ptScale;
 
 }
 
-pat::JetCollection applyNewJec( pat::JetCollection jets, const JetCorrector* corrector, edm::Event& iEvent, const edm::EventSetup& iSetup ) {
+pat::JetCollection applyNewJec(pat::JetCollection jets, const JetCorrector* corrector, edm::Event& iEvent,
+		const edm::EventSetup& iSetup) {
 	pat::JetCollection newJets;
 
 	for (unsigned index = 0; index < jets.size(); ++index) {
 		const pat::Jet jet = jets.at(index);
-		float JEC = getJECForJet( jet, corrector, iEvent, iSetup);
-		pat::Jet newJet( jet );
-		newJet.setP4( jet.correctedJet("Uncorrected").p4() * JEC );
-		newJets.push_back( newJet );
+		float JEC = getJECForJet(jet, corrector, iEvent, iSetup);
+		pat::Jet newJet(jet);
+		newJet.setP4(jet.correctedJet("Uncorrected").p4() * JEC);
+		newJets.push_back(newJet);
 	}
 
 	return newJets;
 }
 
-float getJECForJet(const pat::Jet jet, const JetCorrector* corrector, edm::Event& iEvent, const edm::EventSetup& iSetup ) {
-	return corrector->correction( jet.correctedJet("Uncorrected"), iEvent, iSetup );
+float getJECForJet(const pat::Jet jet, const JetCorrector* corrector, edm::Event& iEvent,
+		const edm::EventSetup& iSetup) {
+	return corrector->correction(jet.correctedJet("Uncorrected"), iEvent, iSetup);
 }
 
-
-
+namespace ntp {
+size_t getClosestJet(const math::XYZTLorentzVectorD& lepton_p4, const pat::JetCollection& jets) {
+	size_t closestJet(0);
+	double closestDR = 9999;
+	for (size_t index = 0; index < jets.size(); ++index) {
+		const pat::Jet jet = jets.at(index);
+		double dr = deltaR(lepton_p4.Eta(), lepton_p4.Phi(), jet.eta(), jet.phi());
+		if (dr < closestDR) {
+			closestDR = dr;
+			closestJet = index;
+		}
+	}
+	return closestJet;
+}
+}

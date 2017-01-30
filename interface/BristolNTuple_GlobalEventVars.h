@@ -15,7 +15,9 @@
 #include "TLorentzVector.h"
 
 
-
+/*
+ * DEPRECATED
+ */
 class BristolNTuple_GlobalEventVars : public edm::EDProducer {
  public:
   explicit BristolNTuple_GlobalEventVars(const edm::ParameterSet&);

@@ -12,6 +12,7 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/Math/interface/LorentzVector.h"
 
 reco::TrackRef pmcTrack(const pat::Muon& mu, int & refit_id);
 
@@ -30,4 +31,10 @@ pat::JetCollection applyNewJec( pat::JetCollection jets, const JetCorrector* cor
 
 float getJECForJet(const pat::Jet jet, const JetCorrector* corrector, edm::Event& iEvent, const edm::EventSetup& iSetup );
 
+namespace ntp {
+/*
+ * Returns the index of the closest jet in collection @jets to the lepton @lepton_p4
+ */
+size_t getClosestJet(const math::XYZTLorentzVectorD& lepton_p4, const pat::JetCollection& jets);
+}
 #endif 
