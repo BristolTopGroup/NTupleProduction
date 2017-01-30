@@ -52,11 +52,11 @@ process.source = cms.Source("PoolSource",
 globalTags = {
     'data': {
         7: '76X_dataRun2_16Dec2015_v0',  # ReReco+Prompt JECv6
-        8: '80X_dataRun2_2016SeptRepro_v4',
+        8: '80X_dataRun2_2016SeptRepro_v5',
     },
     'MC': {
         7: '76X_mcRun2_asymptotic_RunIIFall15DR76_v1',  # 25ns MC
-        8: '80X_mcRun2_asymptotic_2016_miniAODv2_v1',
+        8: '80X_mcRun2_asymptotic_2016_TrancheIV_v6',
     }
 }
 
