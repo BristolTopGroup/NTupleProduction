@@ -96,7 +96,7 @@ private:
 
    	// Control region selections
 	bool nonIsolatedMuonSelection1_, nonIsolatedMuonSelection2_;
-
+	double looseMuonIso_, tightMuonIso_;
 	//internal
 	boost::array<bool, TTbarMuPlusJetsReferenceSelection::NUMBER_OF_SELECTION_STEPS> passes_;
 	unsigned int runNumber_, signalMuonIndex_;

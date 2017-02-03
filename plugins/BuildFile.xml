@@ -12,6 +12,7 @@
 	<use name="FWCore/PluginManager"/>
 	<use name="HLTrigger/HLTcore"/>
 	<use name="JetMETCorrections/Objects"/>
+	<use name="JetMETCorrections/Modules"/>
 	<use name="PhysicsTools/Utilities"/>
 	<use name="RecoEgamma/EgammaTools"/>
 	<use name="BristolAnalysis/NTupleTools"/>

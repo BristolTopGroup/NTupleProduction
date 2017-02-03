@@ -65,14 +65,14 @@ private:
 	virtual void produce(edm::Event&, const edm::EventSetup&) override;
 	virtual void endStream() override;
 
-	void fillVertexVariables(const edm::Event&, pat::Jet& jet) const;
+	void fillVertexVariables(const std::vector<reco::Vertex> primaryVertices, pat::Jet& jet) const;
 	void fillUncertainties(pat::Jet& jet, JetCorrectionUncertainty& jecUnc) const;
 	void fillJetIds(pat::Jet& jet) const;
 	void fillBtagging(pat::Jet& jet) const;
 	void fillBtagWeights(pat::Jet& jet) const;
 	void fillJEC(pat::Jet& jet, const edm::Event& iEvent, const edm::EventSetup& iSetup,
 			const JetCorrector* jetCorrector) const;
-	void fillJER(pat::Jet& jet) const;
+	void fillJER(pat::Jet& jet, double rho) const;
 
 	// ----------member data ---------------------------
 	// inputs
@@ -91,6 +91,9 @@ private:
 
 	double minBtagDiscLooseWP_, minBtagDiscMediumWP_, minBtagDiscTightWP_;
 
+	edm::EDGetTokenT<double> rho_;
+	JME::JetResolution resolution;
+	JME::JetResolutionScaleFactor resolution_sf;
 };
 
 //
@@ -123,7 +126,8 @@ JetUserData::JetUserData(const edm::ParameterSet& iConfig) :
 				maxSignalJetEta_(iConfig.getParameter<double>("maxSignalJetEta")), //
 				minBtagDiscLooseWP_(iConfig.getParameter<double>("minBtagDiscLooseWP")),
 				minBtagDiscMediumWP_(iConfig.getParameter<double>("minBtagDiscMediumWP")),
-				minBtagDiscTightWP_(iConfig.getParameter<double>("minBtagDiscTightWP")) {
+				minBtagDiscTightWP_(iConfig.getParameter<double>("minBtagDiscTightWP")),
+				rho_(consumes<double>(iConfig.getParameter < edm::InputTag > ("rho"))){
 	//register your products
 	produces<std::vector<pat::Jet> >();
 	//now do what ever other initialization is needed
@@ -139,8 +143,6 @@ JetUserData::JetUserData(const edm::ParameterSet& iConfig) :
 		reader.load(btagCalibration_, BTagEntry::FLAV_UDSG, "incl");
 		btagReaders_.push_back(reader);
 	}
-
-	consumes<double>(edm::InputTag("fixedGridRhoFastjetAll"));
 }
 
 JetUserData::~JetUserData() {
@@ -164,17 +166,22 @@ void JetUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
 	edm::Handle < std::vector<reco::Vertex> > primaryVertices;
 	iEvent.getByToken(vtxInputTag_, primaryVertices);
+	const std::vector<reco::Vertex>& vertices = *primaryVertices.product();
+
+	edm::Handle<double> rho_handle;
+	iEvent.getByToken(rho_, rho_handle);
+	const double rho = *rho_handle.product();
 
 	edm::ESHandle < JetCorrectorParametersCollection > jetCorrectorCollection;
 	iSetup.get<JetCorrectionsRecord>().get(jecUncertainty_, jetCorrectorCollection);
+
 	JetCorrectorParameters const & jetCorrectorParams = (*jetCorrectorCollection)["Uncertainty"];
 	JetCorrectionUncertainty jecUnc(jetCorrectorParams);
 	const JetCorrector* jetCorrector(JetCorrector::getJetCorrector(jetCorrectionService_, iSetup));
 
-//	bool isSimulation = !iEvent.isRealData();
-
-	// https://twiki.cern.ch/twiki/bin/view/CMS/JetEnergyScale
-	// https://twiki.cern.ch/twiki/bin/view/CMS/JECAnalysesRecommendations
+	// Available in Data GT so no need to specify is not data. only applied to MC.
+	resolution = JME::JetResolution::get(iSetup, "AK4PFchs_pt");
+	resolution_sf = JME::JetResolutionScaleFactor::get(iSetup, "AK4PFchs");
 
 	if (jets.isValid()) {
 		std::auto_ptr < std::vector<pat::Jet> > jetCollection(new std::vector<pat::Jet>(*jets));
@@ -190,7 +197,7 @@ void JetUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 			// probably just adding a scale factor would be good
 
 			// vertex association
-			fillVertexVariables(iEvent, jet);
+			fillVertexVariables(vertices, jet);
 
 			//IDs
 			fillJetIds(jet);
@@ -204,8 +211,7 @@ void JetUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 			// only for simulation
 			if (!iEvent.isRealData()) {
 				fillBtagWeights(jet);
-				// JER
-				fillJER(jet);
+				fillJER(jet, rho);
 			}
 		}
 		iEvent.put(jetCollection);
@@ -238,13 +244,11 @@ void JetUserData::fillUncertainties(pat::Jet& jet, JetCorrectionUncertainty& jec
 	 reco::Candidate::LorentzVector scaledJetP4 = uncorrJet * corr; */
 }
 
-void JetUserData::fillVertexVariables(const edm::Event& iEvent, pat::Jet& jet) const {
-	edm::Handle < std::vector<reco::Vertex> > primaryVertices;
-	iEvent.getByToken(vtxInputTag_, primaryVertices);
-	if (primaryVertices.isValid()) {
-		LogDebug("JetUserData") << "Total # Primary Vertices: " << primaryVertices->size();
+void JetUserData::fillVertexVariables(const std::vector<reco::Vertex> primaryVertices, pat::Jet& jet) const {
+	if (!primaryVertices.empty()) {
+		LogDebug("JetUserData") << "Total # Primary Vertices: " << primaryVertices.size();
 		// this is only for the primary vertex
-		reco::Vertex pv = primaryVertices->front();
+		reco::Vertex pv = primaryVertices.front();
 		int bestVtxIndex3Ddist = -1;
 		int bestVtxIndexXYdist = -1;
 		int bestVtxIndexZdist = -1;
@@ -256,7 +260,7 @@ void JetUserData::fillVertexVariables(const edm::Event& iEvent, pat::Jet& jet) c
 		double minVtxDistZ = -99999.;
 		double maxTrackAssocRatio = -9999.;
 
-		for (reco::VertexCollection::const_iterator v_it = primaryVertices->begin(); v_it != primaryVertices->end();
+		for (reco::VertexCollection::const_iterator v_it = primaryVertices.begin(); v_it != primaryVertices.end();
 				++v_it) {
 
 			double sumweights = 0.0;
@@ -305,24 +309,24 @@ void JetUserData::fillVertexVariables(const edm::Event& iEvent, pat::Jet& jet) c
 			// Find vertex with minimum weighted distance.
 			if (dist3Dweighted < minVtxDist3D) {
 				minVtxDist3D = dist3Dweighted;
-				bestVtxIndex3Ddist = int(std::distance(primaryVertices->begin(), v_it));
+				bestVtxIndex3Ddist = int(std::distance(primaryVertices.begin(), v_it));
 
 			}
 
 			if (distXYweighted < minVtxDistXY) {
 				minVtxDistXY = distXYweighted;
-				bestVtxIndexXYdist = int(std::distance(primaryVertices->begin(), v_it));
+				bestVtxIndexXYdist = int(std::distance(primaryVertices.begin(), v_it));
 			}
 
 			if (distZweighted < minVtxDistZ) {
 				minVtxDistZ = distZweighted;
-				bestVtxIndexZdist = int(std::distance(primaryVertices->begin(), v_it));
+				bestVtxIndexZdist = int(std::distance(primaryVertices.begin(), v_it));
 			}
 
 			// Find vertex with minimum weighted distance.
 			if (trackassociationratio > maxTrackAssocRatio) {
 				maxTrackAssocRatio = trackassociationratio;
-				bestVtxIndexSharedTracks = int(std::distance(primaryVertices->begin(), v_it));
+				bestVtxIndexSharedTracks = int(std::distance(primaryVertices.begin(), v_it));
 			}
 
 		}
@@ -435,8 +439,25 @@ void JetUserData::fillJEC(pat::Jet& jet, const edm::Event& iEvent, const edm::Ev
 	jet.addUserFloat("L1OffJEC", jet.correctedJet("L1FastJet").pt() / jet.correctedJet("Uncorrected").pt());
 }
 
-void JetUserData::fillJER(pat::Jet& jet) const {
+void JetUserData::fillJER(pat::Jet& jet, double rho) const {
 
+	JME::JetParameters jer_parameters;
+	jer_parameters.setJetPt(jet.pt());
+	jer_parameters.setJetEta(jet.eta());
+	jer_parameters.setRho(rho);
+
+	// Retreive resolution and scale factors
+	float r = resolution.getResolution(jer_parameters);
+	float sf = resolution_sf.getScaleFactor(jer_parameters);
+	float sf_up = resolution_sf.getScaleFactor(jer_parameters, Variation::UP);
+	float sf_down = resolution_sf.getScaleFactor(jer_parameters, Variation::DOWN);
+
+	// std::cout << "Scale factors (Nominal / Up / Down) : " << sf << " / " << sf_up << " / " << sf_down << std::endl;
+
+	jet.addUserFloat("JER", r);
+	jet.addUserFloat("JER_SF", sf);
+	jet.addUserFloat("JER_SFUp", sf_up);
+	jet.addUserFloat("JER_SFDown", sf_down);
 }
 
 // ------------ method called once each stream before processing any runs, lumis or events  ------------

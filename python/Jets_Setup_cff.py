@@ -13,6 +13,7 @@ from BristolAnalysis.NTupleTools.options import CMSSW_MAJOR_VERSION
 def setup_jets(process, cms, options, postfix="PFlow"):
     print '=' * 60
     print "Setting up Jets"
+    print "Deprecated : JEC from GT are applied in JetUserData"
     print '=' * 60
     # use external JECs (sqlite file)
     usePrivateSQlite = options.useJECFromFile

@@ -11,6 +11,10 @@ BristolNTuple_Event::BristolNTuple_Event(const edm::ParameterSet& iConfig) :
 		recoVertexInputTag_(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("recoVertexInputTag"))), //
 		metFiltersToken_(consumes<edm::TriggerResults>(iConfig.getParameter < edm::InputTag > ("metFiltersToken"))), //
 		metFiltersOfInterest_(iConfig.getParameter < std::vector<std::string> > ("metFiltersOfInterest")), //
+
+		badChCandFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("badChargedCandidateFilter"))),
+    	badPFMuonFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("badPFMuonFilter"))),
+
 		is2016Regime_(iConfig.getParameter < bool > ("is2016Regime")), //
 		prefix(iConfig.getParameter < std::string > ("Prefix")), //
 		suffix(iConfig.getParameter < std::string > ("Suffix")) {
@@ -34,6 +38,15 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
 	edm::Handle< std::vector< reco::Vertex > > primaryVertices;
 	iEvent.getByToken(recoVertexInputTag_, primaryVertices);
+
+	// Handles for the Bad Muons
+    edm::Handle<bool> ifilterbadChCand;
+    iEvent.getByToken(badChCandFilterToken_, ifilterbadChCand);
+    bool passBadChargedCand = *ifilterbadChCand;
+
+    edm::Handle<bool> ifilterbadPFMuon;
+    iEvent.getByToken(badPFMuonFilterToken_, ifilterbadPFMuon);
+    bool passBadMuon = *ifilterbadPFMuon;
 
 	std::auto_ptr<unsigned int> run(new unsigned int(iEvent.id().run()));
 	std::auto_ptr<unsigned int> eventNumber(new unsigned int(iEvent.id().event()));
@@ -63,6 +76,9 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 		}
 	}
 
+	metFilters->push_back( passBadChargedCand );
+	metFilters->push_back( passBadMuon );
+	*passesMETFilters = *passesMETFilters && passBadChargedCand && passBadMuon;
 
 	//-----------------------------------------------------------------
 	iEvent.put(run, prefix + "Run" + suffix);

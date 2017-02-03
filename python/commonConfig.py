@@ -15,7 +15,10 @@ config.JobType.psetName = 'BristolAnalysis/NTupleTools/Configuration/makeTuplesF
 config.JobType.allowUndistributedCMSSW = True
 config.JobType.inputFiles = [	'BristolAnalysis/NTupleTools/data/BTagSF/CSVv2Moriond17_2017_1_26_BtoH.csv',
 								'BristolAnalysis/NTupleTools/data/JEC/Spring16_25nsV6_DATA.db',
-								'BristolAnalysis/NTupleTools/data/JEC/Spring16_25nsV6_MC.db']
+								'BristolAnalysis/NTupleTools/data/JEC/Spring16_25nsV6_MC.db',
+								'BristolAnalysis/NTupleTools/data/JER/Spring16_25nsV6_MC_PtResolution_AK4PFchs.txt',
+								'BristolAnalysis/NTupleTools/data/JER/Spring16_25nsV6_MC_SF_AK4PFchs.txt',
+								]
 
 config.section_("Data")
 # config.Data.inputDataset = '/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'

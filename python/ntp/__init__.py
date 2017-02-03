@@ -32,7 +32,7 @@ LOG.addHandler(fh)
 formatter = logging.Formatter('%(message)s')
 ch = logging.StreamHandler()
 if not os.environ.get("DEBUG", False):
-    ch.setLevel(logging.INFO)
+    ch.setLevel(logging.ERROR)
 else:
     ch.setLevel(logging.DEBUG)
 ch.setFormatter(formatter)

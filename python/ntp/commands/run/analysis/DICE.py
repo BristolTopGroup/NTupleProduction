@@ -140,6 +140,9 @@ class Command(C):
 
         # layer 2 - analysis
         for mode in ANALYSIS_MODES:
+            # Only run over specified mode if not run all.
+            if 'all' not in self.__variables['mode']:
+                if mode not in self.__variables['mode']: continue
 
             if 'TTJet' in dataset:
                 if 'down' in dataset or 'up' in dataset or 'mtop' in dataset:

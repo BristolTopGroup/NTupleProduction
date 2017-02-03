@@ -19,4 +19,5 @@ jetUserData = cms.EDProducer(
     minBtagDiscMediumWP=cms.double(0.8484),
     minBtagDiscTightWP=cms.double(0.9535),
     btagCalibrationFile=cms.string('CSVv2Moriond17_2017_1_26_BtoH.csv'),
+    rho=cms.InputTag('fixedGridRhoFastjetAll'),
 )

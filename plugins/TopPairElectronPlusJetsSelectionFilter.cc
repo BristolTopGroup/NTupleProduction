@@ -301,7 +301,7 @@ bool TopPairElectronPlusJetsSelectionFilter::hasExactlyOneSignalElectron() const
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::passesLooseMuonVeto() const {
-	// Require no electrons in the event
+	// Require no muons in the event
 	return vetoMuons_.size() == 0;
 }
 
@@ -324,9 +324,13 @@ bool TopPairElectronPlusJetsSelectionFilter::passesLooseElectronVeto() const {
 			}
 		}
 		return isZEvent == true;
-	} else
-		// Require only one loose electron, which is the signal electron
+	} 
+	else {
+		if (nonIsolatedElectronSelection_ || invertedConversionSelection_){
+			return vetoElectrons_.size() < 1;
+		}
 		return vetoElectrons_.size() < 2;
+	}
 }
 
 bool TopPairElectronPlusJetsSelectionFilter::passesConversionVeto() const {
