@@ -1,3 +1,7 @@
+/**
+ * @deprecated
+ */
+
 #include "BristolAnalysis/NTupleTools/plugins/UnfoldingAnalyser.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"

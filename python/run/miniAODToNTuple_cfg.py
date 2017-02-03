@@ -129,6 +129,9 @@ process.nTupleGenEventInfo.isTTbarMC = cms.bool(isTTbarMC)
 # mapping between MiniAOD collections and our object selections
 process.load('BristolAnalysis.NTupleTools.indices_cff')
 
+# adds process.eventUserDataSequence
+process.load('BristolAnalysis.NTupleTools.userdata.EventUserData_cff')
+
 
 if isTTbarMC:
     process.makingNTuples = cms.Path(
@@ -143,6 +146,7 @@ if isTTbarMC:
         process.selectionCriteriaAnalyzer *
         process.makePseudoTop *
         process.indexSequence *
+        process.eventUserDataSequence *
         process.printEventContent *
         process.nTuples *
         process.nTupleTree
@@ -158,6 +162,7 @@ else:
         process.qcdElectronSelectionAnalyzerSequence *
         process.selectionCriteriaAnalyzer *
         process.indexSequence *
+        process.eventUserDataSequence *
         process.printEventContent *
         process.nTuples *
         process.nTupleTree
@@ -178,6 +183,7 @@ process.nTupleTree.outputCommands.extend(
         'keep bool_topPairEPlusJetsQCDSelectionTagging_*FullSelection*_*',
         'keep bool_topPairEPlusJetsConversionSelectionTagging_*FullSelection*_*',
         'keep uint*_*Indices*_*_*',
+        'keep double_eventUserData*_*_*',
     ]
 )
 
@@ -311,6 +317,7 @@ if is2016:
 process.load('BristolAnalysis.NTupleTools.userdata.ElectronUserData_cfi')
 process.load('BristolAnalysis.NTupleTools.userdata.MuonUserData_cfi')
 process.load('BristolAnalysis.NTupleTools.userdata.JetUserData_cfi')
+
 if options.useJECFromFile:
     process.jetUserData.jetCollection=cms.InputTag("patJetsReapplyJEC")
 

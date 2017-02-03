@@ -5,6 +5,7 @@
 #include "DataFormats/PatCandidates/interface/Isolation.h"
 #include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
 #include "FWCore/Framework/interface/EDConsumerBase.h"
+#include "TLorentzVector.h"
 
 using namespace edm;
 using namespace std;
@@ -89,58 +90,6 @@ unsigned int findTrigger(const std::string& triggerWildCard, const HLTConfigProv
 
 	return found;
 }
-
-//double getRelativeIsolation(const pat::Electron& electron, double cone, double rho, bool isRealData, bool useDeltaBetaCorrections,
-//		bool useRhoActiveAreaCorrections) {
-//	//code from: https://twiki.cern.ch/twiki/bin/view/CMS/PfIsolation
-//	float AEff = 0.00;
-//	//so far this is only for 0.3. 0.4 is available but not 0.5
-//
-//// 	  std::cout << "ElectronEffectiveArea::kEleEAData2011: " << ElectronEffectiveArea::kEleEAData2011 << std::endl;
-////        std::cout << "ElectronEffectiveArea::kEleEAData2012: " << ElectronEffectiveArea::kEleEAData2012<< std::endl;
-//
-////        std::cout << "ElectronEffectiveArea::kEleEAFall1MC: " << ElectronEffectiveArea::kEleEAFall11MC << std::endl;
-////        std::cout << "ElectronEffectiveArea::kEleEASummer12MC: " << ElectronEffectiveArea::kEleEASummer12MC<< std::endl;
-//
-//        if (isRealData) {
-//		AEff = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
-//				electron.superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
-//        } else {
-//		AEff = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
-//				electron.superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
-//	}
-//
-//	AbsVetos vetos_ch;
-//	AbsVetos vetos_nh;
-//	AbsVetos vetos_ph;
-//
-//	Direction Dir = Direction(electron.superCluster()->eta(), electron.superCluster()->phi());
-//
-//	//pf isolation veto setup EGM recommendation
-//	if (fabs(electron.superCluster()->eta()) > 1.479) {
-//		vetos_ch.push_back(new ConeVeto(Dir, 0.015));
-//		vetos_ph.push_back(new ConeVeto(Dir, 0.08));
-//	}
-//
-//	const double chIso = electron.isoDeposit(pat::PfChargedHadronIso)->depositAndCountWithin(cone, vetos_ch).first;
-//	const double nhIso = electron.isoDeposit(pat::PfNeutralHadronIso)->depositAndCountWithin(cone, vetos_nh).first;
-//	const double phIso = electron.isoDeposit(pat::PfGammaIso)->depositAndCountWithin(cone, vetos_ph).first;
-//
-//	const double puChIso = electron.isoDeposit(pat::PfPUChargedHadronIso)->depositAndCountWithin(cone, vetos_ch).first;
-//
-//	const double relIso = (chIso + nhIso + phIso) / electron.pt();
-//	const double relIsodb = (chIso + max(0.0, nhIso + phIso - 0.5 * puChIso)) / electron.pt();
-//	const double relIsorho = (chIso + max(0.0, nhIso + phIso - rho * AEff)) / electron.pt();
-//
-//	if (useRhoActiveAreaCorrections)
-//		return relIsorho;
-//
-//	if (useDeltaBetaCorrections)
-//		return relIsodb;
-//
-//
-//	return relIso;
-//}
 
 double getSmearedJetPtScale(const pat::Jet& jet, int jet_smearing_systematic) {
 	// Get the jet energy resolution scale factors, depending on the jet eta, from 
@@ -242,6 +191,112 @@ pat::JetCollection applyNewJec( pat::JetCollection jets, const JetCorrector* cor
 
 float getJECForJet(const pat::Jet jet, const JetCorrector* corrector, edm::Event& iEvent, const edm::EventSetup& iSetup ) {
 	return corrector->correction( jet.correctedJet("Uncorrected"), iEvent, iSetup );
+}
+
+
+namespace ntp {
+namespace utils {
+double ht(const pat::JetCollection& jets)
+{
+  double result = 0;
+  for (auto jet : jets) {
+    result += jet.pt();
+  }
+  return result;
+}
+
+double st(const pat::JetCollection& jets, const pat::MET& met, const reco::Candidate* lepton)
+{
+  return ht(jets) + met.pt() + lepton->pt();
+}
+
+double wpt(const pat::MET& met, const reco::Candidate* lepton)
+{
+  return sqrt(pow(lepton->px() + met.px(), 2) + pow(lepton->py() + met.py(), 2));
+}
+
+double mt(const pat::MET& met, const reco::Candidate* lepton)
+{
+  double energy_squared = pow(lepton->et() + met.pt(), 2);
+  double momentum_squared = pow(lepton->px() + met.px(), 2) + pow(lepton->py() + met.py(), 2);
+  double MT_squared = energy_squared - momentum_squared;
+
+  if (MT_squared > 0)
+    return sqrt(MT_squared);
+  else
+    return -1;
+}
+
+double m3(const pat::JetCollection& jets)
+{
+  double m3(-1), max_pt(0);
+  if (jets.size() >= 3) {
+    for (unsigned int index1 = 0; index1 < jets.size() - 2; ++index1) {
+      for (unsigned int index2 = index1 + 1; index2 < jets.size() - 1; ++index2) {
+        for (unsigned int index3 = index2 + 1; index3 < jets.size(); ++index3) {
+          TLorentzVector jet1(jets.at(index1).px(), jets.at(index1).py(), jets.at(index1).pz(),
+              jets.at(index1).energy());
+          TLorentzVector jet2(jets.at(index2).px(), jets.at(index2).py(), jets.at(index2).pz(),
+              jets.at(index2).energy());
+          TLorentzVector jet3(jets.at(index3).px(), jets.at(index3).py(), jets.at(index3).pz(),
+              jets.at(index3).energy());
+
+          TLorentzVector m3Vector(jet1 + jet2 + jet3);
+          double currentPt = m3Vector.Pt();
+          if (currentPt > max_pt) {
+            max_pt = currentPt;
+            m3 = m3Vector.M();
+          }
+        }
+      }
+    }
+  }
+
+  return m3;
+}
+
+double angle_bl(const pat::JetCollection& jets, const reco::Candidate* lepton)
+{
+  double angle(-1);
+  const pat::Jet closestJet(getClosestJet(jets, lepton));
+
+  TLorentzVector b(closestJet.px(), closestJet.py(), closestJet.pz(), closestJet.energy());
+  TLorentzVector l(lepton->px(), lepton->py(), lepton->pz(), lepton->energy());
+
+  angle = b.Angle(l.Vect());
+
+  return angle;
+}
+
+pat::Jet getClosestJet(const pat::JetCollection& jets, const reco::Candidate* lepton)
+{
+  double closestDR = 9999;
+  pat::Jet closestJet;
+
+  for (auto jet : jets) {
+    double DR = deltaR(lepton->eta(), lepton->phi(), jet.eta(), jet.phi());
+    if (DR < closestDR) {
+      closestDR = DR;
+      closestJet = pat::Jet(jet);
+    }
+  }
+
+  return closestJet;
+}
+
+double m_bl(const pat::JetCollection& jets, const reco::Candidate* lepton)
+{
+  double mass(-1);
+  const pat::Jet closestJet(getClosestJet(jets, lepton));
+
+  TLorentzVector b(closestJet.px(), closestJet.py(), closestJet.pz(), closestJet.energy());
+  TLorentzVector l(lepton->px(), lepton->py(), lepton->pz(), lepton->energy());
+
+  mass = (b + l).M();
+
+  return mass;
+}
+}
 }
 
 

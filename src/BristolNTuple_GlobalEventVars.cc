@@ -1,3 +1,8 @@
+/**
+ *
+ * @deprecated
+ */
+
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_GlobalEventVars.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
