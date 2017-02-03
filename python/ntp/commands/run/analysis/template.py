@@ -104,8 +104,8 @@ PUFile_up = opj(BAT_DATA, settings['PUFile_up'] )
 PUFile_down = opj(BAT_DATA, settings['PUFile_down'] )
 getMuonScaleFactorsFromFile = True
 getElectronScaleFactorsFromFile = True
-ElectronIdScaleFactorsFile = opj(BAT_DATA, 'egammaEffi.txt_SF2D.root')
-ElectronIsoScaleFactorsFile = opj(BAT_DATA, 'egammaEffi.txt_SF2D.root')
+ElectronIdScaleFactorsFile = opj(BAT_DATA, 'egammaEffi.txt_EGM2D_id.root')
+ElectronRecoScaleFactorsFile = opj(BAT_DATA, 'egammaEffi.txt_EGM2D_reco.root')
 ElectronTriggerScaleFactorsFile = opj(
     BAT_DATA, 'ElectronTriggerEfficiencies.root')
 MuonIdScaleFactorsFile = opj(BAT_DATA, 'EfficienciesAndSF_COMBINED.root')
