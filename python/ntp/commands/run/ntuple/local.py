@@ -15,7 +15,7 @@ from ntp.commands.setup import CMSSW_SRC, TMPDIR, RESULTDIR, LOGDIR
 LOG = logging.getLogger(__name__)
 PSET = os.path.join(TMPDIR, 'pset.py')
 OUTPUT_FILE = os.path.join(RESULTDIR, '{ds}_ntuple.root')
-BTAG_CALIB_FILE = os.path.join(CMSSW_SRC, 'BristolAnalysis/NTupleTools/data/BTagSF/CSVv2Moriond17_2017_1_26_BtoH.csv')
+BTAG_CALIB_FILE = os.path.join(CMSSW_SRC, 'BristolAnalysis/NTupleTools/data/BTagSF/CSVv2_Moriond17_B_H.csv')
 
 class Command(ParentCommand):
 

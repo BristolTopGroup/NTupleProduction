@@ -22,7 +22,7 @@ CRAB_WS = os.path.join(WORKSPACE, 'crab')
 TODAY = datetime.date.today().isoformat()
 PSET = NTPROOT + '/python/run/miniAODToNTuple_cfg.py'
 INPUT_FILES = [
-    'data/BTagSF/CSVv2Moriond17_2017_1_26_BtoH.csv',
+    'data/BTagSF/CSVv2_Moriond17_B_H.csv',
     'data/JEC/Spring16_25nsV6_DATA.db',
     'data/JEC/Spring16_25nsV6_MC.db',
 ]

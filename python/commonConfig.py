@@ -13,7 +13,7 @@ config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'BristolAnalysis/NTupleTools/Configuration/makeTuplesFromMiniAOD_cfg.py'
 # config.JobType.pyCfgParams = ['isTTbarMC=1']
 config.JobType.allowUndistributedCMSSW = True
-config.JobType.inputFiles = [	'BristolAnalysis/NTupleTools/data/BTagSF/CSVv2Moriond17_2017_1_26_BtoH.csv',
+config.JobType.inputFiles = [	'BristolAnalysis/NTupleTools/data/BTagSF/CSVv2_Moriond17_B_H.csv',
 								'BristolAnalysis/NTupleTools/data/JEC/Spring16_25nsV6_DATA.db',
 								'BristolAnalysis/NTupleTools/data/JEC/Spring16_25nsV6_MC.db',
 								'BristolAnalysis/NTupleTools/data/JER/Spring16_25nsV6_MC_PtResolution_AK4PFchs.txt',

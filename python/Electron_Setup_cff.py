@@ -14,12 +14,12 @@ def setup_electrons(process, cms, options):
 	# process.load('EgammaAnalysis.ElectronTools.regressionApplication_cff')
 
 	# Apply the regression from a remote database
-	from EgammaAnalysis.ElectronTools.regressionWeights_cfi import regressionWeights
-	process = regressionWeights(process)
-	process.load('EgammaAnalysis.ElectronTools.regressionApplication_cff')
+	# from EgammaAnalysis.ElectronTools.regressionWeights_cfi import regressionWeights
+	# process = regressionWeights(process)
+	# process.load('EgammaAnalysis.ElectronTools.regressionApplication_cff')
 
 	# Apply from GT
-	# process.load('EgammaAnalysis.ElectronTools.regressionApplication_cff')
+	process.load('EgammaAnalysis.ElectronTools.regressionApplication_cff')
 
 	process.electronRegression = cms.Sequence(process.regressionApplication)
 
