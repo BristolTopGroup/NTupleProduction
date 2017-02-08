@@ -1,7 +1,7 @@
 {
 	"name": "NTupleProduction",
-	"version": "CMSSW_8_0_24_patch1",
-	"cmssw_version": "CMSSW_8_0_24_patch1",
+	"version": "CMSSW_8_0_26_patch1",
+	"cmssw_version": "CMSSW_8_0_26_patch1",
 	"scram_arch": "slc6_amd64_gcc530",
 	"summary": "For the creation of n-tuples",
 	"author": "Bristol Top Quark Group",
@@ -40,22 +40,12 @@
 			"provider": "git"
 		},{
 			"name": "egammaID",
-			"source": "ikrav:egm_id_80X_v1",
+			"source": "ikrav:egm_id_80X_v2",
 			"destination": "",
 			"provider": "git-cms-merge-topic"
 		},{
 			"name": "recoMET",
 			"source": "cms-met:METRecipe_8020",
-			"destination": "",
-			"provider": "git-cms-merge-topic"
-		},{
-			"name": "egmRegression",
-			"source": "rafaellopesdesa:Regression80XEgammaAnalysis_v2",
-			"destination": "",
-			"provider": "git-cms-merge-topic"
-		},{
-			"name": "badMuon",
-			"source": "cms-met:fromCMSSW_8_0_20_postICHEPfilter",
 			"destination": "",
 			"provider": "git-cms-merge-topic"
 		},{				
