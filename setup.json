@@ -39,11 +39,6 @@
 			"destination": "TopQuarkAnalysis/TopHitFit",
 			"provider": "git"
 		},{
-			"name": "egammaID",
-			"source": "ikrav:egm_id_80X_v2",
-			"destination": "",
-			"provider": "git-cms-merge-topic"
-		},{
 			"name": "recoMET",
 			"source": "cms-met:METRecipe_8020",
 			"destination": "",
