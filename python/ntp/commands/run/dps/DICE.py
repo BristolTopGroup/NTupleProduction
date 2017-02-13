@@ -67,7 +67,7 @@ class Command(C):
             self.__phase_space = 'FullPS'
 
         # create tarball
-        self.__create_tar_file(args, variables)
+        self._create_tar_file(args, variables)
 
         self.__run_variable(variable)
         # to check status:

@@ -72,7 +72,7 @@ class Command(C):
         mode = self.__variables['mode']
 
         # create tarball
-        self.__create_tar_file(args, variables)
+        self._create_tar_file(args, variables)
 
         self.__run_dataset(dataset, mode)
         # to check status:

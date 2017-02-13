@@ -136,7 +136,7 @@ class Command(C):
         chosen_dataset = self.__variables['dataset']
 
         # create tarball
-        self.__create_tar_file(args, variables)
+        self._create_tar_file(args, variables)
 
         datasets = [chosen_dataset]
         if chosen_dataset.lower() == 'all':

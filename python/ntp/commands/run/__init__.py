@@ -23,12 +23,12 @@ CONDOR_ROOT = os.path.join(WORKSPACE, 'condor')
 
 class Command(C):
     REQUIRE_GRID_CERT = True
+    _have_fresh_tar_files = False
 
     def __init__(self, path=__file__, doc=__doc__):
         super(Command, self).__init__(path, doc)
 
         # condor specific
-        self.__have_fresh_tar_files = False
         self.__input_files = []
         self.__job_log_dir = ''
         self.__job_dir = ''
@@ -62,19 +62,19 @@ class Command(C):
             results.append('"{0}"'.format(f))
         return ',\n'.join(results)
 
-    def __create_tar_file(self, args, variables):
+    def _create_tar_file(self, args, variables):
         from ntp.commands.create.tarball import Command as TarCommand
         no_operation = 'noop' in self.__variables and self.__variables['noop']
         if no_operation and TarCommand.tarballs_exist():
             self.__input_files.extend(TarCommand.get_existing_files())
             return
-        if self.__have_fresh_tar_files:
+        if Command._have_fresh_tar_files:
             return
         c = TarCommand()
         c.run(args, variables)
         self.__text += c.__text
         self.__input_files.extend(c.get_tar_files())
-        self.__have_fresh_tar_files = True
+        Command._have_fresh_tar_files = True
 
     def __get_job_dir(self, category, name):
         out_dir = os.path.join(CONDOR_ROOT, category, name)

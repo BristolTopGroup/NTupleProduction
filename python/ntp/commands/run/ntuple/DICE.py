@@ -61,7 +61,7 @@ class Command(ParentCommand):
         dataset = self.__variables['dataset']
 
         # create tarball
-        self.__create_tar_file(args, variables)
+        self._create_tar_file(args, variables)
 
         self.__run(campaign, dataset)
         # to check status:
