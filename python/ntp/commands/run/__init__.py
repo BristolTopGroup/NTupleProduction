@@ -73,7 +73,8 @@ class Command(C):
             c.run(args, variables)
             self.__text += c.__text
             Command._have_fresh_tar_files = True
-        self.__input_files.extend(TarCommand.get_tar_files())
+
+        self.__input_files.extend(TarCommand.get_existing_files())
 
     def __get_job_dir(self, category, name):
         out_dir = os.path.join(CONDOR_ROOT, category, name)
