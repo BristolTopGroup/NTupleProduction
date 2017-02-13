@@ -68,13 +68,12 @@ class Command(C):
         if no_operation and TarCommand.tarballs_exist():
             self.__input_files.extend(TarCommand.get_existing_files())
             return
-        if Command._have_fresh_tar_files:
-            return
-        c = TarCommand()
-        c.run(args, variables)
-        self.__text += c.__text
-        self.__input_files.extend(c.get_tar_files())
-        Command._have_fresh_tar_files = True
+        if not Command._have_fresh_tar_files:
+            c = TarCommand()
+            c.run(args, variables)
+            self.__text += c.__text
+            Command._have_fresh_tar_files = True
+        self.__input_files.extend(TarCommand.get_tar_files())
 
     def __get_job_dir(self, category, name):
         out_dir = os.path.join(CONDOR_ROOT, category, name)
@@ -113,6 +112,9 @@ class Command(C):
         self.__variables['isReHLT'] = int('reHLT' in test_file)
         self.__variables['isData'] = int(is_real_data(test_file))
         self.__variables['isTTbarMC'] = int(is_ttbar_mc(test_file))
+
+    def get_input_files(self):
+        return self.__input_files
 
     @staticmethod
     def input_files_from_path(path):
