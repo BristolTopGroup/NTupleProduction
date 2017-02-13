@@ -10,7 +10,7 @@ opj = os.path.join
 BAT_BASE = "{BAT_BASE}"
 BAT_PYTHON = opj(BAT_BASE, 'python')
 BAT_DATA = opj(BAT_BASE, 'data')
-analysis_info_file = opj(BAT_PYTHON, 'analysis_info.py')
+analysis_info_file = opj(BAT_PYTHON, 'analysis_info_2016.py')
 analysis_info = load_source('analysis_info', analysis_info_file)
 
 mc_path = analysis_info.mc_path_13TeV
@@ -40,6 +40,7 @@ default_settings = {{
     'PUFile_down':'PileUp_2015_truth_down.root',
     'MuonIdScaleFactorsFile': 'EfficienciesAndSF_COMBINED.root',
     'MuonIsoScaleFactorsFile': 'EfficienciesAndSF_Isolation_COMBINED.root',
+    'MuonTriggerScaleFactorsFile': 'EfficienciesAndSF_Trigger_COMBINED.root',
     'TTbarLikelihoodFile': 'LikelihoodInputAnalyserOutput.root',
     'BTagEfficiencyFile': 'BTagEfficiency.root',
     'BTagSystematic': 0,
@@ -110,7 +111,7 @@ ElectronTriggerScaleFactorsFile = opj(
     BAT_DATA, 'ElectronTriggerEfficiencies.root')
 MuonIdScaleFactorsFile = opj(BAT_DATA, 'EfficienciesAndSF_COMBINED.root')
 MuonIsoScaleFactorsFile = opj(BAT_DATA, 'EfficienciesAndSF_Isolation_COMBINED.root')
-MuonTriggerScaleFactorsFile = opj(BAT_DATA,'SingleMuonTrigger_Combined.root')
+MuonTriggerScaleFactorsFile = opj(BAT_DATA,'EfficienciesAndSF_Trigger_COMBINED.root')
 MuonTrackingHIPScaleFactorsFile = opj(BAT_DATA, 'ratios_hist.root' )
 getHadronTriggerFromFile = True
 hadronTriggerFile = ''
