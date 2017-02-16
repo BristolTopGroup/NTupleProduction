@@ -41,6 +41,9 @@ default_settings = {{
     'MuonIdScaleFactorsFile': 'EfficienciesAndSF_COMBINED.root',
     'MuonIsoScaleFactorsFile': 'EfficienciesAndSF_Isolation_COMBINED.root',
     'MuonTriggerScaleFactorsFile': 'EfficienciesAndSF_Trigger_COMBINED.root',
+    'ElectronTriggerScaleFactorsFile': 'EfficienciesAndSF_ElectronTrigger_COMBINED.root',
+    'ElectronIdScaleFactorsFile' : 'egammaEffi.txt_EGM2D_id.root',
+    'ElectronRecoScaleFactorsFile' : 'egammaEffi.txt_EGM2D_reco.root',
     'TTbarLikelihoodFile': 'LikelihoodInputAnalyserOutput.root',
     'BTagEfficiencyFile': 'BTagEfficiency.root',
     'BTagSystematic': 0,
@@ -108,7 +111,7 @@ getElectronScaleFactorsFromFile = True
 ElectronIdScaleFactorsFile = opj(BAT_DATA, 'egammaEffi.txt_EGM2D_id.root')
 ElectronRecoScaleFactorsFile = opj(BAT_DATA, 'egammaEffi.txt_EGM2D_reco.root')
 ElectronTriggerScaleFactorsFile = opj(
-    BAT_DATA, 'ElectronTriggerEfficiencies.root')
+    BAT_DATA, 'EfficienciesAndSF_ElectronTrigger_COMBINED.root')
 MuonIdScaleFactorsFile = opj(BAT_DATA, 'EfficienciesAndSF_COMBINED.root')
 MuonIsoScaleFactorsFile = opj(BAT_DATA, 'EfficienciesAndSF_Isolation_COMBINED.root')
 MuonTriggerScaleFactorsFile = opj(BAT_DATA,'EfficienciesAndSF_Trigger_COMBINED.root')
