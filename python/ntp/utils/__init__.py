@@ -38,7 +38,8 @@ def find_latest_iteration(directories):
     """
     numbers = [0]
     for d in directories:
-        number = int(d.split('_')[-1])
+        number_string = d.split('_')[-1].replace('/','')
+        number = int(number_string)
         numbers.append(number)
     return max(numbers)
 

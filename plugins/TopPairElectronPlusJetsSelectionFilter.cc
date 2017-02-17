@@ -326,7 +326,22 @@ bool TopPairElectronPlusJetsSelectionFilter::passesLooseElectronVeto() const {
 		return isZEvent == true;
 	} 
 	else {
-		if (nonIsolatedElectronSelection_ || invertedConversionSelection_){
+		if ( invertedConversionSelection_ ) {
+			return vetoElectrons_.size() < 1;
+		}
+		if (nonIsolatedElectronSelection_ ){
+
+			for (unsigned int index = 0; index < goodIsolatedElectrons_.size(); ++index) {
+				const pat::Electron signalElectron = goodIsolatedElectrons_.at(index);
+				bool passesVetoIsolation = signalElectron.userInt("passesVetoIdIsolation");
+				if (passesVetoIsolation){
+					return vetoMuons_.size() < 2;
+				}
+				else {
+					return vetoMuons_.size() < 1;
+				}
+			}
+
 			return vetoElectrons_.size() < 1;
 		}
 		return vetoElectrons_.size() < 2;

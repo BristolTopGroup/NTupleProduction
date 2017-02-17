@@ -84,9 +84,11 @@ private:
 	const edm::EDGetTokenT<edm::ValueMap<bool> > vetoElectronIDMapToken_;
 	const edm::EDGetTokenT<edm::ValueMap<bool> > tightElectronIDMapToken_;
 	const edm::EDGetTokenT<edm::ValueMap<vid::CutFlowResult> > eleTightIdFullInfoMapToken_;
+	const edm::EDGetTokenT<edm::ValueMap<vid::CutFlowResult> > eleVetoIdFullInfoMapToken_;
 
 	edm::ValueMap<bool> tightElectronIDDecisions_, vetoElectronIDDecisions_;
 	edm::ValueMap<vid::CutFlowResult> tightIdCutFlowData_;
+	edm::ValueMap<vid::CutFlowResult> vetoIdCutFlowData_;
 
 	edm::EDGetTokenT<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit>>> ebrechits_;
 	// cuts
@@ -128,6 +130,9 @@ ElectronUserData::ElectronUserData(const edm::ParameterSet& iConfig) :
 				eleTightIdFullInfoMapToken_(
 						consumes < edm::ValueMap<vid::CutFlowResult>
 								> (iConfig.getParameter < edm::InputTag > ("electronTightIdMap"))), //
+				eleVetoIdFullInfoMapToken_(
+						consumes < edm::ValueMap<vid::CutFlowResult>
+								> (iConfig.getParameter < edm::InputTag > ("electronVetoIdMap"))), //
 				ebrechits_(
 						consumes< edm::SortedCollection
 								< EcalRecHit,edm::StrictWeakOrdering<EcalRecHit >>>(iConfig.getParameter<edm::InputTag>("ebRecHits"))),
@@ -177,6 +182,10 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 	iEvent.getByToken(eleTightIdFullInfoMapToken_, tight_id_cutflow_data);
 	tightIdCutFlowData_ = *tight_id_cutflow_data;
 
+	edm::Handle < edm::ValueMap<vid::CutFlowResult> > veto_id_cutflow_data;
+	iEvent.getByToken(eleVetoIdFullInfoMapToken_, veto_id_cutflow_data);
+	vetoIdCutFlowData_ = *veto_id_cutflow_data;
+
 	if (electrons.isValid()) {
 		std::auto_ptr < std::vector<pat::Electron> > electronCollection(new std::vector<pat::Electron>(*electrons));
 		size_t nElectrons = electronCollection->size();
@@ -191,11 +200,13 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 			el.addUserFloat("energyCorrection", electronSeedCorrections(iEvent, elPtr));
 
 			vid::CutFlowResult fullCutFlowDataTight = tightIdCutFlowData_[elPtr];
+			vid::CutFlowResult vetoCutFlowDataVeto = vetoIdCutFlowData_[elPtr];
 			el.addUserInt("passesVetoId", vetoElectronIDDecisions_[elPtr]);
 			el.addUserInt("passesTightId", tightElectronIDDecisions_[elPtr]);
 			idCutsToInvert = {7};
 			el.addUserInt("passesTightNonIsoId", passesInvertedIDCuts(fullCutFlowDataTight, idCutsToInvert));
 			idCutsToInvert = {8, 9};
+			el.addUserInt("passesVetoIdIsolation",vetoCutFlowDataVeto.getCutResultByIndex(7));
 			el.addUserInt("passesTightConversionId", passesInvertedIDCuts(fullCutFlowDataTight, idCutsToInvert));
 			el.addUserFloat("PFRelIsoWithEA", fullCutFlowDataTight.getValueCutUpon(7));
 
