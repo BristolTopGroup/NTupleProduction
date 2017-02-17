@@ -38,13 +38,13 @@ jobTemplates = [
 	["TTJets_amc_tree.root", [
 		"TTJets_amcatnloFXFX_central_atOutput_*.root"
 	], "C"],
-	# ["TTJets_madgraph_tree.root", [
-	# 	"TTJets_madgraphMLM_central_atOutput_*.root"
-	# ], "C"],
+	["TTJets_madgraph_tree.root", [
+		"TTJets_madgraphMLM_central_atOutput_*.root"
+	], "C"],
 
-	# # ["TTJets_PowhegPythia8_Moriond17_tree.root", [
-	# # 	"TTJets_PowhegPythia8_Moriond17_central_atOutput_*.root"
-	# # ] ],
+	# # # ["TTJets_PowhegPythia8_Moriond17_tree.root", [
+	# # # 	"TTJets_PowhegPythia8_Moriond17_central_atOutput_*.root"
+	# # # ] ],
 
 	["SingleTop_tree.root", [
 		"ST*_central_atOutput_*.root"
@@ -60,14 +60,29 @@ jobTemplates = [
 	 	"W3JetsToLNu_central_atOutput_*",
 	 	"W4JetsToLNu_central_atOutput_*"
 	 ] ],
+
 	["QCD_Electron_tree.root", [
-		# "QCD_bcToE_*_central_atOutput_*", 
-		# "QCD_EMEnriched_*_central_atOutput_*"
-		"QCD_*_central_atOutput_*"
+		"QCD_bcToE_*_central_atOutput_*", 
+		"QCD_EMEnriched_*_central_atOutput_*"
 	] ],
 	["QCD_Muon_tree.root", [
-		# "QCD_MuEnriched_*_central_atOutput_*.root"
-		"QCD_*_central_atOutput_*"
+		"QCD_MuEnriched_*_central_atOutput_*.root"
+	] ],
+
+	["QCD_Inclusive_tree.root", [
+		"QCD_1000to1400_central_atOutput_*.root",
+		"QCD_120to170_central_atOutput_*.root",
+		"QCD_1400to1800_central_atOutput_*.root",
+		"QCD_170to300_central_atOutput_*.root",
+		"QCD_1800to2400_central_atOutput_*.root",
+		"QCD_2400to3200_central_atOutput_*.root",
+		"QCD_300to470_central_atOutput_*.root",
+		"QCD_3200toInf_central_atOutput_*.root",
+		"QCD_470to600_central_atOutput_*.root",
+		"QCD_50to80_central_atOutput_*.root",
+		"QCD_600to800_central_atOutput_*.root",
+		"QCD_800to1000_central_atOutput_*.root",
+		"QCD_80to120_central_atOutput_*.root",
 	] ],
 
 	["data_muon_tree.root", [
