@@ -335,10 +335,10 @@ bool TopPairElectronPlusJetsSelectionFilter::passesLooseElectronVeto() const {
 				const pat::Electron signalElectron = goodIsolatedElectrons_.at(index);
 				bool passesVetoIsolation = signalElectron.userInt("passesVetoIdIsolation");
 				if (passesVetoIsolation){
-					return vetoMuons_.size() < 2;
+					return vetoElectrons_.size() < 2;
 				}
 				else {
-					return vetoMuons_.size() < 1;
+					return vetoElectrons_.size() < 1;
 				}
 			}
 
