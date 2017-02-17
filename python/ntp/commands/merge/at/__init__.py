@@ -51,7 +51,7 @@ class Command(C):
         'input_jobs': '',
         'input_dir': '/hdfs/TopQuarkGroup/{user}/{version}/atOutput/',
         'user': 'ec6821',
-        'version': '1.0.0',
+        'version': '1.0.2',
     }
 
     def __init__(self, path=__file__, doc=__doc__):
