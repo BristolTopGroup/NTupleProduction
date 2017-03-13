@@ -105,6 +105,36 @@ jobTemplates = [
 		"SingleElectron_RunH_Prompt_v2_central_atOutput_*.root",
 		"SingleElectron_RunH_Prompt_v3_central_atOutput_*.root"
 	], "C"],
+
+	["data_electron_B_tree.root", [
+		"SingleElectron_RunB_central_atOutput_*.root"
+	], "C"],
+
+	["data_electron_C_tree.root", [
+		"SingleElectron_RunC_central_atOutput_*.root"
+	], "C"],
+
+	["data_electron_D_tree.root", [
+		"SingleElectron_RunD_central_atOutput_*.root"
+	], "C"],
+
+	["data_electron_E_tree.root", [
+		"SingleElectron_RunE_central_atOutput_*.root"
+	], "C"],
+
+	["data_electron_F_tree.root", [
+		"SingleElectron_RunF_central_atOutput_*.root"
+	], "C"],
+
+	["data_electron_G_tree.root", [
+		"SingleElectron_RunG_central_atOutput_*.root"
+	], "C"],
+
+	["data_electron_H_tree.root", [
+		"SingleElectron_RunH_Prompt_v2_central_atOutput_*.root",
+		"SingleElectron_RunH_Prompt_v3_central_atOutput_*.root"
+	], "C"],
+
 ]
 
 mergingFiles = []
