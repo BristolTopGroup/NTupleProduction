@@ -83,12 +83,15 @@ private:
 
 	const edm::EDGetTokenT<edm::ValueMap<bool> > vetoElectronIDMapToken_;
 	const edm::EDGetTokenT<edm::ValueMap<bool> > tightElectronIDMapToken_;
+	const edm::EDGetTokenT<edm::ValueMap<bool> > hltSafeElectronIDMapToken_;
 	const edm::EDGetTokenT<edm::ValueMap<vid::CutFlowResult> > eleTightIdFullInfoMapToken_;
 	const edm::EDGetTokenT<edm::ValueMap<vid::CutFlowResult> > eleVetoIdFullInfoMapToken_;
+	const edm::EDGetTokenT<edm::ValueMap<vid::CutFlowResult> > eleHLTSafeIdFullInfoMapToken_;
 
-	edm::ValueMap<bool> tightElectronIDDecisions_, vetoElectronIDDecisions_;
+	edm::ValueMap<bool> tightElectronIDDecisions_, vetoElectronIDDecisions_, hltSafeElectronIDDecisions_;
 	edm::ValueMap<vid::CutFlowResult> tightIdCutFlowData_;
 	edm::ValueMap<vid::CutFlowResult> vetoIdCutFlowData_;
+	edm::ValueMap<vid::CutFlowResult> hltSafeIdCutFlowData_;
 
 	edm::EDGetTokenT<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit>>> ebrechits_;
 	// cuts
@@ -127,12 +130,18 @@ ElectronUserData::ElectronUserData(const edm::ParameterSet& iConfig) :
 				tightElectronIDMapToken_(
 						consumes < edm::ValueMap<bool>
 								> (iConfig.getParameter < edm::InputTag > ("electronTightIdMap"))), //
+				hltSafeElectronIDMapToken_(
+						consumes < edm::ValueMap<bool>
+								> (iConfig.getParameter < edm::InputTag > ("electronHLTSafeIdMap"))), //
 				eleTightIdFullInfoMapToken_(
 						consumes < edm::ValueMap<vid::CutFlowResult>
 								> (iConfig.getParameter < edm::InputTag > ("electronTightIdMap"))), //
 				eleVetoIdFullInfoMapToken_(
 						consumes < edm::ValueMap<vid::CutFlowResult>
 								> (iConfig.getParameter < edm::InputTag > ("electronVetoIdMap"))), //
+				eleHLTSafeIdFullInfoMapToken_(
+						consumes < edm::ValueMap<vid::CutFlowResult>
+								> (iConfig.getParameter < edm::InputTag > ("electronHLTSafeIdMap"))), //
 				ebrechits_(
 						consumes< edm::SortedCollection
 								< EcalRecHit,edm::StrictWeakOrdering<EcalRecHit >>>(iConfig.getParameter<edm::InputTag>("ebRecHits"))),
@@ -178,6 +187,10 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 	iEvent.getByToken(tightElectronIDMapToken_, tight_id_decisions);
 	tightElectronIDDecisions_ = *tight_id_decisions;
 
+	edm::Handle < edm::ValueMap<bool> > hltSafe_id_decisions;
+	iEvent.getByToken(hltSafeElectronIDMapToken_, hltSafe_id_decisions);
+	hltSafeElectronIDDecisions_ = *hltSafe_id_decisions;
+
 	edm::Handle < edm::ValueMap<vid::CutFlowResult> > tight_id_cutflow_data;
 	iEvent.getByToken(eleTightIdFullInfoMapToken_, tight_id_cutflow_data);
 	tightIdCutFlowData_ = *tight_id_cutflow_data;
@@ -185,6 +198,10 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 	edm::Handle < edm::ValueMap<vid::CutFlowResult> > veto_id_cutflow_data;
 	iEvent.getByToken(eleVetoIdFullInfoMapToken_, veto_id_cutflow_data);
 	vetoIdCutFlowData_ = *veto_id_cutflow_data;
+
+	edm::Handle < edm::ValueMap<vid::CutFlowResult> > hltSafe_id_cutflow_data;
+	iEvent.getByToken(eleHLTSafeIdFullInfoMapToken_, hltSafe_id_cutflow_data);
+	hltSafeIdCutFlowData_ = *hltSafe_id_cutflow_data;
 
 	if (electrons.isValid()) {
 		std::auto_ptr < std::vector<pat::Electron> > electronCollection(new std::vector<pat::Electron>(*electrons));
@@ -201,6 +218,8 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 
 			vid::CutFlowResult fullCutFlowDataTight = tightIdCutFlowData_[elPtr];
 			vid::CutFlowResult vetoCutFlowDataVeto = vetoIdCutFlowData_[elPtr];
+			vid::CutFlowResult hltSafeCutFlowData = hltSafeIdCutFlowData_[elPtr];
+
 			el.addUserInt("passesVetoId", vetoElectronIDDecisions_[elPtr]);
 			el.addUserInt("passesTightId", tightElectronIDDecisions_[elPtr]);
 			idCutsToInvert = {7};
@@ -209,6 +228,11 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 			el.addUserInt("passesVetoIdIsolation",vetoCutFlowDataVeto.getCutResultByIndex(7));
 			el.addUserInt("passesTightConversionId", passesInvertedIDCuts(fullCutFlowDataTight, idCutsToInvert));
 			el.addUserFloat("PFRelIsoWithEA", fullCutFlowDataTight.getValueCutUpon(7));
+
+			el.addUserFloat("hltECALIso", hltSafeCutFlowData.getValueCutUpon(7));
+			el.addUserFloat("hltHCALIso", hltSafeCutFlowData.getValueCutUpon(8));
+			el.addUserFloat("hltTrackerIso", hltSafeCutFlowData.getValueCutUpon(9));
+
 
 			bool matchesConv = false;
 			if (hConversions.isValid() && bsHandle.isValid()) {

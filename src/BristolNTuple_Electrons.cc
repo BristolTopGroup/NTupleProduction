@@ -78,6 +78,10 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
 		produces < std::vector<double> > (prefix + "PFRelIsoWithEA" + suffix);
 	}
 
+	produces < std::vector<double> > (prefix + "hltECALIso" + suffix);
+	produces < std::vector<double> > (prefix + "hltHCALIso" + suffix);
+	produces < std::vector<double> > (prefix + "hltTrackerIso" + suffix);
+
 	//high energy electron isolation variables
 	produces < std::vector<double> > (prefix + "EcalIsoHeep03" + suffix);
 	produces < std::vector<double> > (prefix + "HcalIsoD1Heep03" + suffix);
@@ -181,6 +185,10 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 
 	std::auto_ptr < std::vector<double> > PFRelIsoWithEA(new std::vector<double>());
 
+	std::auto_ptr < std::vector<double> > hltECALIso(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > hltHCALIso(new std::vector<double>());
+	std::auto_ptr < std::vector<double> > hltTrackerIso(new std::vector<double>());
+
 	// Electron ID variables
 	std::auto_ptr < std::vector<bool> > isTightElectron(new std::vector<bool>());
 	std::auto_ptr < std::vector<bool> > isTightConversionElectron(new std::vector<bool>());
@@ -246,6 +254,11 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			isTightConversionElectron->push_back( it->userInt("passesTightConversionId") );
 			hasMatchedConvPhot->push_back(it->userInt("hasMatchedConvPhot"));
 			PFRelIsoWithEA->push_back( it->userFloat("PFRelIsoWithEA") );
+
+			hltECALIso->push_back( it->userFloat("hltECALIso") );
+			hltHCALIso->push_back( it->userFloat("hltHCALIso") );
+			hltTrackerIso->push_back( it->userFloat("hltTrackerIso") );
+
 			// Vertex association variables
 			// closest vertex
 			vtxIndex->push_back(it->userInt("vtxIndex"));
@@ -412,6 +425,10 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 		iEvent.put(PFRelIso04DeltaBeta, prefix + "PFRelIso04DeltaBeta" + suffix);
 		iEvent.put(PFRelIsoWithEA, prefix + "PFRelIsoWithEA" + suffix);
 	}
+
+	iEvent.put(hltECALIso, prefix + "hltECALIso" + suffix);
+	iEvent.put(hltHCALIso, prefix + "hltHCALIso" + suffix);
+	iEvent.put(hltTrackerIso, prefix + "hltTrackerIso" + suffix);
 
 	//high energy electron isolation variables
 	iEvent.put(ecalIsoHeep03, prefix + "EcalIsoHeep03" + suffix);

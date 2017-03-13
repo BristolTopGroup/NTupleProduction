@@ -14,6 +14,8 @@ electronUserData = cms.EDProducer(
         "egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-medium"),
     electronTightIdMap=cms.InputTag(
         "egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-tight"),
+    electronHLTSafeIdMap=cms.InputTag(
+        "egmGsfElectronIDs:cutBasedElectronHLTPreselection-Summer16-V1"),
     # Top Object Definitions
     minVetoElectronPt=cms.double(15.),
     maxVetoElectronEta=cms.double(2.1),
