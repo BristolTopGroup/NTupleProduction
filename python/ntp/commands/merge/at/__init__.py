@@ -51,7 +51,7 @@ class Command(C):
         'input_jobs': '',
         'input_dir': '/hdfs/TopQuarkGroup/{user}/{version}/atOutput/',
         'user': 'ec6821',
-        'version': '1.0.2',
+        'version': '1.0.4',
     }
 
     def __init__(self, path=__file__, doc=__doc__):
@@ -106,14 +106,15 @@ class Command(C):
             nJobs = len(INPUTFILES)
             INPUTFILES = ' '.join(INPUTFILES)
 
-            SIZE = 20
+            SIZE = 15
             SIZE = str(SIZE)
 
             command = ' '.join([
                 'haddaway.py', 
                 '--output', OUTPUTFILE, 
                 '--size', SIZE, 
-                '--input', INPUTFILES]
+                '--input', INPUTFILES,
+                ]
             )
             print "Merging to : ", OUTPUTFILE
             print "Number of Intermediate hadds : ", nJobs / int(SIZE)
