@@ -104,6 +104,9 @@ class Command(ParentCommand):
             for mode in modes:
                 # Don't do Jet Smearing or Jet Scale for data
                 if ('SingleMuon' in dataset or 'SingleElectron' in dataset ) and 'central' not in mode: continue
+                if 'TTJets' in dataset:
+                    if dataset != 'TTJets_PowhegPythia8' and not 'central' in mode: 
+                            continue
                 results.append(self.__run(dataset, mode))
         return all(results)
 

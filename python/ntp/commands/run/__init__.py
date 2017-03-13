@@ -18,6 +18,7 @@ from .. import Command as C
 import subprocess
 import os
 from ..setup import WORKSPACE
+from time import strftime
 CONDOR_ROOT = os.path.join(WORKSPACE, 'condor')
 
 
@@ -77,7 +78,8 @@ class Command(C):
         self.__input_files.extend(TarCommand.get_existing_files())
 
     def __get_job_dir(self, category, name):
-        out_dir = os.path.join(CONDOR_ROOT, category, name)
+        date = strftime("%d_%b_%y")
+        out_dir = os.path.join(CONDOR_ROOT, category, date, name)
         out_dir = self.__get_latest_outdir(out_dir)
 
         return out_dir

@@ -23,7 +23,7 @@ except:
     LOG.error('Could not import htcondenser')
 
 CONDOR_ROOT = os.path.join(WORKSPACE, 'condor')
-RETRY_COUNT = 1
+RETRY_COUNT = 3
 PREFIX = 'analysis'
 
 SETUP_SCRIPT = """
@@ -47,7 +47,7 @@ LOG_FILE = LOG_STEM + '.log'
 # file splitting for datasets containing 'key'
 # Analysis jobs: 1 file = 17s processing time
 SPLITTING_BY_FILE = {
-    'SingleElectron': 20,
+    'SingleElectron': 10,
     'SingleMuon': 20,
     'TTJet': 10,
     'TT_': 10,
@@ -199,7 +199,8 @@ class Command(C):
             hdfs_store=hdfs_store,
             certificate=self.REQUIRE_GRID_CERT,
             cpus=1,
-            memory='1500MB',
+            memory='900MB',
+            other_args={'Requirements':'(Machine != "sm*")'},
         )
 
         parameters = 'files={files} output_file_suffix={suffix} mode={mode}'

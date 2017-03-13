@@ -91,7 +91,9 @@ class Command(ParentCommand):
 
     def __set_job_dirs(self, campaign, dataset):
         import glob
-        out_dir = os.path.join(CONDOR_ROOT, campaign, dataset)
+        from time import strftime
+        date = strftime("%d_%b_%y")
+        out_dir = os.path.join(CONDOR_ROOT, campaign, date, dataset)
 
         existing_dirs = glob.glob(out_dir + '_*')
         latest = 1
