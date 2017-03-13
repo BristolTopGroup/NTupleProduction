@@ -169,7 +169,7 @@ applyMetType0Corr = False
 TQAFPath = ""
 
 # integrated luminosity the MC simulation will be scaled to
-lumi = 36459
+lumi = 35900
 # this value will be part of the output file name:
 # DataType_CenterOfMassEnergyTeV_lumipb-1_....
 centerOfMassEnergy = 13
