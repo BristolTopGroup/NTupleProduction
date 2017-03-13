@@ -42,15 +42,11 @@ jobTemplates = [
 		"TTJets_madgraphMLM_central_atOutput_*.root"
 	], "C"],
 
-	# # # ["TTJets_PowhegPythia8_Moriond17_tree.root", [
-	# # # 	"TTJets_PowhegPythia8_Moriond17_central_atOutput_*.root"
-	# # # ] ],
-
 	["SingleTop_tree.root", [
 		"ST*_central_atOutput_*.root"
 	] ],
+
 	 ["VJets_tree.root", [
-	 	# "DYJetsToLL_M50_central_atOutput_*", 
 	 	"DY1JetsToLL_M50_central_atOutput_*", 
 	 	"DY2JetsToLL_M50_central_atOutput_*", 
 	 	"DY3JetsToLL_M50_central_atOutput_*", 
@@ -69,21 +65,21 @@ jobTemplates = [
 		"QCD_MuEnriched_*_central_atOutput_*.root"
 	] ],
 
-	["QCD_Inclusive_tree.root", [
-		"QCD_1000to1400_central_atOutput_*.root",
-		"QCD_120to170_central_atOutput_*.root",
-		"QCD_1400to1800_central_atOutput_*.root",
-		"QCD_170to300_central_atOutput_*.root",
-		"QCD_1800to2400_central_atOutput_*.root",
-		"QCD_2400to3200_central_atOutput_*.root",
-		"QCD_300to470_central_atOutput_*.root",
-		"QCD_3200toInf_central_atOutput_*.root",
-		"QCD_470to600_central_atOutput_*.root",
-		"QCD_50to80_central_atOutput_*.root",
-		"QCD_600to800_central_atOutput_*.root",
-		"QCD_800to1000_central_atOutput_*.root",
-		"QCD_80to120_central_atOutput_*.root",
-	] ],
+	# ["QCD_Inclusive_tree.root", [
+	# 	"QCD_1000to1400_central_atOutput_*.root",
+	# 	"QCD_120to170_central_atOutput_*.root",
+	# 	"QCD_1400to1800_central_atOutput_*.root",
+	# 	"QCD_170to300_central_atOutput_*.root",
+	# 	"QCD_1800to2400_central_atOutput_*.root",
+	# 	"QCD_2400to3200_central_atOutput_*.root",
+	# 	"QCD_300to470_central_atOutput_*.root",
+	# 	"QCD_3200toInf_central_atOutput_*.root",
+	# 	"QCD_470to600_central_atOutput_*.root",
+	# 	"QCD_50to80_central_atOutput_*.root",
+	# 	"QCD_600to800_central_atOutput_*.root",
+	# 	"QCD_800to1000_central_atOutput_*.root",
+	# 	"QCD_80to120_central_atOutput_*.root",
+	# ] ],
 
 	["data_muon_tree.root", [
 		"SingleMuon_RunB_central_atOutput_*.root",
