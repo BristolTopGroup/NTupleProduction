@@ -41,6 +41,7 @@ default_settings = {{
     'MuonIdScaleFactorsFile': 'EfficienciesAndSF_COMBINED.root',
     'MuonIsoScaleFactorsFile': 'EfficienciesAndSF_Isolation_COMBINED.root',
     'MuonTriggerScaleFactorsFile': 'EfficienciesAndSF_Trigger_COMBINED.root',
+    'MuonTrackingScaleFactorsFile': 'Tracking_EfficienciesAndSF_BCDEFGH.root',
     'ElectronTriggerScaleFactorsFile': 'EfficienciesAndSF_ElectronTrigger_COMBINED.root',
     'ElectronIdScaleFactorsFile' : 'egammaEffi.txt_EGM2D_id.root',
     'ElectronRecoScaleFactorsFile' : 'egammaEffi.txt_EGM2D_reco.root',
@@ -115,7 +116,7 @@ ElectronTriggerScaleFactorsFile = opj(
 MuonIdScaleFactorsFile = opj(BAT_DATA, 'EfficienciesAndSF_COMBINED.root')
 MuonIsoScaleFactorsFile = opj(BAT_DATA, 'EfficienciesAndSF_Isolation_COMBINED.root')
 MuonTriggerScaleFactorsFile = opj(BAT_DATA,'EfficienciesAndSF_Trigger_COMBINED.root')
-MuonTrackingHIPScaleFactorsFile = opj(BAT_DATA, 'ratios_hist.root' )
+MuonTrackingScaleFactorsFile = opj(BAT_DATA, 'Tracking_EfficienciesAndSF_BCDEFGH.root' )
 getHadronTriggerFromFile = True
 hadronTriggerFile = ''
 ElectronScaleFactorSystematic = settings['ElectronScaleFactorSystematic']
