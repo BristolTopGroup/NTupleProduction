@@ -34,6 +34,11 @@
 				"echo \"AS is now available in DEV/AS (links to {CMSSW_VERSION}/src/BristolAnalysis/Tools)\""
 			]
 		},{
+			"name": "pseudoTop",
+			"source": "intrepid42:pseudotoprivet_80x",
+			"destination": "",
+			"provider": "git-cms-merge-topic"
+		},{
 			"name": "TopHitFit",
 			"source": "https://github.com/BristolTopGroup/TopHitFit.git",
 			"destination": "TopQuarkAnalysis/TopHitFit",

@@ -25,6 +25,13 @@ nTuplePseudoTopNeutrinos = cms.EDProducer("BristolNTuple_GenParticles",
     MaxSize = cms.uint32(25)
 )
 
+nTuplePseudoTopMETs = cms.EDProducer("BristolNTuple_RecoMET",
+    InputTag = cms.InputTag('pseudoTop','mets','Ntuples'),
+    Prefix = cms.string('PseudoTopMETs.'),
+    Suffix = cms.string(''),
+    MaxSize = cms.uint32(25)
+)
+
 nTuplePseudoTops = cms.EDProducer("BristolNTuple_GenParticles",
     InputTag = cms.InputTag('pseudoTop','','Ntuples'),
     Prefix = cms.string('PseudoTops.'),
@@ -36,5 +43,6 @@ pseudoTopSequence = cms.Sequence(
     nTuplePseudoTopJets *
     nTuplePseudoTopLeptons *
     nTuplePseudoTopNeutrinos *
+    nTuplePseudoTopMETs *
     nTuplePseudoTops
 )
