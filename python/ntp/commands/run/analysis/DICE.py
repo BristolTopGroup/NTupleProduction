@@ -200,7 +200,6 @@ class Command(C):
             certificate=self.REQUIRE_GRID_CERT,
             cpus=1,
             memory='900MB',
-            other_args={'Requirements':'(Machine != "sm*")'},
         )
 
         parameters = 'files={files} output_file_suffix={suffix} mode={mode}'

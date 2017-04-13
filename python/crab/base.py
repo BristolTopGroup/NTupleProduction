@@ -15,7 +15,7 @@ if not 'HEP_PROJECT_ROOT' in os.environ:
     sys.exit(-1)
 
 # this is the NTupleVersion!
-__version__ = '1.0.4'
+__version__ = '1.0.5'
 NTPROOT = os.environ['HEP_PROJECT_ROOT']
 WORKSPACE = os.path.join(NTPROOT, 'workspace')
 CRAB_WS = os.path.join(WORKSPACE, 'crab')
