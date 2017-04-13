@@ -16,6 +16,15 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 		genEvtInfoInputTag(consumes< GenEventInfoProduct > (iConfig.getParameter<edm::InputTag>("GenEventInfoInputTag"))),
 		lheEventProductToken_(consumes< LHEEventProduct > (iConfig.getParameter<edm::InputTag>("LHEEventInfoInputTag"))),
 	    genJetsInputTag_(consumes<reco::GenJetCollection > (iConfig.getParameter<edm::InputTag>("GenJetsInputTag"))),
+		pseudoJetsToken_(consumes<std::vector<reco::GenJet> >(edm::InputTag("pseudoTop:jets"))),
+
+		upFragToken_(consumes<edm::ValueMap<float> >(edm::InputTag("bfragWgtProducer:upFrag"))),
+		centralFragToken_(consumes<edm::ValueMap<float> >(edm::InputTag("bfragWgtProducer:centralFrag"))),
+		downFragToken_(consumes<edm::ValueMap<float> >(edm::InputTag("bfragWgtProducer:downFrag"))),
+		petersonFragToken_(consumes<edm::ValueMap<float> >(edm::InputTag("bfragWgtProducer:PetersonFrag"))),
+		semilepbrUpToken_(consumes<edm::ValueMap<float> >(edm::InputTag("bfragWgtProducer:semilepbrUp"))),
+		semilepbrDownToken_(consumes<edm::ValueMap<float> >(edm::InputTag("bfragWgtProducer:semilepbrDown"))),
+
 		puWeightsInputTag_(iConfig.getParameter < edm::InputTag > ("PUWeightsInputTag")), //
 		storePDFWeights_(iConfig.getParameter<bool>("StorePDFWeights")), //
 		isTTbarMC_(iConfig.getParameter<bool>("isTTbarMC")), //
@@ -37,6 +46,14 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 	produces<double>(prefix_ + "centralLHEWeight" + suffix_);
 	produces <std::vector<double> > ( prefix_ + "systematicWeights" + suffix_ );
 	produces <std::vector<int> > ( prefix_ + "systematicWeightIDs" + suffix_ );
+
+	produces <double> ( prefix_ + "upFrag" + suffix_ );
+	produces <double> ( prefix_ + "centralFrag" + suffix_ );
+	produces <double> ( prefix_ + "downFrag" + suffix_ );
+	produces <double> ( prefix_ + "petersonFrag" + suffix_ );
+	produces <double> ( prefix_ + "semilepbrDown" + suffix_ );
+	produces <double> ( prefix_ + "semilepbrUp" + suffix_ );
+
 
 //	produces < std::vector<double> > (prefix_ + "PDFWeights" + suffix_);
 	produces < std::vector<int> > (prefix_ + "PileUpInteractions" + suffix_);
@@ -138,6 +155,13 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	std::auto_ptr<std::vector<double> > systematicWeights(new std::vector<double>());
 	std::auto_ptr<std::vector<int> > systematicWeightIDs(new std::vector<int>());
 
+	std::auto_ptr<double> upFrag(new double());
+	std::auto_ptr<double> centralFrag(new double());
+	std::auto_ptr<double> downFrag(new double());
+	std::auto_ptr<double> petersonFrag(new double());
+	std::auto_ptr<double> semilepbrUp(new double());
+	std::auto_ptr<double> semilepbrDown(new double());
+
 //	std::auto_ptr < std::vector<double> > pdfWeights(new std::vector<double>());
 	std::auto_ptr < std::vector<int> > Number_interactions(new std::vector<int>());
 
@@ -213,6 +237,13 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	*generatorWeight.get() = 0.;
 	*centralLHEWeight.get() = 0;
 	*ttbarDecay.get() = 0;
+
+	*upFrag.get() = 0;
+	*centralFrag.get() = 0;
+	*downFrag.get() = 0;
+	*petersonFrag.get() = 0;
+	*semilepbrUp.get() = 0;
+	*semilepbrDown.get() = 0;
 
 	*leptonicTopPt.get() = 0;
 	*leptonicTopPx.get() = 0;
@@ -365,6 +396,36 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 //				std::cout << weightIndex << " " << EvtHandle->weights()[weightIndex].id << " " << EvtHandle->weights()[weightIndex].wgt << std::endl;
 			}
 
+			// B fragmentation and branching fraction weights
+			edm::Handle<std::vector<reco::GenJet> > pseudoJets;
+			iEvent.getByToken(pseudoJetsToken_,pseudoJets);
+
+			edm::Handle<edm::ValueMap<float> > upFragHandle;
+			iEvent.getByToken(upFragToken_,upFragHandle);
+			edm::Handle<edm::ValueMap<float> > centralFragHandle;
+			iEvent.getByToken(centralFragToken_,centralFragHandle);
+			edm::Handle<edm::ValueMap<float> > downFragHandle;
+			iEvent.getByToken(downFragToken_,downFragHandle);
+			edm::Handle<edm::ValueMap<float> > petersonFragHandle;
+			iEvent.getByToken(petersonFragToken_,petersonFragHandle);
+			edm::Handle<edm::ValueMap<float> > semilepbrDownHandle;
+			iEvent.getByToken(semilepbrDownToken_,semilepbrDownHandle);
+			edm::Handle<edm::ValueMap<float> > semilepbrUpHandle;
+			iEvent.getByToken(semilepbrUpToken_,semilepbrUpHandle);
+			
+			for(auto pseudoJet=pseudoJets->begin(); pseudoJet!=pseudoJets->end(); ++pseudoJet)
+			{
+			    edm::Ref<std::vector<reco::GenJet> > pseudoJetRef(pseudoJets,pseudoJet-pseudoJets->begin());
+
+			    *upFrag.get() = (*upFragHandle)[pseudoJetRef];
+			    *centralFrag.get() = (*centralFragHandle)[pseudoJetRef];
+			    *downFrag.get() = (*downFragHandle)[pseudoJetRef];
+			    *petersonFrag.get() = (*petersonFragHandle)[pseudoJetRef];
+			    *semilepbrUp.get() = (*semilepbrUpHandle)[pseudoJetRef];
+			    *semilepbrDown.get() = (*semilepbrDownHandle)[pseudoJetRef];
+			}
+
+
 			// Only get top parton info if ttbar decay chain has been identified
 			// t->Ws (~1% of top decays) are not recognised, and are ignored.
 			if (numberOfIdentifiedModes==1 ) {
@@ -486,6 +547,14 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	iEvent.put(NumberOfTrueInteractions, prefix_ + "NumberOfTrueInteractions" + suffix_);
 	iEvent.put(OriginBX, prefix_ + "PileUpOriginBX" + suffix_);
 	iEvent.put(ttbarDecay, prefix_ + "TtbarDecay" + suffix_);
+
+	iEvent.put(upFrag, prefix_ + "upFrag" + suffix_);
+	iEvent.put(centralFrag, prefix_ + "centralFrag" + suffix_);
+	iEvent.put(downFrag, prefix_ + "downFrag" + suffix_);
+	iEvent.put(petersonFrag, prefix_ + "petersonFrag" + suffix_);
+	iEvent.put(semilepbrUp, prefix_ + "semilepbrUp" + suffix_);
+	iEvent.put(semilepbrDown, prefix_ + "semilepbrDown" + suffix_);
+
 
 	iEvent.put(leptonicTopPt, prefix_ + "leptonicTopPt" + suffix_);
 	iEvent.put(leptonicTopPx, prefix_ + "leptonicTopPx" + suffix_);

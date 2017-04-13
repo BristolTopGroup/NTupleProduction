@@ -39,6 +39,11 @@
 			"destination": "",
 			"provider": "git-cms-merge-topic"
 		},{
+		   "name": "BFragmentationAnalyzer",
+		   "source": "https://gitlab.cern.ch/CMS-TOPPAG/BFragmentationAnalyzer.git",
+		   "destination": "TopQuarkAnalysis/BFragmentationAnalyzer",
+		   "provider": "git"
+		},{
 			"name": "TopHitFit",
 			"source": "https://github.com/BristolTopGroup/TopHitFit.git",
 			"destination": "TopQuarkAnalysis/TopHitFit",
