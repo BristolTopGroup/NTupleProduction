@@ -27,5 +27,7 @@ nTupleGenEventInfo = cms.EDProducer("BristolNTuple_GenEventInfo",
 
     minGenJetPt = cms.double(20.),
     maxGenJetAbsoluteEta = cms.double(999.),
+    packedGenParticles = cms.InputTag("packedGenParticles"),
+    prunedGenParticles = cms.InputTag("prunedGenParticles")
 
 )

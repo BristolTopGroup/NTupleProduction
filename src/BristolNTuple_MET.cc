@@ -32,7 +32,7 @@ void BristolNTuple_MET::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	std::auto_ptr<double> py(new double(patMET.py()));
 	std::auto_ptr<double> met(new double(patMET.pt()));
 	std::auto_ptr<double> phi(new double(patMET.phi()));
-	std::auto_ptr<double> significance(new double(patMET.significance()));
+	std::auto_ptr<double> significance(new double(patMET.metSignificance()));
 	std::auto_ptr<std::vector<unsigned int > > METUncertaintyTypes(new std::vector<unsigned int>() );
 	std::auto_ptr<std::vector<double> > METUncertaintiesPt(new std::vector<double>() );
 	std::auto_ptr<std::vector<double> > METUncertaintiesPx(new std::vector<double>() );

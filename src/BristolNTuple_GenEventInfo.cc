@@ -12,6 +12,8 @@
 
 using namespace std;
 
+const double LARGE_NEGATIVE_INIT_VALUE = -9999.9;
+
 BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& iConfig) : //
 		genEvtInfoInputTag(consumes< GenEventInfoProduct > (iConfig.getParameter<edm::InputTag>("GenEventInfoInputTag"))),
 		lheEventProductToken_(consumes< LHEEventProduct > (iConfig.getParameter<edm::InputTag>("LHEEventInfoInputTag"))),
@@ -25,7 +27,10 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 	    minGenJetPt_ (iConfig.getParameter<double> ("minGenJetPt")),
 	    maxGenJetAbsoluteEta_ (iConfig.getParameter<double> ("maxGenJetAbsoluteEta")),
 		prefix_(iConfig.getParameter < std::string > ("Prefix")), //
-		suffix_(iConfig.getParameter < std::string > ("Suffix")) {
+		suffix_(iConfig.getParameter < std::string > ("Suffix")), //
+		prunedGenToken_(consumes<edm::View<reco::GenParticle> >(iConfig.getParameter<edm::InputTag>("prunedGenParticles"))), //
+		packedGenToken_(consumes<edm::View<pat::PackedGenParticle> >(iConfig.getParameter<edm::InputTag>("packedGenParticles")))
+		{
 
     for (edm::InputTag const & tag : iConfig.getParameter< std::vector<edm::InputTag> > ("ttbarDecayFlags"))
     ttbarDecayFlags_.push_back(consumes<bool>(tag));
@@ -106,7 +111,25 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 	produces<double>(prefix_ + "SingleNeutrinoPz" + suffix_ );
 	produces<double>(prefix_ + "SingleNeutrinoEnergy" + suffix_ );
 
+  produces<double>(prefix_ + "ZPt" + suffix_);
+  produces<double>(prefix_ + "ZEta" + suffix_);
+  produces<double>(prefix_ + "ZPhi" + suffix_);
+  produces<double>(prefix_ + "ZPx" + suffix_);
+  produces<double>(prefix_ + "ZPy" + suffix_);
+  produces<double>(prefix_ + "ZPz" + suffix_);
+  produces<double>(prefix_ + "ZEnergy" + suffix_);
+  produces<unsigned int>(prefix_ + "ZDecay" + suffix_);
+  produces<unsigned int>(prefix_ + "ZStatus" + suffix_);
 
+  produces < std::vector<double> > (prefix_ + "ZDecayParticlesPt" + suffix_);
+  produces < std::vector<double> > (prefix_ + "ZDecayParticlesEta" + suffix_);
+  produces < std::vector<double> > (prefix_ + "ZDecayParticlesPhi" + suffix_);
+  produces < std::vector<double> > (prefix_ + "ZDecayParticlesPx" + suffix_);
+  produces < std::vector<double> > (prefix_ + "ZDecayParticlesPy" + suffix_);
+  produces < std::vector<double> > (prefix_ + "ZDecayParticlesPz" + suffix_);
+  produces < std::vector<double> > (prefix_ + "ZDecayParticlesEnergy" + suffix_);
+  produces < std::vector<int> > (prefix_ + "ZDecayParticlesPdgId" + suffix_);
+  produces < std::vector<double> > (prefix_ + "ZDecayParticlesCharge" + suffix_);
 }
 
 void BristolNTuple_GenEventInfo::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup) {
@@ -130,11 +153,11 @@ void BristolNTuple_GenEventInfo::beginRun(edm::Run const& iRun, edm::EventSetup 
 void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
 
-	std::auto_ptr<unsigned int> processID(new unsigned int());
-	std::auto_ptr<double> ptHat(new double());
+	std::auto_ptr<unsigned int> processID(new unsigned int(0));
+	std::auto_ptr<double> ptHat(new double(0));
 	std::auto_ptr<double> PUWeight(new double());
-	std::auto_ptr<double> generatorWeight(new double());
-	std::auto_ptr<double> centralLHEWeight(new double());
+	std::auto_ptr<double> generatorWeight(new double(0));
+	std::auto_ptr<double> centralLHEWeight(new double(0));
 	std::auto_ptr<std::vector<double> > systematicWeights(new std::vector<double>());
 	std::auto_ptr<std::vector<int> > systematicWeightIDs(new std::vector<int>());
 
@@ -143,137 +166,68 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 
 	std::auto_ptr < std::vector<int> > NumberOfTrueInteractions(new std::vector<int>());
 	std::auto_ptr < std::vector<int> > OriginBX(new std::vector<int>());
-	std::auto_ptr<unsigned int> ttbarDecay(new unsigned int());
+	std::auto_ptr<unsigned int> ttbarDecay(new unsigned int(0));
 
-	std::auto_ptr<int> leptonicBGenJetIndex(new int());
-	std::auto_ptr<int> hadronicBGenJetIndex(new int());
-	std::auto_ptr<int> hadronicDecayQuarkBarGenJetIndex(new int());
-	std::auto_ptr<int> hadronicDecayQuarkGenJetIndex(new int());
-
-
-	std::auto_ptr<double> leptonicTopPt(new double());
-	std::auto_ptr<double> leptonicTopPx(new double());
-	std::auto_ptr<double> leptonicTopPy(new double());
-	std::auto_ptr<double> leptonicTopPz(new double());
-	std::auto_ptr<double> leptonicTopEnergy(new double());
-	std::auto_ptr<double> hadronicTopPt(new double());
-	std::auto_ptr<double> hadronicTopPx(new double());
-	std::auto_ptr<double> hadronicTopPy(new double());
-	std::auto_ptr<double> hadronicTopPz(new double());
-	std::auto_ptr<double> hadronicTopEnergy(new double());
-
-	std::auto_ptr<double> leptonicBPt(new double());
-	std::auto_ptr<double> leptonicBPx(new double());
-	std::auto_ptr<double> leptonicBPy(new double());
-	std::auto_ptr<double> leptonicBPz(new double());
-	std::auto_ptr<double> leptonicBEnergy(new double());
-	std::auto_ptr<double> hadronicBPt(new double());
-	std::auto_ptr<double> hadronicBPx(new double());
-	std::auto_ptr<double> hadronicBPy(new double());
-	std::auto_ptr<double> hadronicBPz(new double());
-	std::auto_ptr<double> hadronicBEnergy(new double());
-
-	std::auto_ptr<double> leptonicWPt(new double());
-	std::auto_ptr<double> leptonicWPx(new double());
-	std::auto_ptr<double> leptonicWPy(new double());
-	std::auto_ptr<double> leptonicWPz(new double());
-	std::auto_ptr<double> leptonicWEnergy(new double());
-	std::auto_ptr<double> hadronicWPt(new double());
-	std::auto_ptr<double> hadronicWPx(new double());
-	std::auto_ptr<double> hadronicWPy(new double());
-	std::auto_ptr<double> hadronicWPz(new double());
-	std::auto_ptr<double> hadronicWEnergy(new double());
-
-	std::auto_ptr<double> hadronicdecayquarkPt(new double());
-	std::auto_ptr<double> hadronicdecayquarkPx(new double());
-	std::auto_ptr<double> hadronicdecayquarkPy(new double());
-	std::auto_ptr<double> hadronicdecayquarkPz(new double());
-	std::auto_ptr<double> hadronicdecayquarkEnergy(new double());
-	std::auto_ptr<double> hadronicdecayquarkbarPt(new double());
-	std::auto_ptr<double> hadronicdecayquarkbarPx(new double());
-	std::auto_ptr<double> hadronicdecayquarkbarPy(new double());
-	std::auto_ptr<double> hadronicdecayquarkbarPz(new double());
-	std::auto_ptr<double> hadronicdecayquarkbarEnergy(new double());
-
-	std::auto_ptr<double> SingleLeptonPt(new double());
-	std::auto_ptr<double> SingleLeptonPx(new double());
-	std::auto_ptr<double> SingleLeptonPy(new double());
-	std::auto_ptr<double> SingleLeptonPz(new double());
-	std::auto_ptr<double> SingleLeptonEnergy(new double());
-	std::auto_ptr<double> SingleNeutrinoPt(new double());
-	std::auto_ptr<double> SingleNeutrinoPx(new double());
-	std::auto_ptr<double> SingleNeutrinoPy(new double());
-	std::auto_ptr<double> SingleNeutrinoPz(new double());
-	std::auto_ptr<double> SingleNeutrinoEnergy(new double());
+	std::auto_ptr<int> leptonicBGenJetIndex(new int(-1));
+	std::auto_ptr<int> hadronicBGenJetIndex(new int(-1));
+	std::auto_ptr<int> hadronicDecayQuarkBarGenJetIndex(new int(-1));
+	std::auto_ptr<int> hadronicDecayQuarkGenJetIndex(new int(-1));
 
 
-	*processID.get() = 0;
-	*ptHat.get() = 0.;
-	*PUWeight.get() = 0.;
-	*generatorWeight.get() = 0.;
-	*centralLHEWeight.get() = 0;
-	*ttbarDecay.get() = 0;
+	std::auto_ptr<double> leptonicTopPt(new double(LARGE_NEGATIVE_INIT_VALUE));
+	std::auto_ptr<double> leptonicTopPx(new double(0));
+	std::auto_ptr<double> leptonicTopPy(new double(0));
+	std::auto_ptr<double> leptonicTopPz(new double(0));
+	std::auto_ptr<double> leptonicTopEnergy(new double(0));
+	std::auto_ptr<double> hadronicTopPt(new double(LARGE_NEGATIVE_INIT_VALUE));
+	std::auto_ptr<double> hadronicTopPx(new double(0));
+	std::auto_ptr<double> hadronicTopPy(new double(0));
+	std::auto_ptr<double> hadronicTopPz(new double(0));
+	std::auto_ptr<double> hadronicTopEnergy(new double(0));
 
-	*leptonicTopPt.get() = 0;
-	*leptonicTopPx.get() = 0;
-	*leptonicTopPy.get() = 0;
-	*leptonicTopPz.get() = 0;
-	*leptonicTopEnergy.get() = 0;
-	*hadronicTopPt.get() = 0;
-	*hadronicTopPx.get() = 0;
-	*hadronicTopPy.get() = 0;
-	*hadronicTopPz.get() = 0;
-	*hadronicTopEnergy.get() = 0;
+	std::auto_ptr<double> leptonicBPt(new double(LARGE_NEGATIVE_INIT_VALUE));
+	std::auto_ptr<double> leptonicBPx(new double(0));
+	std::auto_ptr<double> leptonicBPy(new double(0));
+	std::auto_ptr<double> leptonicBPz(new double(0));
+	std::auto_ptr<double> leptonicBEnergy(new double(0));
+	std::auto_ptr<double> hadronicBPt(new double(LARGE_NEGATIVE_INIT_VALUE));
+	std::auto_ptr<double> hadronicBPx(new double(0));
+	std::auto_ptr<double> hadronicBPy(new double(0));
+	std::auto_ptr<double> hadronicBPz(new double(0));
+	std::auto_ptr<double> hadronicBEnergy(new double(0));
 
-	*leptonicBPt.get() = 0;
-	*leptonicBPx.get() = 0;
-	*leptonicBPy.get() = 0;
-	*leptonicBPz.get() = 0;
-	*leptonicBEnergy.get() = 0;
-	*hadronicBPt.get() = 0;
-	*hadronicBPx.get() = 0;
-	*hadronicBPy.get() = 0;
-	*hadronicBPz.get() = 0;
-	*hadronicBEnergy.get() = 0;
+	std::auto_ptr<double> leptonicWPt(new double(LARGE_NEGATIVE_INIT_VALUE));
+	std::auto_ptr<double> leptonicWPx(new double(0));
+	std::auto_ptr<double> leptonicWPy(new double(0));
+	std::auto_ptr<double> leptonicWPz(new double(0));
+	std::auto_ptr<double> leptonicWEnergy(new double(0));
+	std::auto_ptr<double> hadronicWPt(new double(LARGE_NEGATIVE_INIT_VALUE));
+	std::auto_ptr<double> hadronicWPx(new double(0));
+	std::auto_ptr<double> hadronicWPy(new double(0));
+	std::auto_ptr<double> hadronicWPz(new double(0));
+	std::auto_ptr<double> hadronicWEnergy(new double(0));
 
-	*leptonicWPt.get() = 0;
-	*leptonicWPx.get() = 0;
-	*leptonicWPy.get() = 0;
-	*leptonicWPz.get() = 0;
-	*leptonicWEnergy.get() = 0;
-	*hadronicWPt.get() = 0;
-	*hadronicWPx.get() = 0;
-	*hadronicWPy.get() = 0;
-	*hadronicWPz.get() = 0;
-	*hadronicWEnergy.get() = 0;
+	std::auto_ptr<double> hadronicdecayquarkPt(new double(LARGE_NEGATIVE_INIT_VALUE));
+	std::auto_ptr<double> hadronicdecayquarkPx(new double(0));
+	std::auto_ptr<double> hadronicdecayquarkPy(new double(0));
+	std::auto_ptr<double> hadronicdecayquarkPz(new double(0));
+	std::auto_ptr<double> hadronicdecayquarkEnergy(new double(0));
+	std::auto_ptr<double> hadronicdecayquarkbarPt(new double(LARGE_NEGATIVE_INIT_VALUE));
+	std::auto_ptr<double> hadronicdecayquarkbarPx(new double(0));
+	std::auto_ptr<double> hadronicdecayquarkbarPy(new double(0));
+	std::auto_ptr<double> hadronicdecayquarkbarPz(new double(0));
+	std::auto_ptr<double> hadronicdecayquarkbarEnergy(new double(0));
 
-	*hadronicdecayquarkPt.get() = 0;
-	*hadronicdecayquarkPx.get() = 0;
-	*hadronicdecayquarkPy.get() = 0;
-	*hadronicdecayquarkPz.get() = 0;
-	*hadronicdecayquarkEnergy.get() = 0;
-	*hadronicdecayquarkbarPt.get() = 0;
-	*hadronicdecayquarkbarPx.get() = 0;
-	*hadronicdecayquarkbarPy.get() = 0;
-	*hadronicdecayquarkbarPz.get() = 0;
-	*hadronicdecayquarkbarEnergy.get() = 0;
-
-	*SingleLeptonPt.get() = 0;
-	*SingleLeptonPx.get() = 0;
-	*SingleLeptonPy.get() = 0;
-	*SingleLeptonPz.get() = 0;
-	*SingleLeptonEnergy.get() = 0;
-	*SingleNeutrinoPt.get() = 0;
-	*SingleNeutrinoPx.get() = 0;
-	*SingleNeutrinoPy.get() = 0;
-	*SingleNeutrinoPz.get() = 0;
-	*SingleNeutrinoEnergy.get() = 0;
-
-	*leptonicBGenJetIndex.get() = -1;
-	*hadronicBGenJetIndex.get() = -1;
-	*hadronicDecayQuarkGenJetIndex.get() = -1;
-	*hadronicDecayQuarkBarGenJetIndex.get() = -1;
-
+	std::auto_ptr<double> SingleLeptonPt(new double(LARGE_NEGATIVE_INIT_VALUE));
+	std::auto_ptr<double> SingleLeptonPx(new double(0));
+	std::auto_ptr<double> SingleLeptonPy(new double(0));
+	std::auto_ptr<double> SingleLeptonPz(new double(0));
+	std::auto_ptr<double> SingleLeptonEnergy(new double(0));
+	std::auto_ptr<double> SingleNeutrinoPt(new double(LARGE_NEGATIVE_INIT_VALUE));
+	std::auto_ptr<double> SingleNeutrinoPx(new double(0));
+	std::auto_ptr<double> SingleNeutrinoPy(new double(0));
+	std::auto_ptr<double> SingleNeutrinoPz(new double(0));
+	std::auto_ptr<double> SingleNeutrinoEnergy(new double(0));
 
 	//-----------------------------------------------------------------
 	if (!iEvent.isRealData()) {
@@ -292,29 +246,6 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 
 		} 
 
-		// // PU Weights Part
-		// edm::Handle<double> puWeightsHandle;
-		// iEvent.getByLabel(puWeightsInputTag_, puWeightsHandle);
-
-		// if (puWeightsHandle.isValid()) {
-		// 	edm::LogInfo("BristolNTuple_GenEventInfoInfo") << "Successfully obtained " << puWeightsInputTag_;
-
-		// 	*PUWeight.get() = *puWeightsHandle;
-
-		// }
-
-		// // PDF Weights Part
-		// if (storePDFWeights_) {
-		// 	edm::Handle < std::vector<double> > pdfWeightsHandle;
-		// 	iEvent.getByLabel(pdfWeightsInputTag_, pdfWeightsHandle);
-
-		// 	if (pdfWeightsHandle.isValid()) {
-		// 		edm::LogInfo("BristolNTuple_GenEventInfoInfo") << "Successfully obtained " << pdfWeightsInputTag_;
-
-		// 		*pdfWeights.get() = *pdfWeightsHandle;
-
-		// 	}
-		// }
 		// PileupSummary Part
 		edm::Handle < std::vector<PileupSummaryInfo> > puInfo;
 		iEvent.getByToken(pileupInfoSrc_, puInfo);
@@ -469,6 +400,8 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 					*hadronicBGenJetIndex = matching.getMatchForParton(3);
 
 				}
+
+				addTTZContent(iEvent, iSetup);
 			}
 		}
 	}
@@ -548,4 +481,171 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 	iEvent.put(hadronicDecayQuarkGenJetIndex, prefix_ + "hadronicDecayQuarkGenJetIndex" + suffix_);
 
 
+}
+
+bool BristolNTuple_GenEventInfo::isAncestor(const reco::Candidate* ancestor, const reco::Candidate * particle) const
+{
+  //particle is already the ancestor
+  if (ancestor == particle)
+    return true;
+
+  //otherwise loop on mothers, if any and return true if the ancestor is found
+  for (size_t i = 0; i < particle->numberOfMothers(); i++) {
+    if (isAncestor(ancestor, particle->mother(i)))
+      return true;
+  }
+  //if we did not return yet, then particle and ancestor are not relatives
+  return false;
+}
+
+void BristolNTuple_GenEventInfo::addTTZContent(edm::Event& iEvent, const edm::EventSetup& iSetup)
+{
+  using namespace edm;
+  using namespace reco;
+  using namespace pat;
+
+  std::auto_ptr<unsigned int> zDecay(new unsigned int(0));
+  std::auto_ptr<unsigned int> zStatus(new unsigned int(0));
+
+  std::auto_ptr<double> zPt(new double(LARGE_NEGATIVE_INIT_VALUE));
+  std::auto_ptr<double> zEta(new double(LARGE_NEGATIVE_INIT_VALUE));
+  std::auto_ptr<double> zPhi(new double(LARGE_NEGATIVE_INIT_VALUE));
+  std::auto_ptr<double> zPx(new double());
+  std::auto_ptr<double> zPy(new double());
+  std::auto_ptr<double> zPz(new double());
+  std::auto_ptr<double> zEnergy(new double());
+  // particles the Z boson decays into
+  std::auto_ptr < std::vector<double> > decayPt(new std::vector<double>());
+  std::auto_ptr < std::vector<double> > decayEta(new std::vector<double>());
+  std::auto_ptr < std::vector<double> > decayPhi(new std::vector<double>());
+  std::auto_ptr < std::vector<double> > decayPx(new std::vector<double>());
+  std::auto_ptr < std::vector<double> > decayPy(new std::vector<double>());
+  std::auto_ptr < std::vector<double> > decayPz(new std::vector<double>());
+  std::auto_ptr < std::vector<double> > decayEnergy(new std::vector<double>());
+  std::auto_ptr < std::vector<int> > decayPdgId(new std::vector<int>());
+  std::auto_ptr < std::vector<double> > decayCharge(new std::vector<double>());
+
+  // Pruned particles are the one containing "important" stuff
+  Handle < edm::View<reco::GenParticle> > pruned;
+  iEvent.getByToken(prunedGenToken_, pruned);
+
+  // Packed particles are all the status 1, so usable to remake jets
+  // The navigation from status 1 to pruned is possible (the other direction should be made by hand)
+  Handle < edm::View<pat::PackedGenParticle> > packed;
+  iEvent.getByToken(packedGenToken_, packed);
+
+  for (auto particle = pruned->begin(); particle != pruned->end(); ++particle) {
+    if (std::abs(particle->pdgId()) == 23) {
+      auto decayParticles = getZDecayParticles(&(*particle), packed);
+      *zDecay = getZDecay(decayParticles);
+      *zStatus = particle->status();
+
+      if (*zDecay == ZDecay::NotInterestingZDecay)
+        continue;
+
+      *zPt.get() = particle->pt();
+      *zEta.get() = particle->eta();
+      *zPhi.get() = particle->phi();
+      *zPx.get() = particle->px();
+      *zPy.get() = particle->py();
+      *zPz.get() = particle->pz();
+      *zEnergy.get() = particle->energy();
+
+      for (auto decayParticle : decayParticles) {
+        decayPt->push_back(decayParticle->pt());
+        decayEta->push_back(decayParticle->eta());
+        decayPhi->push_back(decayParticle->phi());
+        decayPx->push_back(decayParticle->px());
+        decayPy->push_back(decayParticle->py());
+        decayPz->push_back(decayParticle->pz());
+        decayEnergy->push_back(decayParticle->energy());
+        decayPdgId->push_back(decayParticle->pdgId());
+        decayCharge->push_back(decayParticle->charge());
+      }
+
+      break;
+    }
+  }
+
+  iEvent.put(zPt, prefix_ + "ZPt" + suffix_);
+  iEvent.put(zEta, prefix_ + "ZEta" + suffix_);
+  iEvent.put(zPhi, prefix_ + "ZPhi" + suffix_);
+  iEvent.put(zPx, prefix_ + "ZPx" + suffix_);
+  iEvent.put(zPy, prefix_ + "ZPy" + suffix_);
+  iEvent.put(zPz, prefix_ + "ZPz" + suffix_);
+  iEvent.put(zEnergy, prefix_ + "ZEnergy" + suffix_);
+  iEvent.put(zDecay, prefix_ + "ZDecay" + suffix_);
+  iEvent.put(zStatus, prefix_ + "ZStatus" + suffix_);
+
+  iEvent.put(decayPt, prefix_ + "ZDecayParticlesPt" + suffix_);
+  iEvent.put(decayEta, prefix_ + "ZDecayParticlesEta" + suffix_);
+  iEvent.put(decayPhi, prefix_ + "ZDecayParticlesPhi" + suffix_);
+  iEvent.put(decayPx, prefix_ + "ZDecayParticlesPx" + suffix_);
+  iEvent.put(decayPy, prefix_ + "ZDecayParticlesPy" + suffix_);
+  iEvent.put(decayPz, prefix_ + "ZDecayParticlesPz" + suffix_);
+  iEvent.put(decayEnergy, prefix_ + "ZDecayParticlesEnergy" + suffix_);
+  iEvent.put(decayPdgId, prefix_ + "ZDecayParticlesPdgId" + suffix_);
+  iEvent.put(decayCharge, prefix_ + "ZDecayParticlesCharge" + suffix_);
+
+}
+
+std::vector<const pat::PackedGenParticle*> BristolNTuple_GenEventInfo::getZDecayParticles(
+    const reco::Candidate* zBoson, const edm::Handle<edm::View<pat::PackedGenParticle> >& packed) const
+{
+  std::vector<const pat::PackedGenParticle*> decayParticles;
+  /* look for 2 leptons
+   * pdgIds:
+   *    11 -> electron
+   *    12 -> nu_e
+   *    13 -> mu
+   *    14 -> nu_mu
+   *    15 -> tau
+   *    16 -> tau_nu
+   */
+  std::vector<unsigned int> pidsOfInterest = { 11, 12, 13, 14, 15, 16 };
+  for (auto particle = packed->begin(); particle != packed->end(); ++particle) {
+    auto motherInPrunedCollection = particle->mother(0);
+
+    if (motherInPrunedCollection != nullptr && isAncestor(zBoson, motherInPrunedCollection)) {
+      auto isInteresting = std::find(pidsOfInterest.begin(), pidsOfInterest.end(), std::abs(particle->pdgId()))
+          != pidsOfInterest.end();
+      if (isInteresting) {
+        decayParticles.push_back(&(*particle));
+      }
+    }
+  }
+  return decayParticles;
+}
+
+ZDecay::value BristolNTuple_GenEventInfo::getZDecay(
+    const std::vector<const pat::PackedGenParticle*>& decayParticles) const
+{
+  ZDecay::value zDecay(ZDecay::NotInterestingZDecay);
+  for (auto particle : decayParticles) {
+    unsigned int pdgId = std::abs(particle->pdgId());
+    switch (pdgId) {
+    case 11:
+      zDecay = ZDecay::ZToEE;
+      break;
+    case 12:
+      zDecay = ZDecay::ZTo2NuE;
+      break;
+    case 13:
+      zDecay = ZDecay::ZToMuMu;
+      break;
+    case 14:
+      zDecay = ZDecay::ZTo2NuMu;
+      break;
+    case 15:
+      zDecay = ZDecay::ZToTauTau;
+      break;
+    case 16:
+      zDecay = ZDecay::ZTo2NuTau;
+      break;
+    default:
+      zDecay = ZDecay::NotInterestingZDecay;
+      break;
+    }
+  }
+  return zDecay;
 }

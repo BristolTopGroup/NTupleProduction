@@ -14,6 +14,7 @@
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+#include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
 
 namespace TTbarDecay {
 enum value {
@@ -31,6 +32,21 @@ enum value {
 	NumberOfDecayModes
 };
 }
+
+namespace ZDecay {
+enum value {
+  NoZFound,
+  ZToEE,
+  ZToMuMu,
+  ZToTauTau,
+  ZTo2NuE,
+  ZTo2NuMu,
+  ZTo2NuTau,
+  NotInterestingZDecay,
+  NumberOfDecayModes
+};
+}
+
 class BristolNTuple_GenEventInfo: public edm::EDProducer {
 
 public:
@@ -52,7 +68,15 @@ private:
 	const edm::EDGetTokenT<TtGenEvent >  tt_gen_event_input_;
 	const double minGenJetPt_, maxGenJetAbsoluteEta_;
 	const std::string prefix_, suffix_;
+	edm::EDGetTokenT<edm::View<reco::GenParticle> > prunedGenToken_;
+	edm::EDGetTokenT<edm::View<pat::PackedGenParticle> > packedGenToken_;
+
+  bool isAncestor(const reco::Candidate * ancestor, const reco::Candidate * particle) const;
+  std::vector<const pat::PackedGenParticle*> getZDecayParticles(const reco::Candidate* zBoson,
+      const edm::Handle<edm::View<pat::PackedGenParticle> >& packed) const;
+  ZDecay::value getZDecay(const std::vector<const pat::PackedGenParticle*>& decayParticles) const;
+  void addTTZContent(edm::Event &, const edm::EventSetup &);
 };
 
 #endif
-	
+
