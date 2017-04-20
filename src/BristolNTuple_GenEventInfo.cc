@@ -413,17 +413,33 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 			edm::Handle<edm::ValueMap<float> > semilepbrUpHandle;
 			iEvent.getByToken(semilepbrUpToken_,semilepbrUpHandle);
 			
+			double upFragWeight = 1;
+			double centralFragWeight = 1;
+			double downFragWeight = 1;
+			double petersonFragWeight = 1;
+			double semilepbrUpWeight = 1;
+			double semilepbrDownWeight = 1;
 			for(auto pseudoJet=pseudoJets->begin(); pseudoJet!=pseudoJets->end(); ++pseudoJet)
 			{
-			    edm::Ref<std::vector<reco::GenJet> > pseudoJetRef(pseudoJets,pseudoJet-pseudoJets->begin());
+				if ( pseudoJet->pdgId() == 5 ) {
+				    edm::Ref<std::vector<reco::GenJet> > pseudoJetRef(pseudoJets,pseudoJet-pseudoJets->begin());
 
-			    *upFrag.get() = (*upFragHandle)[pseudoJetRef];
-			    *centralFrag.get() = (*centralFragHandle)[pseudoJetRef];
-			    *downFrag.get() = (*downFragHandle)[pseudoJetRef];
-			    *petersonFrag.get() = (*petersonFragHandle)[pseudoJetRef];
-			    *semilepbrUp.get() = (*semilepbrUpHandle)[pseudoJetRef];
-			    *semilepbrDown.get() = (*semilepbrDownHandle)[pseudoJetRef];
+				    upFragWeight *= (*upFragHandle)[pseudoJetRef];
+				    centralFragWeight *= (*centralFragHandle)[pseudoJetRef];
+				    downFragWeight *= (*downFragHandle)[pseudoJetRef];
+				    petersonFragWeight *= (*petersonFragHandle)[pseudoJetRef];
+				    semilepbrUpWeight *= (*semilepbrUpHandle)[pseudoJetRef];
+				    semilepbrDownWeight *= (*semilepbrDownHandle)[pseudoJetRef];
+				}
+
 			}
+
+		    *upFrag.get() = upFragWeight;
+		    *centralFrag.get() = centralFragWeight;
+		    *downFrag.get() = downFragWeight;
+		    *petersonFrag.get() = petersonFragWeight;
+		    *semilepbrUp.get() = semilepbrUpWeight;
+		    *semilepbrDown.get() = semilepbrDownWeight;
 
 
 			// Only get top parton info if ttbar decay chain has been identified
