@@ -45,6 +45,13 @@ private:
   	const edm::EDGetTokenT<LHEEventProduct> lheEventProductToken_;
 	const edm::EDGetTokenT<reco::GenJetCollection > genJetsInputTag_;
 	std::vector<edm::EDGetTokenT<bool> > ttbarDecayFlags_;
+	const edm::EDGetTokenT<std::vector<reco::GenJet>  > pseudoJetsToken_;
+	const edm::EDGetTokenT<edm::ValueMap<float> > upFragToken_;
+	const edm::EDGetTokenT<edm::ValueMap<float> > centralFragToken_;
+	const edm::EDGetTokenT<edm::ValueMap<float> > downFragToken_;
+	const edm::EDGetTokenT<edm::ValueMap<float> > petersonFragToken_;
+	const edm::EDGetTokenT<edm::ValueMap<float> > semilepbrUpToken_;
+	const edm::EDGetTokenT<edm::ValueMap<float> > semilepbrDownToken_;
 	const edm::InputTag puWeightsInputTag_;
 	const bool storePDFWeights_, isTTbarMC_;
 	const edm::InputTag pdfWeightsInputTag_;
