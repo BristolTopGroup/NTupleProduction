@@ -44,7 +44,7 @@ SPLITTING_BY_FILE = {
     'TTJet': 3,
     'TT_': 3,
     'ST' : 3,
-    'DEFAULT': 10,
+    'DEFAULT': 3,
 }
 
 

@@ -24,6 +24,15 @@ jobTemplates = [
 	["TTJets_PowhegPythia8_down_tree.root", [
 		"TTJets_PowhegPythia8_down_central_atOutput_*.root"
 	], "C" ],
+	["TTJets_PowhegPythia8_hdampup_tree.root", [
+		"TTJets_PowhegPythia8_hdampup_central_atOutput_*.root"
+	], "C" ],
+	["TTJets_PowhegPythia8_hdampdown_tree.root", [
+		"TTJets_PowhegPythia8_hdampdown_central_atOutput_*.root"
+	], "C" ],
+	["TTJets_PowhegPythia8_erdOn_tree.root", [
+		"TTJets_PowhegPythia8_erdOn_central_atOutput_*.root"
+	], "C" ],
 
 	["TTJets_PowhegPythia8_mtop1695_tree.root", [
 		"TTJets_PowhegPythia8_mtop1695_central_atOutput_*.root"
@@ -102,34 +111,34 @@ jobTemplates = [
 		"SingleElectron_RunH_Prompt_v3_central_atOutput_*.root"
 	], "C"],
 
-	["data_electron_B_tree.root", [
-		"SingleElectron_RunB_central_atOutput_*.root"
-	], "C"],
+	# ["data_electron_B_tree.root", [
+	# 	"SingleElectron_RunB_central_atOutput_*.root"
+	# ], "C"],
 
-	["data_electron_C_tree.root", [
-		"SingleElectron_RunC_central_atOutput_*.root"
-	], "C"],
+	# ["data_electron_C_tree.root", [
+	# 	"SingleElectron_RunC_central_atOutput_*.root"
+	# ], "C"],
 
-	["data_electron_D_tree.root", [
-		"SingleElectron_RunD_central_atOutput_*.root"
-	], "C"],
+	# ["data_electron_D_tree.root", [
+	# 	"SingleElectron_RunD_central_atOutput_*.root"
+	# ], "C"],
 
-	["data_electron_E_tree.root", [
-		"SingleElectron_RunE_central_atOutput_*.root"
-	], "C"],
+	# ["data_electron_E_tree.root", [
+	# 	"SingleElectron_RunE_central_atOutput_*.root"
+	# ], "C"],
 
-	["data_electron_F_tree.root", [
-		"SingleElectron_RunF_central_atOutput_*.root"
-	], "C"],
+	# ["data_electron_F_tree.root", [
+	# 	"SingleElectron_RunF_central_atOutput_*.root"
+	# ], "C"],
 
-	["data_electron_G_tree.root", [
-		"SingleElectron_RunG_central_atOutput_*.root"
-	], "C"],
+	# ["data_electron_G_tree.root", [
+	# 	"SingleElectron_RunG_central_atOutput_*.root"
+	# ], "C"],
 
-	["data_electron_H_tree.root", [
-		"SingleElectron_RunH_Prompt_v2_central_atOutput_*.root",
-		"SingleElectron_RunH_Prompt_v3_central_atOutput_*.root"
-	], "C"],
+	# ["data_electron_H_tree.root", [
+	# 	"SingleElectron_RunH_Prompt_v2_central_atOutput_*.root",
+	# 	"SingleElectron_RunH_Prompt_v3_central_atOutput_*.root"
+	# ], "C"],
 
 ]
 
