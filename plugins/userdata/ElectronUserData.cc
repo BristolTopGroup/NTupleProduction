@@ -226,7 +226,8 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 			el.addUserInt("passesTightNonIsoId", passesInvertedIDCuts(fullCutFlowDataTight, idCutsToInvert));
 			idCutsToInvert = {8, 9};
 			el.addUserInt("passesVetoIdIsolation",vetoCutFlowDataVeto.getCutResultByIndex(7));
-			el.addUserInt("passesTightConversionId", passesInvertedIDCuts(fullCutFlowDataTight, idCutsToInvert));
+			bool orOfBoth = passesInvertedIDCuts(fullCutFlowDataTight, {8} ) || passesInvertedIDCuts(fullCutFlowDataTight, {9} );
+			el.addUserInt("passesTightConversionId", orOfBoth );
 			el.addUserFloat("PFRelIsoWithEA", fullCutFlowDataTight.getValueCutUpon(7));
 
 			el.addUserFloat("hltECALIso", hltSafeCutFlowData.getValueCutUpon(7));
