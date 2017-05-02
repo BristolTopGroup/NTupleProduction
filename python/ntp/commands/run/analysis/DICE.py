@@ -23,7 +23,7 @@ except:
     LOG.error('Could not import htcondenser')
 
 CONDOR_ROOT = os.path.join(WORKSPACE, 'condor')
-RETRY_COUNT = 3
+RETRY_COUNT = 5
 PREFIX = 'analysis'
 
 SETUP_SCRIPT = """
@@ -48,9 +48,9 @@ LOG_FILE = LOG_STEM + '.log'
 # Analysis jobs: 1 file = 17s processing time
 SPLITTING_BY_FILE = {
     'SingleElectron': 10,
-    'SingleMuon': 20,
-    'TTJet': 10,
-    'TT_': 10,
+    'SingleMuon': 10,
+    'TTJet': 5,
+    'TT_': 5,
     'WJets' : 10,
     'DEFAULT': 25,  # ~= 14 min
 }
