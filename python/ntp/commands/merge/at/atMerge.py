@@ -33,6 +33,9 @@ jobTemplates = [
 	["TTJets_PowhegPythia8_erdOn_tree.root", [
 		"TTJets_PowhegPythia8_erdOn_central_atOutput_*.root"
 	], "C" ],
+	["TTJets_PowhegPythia8_QCDbased_erdOn_tree.root", [
+		"TTJets_PowhegPythia8_QCDbased_erdOn_central_atOutput_*.root"
+	], "C" ],
 
 	["TTJets_PowhegPythia8_mtop1695_tree.root", [
 		"TTJets_PowhegPythia8_mtop1695_central_atOutput_*.root"
