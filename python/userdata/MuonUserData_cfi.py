@@ -8,7 +8,7 @@ muonUserData = cms.EDProducer(
     # Top Object Definitions
     minSignalMuonPt=cms.double(26.),
     maxSignalMuonEta=cms.double(2.4),
-    minLooseMuonPt=cms.double(10.),
+    minLooseMuonPt=cms.double(15.),
     maxLooseMuonEta=cms.double(2.5),
     useBeamSpotCorrection=cms.bool(True),
     # Maximum isolation for signal region

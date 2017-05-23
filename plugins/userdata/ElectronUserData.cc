@@ -73,8 +73,7 @@ private:
 	bool isGood(const edm::Ptr<pat::Electron>& electron, std::vector<reco::Vertex> primaryVertices) const;
 	bool passesImpactParameterSelection(const edm::Ptr<pat::Electron>& electron, std::vector<reco::Vertex> primaryVertices) const;
 	void fillVertexVariables(const edm::Event&, pat::Electron& el) const;
-	float electronSeedCorrections(const edm::Event&, const edm::Ptr<pat::Electron>& electron) const;
-
+	
 	// inputs
 	edm::EDGetToken electronInputTag_;
 	const edm::EDGetTokenT<std::vector<reco::Vertex> > vtxInputTag_;
@@ -212,9 +211,6 @@ void ElectronUserData::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 			pat::Electron & el = electronCollection->at(index);
 			const edm::Ptr<pat::Electron> elPtr(electrons, index);
 			std::vector < uint > idCutsToInvert { 99 };
-
-			// std::cout << "Energy Correction for electron : " << index << " is: " << electronSeedCorrections(iEvent, elPtr) << std::endl;
-			el.addUserFloat("energyCorrection", electronSeedCorrections(iEvent, elPtr));
 
 			vid::CutFlowResult fullCutFlowDataTight = tightIdCutFlowData_[elPtr];
 			vid::CutFlowResult vetoCutFlowDataVeto = vetoIdCutFlowData_[elPtr];
@@ -411,38 +407,6 @@ void ElectronUserData::fillVertexVariables(const edm::Event& iEvent, pat::Electr
 	// beamspot
 	el.addUserFloat("beamSpotDXY", el.dB(pat::Electron::BS2D));
 	el.addUserFloat("beamSpotDXYError", el.edB(pat::Electron::BS2D));
-}
-
-float ElectronUserData::electronSeedCorrections(const edm::Event& iEvent, const edm::Ptr<pat::Electron>& electron) const {
-	/*
-	Return the scale factor for the electron seed energy corrections, Undoes the slew effect. 
-	Will be incorporated into the EGMSMearer and so can be removed in the nearish future
-	*/
-
-	double Ecorr=1;
-	
-	if (iEvent.isRealData()) {
-		edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit>>> ebrechits;
-		iEvent.getByToken(ebrechits_, ebrechits);
-
-		DetId detid = electron->superCluster()->seed()->seed();
-		const EcalRecHit * rh = NULL;
-
-		if (detid.subdetId() == EcalBarrel) {
-		    auto rh_i =  ebrechits->find(detid);
-		    if( rh_i != ebrechits->end()){
-		    	rh =  &(*rh_i);
-		    } 
-		    else rh = NULL;
-		} 
-		if(rh==NULL) Ecorr=1;
-		else{
-		  	if(rh->energy() > 200 && rh->energy()<300)  Ecorr=1.0199;
-		  	else if(rh->energy()>300 && rh->energy()<400) Ecorr=  1.052;
-		  	else if(rh->energy()>400 && rh->energy()<500) Ecorr = 1.015;
-		}
-	}
-	return Ecorr;
 }
 
 // ------------ method called once each stream before processing any runs, lumis or events  ------------

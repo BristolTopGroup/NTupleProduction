@@ -1,6 +1,9 @@
 import FWCore.ParameterSet.Config as cms
 
 from BristolAnalysis.NTupleTools.userdata.EventUserData_cfi import eventUserData
+# from run.miniAODToNTuple_cfg import isData
+
+# print isData
 
 # electron signal selection
 eventUserDataTopPairElectronPlusJetsSelection = eventUserData.clone()
@@ -41,11 +44,11 @@ eventUserDataTopPairMuonPlusJetsQCD2Selection = eventUserData.clone(
 
 eventUserDataSequence = cms.Sequence(
     # electrons
-    eventUserDataTopPairElectronPlusJetsSelection +
-    eventUserDataTopPairElectronPlusJetsConversionSelection +
-    eventUserDataTopPairElectronPlusJetsNonIsoSelection +
+    eventUserDataTopPairElectronPlusJetsSelection *
+    eventUserDataTopPairElectronPlusJetsConversionSelection *
+    eventUserDataTopPairElectronPlusJetsNonIsoSelection *
     # muons
-    eventUserDataTopPairMuonPlusJetsSelection +
-    eventUserDataTopPairMuonPlusJetsQCD1Selection +
+    eventUserDataTopPairMuonPlusJetsSelection *
+    eventUserDataTopPairMuonPlusJetsQCD1Selection *
     eventUserDataTopPairMuonPlusJetsQCD2Selection
 )

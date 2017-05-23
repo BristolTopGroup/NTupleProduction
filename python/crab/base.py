@@ -15,7 +15,7 @@ if not 'HEP_PROJECT_ROOT' in os.environ:
     sys.exit(-1)
 
 # this is the NTupleVersion!
-__version__ = '1.0.7'
+__version__ = '1.0.8'
 NTPROOT = os.environ['HEP_PROJECT_ROOT']
 WORKSPACE = os.path.join(NTPROOT, 'workspace')
 CRAB_WS = os.path.join(WORKSPACE, 'crab')
@@ -25,6 +25,7 @@ INPUT_FILES = [
     'data/BTagSF/CSVv2_Moriond17_B_H.csv',
     'data/JEC/Spring16_25nsV6_DATA.db',
     'data/JEC/Spring16_25nsV6_MC.db',
+    'data/JEC/Spring16_25nsV10_MC.db',
 ]
 
 config = Configuration()

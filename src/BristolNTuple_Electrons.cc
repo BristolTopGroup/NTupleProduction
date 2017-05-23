@@ -133,8 +133,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	std::auto_ptr < std::vector<double> > py(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > pz(new std::vector<double>());
 	std::auto_ptr < std::vector<double> > energy(new std::vector<double>());
-	// std::auto_ptr < std::vector<double> > energyCorrection(new std::vector<double>());
-  	// extra kinematic variables for easier debugging
+	  	// extra kinematic variables for easier debugging
   	std::auto_ptr<std::vector<double> > pt_store(new std::vector<double>());
   	std::auto_ptr<std::vector<double> > eta_store(new std::vector<double>());
   	std::auto_ptr<std::vector<double> > phi_store(new std::vector<double>());
@@ -276,8 +275,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 			px->push_back(it->px());
 			py->push_back(it->py());
 			pz->push_back(it->pz());
-			energy->push_back(it->energy()*it->userFloat("energyCorrection"));
-			// energyCorrection->push_back(it->userFloat("energyCorrection"));
+			energy->push_back(it->energy());
 
 			// extra kinematic variables for easier debugging
 		    pt_store->push_back(it->pt());
@@ -373,8 +371,7 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 	iEvent.put(py, prefix + "Py" + suffix);
 	iEvent.put(pz, prefix + "Pz" + suffix);
 	iEvent.put(energy, prefix + "Energy" + suffix);
-	// iEvent.put(energyCorrection, prefix + "EnergyCorrection" + suffix);
-
+	
 	// extra kinematic variables for easier debugging
   	iEvent.put(pt_store, prefix + "Pt" + suffix);
   	iEvent.put(eta_store, prefix + "Eta" + suffix);

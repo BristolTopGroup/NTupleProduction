@@ -6,5 +6,7 @@ def setupPseudoTop( process, cms ):
 	process.genParticles2HepMC.genEventInfo = cms.InputTag("generator")
 
 	process.load( "TopQuarkAnalysis.TopEventProducers.producers.pseudoTop_cfi" )
+	process.pseudoTop.minJetPt = cms.double(20)
+
 	process.load('TopQuarkAnalysis.BFragmentationAnalyzer.bfragWgtProducer_cfi')
 	process.makePseudoTop = cms.Sequence( process.mergedGenParticles * process.genParticles2HepMC * process.pseudoTop * process.bfragWgtProducer )

@@ -52,10 +52,7 @@ def setup_ntupler(process, cms):
         process.nTupleEvent +
 
         # Trigger
-        process.triggerSequence2015 +
-
-        # Trigger
-        process.triggerSequence2016 +
+        process.triggerSequence +
 
         # Trigger Objects
         # process.triggerObjectSequence +
