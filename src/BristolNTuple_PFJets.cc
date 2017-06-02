@@ -265,6 +265,7 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 		*tau6.get() = (*njettiness6)[ eventjets->refAt( i ) ];
 
 		// std::cout << "njettiness1 : " << *tau1 << " njettiness2 : " << *tau2 << " njettiness3 : " << *tau3 << " njettiness4 : " << *tau4 << std::endl;
+
        }
 
 	if (jets.isValid()) {

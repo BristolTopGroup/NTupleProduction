@@ -133,6 +133,7 @@ if isTTbarMC:
         # process.metFilters *
         process.badMuonTagger *
         process.processedElectrons *
+        process.addNJettiness *
         # process.reapplyJEC *
         process.electronSelectionAnalyzerSequence *
         process.muonSelectionAnalyzerSequence *
@@ -154,6 +155,7 @@ else:
         # process.metFilters *
         process.badMuonTagger *
         process.processedElectrons *
+        process.addNJettiness *
 
         # process.reapplyJEC *
         process.electronSelectionAnalyzerSequence *

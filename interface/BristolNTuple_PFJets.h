@@ -23,6 +23,7 @@ class BristolNTuple_PFJets : public edm::EDProducer {
   const edm::EDGetTokenT< edm::ValueMap < float > > njettiness4InputTag;
   const edm::EDGetTokenT< edm::ValueMap < float > > njettiness5InputTag;
   const edm::EDGetTokenT< edm::ValueMap < float > > njettiness6InputTag;
+
   const std::string     prefix,suffix;
   const unsigned int    maxSize;
   const double      minJetPtToStore;
