@@ -133,13 +133,14 @@ if isTTbarMC:
         # process.metFilters *
         process.badMuonTagger *
         process.processedElectrons *
-        process.addNJettiness *
         # process.reapplyJEC *
         process.electronSelectionAnalyzerSequence *
         process.muonSelectionAnalyzerSequence *
         process.qcdMuonSelectionAnalyzerSequence *
         process.qcdElectronSelectionAnalyzerSequence *
         process.ttGenEvent *
+        process.selectionCriteriaAnalyzer *
+        process.addNJettiness *
         process.makePseudoTop *
         process.genLeptonFilter *
         process.selectionCriteriaAnalyzer *
@@ -155,7 +156,6 @@ else:
         # process.metFilters *
         process.badMuonTagger *
         process.processedElectrons *
-        process.addNJettiness *
 
         # process.reapplyJEC *
         process.electronSelectionAnalyzerSequence *
