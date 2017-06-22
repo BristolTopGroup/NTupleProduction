@@ -240,6 +240,7 @@ if not isTTbarMC:
 else:
     process.selectionCriteriaAnalyzer.isTTbarMC = cms.bool(True)
 
+
 # 76X datasets are all ReReco so far
 process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults', '', 'PAT')
 
