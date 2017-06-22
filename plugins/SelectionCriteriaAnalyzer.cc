@@ -15,11 +15,8 @@ SelectionCriteriaAnalyzer::SelectionCriteriaAnalyzer(const edm::ParameterSet& iC
     offlineSelectionCriteriaInput_.push_back(consumes<bool>(tag));
     for (edm::InputTag const & tag : iConfig.getParameter< std::vector<edm::InputTag> > ("genSelectionCriteriaInput"))
     genSelectionCriteriaInput_.push_back(consumes<bool>(tag));
-    for (edm::InputTag const & tag : iConfig.getParameter< std::vector<edm::InputTag> > ("particleLevelLeptonSelectionInput"))
-    particleLevelLeptonSelectionInput_.push_back(consumes<bool>(tag));
 
 	produces< vector<unsigned int> >("passesOfflineSelection");
-	produces< vector<unsigned int> >("passesGenSelectionNoLepton");	
 	produces< vector<unsigned int> >("passesGenSelection");	
 	}
 
@@ -33,7 +30,6 @@ SelectionCriteriaAnalyzer::~SelectionCriteriaAnalyzer() {
 bool SelectionCriteriaAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	
 	std::auto_ptr< vector<unsigned int> > passesOfflineSelection(new vector<unsigned int>());
-	std::auto_ptr< vector<unsigned int> > passesGenSelectionNoLepton(new vector<unsigned int>());
 	std::auto_ptr< vector<unsigned int> > passesGenSelection(new vector<unsigned int>());
 
 	bool passesAtLeastOneSelection = true;
@@ -61,7 +57,6 @@ bool SelectionCriteriaAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup
 	}
 
 	iEvent.put(passesOfflineSelection, "passesOfflineSelection");
-	iEvent.put(passesGenSelectionNoLepton, "passesGenSelectionNoLepton");
 	iEvent.put(passesGenSelection, "passesGenSelection");
 	return passesAtLeastOneSelection;
 }

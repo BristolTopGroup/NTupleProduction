@@ -139,8 +139,6 @@ if isTTbarMC:
         process.qcdMuonSelectionAnalyzerSequence *
         process.qcdElectronSelectionAnalyzerSequence *
         process.ttGenEvent *
-        process.selectionCriteriaAnalyzer *
-        process.addNJettiness *
         process.makePseudoTop *
         process.genLeptonFilter *
         process.selectionCriteriaAnalyzer *
