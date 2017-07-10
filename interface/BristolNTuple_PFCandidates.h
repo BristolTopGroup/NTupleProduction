@@ -17,7 +17,8 @@ class BristolNTuple_PFCandidates : public edm::EDProducer {
 
 	private:
 	  	void produce( edm::Event &, const edm::EventSetup & );
-	    const edm::EDGetTokenT<std::vector<pat::PackedCandidate>  > pfcandidateToken_;
+	    // const edm::EDGetTokenT<std::vector<pat::PackedCandidate>  > pfcandidateToken_;
+	    const edm::EDGetTokenT<std::vector<reco::PFCandidate>  > pfcandidateToken_;
 };
 
 #endif

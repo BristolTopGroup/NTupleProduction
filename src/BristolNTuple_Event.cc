@@ -56,7 +56,7 @@ void BristolNTuple_Event::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	std::auto_ptr<bool> isdata(new bool(iEvent.isRealData()));
 	std::auto_ptr<bool> is2016data(new bool(is2016Regime_));
 	std::auto_ptr<unsigned int> nv(new unsigned int(primaryVertices->size()));
-
+	std::cout << "Number of PVs : " << *nv << std::endl;
 	// MET Filters
 	std::auto_ptr<std::vector<bool> > metFilters(new std::vector<bool>() );
 	std::auto_ptr<bool> passesMETFilters(new bool(true));
