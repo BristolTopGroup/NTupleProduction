@@ -127,7 +127,7 @@ process.load('BristolAnalysis.NTupleTools.indices_cff')
 process.load('BristolAnalysis.NTupleTools.userdata.EventUserData_cff')
 process.load('BristolAnalysis.NTupleTools.nJettiness_cff')
 process.load('BristolAnalysis.NTupleTools.GenLeptonFilter_cfi')
-
+print ("Is ttbar MC:",isTTbarMC)
 if isTTbarMC:
     process.makingNTuples = cms.Path(
         # process.metFilters *
@@ -237,7 +237,6 @@ if not isTTbarMC:
     process.selectionCriteriaAnalyzer.particleLevelLeptonSelectionInput = cms.InputTag('','','')
 else:
     process.selectionCriteriaAnalyzer.isTTbarMC = cms.bool(True)
-
 
 # 76X datasets are all ReReco so far
 process.nTupleEvent.metFiltersInputTag = cms.InputTag('TriggerResults', '', 'PAT')
