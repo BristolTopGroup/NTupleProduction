@@ -16,6 +16,7 @@
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_TriggerObjects.h"
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_GenParticles.h"
 #include "BristolAnalysis/NTupleTools/interface/BristolNTuple_GlobalEventVars.h"
+#include "BristolAnalysis/NTupleTools/interface/BristolNTuple_PFCandidates.h"
 
 DEFINE_FWK_MODULE(RootTupleMakerV2_Tree);
 DEFINE_FWK_MODULE(BristolNTuple_GenJets);
@@ -33,4 +34,5 @@ DEFINE_FWK_MODULE(BristolNTuple_Trigger);
 DEFINE_FWK_MODULE(BristolNTuple_TriggerObjects);
 DEFINE_FWK_MODULE(BristolNTuple_GenParticles);
 DEFINE_FWK_MODULE(BristolNTuple_GlobalEventVars);
+DEFINE_FWK_MODULE(BristolNTuple_PFCandidates);
 

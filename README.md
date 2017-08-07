@@ -15,6 +15,7 @@ source bin/env.sh
 ntp setup
 ```
 which should create the folders`external` and `workspace`.
+Some git cms-merge-topics can add unwanted packages (e.g. Fireworks). Remove them from `/workspace/CMSSW_VERSION/src/` before compiling, to save time and effort.
 For available commands and how to use them type `ntp help`.
 
 ### Testing
@@ -23,7 +24,7 @@ To check if all is OK you can run
 ./test/test.sh
 ```
 
-### Geenrate the configs
+### Generate the configs
 python python/crab/generate_datasets.py
 
 ## Notes

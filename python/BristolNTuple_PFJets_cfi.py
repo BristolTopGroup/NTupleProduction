@@ -2,6 +2,13 @@ import FWCore.ParameterSet.Config as cms
 
 nTuplePFJets = cms.EDProducer("BristolNTuple_PFJets",
     InputTag = cms.InputTag('patJetsReapplyJEC'),
+    EventJetTag = cms.InputTag('nTuplePFCands', 'OneJet'),
+    NJettiness1Tag = cms.InputTag('njettiness', 'tau1'),
+    NJettiness2Tag = cms.InputTag('njettiness', 'tau2'),
+    NJettiness3Tag = cms.InputTag('njettiness', 'tau3'),
+    NJettiness4Tag = cms.InputTag('njettiness', 'tau4'),
+    NJettiness5Tag = cms.InputTag('njettiness', 'tau5'),
+    NJettiness6Tag = cms.InputTag('njettiness', 'tau6'),
     Prefix = cms.string('Jets.'),
     Suffix = cms.string(''),
     minJetPtToStore = cms.double(20.),

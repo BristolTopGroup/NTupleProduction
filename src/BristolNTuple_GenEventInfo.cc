@@ -39,6 +39,17 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
     for (edm::InputTag const & tag : iConfig.getParameter< std::vector<edm::InputTag> > ("ttbarDecayFlags"))
     ttbarDecayFlags_.push_back(consumes<bool>(tag));
 			
+    for (edm::InputTag const & tag : iConfig.getParameter< std::vector<edm::InputTag> > ("NJettinessInputTags")) {
+		nJettiness_.push_back(consumes<double>(tag));
+    }
+    
+  	for ( unsigned int n = 0; n != nJettiness_.size(); ++n )
+    {
+      std::ostringstream tauN_str;
+      tauN_str << "tau" << n+1;
+      produces<double>(prefix_ + tauN_str.str().c_str() + suffix_ );
+    }
+
 	produces<unsigned int>(prefix_ + "ProcessID" + suffix_);
 	produces<double>(prefix_ + "PtHat" + suffix_);
 	produces<double>(prefix_ + "PUWeight" + suffix_);
@@ -122,7 +133,6 @@ BristolNTuple_GenEventInfo::BristolNTuple_GenEventInfo(const edm::ParameterSet& 
 	produces<double>(prefix_ + "SingleNeutrinoPy" + suffix_ );
 	produces<double>(prefix_ + "SingleNeutrinoPz" + suffix_ );
 	produces<double>(prefix_ + "SingleNeutrinoEnergy" + suffix_ );
-
 
 }
 
@@ -441,6 +451,19 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 		    *semilepbrUp.get() = semilepbrUpWeight;
 		    *semilepbrDown.get() = semilepbrDownWeight;
 
+
+		    // Store nJettiness varialbes at particle level
+			for (unsigned short i = 0; i < nJettiness_.size(); ++i) {
+
+			    std::ostringstream tauN_str;
+			    tauN_str << "tau" << i + 1;
+
+				edm::Handle<double> tauN_handle;
+				iEvent.getByToken(nJettiness_[i],tauN_handle);
+				// std::cout << "NJettiness : " << i + 1 << " " << *tauN_handle << std::endl; 
+			    std::unique_ptr<double> tauN(new double(*tauN_handle) );
+			    iEvent.put(std::move(tauN), prefix_ + tauN_str.str().c_str() + suffix_ );
+			}
 
 			// Only get top parton info if ttbar decay chain has been identified
 			// t->Ws (~1% of top decays) are not recognised, and are ignored.

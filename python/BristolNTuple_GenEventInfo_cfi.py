@@ -28,4 +28,14 @@ nTupleGenEventInfo = cms.EDProducer("BristolNTuple_GenEventInfo",
     minGenJetPt = cms.double(20.),
     maxGenJetAbsoluteEta = cms.double(999.),
 
+    NJettinessInputTags = cms.VInputTag(
+                                        cms.InputTag('pseudoTop','tau1','Ntuples'),
+                                        cms.InputTag('pseudoTop','tau2','Ntuples'),
+                                        cms.InputTag('pseudoTop','tau3','Ntuples'),
+                                        cms.InputTag('pseudoTop','tau4','Ntuples'),
+                                        cms.InputTag('pseudoTop','tau5','Ntuples'),
+                                        cms.InputTag('pseudoTop','tau6','Ntuples'),
+                                        )
+
+
 )

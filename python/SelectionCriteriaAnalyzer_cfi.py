@@ -32,4 +32,6 @@ selectionCriteriaAnalyzer = cms.EDFilter(
         cms.InputTag('ttSemiLeptonicMuonFilter',     '', 'Ntuples'),
         cms.InputTag('ttSemiLeptonicElectronFilter', '', 'Ntuples'),
     ),
+    particleLevelLeptonSelectionInput=cms.InputTag('genLeptonFilter', 'Event.OneParticleLepton', 'Ntuples'),
+    isTTbarMC = cms.bool(False),
 )

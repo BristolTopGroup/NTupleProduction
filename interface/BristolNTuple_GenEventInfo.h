@@ -45,6 +45,7 @@ private:
   	const edm::EDGetTokenT<LHEEventProduct> lheEventProductToken_;
 	const edm::EDGetTokenT<reco::GenJetCollection > genJetsInputTag_;
 	std::vector<edm::EDGetTokenT<bool> > ttbarDecayFlags_;
+	std::vector<edm::EDGetTokenT<double> > nJettiness_;
 	const edm::EDGetTokenT<std::vector<reco::GenJet>  > pseudoJetsToken_;
 	const edm::EDGetTokenT<edm::ValueMap<float> > upFragToken_;
 	const edm::EDGetTokenT<edm::ValueMap<float> > centralFragToken_;
