@@ -10,6 +10,8 @@
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
 
 class BristolNTuple_PFCandidates : public edm::EDProducer {
 	public:
@@ -19,6 +21,12 @@ class BristolNTuple_PFCandidates : public edm::EDProducer {
 	  	void produce( edm::Event &, const edm::EventSetup & );
 	    // const edm::EDGetTokenT<std::vector<pat::PackedCandidate>  > pfcandidateToken_;
 	    const edm::EDGetTokenT<std::vector<reco::PFCandidate>  > pfcandidateToken_;
+		const edm::EDGetToken electronsToken_;
+		const edm::EDGetToken muonsToken_;
+
+		pat::ElectronCollection electrons_;
+		pat::MuonCollection muons_;
+
 };
 
 #endif

@@ -7,5 +7,9 @@ puppi.vertexName = cms.InputTag('offlineSlimmedPrimaryVertices')
 
 nTuplePFCands = cms.EDProducer("BristolNTuple_PFCandidates",
     # pfCandidatesTag = cms.InputTag("packedPFCandidates"),
-    pfCandidatesTag = cms.InputTag("puppi")
+    pfCandidatesTag = cms.InputTag("puppi"),
+
+    electrons=cms.InputTag("goodElectrons"),
+    muons=cms.InputTag("goodMuons"),
+
 )
