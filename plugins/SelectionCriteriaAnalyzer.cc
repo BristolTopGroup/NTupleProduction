@@ -31,12 +31,12 @@ bool SelectionCriteriaAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup
 	std::auto_ptr< vector<unsigned int> > passesOfflineSelection(new vector<unsigned int>());
 	std::auto_ptr< vector<unsigned int> > passesGenSelection(new vector<unsigned int>());
 
-	bool passesAtLeastOneSelection = true;
+	bool passesAtLeastOneSelection = false;
 
 	if (isTTBarMC_){
 		edm::Handle < bool > particleLevelLeptonSelection;
 		iEvent.getByToken(particleLevelLeptonSelectionInput_, particleLevelLeptonSelection);
-		passesAtLeastOneSelection = *particleLevelLeptonSelection;
+		passesAtLeastOneSelection = passesAtLeastOneSelection || *particleLevelLeptonSelection;
 	}
 
 	for (unsigned short selectionIndex = 0; selectionIndex < offlineSelectionCriteriaInput_.size(); ++selectionIndex) {
@@ -50,7 +50,7 @@ bool SelectionCriteriaAnalyzer::filter(edm::Event& iEvent, const edm::EventSetup
 	for (unsigned short selectionIndex = 0; selectionIndex < genSelectionCriteriaInput_.size(); ++selectionIndex) {
 		bool passesSelection = passesFilter(iEvent, genSelectionCriteriaInput_.at(selectionIndex ));
 		passesAtLeastOneSelection = passesAtLeastOneSelection || passesSelection ;
-		if ( passesAtLeastOneSelection ) {
+		if ( passesSelection ) {
 			passesGenSelection->push_back(selectionIndex+1);
 		}	
 	}

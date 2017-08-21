@@ -24,7 +24,6 @@ public:
 private:
 	//config
 
-	bool isTTbarMC_;
 	std::vector<edm::EDGetTokenT<bool> > offlineSelectionCriteriaInput_;
 	std::vector<edm::EDGetTokenT<bool> > genSelectionCriteriaInput_;
 	edm::EDGetTokenT< bool > particleLevelLeptonSelectionInput_;
