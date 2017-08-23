@@ -127,7 +127,7 @@ process.load('BristolAnalysis.NTupleTools.indices_cff')
 process.load('BristolAnalysis.NTupleTools.userdata.EventUserData_cff')
 process.load('BristolAnalysis.NTupleTools.nJettiness_cff')
 process.load('BristolAnalysis.NTupleTools.GenLeptonFilter_cfi')
-
+print ("Is ttbar MC:",isTTbarMC)
 if isTTbarMC:
     process.makingNTuples = cms.Path(
         # process.metFilters *

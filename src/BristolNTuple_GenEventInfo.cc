@@ -452,7 +452,7 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 		    *semilepbrDown.get() = semilepbrDownWeight;
 
 
-		    // Store nJettiness varialbes at particle level
+		 //    // Store nJettiness varialbes at particle level
 			for (unsigned short i = 0; i < nJettiness_.size(); ++i) {
 
 			    std::ostringstream tauN_str;
@@ -460,7 +460,6 @@ void BristolNTuple_GenEventInfo::produce(edm::Event& iEvent, const edm::EventSet
 
 				edm::Handle<double> tauN_handle;
 				iEvent.getByToken(nJettiness_[i],tauN_handle);
-				// std::cout << "NJettiness : " << i + 1 << " " << *tauN_handle << std::endl; 
 			    std::unique_ptr<double> tauN(new double(*tauN_handle) );
 			    iEvent.put(std::move(tauN), prefix_ + tauN_str.str().c_str() + suffix_ );
 			}

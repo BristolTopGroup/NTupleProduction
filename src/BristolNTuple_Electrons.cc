@@ -30,6 +30,10 @@ BristolNTuple_Electrons::BristolNTuple_Electrons(const edm::ParameterSet& iConfi
   	produces<std::vector<double> >(prefix + "Eta" + suffix);
   	produces<std::vector<double> >(prefix + "Phi" + suffix);
 
+  	produces<std::vector<double> >(prefix + "gsfTrackPt" + suffix);
+  	produces<std::vector<double> >(prefix + "gsfTrackEta" + suffix);
+  	produces<std::vector<double> >(prefix + "gsfTrackPhi" + suffix);
+
 	//extra properties
 	produces < std::vector<int> > (prefix + "Charge" + suffix);
 	produces < std::vector<double> > (prefix + "ecalDrivenMomentum.Px" + suffix);
@@ -137,6 +141,9 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
   	std::auto_ptr<std::vector<double> > pt_store(new std::vector<double>());
   	std::auto_ptr<std::vector<double> > eta_store(new std::vector<double>());
   	std::auto_ptr<std::vector<double> > phi_store(new std::vector<double>());
+  	std::auto_ptr<std::vector<double> > gsftrackpt(new std::vector<double>());
+  	std::auto_ptr<std::vector<double> > gsftracketa(new std::vector<double>());
+  	std::auto_ptr<std::vector<double> > gsftrackphi(new std::vector<double>());
 	//extra properties
 	std::auto_ptr < std::vector<int> > charge(new std::vector<int>());
 	std::auto_ptr < std::vector<double> > ecalDrivenMomentumPx(new std::vector<double>());
@@ -282,6 +289,10 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
 		    eta_store->push_back(it->eta());
 		    phi_store->push_back(it->phi());
 
+		    gsftrackpt->push_back(it->gsfTrack()->pt());
+		    gsftracketa->push_back(it->gsfTrack()->eta());
+		    gsftrackphi->push_back(it->gsfTrack()->phi());
+
 			//extra properties
 			charge->push_back(it->charge());
 			ecalDrivenMomentumPx->push_back(it->ecalDrivenMomentum().Px());
@@ -376,6 +387,10 @@ void BristolNTuple_Electrons::produce(edm::Event& iEvent, const edm::EventSetup&
   	iEvent.put(pt_store, prefix + "Pt" + suffix);
   	iEvent.put(eta_store, prefix + "Eta" + suffix);
   	iEvent.put(phi_store, prefix + "Phi" + suffix);
+
+  	iEvent.put(gsftrackpt, prefix + "gsfTrackPt" + suffix);
+  	iEvent.put(gsftracketa, prefix + "gsfTrackEta" + suffix);
+  	iEvent.put(gsftrackphi, prefix + "gsfTrackPhi" + suffix);
 
 	//extra properties
 	iEvent.put(charge, prefix + "Charge" + suffix);

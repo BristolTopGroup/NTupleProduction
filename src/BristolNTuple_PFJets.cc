@@ -265,7 +265,16 @@ void BristolNTuple_PFJets::produce(edm::Event& iEvent, const edm::EventSetup& iS
 		*tau6.get() = (*njettiness6)[ eventjets->refAt( i ) ];
 
 		// std::cout << "njettiness1 : " << *tau1 << " njettiness2 : " << *tau2 << " njettiness3 : " << *tau3 << " njettiness4 : " << *tau4 << std::endl;
+
        }
+
+   // std::cout << "Reco level tau" << std::endl;
+   // std::cout << "Tau 1 : " << *tau1 << std::endl;
+   // std::cout << "Tau 2 : " << *tau2 << std::endl;
+   // std::cout << "Tau 3 : " << *tau3 << std::endl;
+   // std::cout << "Tau 4 : " << *tau4 << std::endl;
+   // std::cout << "Tau 5 : " << *tau5 << std::endl;
+   // std::cout << "Tau 6 : " << *tau6 << std::endl;
 
 	if (jets.isValid()) {
 		for (std::vector<pat::Jet>::const_iterator it = jets->begin(); it != jets->end(); ++it) {

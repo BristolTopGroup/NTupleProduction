@@ -23,6 +23,7 @@ public:
 	static void fillDescriptions(edm::ConfigurationDescriptions & descriptions);
 private:
 	//config
+
 	std::vector<edm::EDGetTokenT<bool> > offlineSelectionCriteriaInput_;
 	std::vector<edm::EDGetTokenT<bool> > genSelectionCriteriaInput_;
 	edm::EDGetTokenT< bool > particleLevelLeptonSelectionInput_;
