@@ -19,11 +19,11 @@ void BristolNTuple_PFCandidates::produce(edm::Event& iEvent, const edm::EventSet
 
 	std::auto_ptr< std::vector<reco::PFJet> > EventJetCollection( new std::vector<reco::PFJet>());
 
-    edm::Handle<std::vector<pat::PackedCandidate>  > pfCandidateCollection;
-    iEvent.getByToken( pfcandidateToken_, pfCandidateCollection );
-
-    // edm::Handle<std::vector<reco::PFCandidate>  > pfCandidateCollection;
+    // edm::Handle<std::vector<pat::PackedCandidate>  > pfCandidateCollection;
     // iEvent.getByToken( pfcandidateToken_, pfCandidateCollection );
+
+    edm::Handle<std::vector<reco::PFCandidate>  > pfCandidateCollection;
+    iEvent.getByToken( pfcandidateToken_, pfCandidateCollection );
 
 	// Electrons
 	edm::Handle < std::vector<pat::Electron> > electrons;
@@ -49,8 +49,8 @@ void BristolNTuple_PFCandidates::produce(edm::Event& iEvent, const edm::EventSet
 	
 	int numPFCandidates = pfCandidateCollection->size();
 	for ( int iPFCandidate = 0; iPFCandidate < numPFCandidates; ++iPFCandidate ) {
-	    edm::Ptr<pat::PackedCandidate> pfCandidatePtr(pfCandidateCollection, iPFCandidate);
-	    // edm::Ptr<reco::PFCandidate> pfCandidatePtr(pfCandidateCollection, iPFCandidate);
+	    // edm::Ptr<pat::PackedCandidate> pfCandidatePtr(pfCandidateCollection, iPFCandidate);
+	    edm::Ptr<reco::PFCandidate> pfCandidatePtr(pfCandidateCollection, iPFCandidate);
 	    if ( pfCandidatePtr->pt() > 1 && fabs( pfCandidatePtr->eta() ) < 2.4 ) {
 
 	    	if ( hasSignalElectron ) {
