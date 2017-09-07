@@ -13,7 +13,7 @@ nTuplePseudoTopLeptons = cms.EDProducer("BristolNTuple_GenJets",
     InputTag = cms.InputTag('pseudoTop','leptons','Ntuples'),
     Prefix = cms.string('PseudoTopLeptons.'),
     Suffix = cms.string(''),
-    minPt = cms.double(20),
+    minPt = cms.double(15),
     maxAbsoluteEta = cms.double(999),
     MaxSize = cms.uint32(99)
 )
