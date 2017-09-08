@@ -44,6 +44,7 @@ default_settings = {{
     'MuonTrackingScaleFactorsFile': 'Tracking_EfficienciesAndSF_BCDEFGH.root',
     'ElectronTriggerScaleFactorsFile': 'SF_HLT_Ele32_eta2p1.root',
     'ElectronIdScaleFactorsFile' : 'egammaEffi.txt_EGM2D_id.root',
+    'ElectronIdScaleFactorsFile_etaBins' : 'egammaEffi.txt_EGM2D_id_etaBins.root',
     'ElectronRecoScaleFactorsFile' : 'egammaEffi.txt_EGM2D_reco.root',
     'TTbarLikelihoodFile': 'LikelihoodInputAnalyserOutput.root',
     'BTagEfficiencyFile': 'BTagEfficiency.root',
@@ -110,6 +111,7 @@ PUFile_down = opj(BAT_DATA, settings['PUFile_down'] )
 getMuonScaleFactorsFromFile = True
 getElectronScaleFactorsFromFile = True
 ElectronIdScaleFactorsFile = opj(BAT_DATA, 'egammaEffi.txt_EGM2D_id.root')
+ElectronIdScaleFactorsFile_etaBins = opj(BAT_DATA, 'egammaEffi.txt_EGM2D_id_etaBins.root')
 ElectronRecoScaleFactorsFile = opj(BAT_DATA, 'egammaEffi.txt_EGM2D_reco.root')
 ElectronTriggerScaleFactorsFile = opj(BAT_DATA, 'SF_HLT_Ele32_eta2p1.root')
 MuonIdScaleFactorsFile = opj(BAT_DATA, 'EfficienciesAndSF_COMBINED.root')
