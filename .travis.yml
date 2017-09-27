@@ -14,7 +14,7 @@ install:
  - source bin/env.sh
 
 script:
-  - python python/ntp/utils/test/test_utils.py
+  - nosetests -vs python/ntp/test
   - ./test/test.sh
   - sudo docker build -t kreczko/ntp .
   - sudo docker run -t -v /software:/software --privileged=true kreczko/ntp

@@ -48,26 +48,13 @@ from ntp import NTPROOT
 from ntp.commands.setup import CMSSW_SRC, TMPDIR, RESULTDIR, LOGDIR
 from ntp.commands.run import Command as ParentCommand
 from crab.util import find_input_files
+from crab.datasets import get_datasets
 from .template import PYCONF
 
 LOG = logging.getLogger(__name__)
 PSET = os.path.join(TMPDIR, 'pset.py')
 OUTPUT_FILE = os.path.join(RESULTDIR, '{ds}_ntuple.root')
 BTAG_CALIB_FILE = os.path.join(NTPROOT, 'data/BTagSF/CSVv2_Moriond17_B_H.csv')
-
-
-def get_datasets(campaign):
-    from crab.datasets import create_sample_list
-    datasets = []
-
-    samples = create_sample_list()
-    if campaign in samples:
-        datasets = samples[campaign]
-    else:
-        LOG.error(
-            'Cannot find datasets for campaign {0}'.format(campaign))
-        return False
-    return datasets
 
 
 class Command(ParentCommand):
@@ -126,7 +113,7 @@ class Command(ParentCommand):
     def __add_output_file(self, dataset, campaign, suffix):
         if self.__variables['output_file']:
             output_file = self.__variables['output_file']
-        else: 
+        else:
             output_file = '_'.join([dataset, campaign, suffix])
         output_file = os.path.join(RESULTDIR, os.path.basename(output_file))
 
@@ -143,7 +130,8 @@ class Command(ParentCommand):
         if path != '':
             input_files = ParentCommand.input_files_from_path(path)
             # dress them for CMSSW (unless they have a global path)
-            input_files = ['file://{0}'.format(f) if not f.startswith('/store') else f for f in input_files]
+            input_files = [
+                'file://{0}'.format(f) if not f.startswith('/store') else f for f in input_files]
         else:
             input_files = find_input_files(
                 campaign, dataset, self.__variables, LOG

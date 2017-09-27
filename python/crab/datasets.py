@@ -1,4 +1,6 @@
 from __future__ import print_function
+import logging
+logger = logging.getLogger(__name__)
 
 DATASETS = {
     "25ns": {
@@ -436,6 +438,18 @@ def datasets_to_str(datasets):
     """
     import json
     return str(json.dumps(datasets, indent=4, sort_keys=True))
+
+def get_datasets(campaign):
+    datasets = []
+
+    samples = create_sample_list()
+    if campaign in samples:
+        datasets = samples[campaign]
+    else:
+        logger.error(
+            'Cannot find datasets for campaign {0}'.format(campaign))
+        return False
+    return datasets
 
 if __name__ == '__main__':
     samples = create_sample_list()

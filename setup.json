@@ -61,7 +61,8 @@
 			"setup-cmds": [
 				"cd {CMSSW_SRC}/EgammaAnalysis/ElectronTools/data/",
 				"git clone git@github.com:ECALELFS/ScalesSmearings.git",
-				"cd -"
+				"cd -",
+				"rm -fr {CMSSW_SRC}/DQMOffline {CMSSW_SRC}/CalibMuon"
 			]
 		}
 	]
