@@ -235,6 +235,7 @@ if not isTTbarMC:
     print('Not a ttbar MC - removing TTbar specific modules')
     process.selectionCriteriaAnalyzer.genSelectionCriteriaInput = cms.VInputTag()
     process.selectionCriteriaAnalyzer.particleLevelLeptonSelectionInput = cms.InputTag('','','')
+    process.nTupleGenEventInfo.NJettinessInputTags = cms.VInputTag()
 else:
     process.selectionCriteriaAnalyzer.isTTbarMC = cms.bool(True)
 
